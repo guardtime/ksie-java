@@ -1,13 +1,12 @@
 package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.datafile.ContainerDataFile;
+import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.AnnotationInfoManifest;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.DataFilesManifest;
 import com.guardtime.container.manifest.SignatureManifest;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class Builder {
@@ -18,10 +17,10 @@ public class Builder {
 
     private List<AnnotationInfoManifest> annotationInfoManifests;
 
-    private List<ContainerDataFile> dataFiles;
+    private List<ContainerDocument> dataFiles;
     private List<ContainerAnnotation> annotations;
 
-    public Builder(List<ContainerDataFile> dataFiles,List<ContainerAnnotation> annotations) {
+    public Builder(List<ContainerDocument> dataFiles,List<ContainerAnnotation> annotations) {
         this.annotations = annotations;
         this.dataFiles = dataFiles;
     }
@@ -46,8 +45,8 @@ public class Builder {
         return this;
     }
 
-    public ZipBlockchainContainer build() {
-        ZipBlockchainContainer container = new ZipBlockchainContainer(dataFiles, annotations);
+    public ZipBlockChainContainer build() {
+        ZipBlockChainContainer container = new ZipBlockChainContainer(dataFiles, annotations);
         container.setAnnotationsManifest(annotationsManifest);
         container.setDataFilesManifest(dataFilesManifest);
         container.setSignatureManifest(signatureManifest);

@@ -1,4 +1,5 @@
-package com.guardtime.container.annotation;
+package com.guardtime.container.datafile;
+
 
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -6,18 +7,15 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import java.io.IOException;
 import java.io.InputStream;
 
-public interface ContainerAnnotation {
+public interface ContainerDocument {
 
-    ContainerAnnotationType getAnnotationType();
+    String getFileName();
 
     String getMimeType();
 
-    String getDomain();
-
-    InputStream getInputStream();
+    InputStream getInputStream() throws IOException;
 
     DataHash getDataHash(HashAlgorithm algorithm) throws IOException;
 
-    String getUri();
-
 }
+

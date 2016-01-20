@@ -1,16 +1,17 @@
 package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.datafile.ContainerDataFile;
+import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.AnnotationInfoManifest;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.DataFilesManifest;
 import com.guardtime.container.manifest.SignatureManifest;
-import com.guardtime.container.packaging.BlockchainContainer;
+import com.guardtime.container.packaging.BlockChainContainer;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.util.Util;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,42 +20,44 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-class ZipBlockchainContainer implements BlockchainContainer {
+class ZipBlockChainContainer implements BlockChainContainer {
+
+    private static final String META_INF_DIR_NAME = "/META-INF/";
 
     private DataFilesManifest dataFilesManifest;
     private AnnotationsManifest annotationsManifest;
     private SignatureManifest signatureManifest;
     private List<AnnotationInfoManifest> annotationInfoManifests;
 
-    private List<ContainerDataFile> dataFiles = new LinkedList<>();
-    private List<ContainerAnnotation> annotations = new LinkedList<>();
+    private List<ContainerDocument> dataFiles;
+    private List<ContainerAnnotation> annotations;
     private List<ContainerSignature> signatures = new LinkedList<>();
 
     private MimeTypeEntry mimeType;
 
-    public ZipBlockchainContainer(List<ContainerDataFile> dataFiles, List<ContainerAnnotation> annotations) {
+    ZipBlockChainContainer(List<ContainerDocument> dataFiles, List<ContainerAnnotation> annotations) {
         this.dataFiles = dataFiles;
         this.annotations = annotations;
         this.mimeType = new MimeTypeEntry();
     }
 
-    public void setAnnotationsManifest(AnnotationsManifest annotationsManifest) {
+    void setAnnotationsManifest(AnnotationsManifest annotationsManifest) {
         this.annotationsManifest = annotationsManifest;
     }
 
-    public void setDataFilesManifest(DataFilesManifest dataFilesManifest) {
+    void setDataFilesManifest(DataFilesManifest dataFilesManifest) {
         this.dataFilesManifest = dataFilesManifest;
     }
 
-    public void setSignatureManifest(SignatureManifest signatureManifest) {
+    void setSignatureManifest(SignatureManifest signatureManifest) {
         this.signatureManifest = signatureManifest;
     }
 
-    public void setAnnotationInfoManifests(List<AnnotationInfoManifest> annotationInfoManifests) {
+    void setAnnotationInfoManifests(List<AnnotationInfoManifest> annotationInfoManifests) {
         this.annotationInfoManifests = annotationInfoManifests;
     }
 
-    public DataHash getSignatureInputHash() {
+    DataHash getSignatureInputHash() {
         return signatureManifest.getDataHash();
     }
 
@@ -64,12 +67,34 @@ class ZipBlockchainContainer implements BlockchainContainer {
 
     @Override
     public void writeTo(OutputStream output) throws IOException {
-        ZipOutputStream zipOutputStream = new ZipOutputStream(output);
-        writeEntry(new ZipEntry(mimeType.getUri()), mimeType.getInputStream(), zipOutputStream);
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(output))) {
+            writeEntry(new ZipEntry(mimeType.getUri()), mimeType.getInputStream(), zipOutputStream);
+            writeDocuments(zipOutputStream);
+            writeAnnotations(zipOutputStream);
+            writeEntry(new ZipEntry(dataFilesManifest.getUri()), dataFilesManifest.getInputStream(), zipOutputStream);
+            writeAnnotationsInfoManifests(zipOutputStream);
+            writeEntry(new ZipEntry(annotationsManifest.getUri()), annotationsManifest.getInputStream(), zipOutputStream);
+            writeEntry(new ZipEntry(signatureManifest.getUri()), signatureManifest.getInputStream(), zipOutputStream);
+            // TODO write signatures
+        }
+    }
 
-        writeEntry(new ZipEntry(dataFilesManifest.getUri()), dataFilesManifest.getInputStream(), zipOutputStream);
-        writeEntry(new ZipEntry(annotationsManifest.getUri()), annotationsManifest.getInputStream(), zipOutputStream);
-        writeEntry(new ZipEntry(signatureManifest.getUri()), signatureManifest.getInputStream(), zipOutputStream);
+    private void writeAnnotationsInfoManifests(ZipOutputStream zipOutputStream) throws IOException {
+        for (AnnotationInfoManifest annotationInfoManifest : annotationInfoManifests) {
+            writeEntry(new ZipEntry(annotationInfoManifest.getUri()), annotationInfoManifest.getInputStream(), zipOutputStream);
+        }
+    }
+
+    private void writeAnnotations(ZipOutputStream zipOutputStream) throws IOException {
+        for (ContainerAnnotation annotation : annotations) {
+            writeEntry(new ZipEntry(annotation.getUri()), annotation.getInputStream(), zipOutputStream);
+        }
+    }
+
+    private void writeDocuments(ZipOutputStream zipOutputStream) throws IOException {
+        for (ContainerDocument dataFile : dataFiles) {
+            writeEntry(new ZipEntry(dataFile.getFileName()), dataFile.getInputStream(), zipOutputStream);
+        }
     }
 
     private void writeEntry(ZipEntry entry, InputStream input, ZipOutputStream output) throws IOException {

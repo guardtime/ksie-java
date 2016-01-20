@@ -2,9 +2,9 @@ package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.datafile.ContainerDataFile;
+import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.*;
-import com.guardtime.container.packaging.BlockchainContainerPackagingFactory;
+import com.guardtime.container.packaging.BlockChainContainerPackagingFactory;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.util.Util;
@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ZipContainerPackagingFactory implements BlockchainContainerPackagingFactory<ZipBlockchainContainer> {
+public class ZipContainerPackagingFactory implements BlockChainContainerPackagingFactory<ZipBlockChainContainer> {
 
     private final SignatureFactory signatureFactory;
     private final ContainerManifestFactory manifestFactory;
@@ -27,20 +27,20 @@ public class ZipContainerPackagingFactory implements BlockchainContainerPackagin
     }
 
     @Override
-    public ZipBlockchainContainer read(InputStream input) {
+    public ZipBlockChainContainer read(InputStream input) {
 
         return null;
     }
 
     @Override
-    public ZipBlockchainContainer create(List<ContainerDataFile> files, List<ContainerAnnotation> annotations) throws BlockChainContainerException {
+    public ZipBlockChainContainer create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws BlockChainContainerException {
         Util.notEmpty(files, "Data files");
         DataFilesManifest dataFilesManifest = manifestFactory.createDataFilesManifest(files);
         List<AnnotationInfoManifest> annotationInfoManifests = createAnnotationInfoManifests(annotations, dataFilesManifest);
         AnnotationsManifest annotationsManifest = manifestFactory.createAnnotationsManifest(annotationInfoManifests);
         SignatureManifest signatureManifest = manifestFactory.createSignatureManifest(dataFilesManifest, annotationsManifest);
 
-        ZipBlockchainContainer container = new Builder(files, annotations).
+        ZipBlockChainContainer container = new Builder(files, annotations).
                 withDataFilesManifest(dataFilesManifest).
                 withAnnotationInfoManifests(annotationInfoManifests).
                 withAnnotationsManifest(annotationsManifest).

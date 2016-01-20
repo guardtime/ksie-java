@@ -2,7 +2,7 @@ package com.guardtime.container.manifest;
 
 
 import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.datafile.ContainerDataFile;
+import com.guardtime.container.datafile.ContainerDocument;
 
 import java.io.InputStream;
 import java.util.List;
@@ -11,7 +11,7 @@ public interface ContainerManifestFactory<S extends SignatureManifest,D extends 
 
     S createSignatureManifest(D dataFilesManifest, A annotationManifest);
 
-    D createDataFilesManifest(List<ContainerDataFile> files);
+    D createDataFilesManifest(List<ContainerDocument> files);
 
     A createAnnotationsManifest(List<AI> annotationManifests);
 
