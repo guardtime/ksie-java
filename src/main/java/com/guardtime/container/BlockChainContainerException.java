@@ -1,6 +1,6 @@
 package com.guardtime.container;
 
-public class BlockChainContainerException extends Exception {
+public class BlockChainContainerException extends RuntimeException {
 
     public BlockChainContainerException(Throwable cause) {
         super(cause);

@@ -19,7 +19,7 @@ public interface ContainerManifestFactory<S extends SignatureManifest,D extends 
 
     S readSignatureManifest(InputStream input);
 
-    D readFileeManifest(InputStream input);
+    D readDataFilesManifest(InputStream input);
 
     A readAnnotationsManifest(InputStream input);
 
