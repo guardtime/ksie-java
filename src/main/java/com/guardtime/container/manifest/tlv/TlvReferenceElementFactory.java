@@ -49,7 +49,7 @@ public class TlvReferenceElementFactory {
                     withType(TlvTypes.ANNOTATION_INFO_REFERENCE).
                     withUriElement(annotationInfo.getUri()).
                     withHashElement(Util.hash(annotationInfo.getInputStream(), DEFAULT_HASH_ALGORITHM)).
-                    withMimeTypeElement(annotationInfo.getAnnotation().getMimeType()).
+                    withMimeTypeElement(annotationInfo.getAnnotation().getAnnotationType().getContent()).
                     build();
         } catch (TLVParserException e) {
             throw new BlockChainContainerException(e);

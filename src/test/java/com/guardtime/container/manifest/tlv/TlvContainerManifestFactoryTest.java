@@ -1,6 +1,7 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
+import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.AnnotationInfoManifest;
 import com.guardtime.ksi.hashing.DataHash;
@@ -14,6 +15,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -44,22 +46,44 @@ public class TlvContainerManifestFactoryTest {
     @Mock
     private ContainerAnnotation mockAnnotation;
 
+    @Mock
+    private TlvAnnotationInfoManifest mockAnnotationInfoManifest;
+
+    @Mock
+    private ContainerDocument mockDocument;
+
     private TlvContainerManifestFactory factory;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        // TODO: Code cleanup
         this.dataHash = new DataHash(HashAlgorithm.SHA2_256, "12345678901234567890123456789012".getBytes());
-        when(mockDataManifest.getInputStream()).thenReturn(new ByteArrayInputStream("dataManifestStuffGoesHereOk".getBytes()));
-        when(mockAnnotationsManifest.getInputStream()).thenReturn(new ByteArrayInputStream("annotationsManifestStuffGoesHereOk".getBytes()));
-        when(mockAnnotation.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHash);
-        when(mockAnnotation.getMimeType()).thenReturn("non-removable");
+        when(mockDataManifest.getInputStream()).thenReturn(new ByteArrayInputStream("".getBytes())); // TODO: Maybe give valid TLV stream ?
+        when(mockAnnotationsManifest.getInputStream()).thenReturn(new ByteArrayInputStream("".getBytes())); // TODO: Maybe give valid TLV stream ?
+
         factory = new TlvContainerManifestFactory();
+    }
+
+    private void setUpMockAnnotation() throws IOException {
+        when(mockAnnotation.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHash);
+        when(mockAnnotation.getAnnotationType()).thenReturn(ContainerAnnotationType.NON_REMOVABLE);
+    }
+
+    private void setUpMockAnnotationInfoManifest() throws IOException {
+        setUpMockAnnotation();
+        when(mockAnnotationInfoManifest.getInputStream()).thenReturn(new ByteArrayInputStream("".getBytes())); // TODO: Maybe give valid TLV stream ?
+        when(mockAnnotationInfoManifest.getAnnotation()).thenReturn(mockAnnotation);
+    }
+
+    private void setUpMockDocument() throws IOException {
+        when(mockDocument.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHash);
+        when(mockDocument.getFileName()).thenReturn("RandomFileIsAwesome.txt");
+        when(mockDocument.getMimeType()).thenReturn("application/text");
     }
 
     @Test(expected = NullPointerException.class)
     public void testCreateAnnotationInfoManifestWithoutDataManifest_ThrowsNullPointerException() throws Exception {
+        setUpMockAnnotation();
         factory.createAnnotationManifest(null, mockAnnotation);
     }
 
@@ -70,6 +94,7 @@ public class TlvContainerManifestFactoryTest {
 
     @Test
     public void testCreateAnnotationInfoManifest() throws Exception {
+        setUpMockAnnotation();
         TlvAnnotationInfoManifest manifest = factory.createAnnotationManifest(mockDataManifest, mockAnnotation);
 
         assertNotNull("Manifest was not created", manifest);
@@ -89,12 +114,10 @@ public class TlvContainerManifestFactoryTest {
 
     @Test
     public void testCreateAnnotationsManifest() throws Exception {
-        LinkedList<TlvAnnotationInfoManifest> annotations = new LinkedList<>();
-        TlvAnnotationInfoManifest mockAnnotationInfoManifest = Mockito.mock(TlvAnnotationInfoManifest.class);
-        when(mockAnnotationInfoManifest.getInputStream()).thenReturn(new ByteArrayInputStream("dataManifestStuffGoesHereOk".getBytes()));
-        when(mockAnnotationInfoManifest.getAnnotation()).thenReturn(mockAnnotation);
-        annotations.add(mockAnnotationInfoManifest);
-        TlvAnnotationsManifest manifest = factory.createAnnotationsManifest(annotations, "Non-important-for-test");
+        setUpMockAnnotationInfoManifest();
+        LinkedList<TlvAnnotationInfoManifest> annotationManifests = new LinkedList<>();
+        annotationManifests.add(mockAnnotationInfoManifest);
+        TlvAnnotationsManifest manifest = factory.createAnnotationsManifest(annotationManifests, "Non-important-for-test");
 
         assertNotNull("Manifest was not created", manifest);
 
@@ -111,11 +134,8 @@ public class TlvContainerManifestFactoryTest {
 
     @Test
     public void testCreateDataFilesManifest() throws Exception {
+        setUpMockDocument();
         LinkedList<ContainerDocument> documents = new LinkedList<>();
-        ContainerDocument mockDocument = Mockito.mock(ContainerDocument.class);
-        when(mockDocument.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHash);
-        when(mockDocument.getFileName()).thenReturn("RandomFileIsAwesome.txt");
-        when(mockDocument.getMimeType()).thenReturn("application/text");
         documents.add(mockDocument);
         TlvDataFilesManifest manifest = factory.createDataFilesManifest(documents, "Non-important-for-test");
 

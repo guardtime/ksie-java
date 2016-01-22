@@ -10,7 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-class TlvAnnotationInfoManifest implements AnnotationInfoManifest {
+public class TlvAnnotationInfoManifest implements AnnotationInfoManifest {
     private static final byte[] MAGIC = "KSIEANNT".getBytes(); // TODO: Replace with bytes according to spec
     private static final String TLV_EXTENSION = "tlv";
     private ContainerAnnotation annotation;

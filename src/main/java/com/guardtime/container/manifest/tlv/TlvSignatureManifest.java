@@ -2,7 +2,9 @@ package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.manifest.SignatureManifest;
+import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVParserException;
 
 import java.io.ByteArrayInputStream;
@@ -23,8 +25,8 @@ public class TlvSignatureManifest implements SignatureManifest {
     }
 
     @Override
-    public DataHash getDataHash() {
-        return null;
+    public DataHash getDataHash(HashAlgorithm algorithm) {
+        return Util.hash(getInputStream(), algorithm);
     }
 
     @Override

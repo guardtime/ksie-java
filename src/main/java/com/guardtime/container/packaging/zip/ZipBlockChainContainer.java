@@ -9,6 +9,7 @@ import com.guardtime.container.manifest.SignatureManifest;
 import com.guardtime.container.packaging.BlockChainContainer;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.util.Util;
 
 import java.io.BufferedOutputStream;
@@ -56,7 +57,7 @@ class ZipBlockChainContainer implements BlockChainContainer {
     }
 
     DataHash getSignatureInputHash() {
-        return signatureManifest.getDataHash();
+        return signatureManifest.getDataHash(HashAlgorithm.SHA2_256);
     }
 
     public void addSignature(ContainerSignature signature) {
