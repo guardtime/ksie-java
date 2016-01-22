@@ -22,6 +22,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 public class TlvContainerManifestFactoryTest {
+    // TODO: Review constants when spec is final
     private static final int SIGNATURE_REFERENCE_TYPE = 0xb06;
     private static final int DATA_MANIFEST_REFERENCE_TYPE = 0xb01;
     private static final int ANNOTATIONS_MANIFEST_REFERENCE_TYPE = 0xb02;
@@ -48,9 +49,10 @@ public class TlvContainerManifestFactoryTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+        // TODO: Code cleanup
         this.dataHash = new DataHash(HashAlgorithm.SHA2_256, "12345678901234567890123456789012".getBytes());
         when(mockDataManifest.getInputStream()).thenReturn(new ByteArrayInputStream("dataManifestStuffGoesHereOk".getBytes()));
-        when(mockAnnotationsManifest.getInputStream()).thenReturn(new ByteArrayInputStream("dataManifestStuffGoesHereOk".getBytes()));
+        when(mockAnnotationsManifest.getInputStream()).thenReturn(new ByteArrayInputStream("annotationsManifestStuffGoesHereOk".getBytes()));
         when(mockAnnotation.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHash);
         when(mockAnnotation.getMimeType()).thenReturn("non-removable");
         factory = new TlvContainerManifestFactory();
@@ -82,7 +84,7 @@ public class TlvContainerManifestFactoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateAnnotationsManifestWithoutAnnotationInfoManifests_ThrowsIllegalArgumentException() throws Exception {
-        factory.createAnnotationsManifest(new LinkedList<AnnotationInfoManifest>());
+        factory.createAnnotationsManifest(new LinkedList<AnnotationInfoManifest>(), "Non-important-for-test");
     }
 
     @Test
@@ -92,7 +94,7 @@ public class TlvContainerManifestFactoryTest {
         when(mockAnnotationInfoManifest.getInputStream()).thenReturn(new ByteArrayInputStream("dataManifestStuffGoesHereOk".getBytes()));
         when(mockAnnotationInfoManifest.getAnnotation()).thenReturn(mockAnnotation);
         annotations.add(mockAnnotationInfoManifest);
-        TlvAnnotationsManifest manifest = factory.createAnnotationsManifest(annotations);
+        TlvAnnotationsManifest manifest = factory.createAnnotationsManifest(annotations, "Non-important-for-test");
 
         assertNotNull("Manifest was not created", manifest);
 
@@ -104,7 +106,7 @@ public class TlvContainerManifestFactoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateDataFilesManifestWithoutDataFiles_ThrowsIllegalArgumentException() throws Exception {
-        factory.createDataFilesManifest(new LinkedList<ContainerDocument>());
+        factory.createDataFilesManifest(new LinkedList<ContainerDocument>(), "Non-important-for-test");
     }
 
     @Test
@@ -115,7 +117,7 @@ public class TlvContainerManifestFactoryTest {
         when(mockDocument.getFileName()).thenReturn("RandomFileIsAwesome.txt");
         when(mockDocument.getMimeType()).thenReturn("application/text");
         documents.add(mockDocument);
-        TlvDataFilesManifest manifest = factory.createDataFilesManifest(documents);
+        TlvDataFilesManifest manifest = factory.createDataFilesManifest(documents, "Non-important-for-test");
 
         assertNotNull("Manifest was not created", manifest);
 
@@ -127,17 +129,17 @@ public class TlvContainerManifestFactoryTest {
 
     @Test(expected = NullPointerException.class)
     public void testCreateSignatureManifestWithoutDataManifest_ThrowsNullPointerException() throws Exception {
-        factory.createSignatureManifest(null, mockAnnotationsManifest);
+        factory.createSignatureManifest(null, mockAnnotationsManifest, "Non-important-for-test");
     }
 
     @Test(expected = NullPointerException.class)
     public void testCreateSignatureManifestWithoutAnnotationsManifest_ThrowsNullPointerException() throws Exception {
-        factory.createSignatureManifest(mockDataManifest, null);
+        factory.createSignatureManifest(mockDataManifest, null, "Non-important-for-test");
     }
 
     @Test
     public void testCreateSignatureManifest() throws Exception {
-        TlvSignatureManifest manifest = factory.createSignatureManifest(mockDataManifest, mockAnnotationsManifest);
+        TlvSignatureManifest manifest = factory.createSignatureManifest(mockDataManifest, mockAnnotationsManifest, "Non-important-for-test");
 
         assertNotNull("Manifest was not created", manifest);
 

@@ -22,8 +22,6 @@ import java.util.zip.ZipOutputStream;
 
 class ZipBlockChainContainer implements BlockChainContainer {
 
-    private static final String META_INF_DIR_NAME = "/META-INF/";
-
     private DataFilesManifest dataFilesManifest;
     private AnnotationsManifest annotationsManifest;
     private SignatureManifest signatureManifest;

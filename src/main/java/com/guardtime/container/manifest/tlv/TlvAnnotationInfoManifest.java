@@ -3,7 +3,6 @@ package com.guardtime.container.manifest.tlv;
 import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.manifest.AnnotationInfoManifest;
-import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 
 import java.io.ByteArrayInputStream;
@@ -13,10 +12,11 @@ import java.io.InputStream;
 
 class TlvAnnotationInfoManifest implements AnnotationInfoManifest {
     private static final byte[] MAGIC = "KSIEANNT".getBytes(); // TODO: Replace with bytes according to spec
+    private static final String TLV_EXTENSION = "tlv";
     private ContainerAnnotation annotation;
     private TlvDataFilesManifest dataManifest;
 
-    public TlvAnnotationInfoManifest(ContainerAnnotation annotation, TlvDataFilesManifest dataManifest) throws BlockChainContainerException{
+    public TlvAnnotationInfoManifest(ContainerAnnotation annotation, TlvDataFilesManifest dataManifest) throws BlockChainContainerException {
         this.annotation = annotation;
         this.dataManifest = dataManifest;
     }
@@ -36,8 +36,8 @@ class TlvAnnotationInfoManifest implements AnnotationInfoManifest {
 
     @Override
     public String getUri() {
-        // TODO: Should be pretty much the same as the annotation has only with different ending.
-        return null;
+        String baseUri = annotation.getUri();
+        return baseUri.substring(0, annotation.getUri().lastIndexOf(".")) + TLV_EXTENSION;
     }
 
     public ContainerAnnotation getAnnotation() {

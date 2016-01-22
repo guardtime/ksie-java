@@ -43,10 +43,10 @@ public class AbstractBlockChainContainerTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        when(mockedManifestFactory.createAnnotationsManifest(Mockito.anyListOf(AnnotationInfoManifest.class))).thenReturn(mockedAnnotationsManifest);
+        when(mockedManifestFactory.createAnnotationsManifest(Mockito.anyListOf(AnnotationInfoManifest.class), Mockito.anyString())).thenReturn(mockedAnnotationsManifest);
         when(mockedManifestFactory.createAnnotationManifest(Mockito.any(DataFilesManifest.class), Mockito.any(ContainerAnnotation.class))).thenReturn(annotationInfoManifest);
-        when(mockedManifestFactory.createDataFilesManifest(Mockito.anyListOf(ContainerDocument[].class))).thenReturn(mockedDataFileManifest);
-        when(mockedManifestFactory.createSignatureManifest(Mockito.any(DataFilesManifest.class), Mockito.any(AnnotationsManifest.class))).thenReturn(mockedSignatureManifest);
+        when(mockedManifestFactory.createDataFilesManifest(Mockito.anyListOf(ContainerDocument[].class), Mockito.anyString())).thenReturn(mockedDataFileManifest);
+        when(mockedManifestFactory.createSignatureManifest(Mockito.any(DataFilesManifest.class), Mockito.any(AnnotationsManifest.class), Mockito.anyString())).thenReturn(mockedSignatureManifest);
     }
 
 }

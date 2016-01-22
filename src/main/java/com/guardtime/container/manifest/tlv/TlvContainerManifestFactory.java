@@ -1,7 +1,7 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.manifest.*;
+import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.util.Util;
 
 import java.io.InputStream;
@@ -9,17 +9,19 @@ import java.util.List;
 
 public class TlvContainerManifestFactory implements ContainerManifestFactory<TlvSignatureManifest, TlvDataFilesManifest, TlvAnnotationsManifest, TlvAnnotationInfoManifest> {
 
+    private static final String TLV_EXTENSION = ".tlv";
+
     @Override
-    public TlvSignatureManifest createSignatureManifest(TlvDataFilesManifest dataFilesManifest, TlvAnnotationsManifest annotationManifest) {
+    public TlvSignatureManifest createSignatureManifest(TlvDataFilesManifest dataFilesManifest, TlvAnnotationsManifest annotationManifest, String manifestUri) {
         Util.notNull(dataFilesManifest, "Document manifest");
         Util.notNull(annotationManifest, "Annotations manifest");
-        return new TlvSignatureManifest(dataFilesManifest, annotationManifest);
+        return new TlvSignatureManifest(dataFilesManifest, annotationManifest, manifestUri + TLV_EXTENSION);
     }
 
     @Override
-    public TlvAnnotationsManifest createAnnotationsManifest(List annotationManifests) {
+    public TlvAnnotationsManifest createAnnotationsManifest(List annotationManifests, String manifestUri) {
         Util.notEmpty(annotationManifests, "Annotation info manifests list");
-        return new TlvAnnotationsManifest(annotationManifests);
+        return new TlvAnnotationsManifest(annotationManifests, manifestUri + TLV_EXTENSION);
     }
 
     @Override
@@ -30,9 +32,9 @@ public class TlvContainerManifestFactory implements ContainerManifestFactory<Tlv
     }
 
     @Override
-    public TlvDataFilesManifest createDataFilesManifest(List files) {
+    public TlvDataFilesManifest createDataFilesManifest(List files, String manifestUri) {
         Util.notEmpty(files, "Document files list");
-        return new TlvDataFilesManifest(files);
+        return new TlvDataFilesManifest(files, manifestUri + TLV_EXTENSION);
     }
 
     @Override

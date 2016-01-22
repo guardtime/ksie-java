@@ -14,14 +14,16 @@ import java.util.List;
 public class TlvDataFilesManifest implements DataFilesManifest {
     private static final byte[] MAGIC = "KSIEDAMF".getBytes(); // TODO: Replace with bytes according to spec
     private List<ContainerDocument> documents;
+    private String manifestUri;
 
-    public TlvDataFilesManifest(List<ContainerDocument> documents) {
+    public TlvDataFilesManifest(List<ContainerDocument> documents, String manifestUri) {
         this.documents = documents;
+        this.manifestUri = manifestUri;
     }
 
     @Override
     public String getUri() {
-        return null;
+        return manifestUri;
     }
 
     @Override

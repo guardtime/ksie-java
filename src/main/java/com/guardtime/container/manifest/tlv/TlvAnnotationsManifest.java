@@ -13,9 +13,11 @@ import java.util.List;
 public class TlvAnnotationsManifest implements AnnotationsManifest {
     private static final byte[] MAGIC = "KSIEANMF".getBytes(); // TODO: Replace with bytes according to spec
     private List<TlvAnnotationInfoManifest> annotationReferences;
+    private String manifestUri;
 
-    public TlvAnnotationsManifest(List<TlvAnnotationInfoManifest> annotationReferences) {
+    public TlvAnnotationsManifest(List<TlvAnnotationInfoManifest> annotationReferences, String manifestUri) {
         this.annotationReferences = annotationReferences;
+        this.manifestUri = manifestUri;
     }
 
     @Override
@@ -34,7 +36,6 @@ public class TlvAnnotationsManifest implements AnnotationsManifest {
 
     @Override
     public String getUri() {
-        // TODO: Should be pretty much the same as the annotation has only with different ending.
-        return null;
+        return manifestUri;
     }
 }

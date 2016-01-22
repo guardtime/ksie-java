@@ -7,13 +7,13 @@ import com.guardtime.container.datafile.ContainerDocument;
 import java.io.InputStream;
 import java.util.List;
 
-public interface ContainerManifestFactory<S extends SignatureManifest,D extends DataFilesManifest,A extends AnnotationsManifest, AI extends AnnotationInfoManifest> {
+public interface ContainerManifestFactory<S extends SignatureManifest, D extends DataFilesManifest, A extends AnnotationsManifest, AI extends AnnotationInfoManifest> {
 
-    S createSignatureManifest(D dataFilesManifest, A annotationManifest);
+    S createSignatureManifest(D dataFilesManifest, A annotationManifest, String manifestUri);
 
-    D createDataFilesManifest(List<ContainerDocument> files);
+    D createDataFilesManifest(List<ContainerDocument> files, String manifestUri);
 
-    A createAnnotationsManifest(List<AI> annotationManifests);
+    A createAnnotationsManifest(List<AI> annotationManifests, String manifestUri);
 
     AI createAnnotationManifest(D dataManifest, ContainerAnnotation annotation);
 

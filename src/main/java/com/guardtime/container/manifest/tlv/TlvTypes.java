@@ -1,4 +1,4 @@
-package com.guardtime.container;
+package com.guardtime.container.manifest.tlv;
 
 public enum TlvTypes {
     DATA_FILES_MANIFEST_REFERENCE(0xb01),

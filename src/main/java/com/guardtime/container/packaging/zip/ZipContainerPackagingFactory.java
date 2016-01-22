@@ -16,6 +16,8 @@ import java.util.List;
 
 public class ZipContainerPackagingFactory implements BlockChainContainerPackagingFactory<ZipBlockChainContainer> {
 
+    private static final String META_INF_DIR_NAME = "/META-INF/";
+
     private final SignatureFactory signatureFactory;
     private final ContainerManifestFactory manifestFactory;
 
@@ -35,10 +37,10 @@ public class ZipContainerPackagingFactory implements BlockChainContainerPackagin
     @Override
     public ZipBlockChainContainer create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws BlockChainContainerException {
         Util.notEmpty(files, "Data files");
-        DataFilesManifest dataFilesManifest = manifestFactory.createDataFilesManifest(files);
+        DataFilesManifest dataFilesManifest = manifestFactory.createDataFilesManifest(files, META_INF_DIR_NAME + "datamanifest");
         List<AnnotationInfoManifest> annotationInfoManifests = createAnnotationInfoManifests(annotations, dataFilesManifest);
-        AnnotationsManifest annotationsManifest = manifestFactory.createAnnotationsManifest(annotationInfoManifests);
-        SignatureManifest signatureManifest = manifestFactory.createSignatureManifest(dataFilesManifest, annotationsManifest);
+        AnnotationsManifest annotationsManifest = manifestFactory.createAnnotationsManifest(annotationInfoManifests, META_INF_DIR_NAME + "annotmanifest");
+        SignatureManifest signatureManifest = manifestFactory.createSignatureManifest(dataFilesManifest, annotationsManifest, META_INF_DIR_NAME + "manifest");
 
         ZipBlockChainContainer container = new Builder(files, annotations).
                 withDataFilesManifest(dataFilesManifest).
