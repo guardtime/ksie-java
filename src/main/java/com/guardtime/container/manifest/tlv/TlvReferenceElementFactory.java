@@ -73,7 +73,7 @@ public class TlvReferenceElementFactory {
         try {
             return new TlvReferenceBuilder().
                     withType(TlvTypes.ANNOTATIONS_MANIFEST_REFERENCE).
-                    withUriElement(annotationsManifest.getUri()). // TODO: Problematic as this should be full URI and this might depend on the packaging format :S
+                    withUriElement(annotationsManifest.getUri()).
                     withHashElement(Util.hash(annotationsManifest.getInputStream(), DEFAULT_HASH_ALGORITHM)).
                     withMimeTypeElement(ContainerManifestMimeType.ANNOTATIONS_MANIFEST.getType()).
                     build();
@@ -82,12 +82,12 @@ public class TlvReferenceElementFactory {
         }
     }
 
-    public static TLVElement createSignatureReferenceTlvElement() { // TODO: Really need to pass in something here, probably container or datamanifest or annotationsmanifest or sth to get the signature index
+    public static TLVElement createSignatureReferenceTlvElement() {
         try {
 
             return new TlvReferenceBuilder().
                     withType(TlvTypes.SIGNATURE_REFERENCE).
-                    withUriElement("META-INF/signature1.ksig"). // TODO: Problematic as this should be full URI and this might depend on the packaging format :S
+                    withUriElement("META-INF/signature1.ksig"). // TODO: Find a solution to generate correct signature path
                     withMimeTypeElement(ContainerManifestMimeType.SIGNATURE_MANIFEST.getType()).
                     build();
         } catch (TLVParserException e) {

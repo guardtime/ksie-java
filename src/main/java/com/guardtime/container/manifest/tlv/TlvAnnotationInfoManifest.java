@@ -37,7 +37,13 @@ class TlvAnnotationInfoManifest implements AnnotationInfoManifest {
     @Override
     public String getUri() {
         String baseUri = annotation.getUri();
-        return baseUri.substring(0, annotation.getUri().lastIndexOf(".")) + TLV_EXTENSION;
+        String uriStr;
+        if (annotation.getUri().lastIndexOf(".") > 0){
+            uriStr = baseUri.substring(0, annotation.getUri().lastIndexOf(".")) + TLV_EXTENSION;
+        } else {
+            uriStr = baseUri + "." + TLV_EXTENSION;
+        }
+        return uriStr;
     }
 
     public ContainerAnnotation getAnnotation() {
