@@ -1,5 +1,6 @@
 package com.guardtime.container.packaging.zip;
 
+import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.AnnotationInfoManifest;
@@ -56,7 +57,7 @@ class ZipBlockChainContainer implements BlockChainContainer {
         this.annotationInfoManifests = annotationInfoManifests;
     }
 
-    DataHash getSignatureInputHash() {
+    DataHash getSignatureInputHash() throws BlockChainContainerException {
         return signatureManifest.getDataHash(HashAlgorithm.SHA2_256);
     }
 
@@ -65,7 +66,7 @@ class ZipBlockChainContainer implements BlockChainContainer {
     }
 
     @Override
-    public void writeTo(OutputStream output) throws IOException {
+    public void writeTo(OutputStream output) throws BlockChainContainerException {
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(output))) {
             writeEntry(new ZipEntry(mimeType.getUri()), mimeType.getInputStream(), zipOutputStream);
             writeDocuments(zipOutputStream);
@@ -75,10 +76,12 @@ class ZipBlockChainContainer implements BlockChainContainer {
             writeEntry(new ZipEntry(annotationsManifest.getUri()), annotationsManifest.getInputStream(), zipOutputStream);
             writeEntry(new ZipEntry(signatureManifest.getUri()), signatureManifest.getInputStream(), zipOutputStream);
             // TODO write signatures
+        } catch (IOException e) {
+            throw new BlockChainContainerException(e);
         }
     }
 
-    private void writeAnnotationsInfoManifests(ZipOutputStream zipOutputStream) throws IOException {
+    private void writeAnnotationsInfoManifests(ZipOutputStream zipOutputStream) throws IOException, BlockChainContainerException {
         for (AnnotationInfoManifest annotationInfoManifest : annotationInfoManifests) {
             writeEntry(new ZipEntry(annotationInfoManifest.getUri()), annotationInfoManifest.getInputStream(), zipOutputStream);
         }

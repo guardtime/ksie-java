@@ -1,6 +1,6 @@
 package com.guardtime.container.manifest.tlv;
 
-public enum TlvTypes {
+enum TlvTypes {
     DATA_FILES_MANIFEST_REFERENCE(0xb01),
     ANNOTATIONS_MANIFEST_REFERENCE(0xb02),
     DATA_FILE_REFERENCE(0xb03),

@@ -1,10 +1,11 @@
 package com.guardtime.container.packaging;
 
-import java.io.IOException;
+import com.guardtime.container.BlockChainContainerException;
+
 import java.io.OutputStream;
 
 public interface BlockChainContainer {
 
-    void writeTo(OutputStream output) throws IOException;
+    void writeTo(OutputStream output) throws BlockChainContainerException;
 
 }

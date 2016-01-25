@@ -8,7 +8,7 @@ import com.guardtime.ksi.tlv.TLVParserException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class TlvReferenceBuilder {
+class TlvReferenceBuilder {
     private int type;
     private List<TLVElement> elements = new LinkedList<>();
 

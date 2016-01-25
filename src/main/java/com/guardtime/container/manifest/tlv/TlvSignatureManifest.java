@@ -5,11 +5,7 @@ import com.guardtime.container.manifest.SignatureManifest;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
-import com.guardtime.ksi.tlv.TLVParserException;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 public class TlvSignatureManifest implements SignatureManifest {
@@ -25,22 +21,18 @@ public class TlvSignatureManifest implements SignatureManifest {
     }
 
     @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) {
+    public DataHash getDataHash(HashAlgorithm algorithm) throws BlockChainContainerException {
         return Util.hash(getInputStream(), algorithm);
     }
 
     @Override
-    public InputStream getInputStream() {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            bos.write(MAGIC);
-            TlvReferenceElementFactory.createDataManifestReferenceTlvElement(dataManifest).writeTo(bos);
-            TlvReferenceElementFactory.createSignatureReferenceTlvElement().writeTo(bos);
-            TlvReferenceElementFactory.createAnnotationsManifestReferenceTlvElement(annotationsManifest).writeTo(bos);
-            return new ByteArrayInputStream(bos.toByteArray());
-        } catch (IOException | TLVParserException e) {
-            throw new BlockChainContainerException(e);
-        }
+    public InputStream getInputStream() throws BlockChainContainerException {
+        return TlvUtil.generateInputStream(
+                MAGIC,
+                TlvReferenceElementFactory.createDataManifestReferenceTlvElement(dataManifest),
+                TlvReferenceElementFactory.createSignatureReferenceTlvElement(),
+                TlvReferenceElementFactory.createAnnotationsManifestReferenceTlvElement(annotationsManifest)
+        );
     }
 
     @Override

@@ -55,7 +55,7 @@ public class ZipContainerPackagingFactory implements BlockChainContainerPackagin
         return container;
     }
 
-    private List<AnnotationInfoManifest> createAnnotationInfoManifests(List<ContainerAnnotation> annotations, DataFilesManifest dataFilesManifest) {
+    private List<AnnotationInfoManifest> createAnnotationInfoManifests(List<ContainerAnnotation> annotations, DataFilesManifest dataFilesManifest) throws BlockChainContainerException {
         List<AnnotationInfoManifest> annotationInfoManifests = new LinkedList<>();
         for (ContainerAnnotation annotation : annotations) {
             AnnotationInfoManifest singleAnnotationManifest = manifestFactory.createAnnotationManifest(dataFilesManifest, annotation);

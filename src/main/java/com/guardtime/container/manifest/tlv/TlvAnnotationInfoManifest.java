@@ -3,11 +3,7 @@ package com.guardtime.container.manifest.tlv;
 import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.manifest.AnnotationInfoManifest;
-import com.guardtime.ksi.tlv.TLVParserException;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 public class TlvAnnotationInfoManifest implements AnnotationInfoManifest {
@@ -16,29 +12,25 @@ public class TlvAnnotationInfoManifest implements AnnotationInfoManifest {
     private ContainerAnnotation annotation;
     private TlvDataFilesManifest dataManifest;
 
-    public TlvAnnotationInfoManifest(ContainerAnnotation annotation, TlvDataFilesManifest dataManifest) throws BlockChainContainerException {
+    public TlvAnnotationInfoManifest(ContainerAnnotation annotation, TlvDataFilesManifest dataManifest) {
         this.annotation = annotation;
         this.dataManifest = dataManifest;
     }
 
     @Override
-    public InputStream getInputStream() {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            bos.write(MAGIC);
-            TlvReferenceElementFactory.createDataManifestReferenceTlvElement(dataManifest).writeTo(bos);
-            TlvReferenceElementFactory.createAnnotationReferenceTlvElement(annotation).writeTo(bos);
-            return new ByteArrayInputStream(bos.toByteArray());
-        } catch (IOException | TLVParserException e) {
-            throw new BlockChainContainerException(e);
-        }
+    public InputStream getInputStream() throws BlockChainContainerException {
+        return TlvUtil.generateInputStream(
+                MAGIC,
+                TlvReferenceElementFactory.createDataManifestReferenceTlvElement(dataManifest),
+                TlvReferenceElementFactory.createAnnotationReferenceTlvElement(annotation)
+        );
     }
 
     @Override
     public String getUri() {
         String baseUri = annotation.getUri();
         String uriStr;
-        if (annotation.getUri().lastIndexOf(".") > 0){
+        if (annotation.getUri().lastIndexOf(".") > 0) {
             uriStr = baseUri.substring(0, annotation.getUri().lastIndexOf(".")) + TLV_EXTENSION;
         } else {
             uriStr = baseUri + "." + TLV_EXTENSION;

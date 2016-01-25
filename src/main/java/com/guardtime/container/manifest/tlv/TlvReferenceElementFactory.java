@@ -12,7 +12,7 @@ import com.guardtime.ksi.tlv.TLVParserException;
 
 import java.io.IOException;
 
-public class TlvReferenceElementFactory {
+class TlvReferenceElementFactory {
 
 
     private static final HashAlgorithm DEFAULT_HASH_ALGORITHM = HashAlgorithm.SHA2_256;
@@ -30,7 +30,7 @@ public class TlvReferenceElementFactory {
         }
     }
 
-    public static TLVElement createAnnotationReferenceTlvElement(ContainerAnnotation annotation) {
+    public static TLVElement createAnnotationReferenceTlvElement(ContainerAnnotation annotation) throws BlockChainContainerException {
         try {
             return new TlvReferenceBuilder().
                     withType(TlvTypes.ANNOTATION_REFERENCE).
@@ -43,7 +43,7 @@ public class TlvReferenceElementFactory {
         }
     }
 
-    public static TLVElement createAnnotationInfoReferenceTlvElement(TlvAnnotationInfoManifest annotationInfo) {
+    public static TLVElement createAnnotationInfoReferenceTlvElement(TlvAnnotationInfoManifest annotationInfo) throws BlockChainContainerException {
         try {
             return new TlvReferenceBuilder().
                     withType(TlvTypes.ANNOTATION_INFO_REFERENCE).
@@ -56,7 +56,7 @@ public class TlvReferenceElementFactory {
         }
     }
 
-    public static TLVElement createDocumentReferenceTlvElement(ContainerDocument document) {
+    public static TLVElement createDocumentReferenceTlvElement(ContainerDocument document) throws BlockChainContainerException {
         try {
             return new TlvReferenceBuilder().
                     withType(TlvTypes.DATA_FILE_REFERENCE).
@@ -69,7 +69,7 @@ public class TlvReferenceElementFactory {
         }
     }
 
-    public static TLVElement createAnnotationsManifestReferenceTlvElement(TlvAnnotationsManifest annotationsManifest) {
+    public static TLVElement createAnnotationsManifestReferenceTlvElement(TlvAnnotationsManifest annotationsManifest) throws BlockChainContainerException {
         try {
             return new TlvReferenceBuilder().
                     withType(TlvTypes.ANNOTATIONS_MANIFEST_REFERENCE).
@@ -82,7 +82,7 @@ public class TlvReferenceElementFactory {
         }
     }
 
-    public static TLVElement createSignatureReferenceTlvElement() {
+    public static TLVElement createSignatureReferenceTlvElement() throws BlockChainContainerException {
         try {
 
             return new TlvReferenceBuilder().

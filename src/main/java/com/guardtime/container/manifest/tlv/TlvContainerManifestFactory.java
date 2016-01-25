@@ -1,5 +1,6 @@
 package com.guardtime.container.manifest.tlv;
 
+import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.util.Util;
@@ -12,27 +13,27 @@ public class TlvContainerManifestFactory implements ContainerManifestFactory<Tlv
     private static final String TLV_EXTENSION = ".tlv";
 
     @Override
-    public TlvSignatureManifest createSignatureManifest(TlvDataFilesManifest dataFilesManifest, TlvAnnotationsManifest annotationManifest, String manifestUri) {
+    public TlvSignatureManifest createSignatureManifest(TlvDataFilesManifest dataFilesManifest, TlvAnnotationsManifest annotationManifest, String manifestUri) throws BlockChainContainerException {
         Util.notNull(dataFilesManifest, "Document manifest");
         Util.notNull(annotationManifest, "Annotations manifest");
         return new TlvSignatureManifest(dataFilesManifest, annotationManifest, manifestUri + TLV_EXTENSION);
     }
 
     @Override
-    public TlvAnnotationsManifest createAnnotationsManifest(List annotationManifests, String manifestUri) {
+    public TlvAnnotationsManifest createAnnotationsManifest(List annotationManifests, String manifestUri) throws BlockChainContainerException {
         Util.notEmpty(annotationManifests, "Annotation info manifests list");
         return new TlvAnnotationsManifest(annotationManifests, manifestUri + TLV_EXTENSION);
     }
 
     @Override
-    public TlvAnnotationInfoManifest createAnnotationManifest(TlvDataFilesManifest dataManifest, ContainerAnnotation annotation) {
+    public TlvAnnotationInfoManifest createAnnotationManifest(TlvDataFilesManifest dataManifest, ContainerAnnotation annotation) throws BlockChainContainerException {
         Util.notNull(dataManifest, "Document manifest");
         Util.notNull(annotation, "Annotation");
         return new TlvAnnotationInfoManifest(annotation, dataManifest);
     }
 
     @Override
-    public TlvDataFilesManifest createDataFilesManifest(List files, String manifestUri) {
+    public TlvDataFilesManifest createDataFilesManifest(List files, String manifestUri) throws BlockChainContainerException {
         Util.notEmpty(files, "Document files list");
         return new TlvDataFilesManifest(files, manifestUri + TLV_EXTENSION);
     }
