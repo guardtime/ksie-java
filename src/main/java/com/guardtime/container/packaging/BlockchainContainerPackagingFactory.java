@@ -12,5 +12,7 @@ public interface BlockChainContainerPackagingFactory<C extends BlockChainContain
     C read(InputStream input);
 
     C create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws BlockChainContainerException;
+    
+    C create(C existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws BlockChainContainerException;
 
 }

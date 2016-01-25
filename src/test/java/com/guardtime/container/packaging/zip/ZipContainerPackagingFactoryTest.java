@@ -26,7 +26,6 @@ import static org.mockito.Mockito.*;
 
 public class ZipContainerPackagingFactoryTest extends AbstractBlockChainContainerTest {
 
-    protected static final VerificationMode ONE_EXECUTION = times(1);
     protected static final String ANNOTATION_INFO_MANIFEST_NAME = "META-INF/annotmanifest1.tlv";
     protected static final String DATA_FILES_MANIFEST_NAME = "META-INF/datamanifest.tlv";
     protected static final String SIGNATURE_MANIFEST1_NAME = "META-INF/manifest1.tlv";

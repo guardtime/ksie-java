@@ -4,15 +4,12 @@ import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.datafile.FileContainerDocument;
 import com.guardtime.container.datafile.StreamContainerDocument;
-import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.packaging.BlockChainContainer;
 import com.guardtime.container.packaging.BlockChainContainerPackagingFactory;
-import com.guardtime.container.signature.SignatureFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,20 +20,24 @@ public class BlockChainContainerBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BlockChainContainerBuilder.class);
 
-    private List<ContainerDocument> documents = new LinkedList<>();
-    private List<ContainerAnnotation> annotations = new LinkedList<>();
+    private final List<ContainerDocument> documents = new LinkedList<>();
+    private final List<ContainerAnnotation> annotations = new LinkedList<>();
+    
+    private final BlockChainContainerPackagingFactory packagingFactory;
+    private BlockChainContainer existingContainer;
 
-    private SignatureFactory signatureFactory;
-    private ContainerManifestFactory manifestFactory;
-    private BlockChainContainerPackagingFactory packagingFactory;
-
-    public BlockChainContainerBuilder(SignatureFactory signatureFactory, ContainerManifestFactory manifestFactory, BlockChainContainerPackagingFactory packagingFactory) {
-        notNull(signatureFactory, "Signature factory");
-        notNull(manifestFactory, "Manifest factory");
+    public BlockChainContainerBuilder(BlockChainContainerPackagingFactory packagingFactory) {
         notNull(packagingFactory, "Packaging factory");
-        this.signatureFactory = signatureFactory;
-        this.manifestFactory = manifestFactory;
         this.packagingFactory = packagingFactory;
+    }
+
+    public BlockChainContainerBuilder withExistingContainer(InputStream input) {
+        return withExistingContainer(packagingFactory.read(input));
+    }
+
+    public BlockChainContainerBuilder withExistingContainer(BlockChainContainer existingContainer) {
+        this.existingContainer = existingContainer;
+        return this;
     }
 
     public BlockChainContainerBuilder withDataFile(InputStream input, String name, String mimeType) {
@@ -51,7 +52,7 @@ public class BlockChainContainerBuilder {
         notNull(document, "Data file ");
         documents.add(document);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Document {} will be added to the container");
+            LOGGER.debug("Document '{}' will be added to the container", document);
         }
         return this;
     }
@@ -59,11 +60,14 @@ public class BlockChainContainerBuilder {
     public BlockChainContainerBuilder withAnnotation(ContainerAnnotation annotation) {
         notNull(annotations, "Annotation");
         annotations.add(annotation);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Annotation '{}' will be added to the container", annotation);
+        }
         return this;
     }
 
-    public BlockChainContainer build() {
-        return null;
+    public BlockChainContainer build() throws BlockChainContainerException {
+        return packagingFactory.create(existingContainer, documents, annotations);
     }
 
     List<ContainerDocument> getDocuments() {
