@@ -38,7 +38,7 @@ public class BlockChainContainerBuilderTest extends AbstractBlockChainContainerT
     @Test
     public void testAddDocumentToContainer() throws Exception {
         BlockChainContainerBuilder builder = new BlockChainContainerBuilder(mockedPackagingFactory);
-        StreamContainerDocument content = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA), FILE_NAME_TEST_TXT, MIME_TYPE_APPLICATION_TXT);
+        StreamContainerDocument content = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA), TEST_FILE_NAME_TEST_TXT, MIME_TYPE_APPLICATION_TXT);
         builder.withDataFile(content);
         assertEquals(1, builder.getDocuments().size());
     }
@@ -57,7 +57,7 @@ public class BlockChainContainerBuilderTest extends AbstractBlockChainContainerT
         BlockChainContainerBuilder builder = new BlockChainContainerBuilder(mockedPackagingFactory);
 
         BlockChainContainer container = builder.
-                withDataFile(new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA), FILE_NAME_TEST_TXT, MIME_TYPE_APPLICATION_TXT)).
+                withDataFile(new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA), TEST_FILE_NAME_TEST_TXT, MIME_TYPE_APPLICATION_TXT)).
                 withAnnotation(new StringContainerAnnotation(ContainerAnnotationType.NON_REMOVABLE, "42", "com.guardtime")).
                 build();
 
