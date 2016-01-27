@@ -24,7 +24,7 @@ public class FileContainerDocument implements ContainerDocument {
 
     public FileContainerDocument(File file, String mimeType, String fileName) {
         notNull(file, "File");
-        notNull(file, "MIME type");
+        notNull(mimeType, "MIME type");
         this.file = file;
         this.mimeType = mimeType;
         this.fileName = fileName == null ? file.getName() : fileName;
@@ -51,5 +51,12 @@ public class FileContainerDocument implements ContainerDocument {
             dataHash = Util.hash(getInputStream(), algorithm);
         }
         return dataHash;
+    }
+
+    @Override
+    public String toString() {
+        return "{type=File" +
+                ", fileName=" + fileName +
+                ", mimeType=" + mimeType+ "}";
     }
 }

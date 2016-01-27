@@ -16,34 +16,41 @@ public class StreamContainerDocument implements ContainerDocument {
     private static final String TEMP_FILE_PREFIX = "bcc-";
     private static final String TEMP_FILE_SUFFIX = ".dat";
 
-    private FileContainerDocument documentContent;
+    private FileContainerDocument containerDocument;
 
-    public StreamContainerDocument(InputStream input, String fileName, String mimeType) {
+    public StreamContainerDocument(InputStream input, String mimeType, String fileName) {
         notNull(input, "Input stream");
-        notNull(fileName, "File name");
         notNull(mimeType, "MIME type");
+        notNull(fileName, "File name");
         File tempFile = copy(input);
-        this.documentContent = new FileContainerDocument(tempFile, mimeType, fileName);
+        this.containerDocument = new FileContainerDocument(tempFile, mimeType, fileName);
     }
 
     @Override
     public String getFileName() {
-        return documentContent.getFileName();
+        return containerDocument.getFileName();
     }
 
     @Override
     public String getMimeType() {
-        return documentContent.getMimeType();
+        return containerDocument.getMimeType();
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return documentContent.getInputStream();
+        return containerDocument.getInputStream();
     }
 
     @Override
     public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
-        return documentContent.getDataHash(algorithm);
+        return containerDocument.getDataHash(algorithm);
+    }
+
+    @Override
+    public String toString() {
+        return "{type=Stream" +
+                ", fileName=" + containerDocument.getFileName() +
+                ", mimeType=" + containerDocument.getMimeType() + "}";
     }
 
     protected File copy(InputStream input) {
