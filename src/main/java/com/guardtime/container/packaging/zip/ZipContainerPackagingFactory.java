@@ -58,6 +58,12 @@ public class ZipContainerPackagingFactory implements BlockChainContainerPackagin
         return container;
     }
 
+    @Override
+    public ZipBlockChainContainer create(ZipBlockChainContainer existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws BlockChainContainerException {
+        // TODO implement
+        return null;
+    }
+    
     private Map<ContainerAnnotationType, AnnotationInfoManifest> createAnnotationInfoManifests(List<ContainerAnnotation> annotations, DataFilesManifest dataFilesManifest) throws BlockChainContainerException {
         Map<ContainerAnnotationType, AnnotationInfoManifest> annotationInfoManifests = new HashMap<>();
         for (ContainerAnnotation annotation : annotations) {

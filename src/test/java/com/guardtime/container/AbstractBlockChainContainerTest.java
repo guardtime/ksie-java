@@ -11,10 +11,19 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.verification.VerificationMode;
 
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 public class AbstractBlockChainContainerTest {
+
+    protected static final String MIME_TYPE_APPLICATION_TXT = "application/txt";
+    protected static final String TEST_FILE_PATH_TEST_TXT = "test-data-files/test.txt";
+    protected static final String TEST_FILE_NAME_TEST2_DOC = "test2.doc";
+    protected static final String TEST_FILE_NAME_TEST_TXT = "test.txt";
+    protected static final VerificationMode ONE_EXECUTION = times(1);
+    protected static final byte[] TEST_DATA = new byte[200];
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
