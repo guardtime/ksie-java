@@ -1,38 +1,47 @@
 package com.guardtime.container.manifest.tlv;
 
-import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedList;
 import java.util.List;
 
-public class TlvAnnotationsManifest implements AnnotationsManifest {
-    private static final byte[] MAGIC = "KSIEANMF".getBytes(); // TODO: Replace with bytes according to spec
-    private List<TlvAnnotationInfoManifest> annotationReferences;
-    private String manifestUri;
+public class TlvAnnotationsManifest extends TlvManifestStructure implements AnnotationsManifest {
+    private static final byte[] MAGIC = "KSIEANMF".getBytes();  // TODO: Verify from spec
+    private String uri;
+    private List<TLVElement> annotationReferences;
 
-    public TlvAnnotationsManifest(List<TlvAnnotationInfoManifest> annotationReferences, String manifestUri) {
-        this.annotationReferences = annotationReferences;
-        this.manifestUri = manifestUri;
+    public TlvAnnotationsManifest(List<TLVElement> elements, String uri) throws TLVParserException {
+        super(MAGIC, elements);
+        this.uri = uri;
     }
 
-    @Override
-    public InputStream getInputStream() throws BlockChainContainerException {
-        LinkedList<TLVElement> elements = new LinkedList<>(); // TODO: Possibly a better solution,  revisit
-        for (TlvAnnotationInfoManifest manifest : annotationReferences) {
-            elements.add(TlvReferenceElementFactory.createAnnotationInfoReferenceTlvElement(manifest));
-        }
-        return TlvUtil.generateInputStream(MAGIC, elements.toArray(new TLVElement[elements.size()]));
+    public TlvAnnotationsManifest(InputStream stream, String uri) throws TLVParserException {
+        super(stream);
+        this.uri = uri;
     }
 
     @Override
     public String getUri() {
-        return manifestUri;
+        return uri;
+    }
+
+    @Override
+    protected byte[] getMagic() {
+        return MAGIC;
+    }
+
+    @Override
+    protected List<TLVElement> getElements() {
+        return annotationReferences;
+    }
+
+    @Override
+    protected void setElements(List<TLVElement> tlvElements) throws TLVParserException {
+        if (tlvElements == null || tlvElements.isEmpty()) {
+            throw new TLVParserException("No elements in manifest");
+        }
+        this.annotationReferences = tlvElements;
     }
 }

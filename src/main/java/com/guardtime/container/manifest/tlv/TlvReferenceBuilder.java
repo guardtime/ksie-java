@@ -9,6 +9,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 class TlvReferenceBuilder {
+    private static final int URI_TYPE = 0x1;
+    private static final int HASH_TYPE = 0x2;
+    private static final int MIME_TYPE = 0x3;
+    private static final int DOMAIN_TYPE = 0x4;
+
     private int type;
     private List<TLVElement> elements = new LinkedList<>();
 
@@ -21,33 +26,32 @@ class TlvReferenceBuilder {
     }
 
     public TlvReferenceBuilder withType(TlvTypes type) {
-        this.type = type.getType();
-        return this;
+        return this.withType(type.getType());
     }
 
     public TlvReferenceBuilder withUriElement(String uri) throws TLVParserException {
-        TLVElement element = new TLVElement(new TLVHeader(false, false, 0x1));
+        TLVElement element = new TLVElement(new TLVHeader(false, false, URI_TYPE));
         element.setStringContent(uri);
         this.elements.add(element);
         return this;
     }
 
     public TlvReferenceBuilder withHashElement(DataHash hash) throws TLVParserException {
-        TLVElement element = new TLVElement(new TLVHeader(false, false, 0x2));
+        TLVElement element = new TLVElement(new TLVHeader(false, false, HASH_TYPE));
         element.setDataHashContent(hash);
         this.elements.add(element);
         return this;
     }
 
     public TlvReferenceBuilder withMimeTypeElement(String mimeType) throws TLVParserException {
-        TLVElement element = new TLVElement(new TLVHeader(false, false, 0x3));
+        TLVElement element = new TLVElement(new TLVHeader(false, false, MIME_TYPE));
         element.setStringContent(mimeType);
         this.elements.add(element);
         return this;
     }
 
     public TlvReferenceBuilder withDomainElement(String domain) throws TLVParserException {
-        TLVElement element = new TLVElement(new TLVHeader(false, false, 0x4));
+        TLVElement element = new TLVElement(new TLVHeader(false, false, DOMAIN_TYPE));
         element.setStringContent(domain);
         this.elements.add(element);
         return this;

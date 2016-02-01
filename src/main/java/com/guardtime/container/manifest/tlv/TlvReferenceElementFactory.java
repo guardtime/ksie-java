@@ -2,6 +2,7 @@ package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
+import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.ContainerManifestMimeType;
 import com.guardtime.container.manifest.DataFilesManifest;
@@ -43,13 +44,13 @@ class TlvReferenceElementFactory {
         }
     }
 
-    public static TLVElement createAnnotationInfoReferenceTlvElement(TlvAnnotationInfoManifest annotationInfo) throws BlockChainContainerException {
+    public static TLVElement createAnnotationInfoReferenceTlvElement(TlvAnnotationInfoManifest annotationInfo, ContainerAnnotationType annotationType) throws BlockChainContainerException {
         try {
             return new TlvReferenceBuilder().
                     withType(TlvTypes.ANNOTATION_INFO_REFERENCE).
                     withUriElement(annotationInfo.getUri()).
                     withHashElement(Util.hash(annotationInfo.getInputStream(), DEFAULT_HASH_ALGORITHM)).
-                    withMimeTypeElement(annotationInfo.getAnnotation().getAnnotationType().getContent()).
+                    withMimeTypeElement(annotationType.getContent()).
                     build();
         } catch (TLVParserException e) {
             throw new BlockChainContainerException(e);
@@ -82,12 +83,12 @@ class TlvReferenceElementFactory {
         }
     }
 
-    public static TLVElement createSignatureReferenceTlvElement() throws BlockChainContainerException {
+    public static TLVElement createSignatureReferenceTlvElement(String signaturePath) throws BlockChainContainerException {
         try {
 
             return new TlvReferenceBuilder().
                     withType(TlvTypes.SIGNATURE_REFERENCE).
-                    withUriElement("META-INF/signature1.ksig"). // TODO: Find a solution to generate correct signature path
+                    withUriElement(signaturePath).
                     withMimeTypeElement(ContainerManifestMimeType.SIGNATURE_MANIFEST.getType()).
                     build();
         } catch (TLVParserException e) {

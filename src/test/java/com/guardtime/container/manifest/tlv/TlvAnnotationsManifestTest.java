@@ -1,6 +1,10 @@
 package com.guardtime.container.manifest.tlv;
 
+import com.guardtime.container.BlockChainContainerException;
+import com.guardtime.container.annotation.ContainerAnnotationType;
+import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVInputStream;
+import com.guardtime.ksi.tlv.TLVParserException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,9 +15,9 @@ public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
     private TlvAnnotationsManifest manifest;
 
     @Before
-    public void setupManifest(){
-        LinkedList<TlvAnnotationInfoManifest> annotationManifests = new LinkedList<>();
-        annotationManifests.add(mockAnnotationInfoManifest);
+    public void setupManifest() throws TLVParserException, BlockChainContainerException {
+        LinkedList<TLVElement> annotationManifests = new LinkedList<>();
+        annotationManifests.add(TlvReferenceElementFactory.createAnnotationInfoReferenceTlvElement(mockAnnotationInfoManifest, ContainerAnnotationType.FULLY_REMOVABLE));
         this.manifest = new TlvAnnotationsManifest(annotationManifests, "Non-important-for-test");
     }
 

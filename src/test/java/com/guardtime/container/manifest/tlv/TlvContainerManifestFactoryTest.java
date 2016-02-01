@@ -1,11 +1,13 @@
 package com.guardtime.container.manifest.tlv;
 
+import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.datafile.ContainerDocument;
-import com.guardtime.container.manifest.AnnotationInfoManifest;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -22,18 +24,18 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
     @Test
     public void testCreateAnnotationInfoManifestWithoutDataManifest_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
-        factory.createAnnotationManifest(null, mockAnnotation);
+        factory.createAnnotationManifest(null, mockAnnotation, "RandomString");
     }
 
     @Test
     public void testCreateAnnotationInfoManifestWithoutAnnotation_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
-        factory.createAnnotationManifest(mockDataManifest, null);
+        factory.createAnnotationManifest(mockDataManifest, null, "RandomString");
     }
 
     @Test
     public void testCreateAnnotationInfoManifestOK() throws Exception {
-        TlvAnnotationInfoManifest manifest = factory.createAnnotationManifest(mockDataManifest, mockAnnotation);
+        TlvAnnotationInfoManifest manifest = factory.createAnnotationManifest(mockDataManifest, mockAnnotation, "RandomString");
 
         assertNotNull("Manifest was not created", manifest);
     }
@@ -41,13 +43,13 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
     @Test
     public void testCreateAnnotationsManifestWithoutAnnotationInfoManifests_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
-        factory.createAnnotationsManifest(new LinkedList<AnnotationInfoManifest>(), "Non-important-for-test");
+        factory.createAnnotationsManifest(new HashMap<ContainerAnnotationType, TlvAnnotationInfoManifest>(), "Non-important-for-test");
     }
 
     @Test
     public void testCreateAnnotationsManifestOK() throws Exception {
-        LinkedList<TlvAnnotationInfoManifest> annotationManifests = new LinkedList<>();
-        annotationManifests.add(mockAnnotationInfoManifest);
+        Map<ContainerAnnotationType, TlvAnnotationInfoManifest> annotationManifests = new HashMap();
+        annotationManifests.put(ContainerAnnotationType.FULLY_REMOVABLE, mockAnnotationInfoManifest);
         TlvAnnotationsManifest manifest = factory.createAnnotationsManifest(annotationManifests, "Non-important-for-test");
 
         assertNotNull("Manifest was not created", manifest);

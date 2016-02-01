@@ -65,7 +65,6 @@ public class AbstractTlvManifestTest {
         when(mockAnnotation.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHash);
         when(mockAnnotation.getAnnotationType()).thenReturn(ContainerAnnotationType.NON_REMOVABLE);
         when(mockAnnotationInfoManifest.getInputStream()).thenReturn(new ByteArrayInputStream("".getBytes())); // TODO: Maybe give valid TLV stream ?
-        when(mockAnnotationInfoManifest.getAnnotation()).thenReturn(mockAnnotation);
         when(mockDocument.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHash);
         when(mockDocument.getFileName()).thenReturn("RandomFileIsAwesome.txt");
         when(mockDocument.getMimeType()).thenReturn("application/text");
