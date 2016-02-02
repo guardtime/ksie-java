@@ -10,23 +10,17 @@ import java.util.List;
 
 public class TlvAnnotationInfoManifest extends TlvManifestStructure implements AnnotationInfoManifest {
     private static final byte[] MAGIC = "KSIEANNT".getBytes();  // TODO: Verify from spec
-    private String uri;
     private TLVElement annotationReference;
     private TLVElement dataManifestReference;
 
     public TlvAnnotationInfoManifest(List<TLVElement> elements, String uri) throws TLVParserException {
-        super(MAGIC, elements);
-        this.uri = uri;
+        super(elements);
+        this.setUri(uri);
     }
 
     public TlvAnnotationInfoManifest(InputStream stream, String uri) throws TLVParserException {
         super(stream);
-        this.uri = uri;
-    }
-
-    @Override
-    public String getUri() {
-        return uri;
+        this.setUri(uri);
     }
 
     @Override
@@ -44,12 +38,8 @@ public class TlvAnnotationInfoManifest extends TlvManifestStructure implements A
 
     @Override
     protected void setElements(List<TLVElement> tlvElements) throws TLVParserException {
-        if (tlvElements == null || tlvElements.isEmpty()) {
-            throw new TLVParserException("No elements in manifest");
-        }
-
-        for(TLVElement element : tlvElements){
-            switch (TlvTypes.fromValue(element.getType())){
+        for (TLVElement element : tlvElements) {
+            switch (TlvTypes.fromValue(element.getType())) {
                 case DATA_FILES_MANIFEST_REFERENCE:
                     dataManifestReference = readOnce(element);
                     break;
@@ -57,7 +47,7 @@ public class TlvAnnotationInfoManifest extends TlvManifestStructure implements A
                     annotationReference = readOnce(element);
                     break;
                 default:
-                    throw new TLVParserException("Unexpected element in manifest!");
+                    verifyCriticalFlag(element);
             }
         }
         // Check that all mandatory elements present

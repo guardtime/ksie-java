@@ -1,6 +1,7 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.BlockChainContainerException;
+import com.guardtime.container.util.Util;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVInputStream;
@@ -15,15 +16,10 @@ import java.util.Set;
 public abstract class TlvManifestStructure {
 
     private Set<Integer> processedElements = new HashSet<>();
+    private String uri;
 
-    public TlvManifestStructure(byte[] magic, List<TLVElement> elements) throws TLVParserException {
-        if (elements == null || elements.isEmpty()) {
-            throw new TLVParserException("Elements must be present");
-        }
-
-        if (!magic.equals(getMagic())) {
-            throw new TLVParserException("Invalid magic for manifest type");
-        }
+    public TlvManifestStructure(List<TLVElement> elements) throws TLVParserException {
+        Util.notEmpty(elements, "TLV Elements");
         this.setElements(elements);
     }
 
@@ -44,7 +40,6 @@ public abstract class TlvManifestStructure {
             List<TLVElement> elements = new LinkedList<>();
             TLVElement elem;
             while ((elem = ((TLVInputStream) stream).readElement()) != null) {
-                verifyCriticalFlag(elem);
                 elements.add(elem);
             }
             this.setElements(elements);
@@ -89,6 +84,14 @@ public abstract class TlvManifestStructure {
 
     protected abstract void setElements(List<TLVElement> rootElements) throws TLVParserException;
 
+    public String getUri() {
+        return uri;
+    }
+
+    protected void setUri(String uri) {
+        this.uri = uri;
+    }
+
     public void writeTo(OutputStream out) throws KSIException {
         if (out == null) {
             throw new KSIException("Output stream can not be null");
@@ -111,6 +114,16 @@ public abstract class TlvManifestStructure {
         if (!this.getMagic().equals(that.getMagic())) return false;
         if (that.getElements() == null) return false;
         return this.getElements().equals(that.getElements());
+    }
+
+    @Override
+    public int hashCode() {
+        int code = 1;
+        code += getMagic().hashCode();
+        for (TLVElement element : getElements()) {
+            code += element.hashCode();
+        }
+        return code;
     }
 
     public InputStream getInputStream() throws BlockChainContainerException {

@@ -1,5 +1,6 @@
 package com.guardtime.container.manifest.tlv;
 
+import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.datafile.ContainerDocument;
 import org.junit.Before;
@@ -43,13 +44,13 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
     @Test
     public void testCreateAnnotationsManifestWithoutAnnotationInfoManifests_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
-        factory.createAnnotationsManifest(new HashMap<ContainerAnnotationType, TlvAnnotationInfoManifest>(), "Non-important-for-test");
+        factory.createAnnotationsManifest(new HashMap<ContainerAnnotation, TlvAnnotationInfoManifest>(), "Non-important-for-test");
     }
 
     @Test
     public void testCreateAnnotationsManifestOK() throws Exception {
-        Map<ContainerAnnotationType, TlvAnnotationInfoManifest> annotationManifests = new HashMap();
-        annotationManifests.put(ContainerAnnotationType.FULLY_REMOVABLE, mockAnnotationInfoManifest);
+        Map<ContainerAnnotation, TlvAnnotationInfoManifest> annotationManifests = new HashMap();
+        annotationManifests.put(mockAnnotation, mockAnnotationInfoManifest);
         TlvAnnotationsManifest manifest = factory.createAnnotationsManifest(annotationManifests, "Non-important-for-test");
 
         assertNotNull("Manifest was not created", manifest);

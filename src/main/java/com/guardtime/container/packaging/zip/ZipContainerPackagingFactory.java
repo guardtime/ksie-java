@@ -2,7 +2,6 @@ package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.*;
 import com.guardtime.container.packaging.BlockChainContainerPackagingFactory;
@@ -41,7 +40,7 @@ public class ZipContainerPackagingFactory implements BlockChainContainerPackagin
     public ZipBlockChainContainer create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws BlockChainContainerException {
         Util.notEmpty(files, "Data files");
         DataFilesManifest dataFilesManifest = manifestFactory.createDataFilesManifest(files, META_INF_DIR_NAME + "datamanifest");
-        Map<ContainerAnnotationType, AnnotationInfoManifest> annotationInfoManifests = createAnnotationInfoManifests(annotations, dataFilesManifest);
+        Map<ContainerAnnotation, AnnotationInfoManifest> annotationInfoManifests = createAnnotationInfoManifests(annotations, dataFilesManifest);
         AnnotationsManifest annotationsManifest = manifestFactory.createAnnotationsManifest(annotationInfoManifests, META_INF_DIR_NAME + "annotmanifest");
         SignatureManifest signatureManifest = manifestFactory.createSignatureManifest(dataFilesManifest, annotationsManifest, META_INF_DIR_NAME + "manifest");
 
@@ -63,12 +62,12 @@ public class ZipContainerPackagingFactory implements BlockChainContainerPackagin
         // TODO implement
         return null;
     }
-    
-    private Map<ContainerAnnotationType, AnnotationInfoManifest> createAnnotationInfoManifests(List<ContainerAnnotation> annotations, DataFilesManifest dataFilesManifest) throws BlockChainContainerException {
-        Map<ContainerAnnotationType, AnnotationInfoManifest> annotationInfoManifests = new HashMap<>();
+
+    private Map<ContainerAnnotation, AnnotationInfoManifest> createAnnotationInfoManifests(List<ContainerAnnotation> annotations, DataFilesManifest dataFilesManifest) throws BlockChainContainerException {
+        Map<ContainerAnnotation, AnnotationInfoManifest> annotationInfoManifests = new HashMap<>();
         for (ContainerAnnotation annotation : annotations) {
             AnnotationInfoManifest singleAnnotationManifest = manifestFactory.createAnnotationManifest(dataFilesManifest, annotation, annotation.getUri());
-            annotationInfoManifests.put(annotation.getAnnotationType(), singleAnnotationManifest);
+            annotationInfoManifests.put(annotation, singleAnnotationManifest);
         }
         return annotationInfoManifests;
     }

@@ -2,7 +2,6 @@ package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.util.Util;
@@ -49,16 +48,16 @@ public class TlvContainerManifestFactory implements ContainerManifestFactory<Tlv
     }
 
     @Override
-    public TlvAnnotationsManifest createAnnotationsManifest(Map<ContainerAnnotationType, TlvAnnotationInfoManifest> annotationManifests, String manifestUri) throws BlockChainContainerException {
+    public TlvAnnotationsManifest createAnnotationsManifest(Map<ContainerAnnotation, TlvAnnotationInfoManifest> annotationManifests, String manifestUri) throws BlockChainContainerException {
         if (annotationManifests.isEmpty()) {
             throw new IllegalArgumentException("Annotation info manifests list");
         }
         List<TLVElement> elements = new LinkedList<>();
         TlvAnnotationInfoManifest manifest;
         try {
-            for (ContainerAnnotationType annotationType : annotationManifests.keySet()) {
-                manifest = annotationManifests.get(annotationType);
-                elements.add(TlvReferenceElementFactory.createAnnotationInfoReferenceTlvElement(manifest, annotationType));
+            for (ContainerAnnotation annotation : annotationManifests.keySet()) {
+                manifest = annotationManifests.get(annotation);
+                elements.add(TlvReferenceElementFactory.createAnnotationInfoReferenceTlvElement(manifest, annotation.getAnnotationType()));
             }
 
             return new TlvAnnotationsManifest(elements, manifestUri + TLV_EXTENSION);

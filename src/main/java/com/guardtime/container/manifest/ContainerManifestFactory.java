@@ -3,7 +3,6 @@ package com.guardtime.container.manifest;
 
 import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.datafile.ContainerDocument;
 
 import java.io.InputStream;
@@ -16,7 +15,7 @@ public interface ContainerManifestFactory<S extends SignatureManifest, D extends
 
     D createDataFilesManifest(List<ContainerDocument> files, String manifestUri) throws BlockChainContainerException;
 
-    A createAnnotationsManifest(Map<ContainerAnnotationType, AI> annotationManifests, String manifestUri) throws BlockChainContainerException;
+    A createAnnotationsManifest(Map<ContainerAnnotation, AI> annotationManifests, String manifestUri) throws BlockChainContainerException;
 
     AI createAnnotationManifest(D dataManifest, ContainerAnnotation annotation, String manifestUri) throws BlockChainContainerException;
 

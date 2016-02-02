@@ -14,19 +14,18 @@ import java.util.List;
 
 public class TlvSignatureManifest extends TlvManifestStructure implements SignatureManifest {
     private static final byte[] MAGIC = "KSIEMFST".getBytes();  // TODO: Verify from spec
-    private String uri;
     private TLVElement dataFilesManifestReference;
     private TLVElement signatureReference;
     private TLVElement annotationsManifestReference;
 
     public TlvSignatureManifest(List<TLVElement> elements, String uri) throws TLVParserException {
-        super(MAGIC, elements);
-        this.uri = uri;
+        super(elements);
+        this.setUri(uri);
     }
 
     public TlvSignatureManifest(InputStream stream, String uri) throws TLVParserException {
         super(stream);
-        this.uri = uri;
+        this.setUri(uri);
     }
 
     @Override
@@ -50,12 +49,8 @@ public class TlvSignatureManifest extends TlvManifestStructure implements Signat
 
     @Override
     protected void setElements(List<TLVElement> tlvElements) throws TLVParserException {
-        if (tlvElements == null || tlvElements.isEmpty()) {
-            throw new TLVParserException("No elements in manifest");
-        }
-
-        for(TLVElement element : tlvElements){
-            switch (TlvTypes.fromValue(element.getType())){
+        for (TLVElement element : tlvElements) {
+            switch (TlvTypes.fromValue(element.getType())) {
                 case DATA_FILES_MANIFEST_REFERENCE:
                     dataFilesManifestReference = readOnce(element);
                     break;
@@ -66,17 +61,12 @@ public class TlvSignatureManifest extends TlvManifestStructure implements Signat
                     annotationsManifestReference = readOnce(element);
                     break;
                 default:
-                    throw new TLVParserException("Unexpected element in manifest!");
+                    verifyCriticalFlag(element);
             }
         }
         // Check that all mandatory elements present
         if (dataFilesManifestReference == null || signatureReference == null || annotationsManifestReference == null) {
             throw new TLVParserException("Missing mandatory elements!");
         }
-    }
-
-    @Override
-    public String getUri() {
-        return uri;
     }
 }
