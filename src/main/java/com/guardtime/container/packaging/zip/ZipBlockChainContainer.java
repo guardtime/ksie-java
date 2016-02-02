@@ -66,7 +66,7 @@ class ZipBlockChainContainer implements BlockChainContainer {
     }
 
     @Override
-    public void writeTo(OutputStream output) throws BlockChainContainerException {
+    public void writeTo(OutputStream output) throws IOException {
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(output))) {
             writeEntry(new ZipEntry(mimeType.getUri()), mimeType.getInputStream(), zipOutputStream);
             writeDocuments(zipOutputStream);
@@ -76,8 +76,8 @@ class ZipBlockChainContainer implements BlockChainContainer {
             writeEntry(new ZipEntry(annotationsManifest.getUri()), annotationsManifest.getInputStream(), zipOutputStream);
             writeEntry(new ZipEntry(signatureManifest.getUri()), signatureManifest.getInputStream(), zipOutputStream);
             // TODO write signatures
-        } catch (IOException e) {
-            throw new BlockChainContainerException(e);
+        } catch (BlockChainContainerException e) {
+            throw new IOException(e);
         }
     }
 
