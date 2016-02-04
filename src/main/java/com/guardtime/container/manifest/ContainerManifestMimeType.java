@@ -1,7 +1,7 @@
 package com.guardtime.container.manifest;
 
 public enum ContainerManifestMimeType {
-    SIGNATURE_MANIFEST("application/ksi-signature"),
+    SIGNATURE("application/ksi-signature"),
     ANNOTATIONS_MANIFEST("ksie10/annotmanifest"),
     DATA_MANIFEST("ksie10/datamanifest");
 

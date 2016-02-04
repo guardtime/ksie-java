@@ -1,36 +1,52 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.BlockChainContainerException;
+import com.guardtime.container.manifest.AnnotationsManifest;
+import com.guardtime.container.manifest.DataFilesManifest;
 import com.guardtime.container.manifest.SignatureManifest;
+import com.guardtime.container.manifest.tlv.reference.AnnotationsManifestReference;
+import com.guardtime.container.manifest.tlv.reference.DataManifestReference;
+import com.guardtime.container.manifest.tlv.reference.SignatureReference;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
 public class TlvSignatureManifest extends TlvManifestStructure implements SignatureManifest {
     private static final byte[] MAGIC = "KSIEMFST".getBytes();  // TODO: Verify from spec
-    private TLVElement dataFilesManifestReference;
-    private TLVElement signatureReference;
-    private TLVElement annotationsManifestReference;
+    private DataManifestReference dataFilesManifestReference;
+    private SignatureReference signatureReference;
+    private AnnotationsManifestReference annotationsManifestReference;
 
-    public TlvSignatureManifest(List<TLVElement> elements, String uri) throws TLVParserException {
-        super(elements);
-        this.setUri(uri);
+    public TlvSignatureManifest(DataFilesManifest dataFilesManifest, AnnotationsManifest annotationsManifest, String signaturePath, String uri) throws TLVParserException {
+        super(uri);
+        try {
+            this.dataFilesManifestReference = new DataManifestReference(dataFilesManifest);
+            this.signatureReference = new SignatureReference(signaturePath);
+            this.annotationsManifestReference = new AnnotationsManifestReference(annotationsManifest);
+        } catch (IOException e) {
+            throw new TLVParserException("Failed to generate TLVElement", e);
+        }
     }
 
     public TlvSignatureManifest(InputStream stream, String uri) throws TLVParserException {
-        super(stream);
-        this.setUri(uri);
+        super(uri);
+        setElements(parseElementsFromStream(stream));
     }
 
     @Override
     public DataHash getDataHash(HashAlgorithm algorithm) throws BlockChainContainerException {
-        return Util.hash(getInputStream(), algorithm);
+        try {
+            return Util.hash(getInputStream(), algorithm);
+        } catch (IOException e) {
+            throw new BlockChainContainerException(e);
+        }
     }
 
     @Override
@@ -41,24 +57,23 @@ public class TlvSignatureManifest extends TlvManifestStructure implements Signat
     @Override
     protected List<TLVElement> getElements() {
         List<TLVElement> elements = new LinkedList<>();
-        elements.add(dataFilesManifestReference);
-        elements.add(signatureReference);
-        elements.add(annotationsManifestReference);
+        elements.add(dataFilesManifestReference.getRootElement());
+        elements.add(signatureReference.getRootElement());
+        elements.add(annotationsManifestReference.getRootElement());
         return elements;
     }
 
-    @Override
     protected void setElements(List<TLVElement> tlvElements) throws TLVParserException {
         for (TLVElement element : tlvElements) {
-            switch (TlvTypes.fromValue(element.getType())) {
-                case DATA_FILES_MANIFEST_REFERENCE:
-                    dataFilesManifestReference = readOnce(element);
+            switch (element.getType()) {
+                case DataManifestReference.DATA_FILES_MANIFEST_REFERENCE:
+                    dataFilesManifestReference = new DataManifestReference(readOnce(element));
                     break;
-                case SIGNATURE_REFERENCE:
-                    signatureReference = readOnce(element);
+                case SignatureReference.SIGNATURE_REFERENCE:
+                    signatureReference = new SignatureReference(readOnce(element));
                     break;
-                case ANNOTATIONS_MANIFEST_REFERENCE:
-                    annotationsManifestReference = readOnce(element);
+                case AnnotationsManifestReference.ANNOTATIONS_MANIFEST_REFERENCE:
+                    annotationsManifestReference = new AnnotationsManifestReference(readOnce(element));
                     break;
                 default:
                     verifyCriticalFlag(element);

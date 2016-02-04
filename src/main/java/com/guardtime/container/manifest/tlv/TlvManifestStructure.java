@@ -1,29 +1,22 @@
 package com.guardtime.container.manifest.tlv;
 
-import com.guardtime.container.BlockChainContainerException;
-import com.guardtime.container.util.Util;
-import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVInputStream;
 import com.guardtime.ksi.tlv.TLVParserException;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public abstract class TlvManifestStructure {
 
     private Set<Integer> processedElements = new HashSet<>();
     private String uri;
 
-    public TlvManifestStructure(List<TLVElement> elements) throws TLVParserException {
-        Util.notEmpty(elements, "TLV Elements");
-        this.setElements(elements);
+    public TlvManifestStructure(String uri) {
+        this.uri = uri;
     }
 
-    public TlvManifestStructure(InputStream stream) throws TLVParserException {
+    protected List<TLVElement> parseElementsFromStream(InputStream stream) throws TLVParserException {
         if (stream == null) {
             throw new TLVParserException("Stream must be present");
         }
@@ -33,16 +26,24 @@ public abstract class TlvManifestStructure {
                 throw new TLVParserException("Stream must contain data");
             }
 
-            if (!magic.equals(getMagic())) {
+            if (!Arrays.equals(magic, getMagic())) {
                 throw new TLVParserException("Invalid magic for manifest type");
             }
 
             List<TLVElement> elements = new LinkedList<>();
             TLVElement elem;
-            while ((elem = ((TLVInputStream) stream).readElement()) != null) {
+
+            TLVInputStream tlvStream;
+            if (stream instanceof TLVInputStream) {
+                tlvStream = (TLVInputStream) stream;
+            } else {
+                tlvStream = new TLVInputStream(stream);
+            }
+            while (tlvStream.hasNextElement()) {
+                elem = tlvStream.readElement();
                 elements.add(elem);
             }
-            this.setElements(elements);
+            return elements;
         } catch (IOException e) {
             throw new TLVParserException("Failed to read stream", e);
         }
@@ -82,27 +83,21 @@ public abstract class TlvManifestStructure {
 
     protected abstract List<TLVElement> getElements();
 
-    protected abstract void setElements(List<TLVElement> rootElements) throws TLVParserException;
-
     public String getUri() {
         return uri;
     }
 
-    protected void setUri(String uri) {
-        this.uri = uri;
-    }
-
-    public void writeTo(OutputStream out) throws KSIException {
+    public void writeTo(OutputStream out) throws IOException {
         if (out == null) {
-            throw new KSIException("Output stream can not be null");
+            throw new IOException("Output stream can not be null");
         }
         try {
             out.write(getMagic());
             for (TLVElement elem : getElements()) {
                 elem.writeTo(out);
             }
-        } catch (IOException e) {
-            throw new KSIException("Writing to OutputStream failed", e);
+        } catch (TLVParserException e) {
+            throw new IOException("Writing to OutputStream failed", e);
         }
     }
 
@@ -126,13 +121,9 @@ public abstract class TlvManifestStructure {
         return code;
     }
 
-    public InputStream getInputStream() throws BlockChainContainerException {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            writeTo(bos);
-            return new ByteArrayInputStream(bos.toByteArray());
-        } catch (KSIException e) {
-            throw new BlockChainContainerException("Failed to generate InputStream", e);
-        }
+    public InputStream getInputStream() throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        writeTo(bos);
+        return new ByteArrayInputStream(bos.toByteArray());
     }
 }

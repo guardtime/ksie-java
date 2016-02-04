@@ -8,7 +8,7 @@ import com.guardtime.ksi.tlv.TLVParserException;
 import java.util.LinkedList;
 import java.util.List;
 
-class TlvReferenceBuilder {
+public class TlvReferenceBuilder {
     private static final int URI_TYPE = 0x1;
     private static final int HASH_TYPE = 0x2;
     private static final int MIME_TYPE = 0x3;
@@ -23,10 +23,6 @@ class TlvReferenceBuilder {
     public TlvReferenceBuilder withType(int type) {
         this.type = type;
         return this;
-    }
-
-    public TlvReferenceBuilder withType(TlvTypes type) {
-        return this.withType(type.getType());
     }
 
     public TlvReferenceBuilder withUriElement(String uri) throws TLVParserException {

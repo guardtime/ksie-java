@@ -2,7 +2,6 @@ package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.datafile.ContainerDocument;
-import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVInputStream;
 import com.guardtime.ksi.tlv.TLVParserException;
 import org.junit.Before;
@@ -16,8 +15,8 @@ public class TlvDataFilesManifestTest extends AbstractTlvManifestTest {
 
     @Before
     public void setUpManifest() throws TLVParserException, BlockChainContainerException {
-        LinkedList<TLVElement> documents = new LinkedList<>();
-        documents.add(TlvReferenceElementFactory.createDocumentReferenceTlvElement(mockDocument));
+        LinkedList<ContainerDocument> documents = new LinkedList<>();
+        documents.add(mockDocument);
         this.manifest = new TlvDataFilesManifest(documents, "Non-important-for-test");
     }
 
