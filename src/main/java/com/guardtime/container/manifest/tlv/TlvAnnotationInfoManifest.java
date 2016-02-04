@@ -1,6 +1,5 @@
 package com.guardtime.container.manifest.tlv;
 
-import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.manifest.AnnotationInfoManifest;
 import com.guardtime.container.manifest.DataFilesManifest;
@@ -19,25 +18,21 @@ public class TlvAnnotationInfoManifest extends TlvManifestStructure implements A
     private AnnotationReference annotationReference;
     private DataManifestReference dataManifestReference;
 
-    public TlvAnnotationInfoManifest(ContainerAnnotation annotation, DataFilesManifest dataManifest, String uri) throws BlockChainContainerException {
+    public TlvAnnotationInfoManifest(ContainerAnnotation annotation, DataFilesManifest dataManifest, String uri) throws TLVParserException {
         super(uri);
         try {
             this.annotationReference = new AnnotationReference(annotation);
             this.dataManifestReference = new DataManifestReference(dataManifest);
-        } catch (IOException | TLVParserException e) {
-            throw new BlockChainContainerException("Failed to generate file reference TLVElement", e);
+        } catch (IOException e) {
+            throw new TLVParserException("Failed to generate file reference TLVElement", e);
         }
     }
 
-    public TlvAnnotationInfoManifest(InputStream stream, String uri) throws BlockChainContainerException {
-        super(uri);
-        try {
-            setReferencesFromTLVElements(
-                    parseElementsFromStream(stream)
-            );
-        } catch (TLVParserException e) {
-            throw new BlockChainContainerException(e);
-        }
+    public TlvAnnotationInfoManifest(InputStream stream, String uri) throws TLVParserException {
+        super(uri, stream);
+        setReferencesFromTLVElements(
+                parseElementsFromStream(stream)
+        );
     }
 
     @Override

@@ -24,26 +24,22 @@ public class TlvSignatureManifest extends TlvManifestStructure implements Signat
     private SignatureReference signatureReference;
     private AnnotationsManifestReference annotationsManifestReference;
 
-    public TlvSignatureManifest(DataFilesManifest dataFilesManifest, AnnotationsManifest annotationsManifest, String signaturePath, String uri) throws BlockChainContainerException {
+    public TlvSignatureManifest(DataFilesManifest dataFilesManifest, AnnotationsManifest annotationsManifest, String signaturePath, String uri) throws TLVParserException {
         super(uri);
         try {
             this.dataFilesManifestReference = new DataManifestReference(dataFilesManifest);
             this.signatureReference = new SignatureReference(signaturePath);
             this.annotationsManifestReference = new AnnotationsManifestReference(annotationsManifest);
-        } catch (IOException | TLVParserException e) {
-            throw new BlockChainContainerException("Failed to generate file reference TLVElement", e);
+        } catch (IOException e) {
+            throw new TLVParserException("Failed to generate file reference TLVElement", e);
         }
     }
 
-    public TlvSignatureManifest(InputStream stream, String uri) throws BlockChainContainerException {
+    public TlvSignatureManifest(InputStream stream, String uri) throws TLVParserException {
         super(uri);
-        try {
-            setReferencesFromTLVElements(
-                    parseElementsFromStream(stream)
-            );
-        } catch (TLVParserException e) {
-            throw new BlockChainContainerException(e);
-        }
+        setReferencesFromTLVElements(
+                parseElementsFromStream(stream)
+        );
     }
 
     @Override

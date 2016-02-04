@@ -16,10 +16,8 @@ public abstract class TlvManifestStructure {
         this.uri = uri;
     }
 
-    protected List<TLVElement> parseElementsFromStream(InputStream stream) throws TLVParserException {
-        if (stream == null) {
-            throw new TLVParserException("Stream must be present");
-        }
+    public TlvManifestStructure(String uri, InputStream stream) throws TLVParserException {
+        checkStream(stream);
         try {
             byte[] magic = new byte[8]; // TODO: Fix byte array size
             if (stream.read(magic) == 0) {
@@ -29,7 +27,21 @@ public abstract class TlvManifestStructure {
             if (!Arrays.equals(magic, getMagic())) {
                 throw new TLVParserException("Invalid magic for manifest type");
             }
+        } catch (IOException e) {
+            throw new TLVParserException("Failed to read stream", e);
+        }
+        this.uri = uri;
+    }
 
+    /**
+     * Parses given stream for manifest specific starting byte sequence
+     * @param stream
+     * @return
+     * @throws TLVParserException
+     */
+    protected List<TLVElement> parseElementsFromStream(InputStream stream) throws TLVParserException {
+        checkStream(stream);
+        try {
             List<TLVElement> elements = new LinkedList<>();
             TLVElement elem;
 
@@ -46,6 +58,12 @@ public abstract class TlvManifestStructure {
             return elements;
         } catch (IOException e) {
             throw new TLVParserException("Failed to read stream", e);
+        }
+    }
+
+    private void checkStream(InputStream stream) throws TLVParserException {
+        if (stream == null) {
+            throw new TLVParserException("Stream must be present");
         }
     }
 

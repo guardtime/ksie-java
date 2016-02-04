@@ -1,6 +1,5 @@
 package com.guardtime.container.manifest.tlv;
 
-import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.tlv.reference.AnnotationInfoReference;
@@ -17,18 +16,14 @@ public class TlvAnnotationsManifest extends TlvManifestStructure implements Anno
     private static final byte[] MAGIC = "KSIEANMF".getBytes();  // TODO: Verify from spec
     private List<AnnotationInfoReference> annotationReferences = new LinkedList<>();
 
-    public TlvAnnotationsManifest(InputStream stream, String uri) throws BlockChainContainerException {
-        super(uri);
-        try {
-            fillReferencesListFromTLVElements(
-                    parseElementsFromStream(stream)
-            );
-        } catch (TLVParserException e) {
-            throw new BlockChainContainerException(e);
-        }
+    public TlvAnnotationsManifest(InputStream stream, String uri) throws TLVParserException {
+        super(uri, stream);
+        fillReferencesListFromTLVElements(
+                parseElementsFromStream(stream)
+        );
     }
 
-    public TlvAnnotationsManifest(Map<ContainerAnnotation, TlvAnnotationInfoManifest> annotationManifests, String uri) throws BlockChainContainerException {
+    public TlvAnnotationsManifest(Map<ContainerAnnotation, TlvAnnotationInfoManifest> annotationManifests, String uri) throws TLVParserException {
         super(uri);
         fillReferencesListFromMap(annotationManifests);
     }
@@ -47,14 +42,14 @@ public class TlvAnnotationsManifest extends TlvManifestStructure implements Anno
         return returnable;
     }
 
-    private void fillReferencesListFromMap(Map<ContainerAnnotation, TlvAnnotationInfoManifest> annotationManifests) throws BlockChainContainerException {
+    private void fillReferencesListFromMap(Map<ContainerAnnotation, TlvAnnotationInfoManifest> annotationManifests) throws TLVParserException {
         try {
             for (ContainerAnnotation annotation : annotationManifests.keySet()) {
                 TlvAnnotationInfoManifest manifest = annotationManifests.get(annotation);
                 this.annotationReferences.add(new AnnotationInfoReference(manifest, annotation.getAnnotationType()));
             }
-        } catch (TLVParserException | IOException e) {
-            throw new BlockChainContainerException(e);
+        } catch (IOException e) {
+            throw new TLVParserException("Failed to generate file reference TLVElement", e);
         }
     }
 
