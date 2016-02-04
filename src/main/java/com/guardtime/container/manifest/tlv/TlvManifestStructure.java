@@ -106,7 +106,7 @@ public abstract class TlvManifestStructure {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TlvManifestStructure that = (TlvManifestStructure) o;
-        if (!this.getMagic().equals(that.getMagic())) return false;
+        if (!Arrays.equals(this.getMagic(), that.getMagic())) return false;
         if (that.getElements() == null) return false;
         return this.getElements().equals(that.getElements());
     }
@@ -114,7 +114,7 @@ public abstract class TlvManifestStructure {
     @Override
     public int hashCode() {
         int code = 1;
-        code += getMagic().hashCode();
+        code += Arrays.hashCode(getMagic());
         for (TLVElement element : getElements()) {
             code += element.hashCode();
         }

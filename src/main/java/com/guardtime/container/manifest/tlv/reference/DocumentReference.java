@@ -1,7 +1,6 @@
 package com.guardtime.container.manifest.tlv.reference;
 
 import com.guardtime.container.datafile.ContainerDocument;
-import com.guardtime.container.manifest.tlv.TlvReferenceBuilder;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 

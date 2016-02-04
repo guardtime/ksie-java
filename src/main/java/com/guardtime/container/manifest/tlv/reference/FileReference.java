@@ -7,10 +7,10 @@ import com.guardtime.ksi.tlv.TLVParserException;
 import com.guardtime.ksi.tlv.TLVStructure;
 
 public abstract class FileReference extends TLVStructure {
-    private static final int URI_TYPE = 0x1;
-    private static final int HASH_TYPE = 0x2;
-    private static final int MIME_TYPE = 0x3;
-    private static final int DOMAIN_TYPE = 0x4;
+    protected static final int URI_TYPE = 0x1;
+    protected static final int HASH_TYPE = 0x2;
+    protected static final int MIME_TYPE = 0x3;
+    protected static final int DOMAIN_TYPE = 0x4;
     protected static final HashAlgorithm DEFAULT_HASH_ALGORITHM = HashAlgorithm.SHA2_256;
 
     protected String uri;

@@ -1,5 +1,6 @@
 package com.guardtime.container.manifest.tlv;
 
+import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.manifest.AnnotationInfoManifest;
 import com.guardtime.container.manifest.DataFilesManifest;
@@ -18,19 +19,25 @@ public class TlvAnnotationInfoManifest extends TlvManifestStructure implements A
     private AnnotationReference annotationReference;
     private DataManifestReference dataManifestReference;
 
-    public TlvAnnotationInfoManifest(ContainerAnnotation annotation, DataFilesManifest dataManifest, String uri) throws TLVParserException {
+    public TlvAnnotationInfoManifest(ContainerAnnotation annotation, DataFilesManifest dataManifest, String uri) throws BlockChainContainerException {
         super(uri);
         try {
             this.annotationReference = new AnnotationReference(annotation);
             this.dataManifestReference = new DataManifestReference(dataManifest);
-        } catch (IOException e) {
-            throw new TLVParserException("Failed to generate TLVElement", e);
+        } catch (IOException | TLVParserException e) {
+            throw new BlockChainContainerException("Failed to generate file reference TLVElement", e);
         }
     }
 
-    public TlvAnnotationInfoManifest(InputStream stream, String uri) throws TLVParserException {
+    public TlvAnnotationInfoManifest(InputStream stream, String uri) throws BlockChainContainerException {
         super(uri);
-        setReferencesFromTLVElements(parseElementsFromStream(stream));
+        try {
+            setReferencesFromTLVElements(
+                    parseElementsFromStream(stream)
+            );
+        } catch (TLVParserException e) {
+            throw new BlockChainContainerException(e);
+        }
     }
 
     @Override
@@ -59,6 +66,7 @@ public class TlvAnnotationInfoManifest extends TlvManifestStructure implements A
                     verifyCriticalFlag(element);
             }
         }
+
         // Check that all mandatory elements present
         if (dataManifestReference == null || annotationReference == null) {
             throw new TLVParserException("Missing mandatory elements!");

@@ -1,5 +1,6 @@
 package com.guardtime.container.manifest.tlv;
 
+import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.tlv.reference.AnnotationInfoReference;
@@ -16,17 +17,20 @@ public class TlvAnnotationsManifest extends TlvManifestStructure implements Anno
     private static final byte[] MAGIC = "KSIEANMF".getBytes();  // TODO: Verify from spec
     private List<AnnotationInfoReference> annotationReferences = new LinkedList<>();
 
-    public TlvAnnotationsManifest(InputStream stream, String uri) throws TLVParserException {
+    public TlvAnnotationsManifest(InputStream stream, String uri) throws BlockChainContainerException {
         super(uri);
-        setElements(parseElementsFromStream(stream));
+        try {
+            fillReferencesListFromTLVElements(
+                    parseElementsFromStream(stream)
+            );
+        } catch (TLVParserException e) {
+            throw new BlockChainContainerException(e);
+        }
     }
 
-    public TlvAnnotationsManifest(Map<ContainerAnnotation, TlvAnnotationInfoManifest> annotationManifests, String uri) throws IOException, TLVParserException {
+    public TlvAnnotationsManifest(Map<ContainerAnnotation, TlvAnnotationInfoManifest> annotationManifests, String uri) throws BlockChainContainerException {
         super(uri);
-        for (ContainerAnnotation annotation : annotationManifests.keySet()) {
-            TlvAnnotationInfoManifest manifest = annotationManifests.get(annotation);
-            this.annotationReferences.add(new AnnotationInfoReference(manifest, annotation.getAnnotationType()));
-        }
+        fillReferencesListFromMap(annotationManifests);
     }
 
     @Override
@@ -43,7 +47,18 @@ public class TlvAnnotationsManifest extends TlvManifestStructure implements Anno
         return returnable;
     }
 
-    protected void setElements(List<TLVElement> tlvElements) throws TLVParserException {
+    private void fillReferencesListFromMap(Map<ContainerAnnotation, TlvAnnotationInfoManifest> annotationManifests) throws BlockChainContainerException {
+        try {
+            for (ContainerAnnotation annotation : annotationManifests.keySet()) {
+                TlvAnnotationInfoManifest manifest = annotationManifests.get(annotation);
+                this.annotationReferences.add(new AnnotationInfoReference(manifest, annotation.getAnnotationType()));
+            }
+        } catch (TLVParserException | IOException e) {
+            throw new BlockChainContainerException(e);
+        }
+    }
+
+    protected void fillReferencesListFromTLVElements(List<TLVElement> tlvElements) throws TLVParserException {
         for (TLVElement element : tlvElements) {
             this.annotationReferences.add(new AnnotationInfoReference(element));
         }

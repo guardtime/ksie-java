@@ -24,20 +24,26 @@ public class TlvSignatureManifest extends TlvManifestStructure implements Signat
     private SignatureReference signatureReference;
     private AnnotationsManifestReference annotationsManifestReference;
 
-    public TlvSignatureManifest(DataFilesManifest dataFilesManifest, AnnotationsManifest annotationsManifest, String signaturePath, String uri) throws TLVParserException {
+    public TlvSignatureManifest(DataFilesManifest dataFilesManifest, AnnotationsManifest annotationsManifest, String signaturePath, String uri) throws BlockChainContainerException {
         super(uri);
         try {
             this.dataFilesManifestReference = new DataManifestReference(dataFilesManifest);
             this.signatureReference = new SignatureReference(signaturePath);
             this.annotationsManifestReference = new AnnotationsManifestReference(annotationsManifest);
-        } catch (IOException e) {
-            throw new TLVParserException("Failed to generate TLVElement", e);
+        } catch (IOException | TLVParserException e) {
+            throw new BlockChainContainerException("Failed to generate file reference TLVElement", e);
         }
     }
 
-    public TlvSignatureManifest(InputStream stream, String uri) throws TLVParserException {
+    public TlvSignatureManifest(InputStream stream, String uri) throws BlockChainContainerException {
         super(uri);
-        setElements(parseElementsFromStream(stream));
+        try {
+            setReferencesFromTLVElements(
+                    parseElementsFromStream(stream)
+            );
+        } catch (TLVParserException e) {
+            throw new BlockChainContainerException(e);
+        }
     }
 
     @Override
@@ -63,7 +69,7 @@ public class TlvSignatureManifest extends TlvManifestStructure implements Signat
         return elements;
     }
 
-    protected void setElements(List<TLVElement> tlvElements) throws TLVParserException {
+    protected void setReferencesFromTLVElements(List<TLVElement> tlvElements) throws TLVParserException {
         for (TLVElement element : tlvElements) {
             switch (element.getType()) {
                 case DataManifestReference.DATA_FILES_MANIFEST_REFERENCE:
@@ -79,6 +85,7 @@ public class TlvSignatureManifest extends TlvManifestStructure implements Signat
                     verifyCriticalFlag(element);
             }
         }
+
         // Check that all mandatory elements present
         if (dataFilesManifestReference == null || signatureReference == null || annotationsManifestReference == null) {
             throw new TLVParserException("Missing mandatory elements!");
