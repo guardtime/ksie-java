@@ -8,9 +8,11 @@ import com.guardtime.ksi.tlv.TLVParserException;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.guardtime.container.manifest.tlv.reference.FileReference.*;
-
 public class TlvReferenceBuilder {
+    public static final int URI_TYPE = 0x1;
+    public static final int HASH_TYPE = 0x2;
+    public static final int MIME_TYPE = 0x3;
+    public static final int DOMAIN_TYPE = 0x4;
 
     private int type;
     private List<TLVElement> elements = new LinkedList<>();

@@ -27,11 +27,6 @@ public class AnnotationInfoReference extends FileReference {
     }
 
     @Override
-    protected Object[] getMandatoryElements() {
-        return new Object[]{uri, hash, mimeType};
-    }
-
-    @Override
     public int getElementType() {
         return ANNOTATION_INFO_REFERENCE;
     }

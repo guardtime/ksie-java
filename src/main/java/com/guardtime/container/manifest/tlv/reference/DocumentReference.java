@@ -25,11 +25,6 @@ public class DocumentReference extends FileReference {
     }
 
     @Override
-    protected Object[] getMandatoryElements() {
-        return new Object[]{uri, hash, mimeType};
-    }
-
-    @Override
     public int getElementType() {
         return DATA_FILE_REFERENCE;
     }

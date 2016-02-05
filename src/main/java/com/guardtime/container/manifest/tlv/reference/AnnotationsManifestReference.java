@@ -27,11 +27,6 @@ public class AnnotationsManifestReference extends FileReference {
     }
 
     @Override
-    protected Object[] getMandatoryElements() {
-        return new Object[]{uri, hash, mimeType};
-    }
-
-    @Override
     public int getElementType() {
         return ANNOTATIONS_MANIFEST_REFERENCE;
     }
