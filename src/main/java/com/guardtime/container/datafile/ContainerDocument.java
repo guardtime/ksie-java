@@ -1,0 +1,21 @@
+package com.guardtime.container.datafile;
+
+
+import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+public interface ContainerDocument {
+
+    String getFileName();
+
+    String getMimeType();
+
+    InputStream getInputStream() throws IOException;
+
+    DataHash getDataHash(HashAlgorithm algorithm) throws IOException;
+
+}
+
