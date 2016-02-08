@@ -11,10 +11,14 @@ import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class ZipContainerPackagingFactory implements BlockChainContainerPackagingFactory<ZipBlockChainContainer> {
+
+    private static final String META_INF_DIR_NAME = "/META-INF/";
 
     private final SignatureFactory signatureFactory;
     private final ContainerManifestFactory manifestFactory;
@@ -35,14 +39,14 @@ public class ZipContainerPackagingFactory implements BlockChainContainerPackagin
     @Override
     public ZipBlockChainContainer create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws BlockChainContainerException {
         Util.notEmpty(files, "Data files");
-        DataFilesManifest dataFilesManifest = manifestFactory.createDataFilesManifest(files);
-        List<AnnotationInfoManifest> annotationInfoManifests = createAnnotationInfoManifests(annotations, dataFilesManifest);
-        AnnotationsManifest annotationsManifest = manifestFactory.createAnnotationsManifest(annotationInfoManifests);
-        SignatureManifest signatureManifest = manifestFactory.createSignatureManifest(dataFilesManifest, annotationsManifest);
+        DataFilesManifest dataFilesManifest = manifestFactory.createDataFilesManifest(files, META_INF_DIR_NAME + "datamanifest");
+        Map<ContainerAnnotation, AnnotationInfoManifest> annotationInfoManifests = createAnnotationInfoManifests(annotations, dataFilesManifest);
+        AnnotationsManifest annotationsManifest = manifestFactory.createAnnotationsManifest(annotationInfoManifests, META_INF_DIR_NAME + "annotmanifest");
+        SignatureManifest signatureManifest = manifestFactory.createSignatureManifest(dataFilesManifest, annotationsManifest, META_INF_DIR_NAME + "manifest");
 
         ZipBlockChainContainer container = new Builder(files, annotations).
                 withDataFilesManifest(dataFilesManifest).
-                withAnnotationInfoManifests(annotationInfoManifests).
+                withAnnotationInfoManifests(new LinkedList<>(annotationInfoManifests.values())).
                 withAnnotationsManifest(annotationsManifest).
                 withSignatureManifest(signatureManifest).
                 build();
@@ -59,11 +63,11 @@ public class ZipContainerPackagingFactory implements BlockChainContainerPackagin
         return null;
     }
 
-    private List<AnnotationInfoManifest> createAnnotationInfoManifests(List<ContainerAnnotation> annotations, DataFilesManifest dataFilesManifest) {
-        List<AnnotationInfoManifest> annotationInfoManifests = new LinkedList<>();
+    private Map<ContainerAnnotation, AnnotationInfoManifest> createAnnotationInfoManifests(List<ContainerAnnotation> annotations, DataFilesManifest dataFilesManifest) throws BlockChainContainerException {
+        Map<ContainerAnnotation, AnnotationInfoManifest> annotationInfoManifests = new HashMap<>();
         for (ContainerAnnotation annotation : annotations) {
-            AnnotationInfoManifest singleAnnotationManifest = manifestFactory.createAnnotationManifest(dataFilesManifest, annotation);
-            annotationInfoManifests.add(singleAnnotationManifest);
+            AnnotationInfoManifest singleAnnotationManifest = manifestFactory.createAnnotationManifest(dataFilesManifest, annotation, annotation.getUri());
+            annotationInfoManifests.put(annotation, singleAnnotationManifest);
         }
         return annotationInfoManifests;
     }

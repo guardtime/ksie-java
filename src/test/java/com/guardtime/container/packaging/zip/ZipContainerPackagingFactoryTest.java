@@ -15,7 +15,6 @@ import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -91,10 +90,10 @@ public class ZipContainerPackagingFactoryTest extends AbstractBlockChainContaine
         ZipBlockChainContainer container = containerFactory.create(Arrays.asList(new ContainerDocument[]{mockedDataFile}), annotations);
 
         assertNotNull(container);
-        verify(mockedManifestFactory, ONE_EXECUTION).createAnnotationManifest(Mockito.any(DataFilesManifest.class), Mockito.any(ContainerAnnotation.class));
-        verify(mockedManifestFactory, ONE_EXECUTION).createAnnotationsManifest(Mockito.anyListOf(AnnotationInfoManifest.class));
-        verify(mockedManifestFactory, ONE_EXECUTION).createDataFilesManifest(Mockito.anyListOf(ContainerDocument[].class));
-        verify(mockedManifestFactory, ONE_EXECUTION).createSignatureManifest(Mockito.any(DataFilesManifest.class), Mockito.any(AnnotationsManifest.class));
+        verify(mockedManifestFactory, ONE_EXECUTION).createAnnotationManifest(Mockito.any(DataFilesManifest.class), Mockito.any(ContainerAnnotation.class), Mockito.anyString());
+        verify(mockedManifestFactory, ONE_EXECUTION).createAnnotationsManifest(Mockito.anyMapOf(ContainerAnnotation.class, AnnotationInfoManifest.class), Mockito.anyString());
+        verify(mockedManifestFactory, ONE_EXECUTION).createDataFilesManifest(Mockito.anyListOf(ContainerDocument[].class), Mockito.anyString());
+        verify(mockedManifestFactory, ONE_EXECUTION).createSignatureManifest(Mockito.any(DataFilesManifest.class), Mockito.any(AnnotationsManifest.class), Mockito.anyString());
     }
 
     //TODO add tests: create container without data file(s)

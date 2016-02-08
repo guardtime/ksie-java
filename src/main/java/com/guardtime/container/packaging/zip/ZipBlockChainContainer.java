@@ -1,5 +1,6 @@
 package com.guardtime.container.packaging.zip;
 
+import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.AnnotationInfoManifest;
@@ -9,6 +10,7 @@ import com.guardtime.container.manifest.SignatureManifest;
 import com.guardtime.container.packaging.BlockChainContainer;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.util.Util;
 
 import java.io.BufferedOutputStream;
@@ -21,8 +23,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 class ZipBlockChainContainer implements BlockChainContainer {
-
-    private static final String META_INF_DIR_NAME = "/META-INF/";
 
     private DataFilesManifest dataFilesManifest;
     private AnnotationsManifest annotationsManifest;
@@ -57,8 +57,8 @@ class ZipBlockChainContainer implements BlockChainContainer {
         this.annotationInfoManifests = annotationInfoManifests;
     }
 
-    DataHash getSignatureInputHash() {
-        return signatureManifest.getDataHash();
+    DataHash getSignatureInputHash() throws BlockChainContainerException {
+        return signatureManifest.getDataHash(HashAlgorithm.SHA2_256);
     }
 
     public void addSignature(ContainerSignature signature) {
@@ -76,10 +76,12 @@ class ZipBlockChainContainer implements BlockChainContainer {
             writeEntry(new ZipEntry(annotationsManifest.getUri()), annotationsManifest.getInputStream(), zipOutputStream);
             writeEntry(new ZipEntry(signatureManifest.getUri()), signatureManifest.getInputStream(), zipOutputStream);
             // TODO write signatures
+        } catch (BlockChainContainerException e) {
+            throw new IOException(e);
         }
     }
 
-    private void writeAnnotationsInfoManifests(ZipOutputStream zipOutputStream) throws IOException {
+    private void writeAnnotationsInfoManifests(ZipOutputStream zipOutputStream) throws IOException, BlockChainContainerException {
         for (AnnotationInfoManifest annotationInfoManifest : annotationInfoManifests) {
             writeEntry(new ZipEntry(annotationInfoManifest.getUri()), annotationInfoManifest.getInputStream(), zipOutputStream);
         }
