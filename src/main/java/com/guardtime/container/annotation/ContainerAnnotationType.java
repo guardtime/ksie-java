@@ -1,5 +1,8 @@
 package com.guardtime.container.annotation;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum ContainerAnnotationType {
 
     FULLY_REMOVABLE("ksie10/removable-fully"),
@@ -7,6 +10,14 @@ public enum ContainerAnnotationType {
     NON_REMOVABLE("ksie10/removable-none");
 
     private String content;
+    private static Map<String, ContainerAnnotationType> types;
+
+    static {
+        types = new HashMap<>();
+        types.put(FULLY_REMOVABLE.getContent(), FULLY_REMOVABLE);
+        types.put(VALUE_REMOVABLE.getContent(), VALUE_REMOVABLE);
+        types.put(NON_REMOVABLE.getContent(), NON_REMOVABLE);
+    }
 
     ContainerAnnotationType(String content) {
         this.content = content;
@@ -14,5 +25,9 @@ public enum ContainerAnnotationType {
 
     public String getContent() {
         return content;
+    }
+
+    public static ContainerAnnotationType fromContent(String content) {
+        return types.get(content);
     }
 }

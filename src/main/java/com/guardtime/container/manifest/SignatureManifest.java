@@ -1,6 +1,8 @@
 package com.guardtime.container.manifest;
 
 import com.guardtime.container.BlockChainContainerException;
+import com.guardtime.container.manifest.reference.AnnotationsManifestReference;
+import com.guardtime.container.manifest.reference.DataFilesManifestReference;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
@@ -14,5 +16,11 @@ public interface SignatureManifest {
     InputStream getInputStream() throws IOException;
 
     String getUri();
+
+    DataFilesManifestReference getDataFilesManifestReference();
+
+    AnnotationsManifestReference getAnnotationsManifestReference();
+
+    String getSignatureUri();
 
 }

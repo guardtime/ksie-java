@@ -4,9 +4,11 @@ import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.DataFilesManifest;
 import com.guardtime.container.manifest.SignatureManifest;
-import com.guardtime.container.manifest.tlv.reference.AnnotationsManifestReference;
-import com.guardtime.container.manifest.tlv.reference.DataManifestReference;
-import com.guardtime.container.manifest.tlv.reference.SignatureReference;
+import com.guardtime.container.manifest.reference.AnnotationsManifestReference;
+import com.guardtime.container.manifest.reference.DataFilesManifestReference;
+import com.guardtime.container.manifest.reference.tlv.TlvAnnotationsManifestReference;
+import com.guardtime.container.manifest.reference.tlv.TlvDataFilesManifestReference;
+import com.guardtime.container.manifest.reference.tlv.TlvSignatureReference;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -20,16 +22,16 @@ import java.util.List;
 
 public class TlvSignatureManifest extends TlvManifestStructure implements SignatureManifest {
     private static final byte[] MAGIC = "KSIEMFST".getBytes();  // TODO: Verify from spec
-    private DataManifestReference dataFilesManifestReference;
-    private SignatureReference signatureReference;
-    private AnnotationsManifestReference annotationsManifestReference;
+    private TlvDataFilesManifestReference dataFilesManifestReference;
+    private TlvSignatureReference signatureReference;
+    private TlvAnnotationsManifestReference annotationsManifestReference;
 
     public TlvSignatureManifest(DataFilesManifest dataFilesManifest, AnnotationsManifest annotationsManifest, String signaturePath, String uri) throws TLVParserException {
         super(uri);
         try {
-            this.dataFilesManifestReference = new DataManifestReference(dataFilesManifest);
-            this.signatureReference = new SignatureReference(signaturePath);
-            this.annotationsManifestReference = new AnnotationsManifestReference(annotationsManifest);
+            this.dataFilesManifestReference = new TlvDataFilesManifestReference(dataFilesManifest);
+            this.signatureReference = new TlvSignatureReference(signaturePath);
+            this.annotationsManifestReference = new TlvAnnotationsManifestReference(annotationsManifest);
         } catch (IOException e) {
             throw new TLVParserException("Failed to generate file reference TLVElement", e);
         }
@@ -52,6 +54,21 @@ public class TlvSignatureManifest extends TlvManifestStructure implements Signat
     }
 
     @Override
+    public DataFilesManifestReference getDataFilesManifestReference() {
+        return dataFilesManifestReference;
+    }
+
+    @Override
+    public AnnotationsManifestReference getAnnotationsManifestReference() {
+        return annotationsManifestReference;
+    }
+
+    @Override
+    public String getSignatureUri() {
+        return signatureReference.getUri();
+    }
+
+    @Override
     protected byte[] getMagic() {
         return MAGIC;
     }
@@ -68,14 +85,14 @@ public class TlvSignatureManifest extends TlvManifestStructure implements Signat
     protected void setReferencesFromTLVElements(List<TLVElement> tlvElements) throws TLVParserException {
         for (TLVElement element : tlvElements) {
             switch (element.getType()) {
-                case DataManifestReference.DATA_FILES_MANIFEST_REFERENCE:
-                    dataFilesManifestReference = new DataManifestReference(readOnce(element));
+                case TlvDataFilesManifestReference.DATA_FILES_MANIFEST_REFERENCE:
+                    dataFilesManifestReference = new TlvDataFilesManifestReference(readOnce(element));
                     break;
-                case SignatureReference.SIGNATURE_REFERENCE:
-                    signatureReference = new SignatureReference(readOnce(element));
+                case TlvSignatureReference.SIGNATURE_REFERENCE:
+                    signatureReference = new TlvSignatureReference(readOnce(element));
                     break;
-                case AnnotationsManifestReference.ANNOTATIONS_MANIFEST_REFERENCE:
-                    annotationsManifestReference = new AnnotationsManifestReference(readOnce(element));
+                case TlvAnnotationsManifestReference.ANNOTATIONS_MANIFEST_REFERENCE:
+                    annotationsManifestReference = new TlvAnnotationsManifestReference(readOnce(element));
                     break;
                 default:
                     verifyCriticalFlag(element);

@@ -73,18 +73,18 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
     @Test
     public void testCreateSignatureManifestWithoutDataManifest_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
-        factory.createSignatureManifest(null, mockAnnotationsManifest, "Non-important-for-test");
+        factory.createSignatureManifest(null, mockAnnotationsManifest, "Non-important-for-test", "signature.ksig");
     }
 
     @Test
     public void testCreateSignatureManifestWithoutAnnotationsManifest_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
-        factory.createSignatureManifest(mockDataManifest, null, "Non-important-for-test");
+        factory.createSignatureManifest(mockDataManifest, null, "Non-important-for-test", "signature.ksig");
     }
 
     @Test
     public void testCreateSignatureManifestOK() throws Exception {
-        TlvSignatureManifest manifest = factory.createSignatureManifest(mockDataManifest, mockAnnotationsManifest, "Non-important-for-test");
+        TlvSignatureManifest manifest = factory.createSignatureManifest(mockDataManifest, mockAnnotationsManifest, "Non-important-for-test", "signature.ksig");
 
         assertNotNull("Manifest was not created", manifest);
     }
