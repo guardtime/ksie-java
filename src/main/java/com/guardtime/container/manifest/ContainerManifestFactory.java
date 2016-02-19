@@ -11,7 +11,7 @@ import java.util.Map;
 
 public interface ContainerManifestFactory<S extends SignatureManifest, D extends DataFilesManifest, A extends AnnotationsManifest, AI extends AnnotationInfoManifest> {
 
-    S createSignatureManifest(D dataFilesManifest, A annotationManifest, String manifestUri) throws BlockChainContainerException;
+    S createSignatureManifest(D dataFilesManifest, A annotationManifest, String manifestUri, String signatureURI) throws BlockChainContainerException;
 
     D createDataFilesManifest(List<ContainerDocument> files, String manifestUri) throws BlockChainContainerException;
 

@@ -22,6 +22,7 @@ public class ZipContainerPackagingFactory implements BlockChainContainerPackagin
 
     private final SignatureFactory signatureFactory;
     private final ContainerManifestFactory manifestFactory;
+    private String signatureUri;
 
     public ZipContainerPackagingFactory(SignatureFactory signatureFactory, ContainerManifestFactory manifestFactory) {
         Util.notNull(signatureFactory, "Signature factory");
@@ -42,7 +43,7 @@ public class ZipContainerPackagingFactory implements BlockChainContainerPackagin
         DataFilesManifest dataFilesManifest = manifestFactory.createDataFilesManifest(files, META_INF_DIR_NAME + "datamanifest");
         Map<ContainerAnnotation, AnnotationInfoManifest> annotationInfoManifests = createAnnotationInfoManifests(annotations, dataFilesManifest);
         AnnotationsManifest annotationsManifest = manifestFactory.createAnnotationsManifest(annotationInfoManifests, META_INF_DIR_NAME + "annotmanifest");
-        SignatureManifest signatureManifest = manifestFactory.createSignatureManifest(dataFilesManifest, annotationsManifest, META_INF_DIR_NAME + "manifest");
+        SignatureManifest signatureManifest = manifestFactory.createSignatureManifest(dataFilesManifest, annotationsManifest, META_INF_DIR_NAME + "manifest", getSignatureUri());
 
         ZipBlockChainContainer container = new Builder(files, annotations).
                 withDataFilesManifest(dataFilesManifest).
@@ -72,4 +73,7 @@ public class ZipContainerPackagingFactory implements BlockChainContainerPackagin
         return annotationInfoManifests;
     }
 
+    private String getSignatureUri() {
+        return META_INF_DIR_NAME + "signature1.ksig"; // TODO: real signature uri value
+    }
 }

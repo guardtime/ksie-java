@@ -1,6 +1,7 @@
-package com.guardtime.container.manifest.tlv.reference;
+package com.guardtime.container.manifest.reference.tlv;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
+import com.guardtime.container.manifest.reference.AnnotationReference;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
@@ -8,26 +9,24 @@ import com.guardtime.ksi.tlv.TLVStructure;
 
 import java.io.IOException;
 
-import static com.guardtime.container.manifest.tlv.reference.TlvReferenceBuilder.*;
-
-public class AnnotationReference extends TLVStructure {
+public class TlvAnnotationReference extends TLVStructure implements AnnotationReference {
     public static final int ANNOTATION_REFERENCE = 0xb05;
 
     private String uri;
     private DataHash hash;
     private String domain;
 
-    public AnnotationReference(TLVElement rootElement) throws TLVParserException {
+    public TlvAnnotationReference(TLVElement rootElement) throws TLVParserException {
         super(rootElement);
         for (TLVElement element : rootElement.getChildElements()) {
             switch (element.getType()) {
-                case URI_TYPE:
+                case TlvReferenceBuilder.URI_TYPE:
                     this.uri = readOnce(element).getDecodedString();
                     break;
-                case HASH_TYPE:
+                case TlvReferenceBuilder.HASH_TYPE:
                     this.hash = readOnce(element).getDecodedDataHash();
                     break;
-                case DOMAIN_TYPE:
+                case TlvReferenceBuilder.DOMAIN_TYPE:
                     this.domain = readOnce(element).getDecodedString();
                     break;
                 default:
@@ -36,12 +35,12 @@ public class AnnotationReference extends TLVStructure {
         }
     }
 
-    public AnnotationReference(ContainerAnnotation annotation) throws TLVParserException, IOException {
+    public TlvAnnotationReference(ContainerAnnotation annotation) throws TLVParserException, IOException {
         this(
                 new TlvReferenceBuilder().
                         withType(ANNOTATION_REFERENCE).
                         withUriElement(annotation.getUri()).
-                        withHashElement(annotation.getDataHash(FileReference.DEFAULT_HASH_ALGORITHM)).
+                        withHashElement(annotation.getDataHash(TlvFileReference.DEFAULT_HASH_ALGORITHM)).
                         withDomainElement(annotation.getDomain()).
                         build()
         );
@@ -58,5 +57,10 @@ public class AnnotationReference extends TLVStructure {
 
     public String getDomain() {
         return domain;
+    }
+
+    @Override
+    public DataHash getHash() {
+        return hash;
     }
 }

@@ -1,28 +1,26 @@
-package com.guardtime.container.manifest.tlv.reference;
+package com.guardtime.container.manifest.reference.tlv;
 
 import com.guardtime.container.manifest.ContainerManifestMimeType;
+import com.guardtime.container.manifest.reference.SignatureReference;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 import com.guardtime.ksi.tlv.TLVStructure;
 
-import static com.guardtime.container.manifest.tlv.reference.TlvReferenceBuilder.MIME_TYPE;
-import static com.guardtime.container.manifest.tlv.reference.TlvReferenceBuilder.URI_TYPE;
-
-public class SignatureReference extends TLVStructure {
+public class TlvSignatureReference extends TLVStructure implements SignatureReference {
     public static final int SIGNATURE_REFERENCE = 0xb06;
 
     private String uri;
 
-    public SignatureReference(TLVElement rootElement) throws TLVParserException {
+    public TlvSignatureReference(TLVElement rootElement) throws TLVParserException {
         super(rootElement);
         for (TLVElement element : rootElement.getChildElements()) {
             switch (element.getType()) {
-                case URI_TYPE:
+                case TlvReferenceBuilder.URI_TYPE:
                     this.uri = readOnce(element).getDecodedString();
                     break;
-                case MIME_TYPE:
-                    String mimetype = readOnce(element).getDecodedString();
-                    if (!mimetype.equals(ContainerManifestMimeType.SIGNATURE.getType())) {
+                case TlvReferenceBuilder.MIME_TYPE:
+                    String mimeType = readOnce(element).getDecodedString();
+                    if (!mimeType.equals(ContainerManifestMimeType.SIGNATURE.getType())) {
                         throw new TLVParserException("Invalid MIME type for signature");
                     }
                     break;
@@ -32,7 +30,7 @@ public class SignatureReference extends TLVStructure {
         }
     }
 
-    public SignatureReference(String uri) throws TLVParserException {
+    public TlvSignatureReference(String uri) throws TLVParserException {
         this(
                 new TlvReferenceBuilder().
                         withType(SIGNATURE_REFERENCE).

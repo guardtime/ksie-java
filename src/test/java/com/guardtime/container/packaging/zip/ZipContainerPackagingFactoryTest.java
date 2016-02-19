@@ -93,7 +93,7 @@ public class ZipContainerPackagingFactoryTest extends AbstractBlockChainContaine
         verify(mockedManifestFactory, ONE_EXECUTION).createAnnotationManifest(Mockito.any(DataFilesManifest.class), Mockito.any(ContainerAnnotation.class), Mockito.anyString());
         verify(mockedManifestFactory, ONE_EXECUTION).createAnnotationsManifest(Mockito.anyMapOf(ContainerAnnotation.class, AnnotationInfoManifest.class), Mockito.anyString());
         verify(mockedManifestFactory, ONE_EXECUTION).createDataFilesManifest(Mockito.anyListOf(ContainerDocument[].class), Mockito.anyString());
-        verify(mockedManifestFactory, ONE_EXECUTION).createSignatureManifest(Mockito.any(DataFilesManifest.class), Mockito.any(AnnotationsManifest.class), Mockito.anyString());
+        verify(mockedManifestFactory, ONE_EXECUTION).createSignatureManifest(Mockito.any(DataFilesManifest.class), Mockito.any(AnnotationsManifest.class), Mockito.anyString(), Mockito.anyString());
     }
 
     //TODO add tests: create container without data file(s)

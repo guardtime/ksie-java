@@ -4,14 +4,10 @@ import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.ContainerManifestFactory;
-import com.guardtime.container.manifest.tlv.reference.DataManifestReference;
 import com.guardtime.container.util.Util;
-import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,11 +16,10 @@ public class TlvContainerManifestFactory implements ContainerManifestFactory<Tlv
     private final String TLV_EXTENSION = ".tlv";
 
     @Override
-    public TlvSignatureManifest createSignatureManifest(TlvDataFilesManifest dataFilesManifest, TlvAnnotationsManifest annotationsManifest, String manifestUri) throws BlockChainContainerException {
+    public TlvSignatureManifest createSignatureManifest(TlvDataFilesManifest dataFilesManifest, TlvAnnotationsManifest annotationsManifest, String manifestUri, String signatureURI) throws BlockChainContainerException {
         Util.notNull(dataFilesManifest, "Document manifest");
         Util.notNull(annotationsManifest, "Annotations manifest");
 
-        String signatureURI = "META-INF/signature1.ksig"; // TODO: Find a solution to generate correct signature path
         try {
             return new TlvSignatureManifest(dataFilesManifest, annotationsManifest, signatureURI, manifestUri + TLV_EXTENSION);
         } catch (TLVParserException e) {

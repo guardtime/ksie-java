@@ -1,4 +1,4 @@
-package com.guardtime.container.manifest.tlv.reference;
+package com.guardtime.container.manifest.reference.tlv;
 
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.tlv.TLVElement;
@@ -8,7 +8,7 @@ import com.guardtime.ksi.tlv.TLVParserException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class TlvReferenceBuilder {
+class TlvReferenceBuilder {
     public static final int URI_TYPE = 0x1;
     public static final int HASH_TYPE = 0x2;
     public static final int MIME_TYPE = 0x3;

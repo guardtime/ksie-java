@@ -1,19 +1,20 @@
-package com.guardtime.container.manifest.tlv.reference;
+package com.guardtime.container.manifest.reference.tlv;
 
 import com.guardtime.container.datafile.ContainerDocument;
+import com.guardtime.container.manifest.reference.DataFileReference;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 
 import java.io.IOException;
 
-public class DocumentReference extends FileReference {
+public class TlvDataFileReference extends TlvFileReference implements DataFileReference {
     public static final int DATA_FILE_REFERENCE = 0xb03;
 
-    public DocumentReference(TLVElement root) throws TLVParserException {
+    public TlvDataFileReference(TLVElement root) throws TLVParserException {
         super(root);
     }
 
-    public DocumentReference(ContainerDocument document) throws TLVParserException, IOException {
+    public TlvDataFileReference(ContainerDocument document) throws TLVParserException, IOException {
         this(
                 new TlvReferenceBuilder().
                         withType(DATA_FILE_REFERENCE).

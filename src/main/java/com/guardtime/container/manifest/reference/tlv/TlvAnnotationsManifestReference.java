@@ -1,21 +1,22 @@
-package com.guardtime.container.manifest.tlv.reference;
+package com.guardtime.container.manifest.reference.tlv;
 
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.ContainerManifestMimeType;
+import com.guardtime.container.manifest.reference.AnnotationsManifestReference;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 
 import java.io.IOException;
 
-public class AnnotationsManifestReference extends FileReference {
+public class TlvAnnotationsManifestReference extends TlvFileReference implements AnnotationsManifestReference {
     public static final int ANNOTATIONS_MANIFEST_REFERENCE = 0xb02;
 
-    public AnnotationsManifestReference(TLVElement rootElement) throws TLVParserException {
+    public TlvAnnotationsManifestReference(TLVElement rootElement) throws TLVParserException {
         super(rootElement);
     }
 
-    public AnnotationsManifestReference(AnnotationsManifest manifest) throws TLVParserException, IOException {
+    public TlvAnnotationsManifestReference(AnnotationsManifest manifest) throws TLVParserException, IOException {
         this(
                 new TlvReferenceBuilder().
                         withType(ANNOTATIONS_MANIFEST_REFERENCE).

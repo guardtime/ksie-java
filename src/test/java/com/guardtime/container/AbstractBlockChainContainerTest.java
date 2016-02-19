@@ -55,7 +55,7 @@ public class AbstractBlockChainContainerTest {
         when(mockedManifestFactory.createAnnotationsManifest(Mockito.anyMapOf(ContainerAnnotation.class, AnnotationInfoManifest.class), Mockito.anyString())).thenReturn(mockedAnnotationsManifest);
         when(mockedManifestFactory.createAnnotationManifest(Mockito.any(DataFilesManifest.class), Mockito.any(ContainerAnnotation.class), Mockito.anyString())).thenReturn(annotationInfoManifest);
         when(mockedManifestFactory.createDataFilesManifest(Mockito.anyListOf(ContainerDocument[].class), Mockito.anyString())).thenReturn(mockedDataFileManifest);
-        when(mockedManifestFactory.createSignatureManifest(Mockito.any(DataFilesManifest.class), Mockito.any(AnnotationsManifest.class), Mockito.anyString())).thenReturn(mockedSignatureManifest);
+        when(mockedManifestFactory.createSignatureManifest(Mockito.any(DataFilesManifest.class), Mockito.any(AnnotationsManifest.class), Mockito.anyString(), Mockito.anyString())).thenReturn(mockedSignatureManifest);
     }
 
 }
