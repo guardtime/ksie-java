@@ -1,12 +1,14 @@
-package com.guardtime.container.manifest.reference.tlv;
+package com.guardtime.container.manifest.tlv;
 
+import com.guardtime.container.manifest.FileReference;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 import com.guardtime.ksi.tlv.TLVStructure;
 
-public abstract class TlvFileReference extends TLVStructure {
+abstract class TlvFileReference extends TLVStructure implements FileReference {
+
     protected static final HashAlgorithm DEFAULT_HASH_ALGORITHM = HashAlgorithm.SHA2_256;
 
     private String uri;
@@ -30,6 +32,18 @@ public abstract class TlvFileReference extends TLVStructure {
                     verifyCriticalFlag(element);
             }
         }
+    }
+
+    public TlvFileReference(String uri, DataHash dataHash, String mimeType) throws TLVParserException {
+        this.uri = uri;
+        this.hash = dataHash;
+        this.mimeType = mimeType;
+        this.rootElement = new TlvReferenceBuilder()
+                .withType(getElementType())
+                .withUriElement(uri)
+                .withHashElement(dataHash)
+                .withMimeTypeElement(mimeType)
+                .build();
     }
 
     public String getUri() {

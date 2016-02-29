@@ -1,10 +1,13 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
+import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.manifest.AnnotationsManifest;
-import com.guardtime.container.manifest.reference.AnnotationInfoManifestReference;
-import com.guardtime.container.manifest.reference.tlv.TlvAnnotationInfoManifestReference;
+import com.guardtime.container.manifest.FileReference;
+import com.guardtime.container.manifest.InvalidManifestException;
+import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.tlv.TLVElement;
+import com.guardtime.ksi.tlv.TLVInputStream;
 import com.guardtime.ksi.tlv.TLVParserException;
 
 import java.io.IOException;
@@ -13,55 +16,50 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class TlvAnnotationsManifest extends TlvManifestStructure implements AnnotationsManifest {
+class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements AnnotationsManifest {
+
     private static final byte[] MAGIC = "KSIEANMF".getBytes();  // TODO: Verify from spec
+
     private List<TlvAnnotationInfoManifestReference> annotationReferences = new LinkedList<>();
 
-    public TlvAnnotationsManifest(InputStream stream, String uri) throws TLVParserException {
-        super(uri, stream);
-        fillReferencesListFromTLVElements(
-                parseElementsFromStream(stream)
-        );
-    }
-
-    public TlvAnnotationsManifest(Map<ContainerAnnotation, TlvAnnotationInfoManifest> annotationManifests, String uri) throws TLVParserException {
-        super(uri);
-        fillReferencesListFromMap(annotationManifests);
-    }
-
-    @Override
-    protected byte[] getMagic() {
-        return MAGIC;
-    }
-
-    @Override
-    protected List<TLVElement> getElements() {
-        List<TLVElement> returnable = new LinkedList<>();
-        for (TlvAnnotationInfoManifestReference reference : annotationReferences) {
-            returnable.add(reference.getRootElement());
-        }
-        return returnable;
-    }
-
-    private void fillReferencesListFromMap(Map<ContainerAnnotation, TlvAnnotationInfoManifest> annotationManifests) throws TLVParserException {
+    public TlvAnnotationsManifest(Map<ContainerAnnotation, Pair<String, TlvAnnotationInfoManifest>> annotationManifests) throws InvalidManifestException {
+        super(MAGIC);
         try {
-            for (ContainerAnnotation annotation : annotationManifests.keySet()) {
-                TlvAnnotationInfoManifest manifest = annotationManifests.get(annotation);
-                this.annotationReferences.add(new TlvAnnotationInfoManifestReference(manifest, annotation.getAnnotationType()));
+            for (Pair<String, TlvAnnotationInfoManifest> annotation : annotationManifests.values()) {
+                //TODO annotation type
+                this.annotationReferences.add(new TlvAnnotationInfoManifestReference(annotation.getLeft(), annotation.getRight(), ContainerAnnotationType.FULLY_REMOVABLE));
             }
-        } catch (IOException e) {
-            throw new TLVParserException("Failed to generate file reference TLVElement", e);
+        } catch (TLVParserException | IOException e) {
+            throw new InvalidManifestException("Failed to generate file reference TLVElement", e);
         }
     }
 
-    protected void fillReferencesListFromTLVElements(List<TLVElement> tlvElements) throws TLVParserException {
-        for (TLVElement element : tlvElements) {
+    public TlvAnnotationsManifest(InputStream stream) throws InvalidManifestException {
+        super(MAGIC, stream);
+        try {
+            read(stream);
+        } catch (TLVParserException | IOException e) {
+            throw new InvalidManifestException(e);
+        }
+    }
+
+    private void read(InputStream stream) throws TLVParserException, IOException {
+        TLVInputStream input = toTlvInputStream(stream);
+        TLVElement element;
+        while (input.hasNextElement()) {
+            element = input.readElement();
+            //TODO unknown elements
             this.annotationReferences.add(new TlvAnnotationInfoManifestReference(element));
         }
     }
 
     @Override
-    public List<? extends AnnotationInfoManifestReference> getAnnotationManifestReferences() {
+    protected List<TlvAnnotationInfoManifestReference> getElements() {
+        return annotationReferences;
+    }
+
+    @Override
+    public List<? extends FileReference> getAnnotationManifestReferences() {
         return annotationReferences;
     }
 }

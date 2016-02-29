@@ -11,7 +11,7 @@ import java.nio.charset.Charset;
 import static com.guardtime.container.util.Util.hash;
 import static com.guardtime.container.util.Util.notNull;
 
-public class StringContainerAnnotation implements ContainerAnnotation {
+public class StringAnnotation implements ContainerAnnotation {
 
     private final String mimeType = "application/txt";
     private final String content;
@@ -19,7 +19,7 @@ public class StringContainerAnnotation implements ContainerAnnotation {
     private final ContainerAnnotationType type;
     private DataHash dataHash;
 
-    public StringContainerAnnotation(ContainerAnnotationType type, String content, String domain) {
+    public StringAnnotation(ContainerAnnotationType type, String content, String domain) {
         notNull(content, "Type");
         notNull(content, "Content");
         this.type = type;
@@ -53,12 +53,6 @@ public class StringContainerAnnotation implements ContainerAnnotation {
             dataHash = hash(getInputStream(), algorithm);
         }
         return dataHash;
-    }
-
-    @Override
-    public String getUri() {
-        //TODO
-        return "annot1";
     }
 
     @Override

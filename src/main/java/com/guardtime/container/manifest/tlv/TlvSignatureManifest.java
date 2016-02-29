@@ -1,47 +1,55 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.BlockChainContainerException;
-import com.guardtime.container.manifest.AnnotationsManifest;
-import com.guardtime.container.manifest.DataFilesManifest;
+import com.guardtime.container.manifest.FileReference;
+import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.manifest.SignatureManifest;
-import com.guardtime.container.manifest.reference.AnnotationsManifestReference;
-import com.guardtime.container.manifest.reference.DataFilesManifestReference;
-import com.guardtime.container.manifest.reference.tlv.TlvAnnotationsManifestReference;
-import com.guardtime.container.manifest.reference.tlv.TlvDataFilesManifestReference;
-import com.guardtime.container.manifest.reference.tlv.TlvSignatureReference;
+import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
+import com.guardtime.ksi.tlv.TLVInputStream;
 import com.guardtime.ksi.tlv.TLVParserException;
+import com.guardtime.ksi.tlv.TLVStructure;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedList;
 import java.util.List;
 
-public class TlvSignatureManifest extends TlvManifestStructure implements SignatureManifest {
+import static java.util.Arrays.asList;
+
+//TODO fix reference object
+class TlvSignatureManifest extends AbstractTlvManifestStructure implements SignatureManifest {
+
     private static final byte[] MAGIC = "KSIEMFST".getBytes();  // TODO: Verify from spec
+
     private TlvDataFilesManifestReference dataFilesManifestReference;
     private TlvSignatureReference signatureReference;
     private TlvAnnotationsManifestReference annotationsManifestReference;
 
-    public TlvSignatureManifest(DataFilesManifest dataFilesManifest, AnnotationsManifest annotationsManifest, String signaturePath, String uri) throws TLVParserException {
-        super(uri);
+    public TlvSignatureManifest(Pair<String, TlvDataFilesManifest> dataFilesManifest, Pair<String, TlvAnnotationsManifest> annotationsManifest,  Pair<String, String> signatureReference) throws InvalidManifestException {
+        super(MAGIC);
         try {
-            this.dataFilesManifestReference = new TlvDataFilesManifestReference(dataFilesManifest);
-            this.signatureReference = new TlvSignatureReference(signaturePath);
-            this.annotationsManifestReference = new TlvAnnotationsManifestReference(annotationsManifest);
-        } catch (IOException e) {
-            throw new TLVParserException("Failed to generate file reference TLVElement", e);
+            this.dataFilesManifestReference = new TlvDataFilesManifestReference(dataFilesManifest.getRight(), dataFilesManifest.getLeft());
+            this.signatureReference = new TlvSignatureReference(signatureReference.getLeft(), signatureReference.getRight());
+            this.annotationsManifestReference = new TlvAnnotationsManifestReference(annotationsManifest.getLeft(), annotationsManifest.getRight());
+        } catch (TLVParserException | IOException e) {
+            throw new InvalidManifestException("Failed to generate file reference TLVElement", e);
         }
     }
 
-    public TlvSignatureManifest(InputStream stream, String uri) throws TLVParserException {
-        super(uri);
-        setReferencesFromTLVElements(
-                parseElementsFromStream(stream)
-        );
+    public TlvSignatureManifest(InputStream stream) throws InvalidManifestException {
+        super(MAGIC, stream);
+        try {
+            TLVInputStream inputStream = toTlvInputStream(stream);
+            read(inputStream);
+        } catch (TLVParserException | IOException e) {
+            throw new InvalidManifestException(e);
+        }
+        if (dataFilesManifestReference == null || signatureReference == null || annotationsManifestReference == null) {
+            throw new InvalidManifestException("Missing mandatory elements!");
+        }
     }
 
     @Override
@@ -54,36 +62,30 @@ public class TlvSignatureManifest extends TlvManifestStructure implements Signat
     }
 
     @Override
-    public DataFilesManifestReference getDataFilesManifestReference() {
+    public FileReference getDataFilesReference() {
         return dataFilesManifestReference;
     }
 
     @Override
-    public AnnotationsManifestReference getAnnotationsManifestReference() {
+    public FileReference getAnnotationsManifestReference() {
         return annotationsManifestReference;
     }
 
     @Override
-    public String getSignatureUri() {
-        return signatureReference.getUri();
+    public com.guardtime.container.manifest.SignatureReference getSignatureReference() {
+        return signatureReference;
     }
 
     @Override
-    protected byte[] getMagic() {
-        return MAGIC;
+    protected List<TLVStructure> getElements() {
+        return asList(dataFilesManifestReference, signatureReference, annotationsManifestReference);
     }
 
-    @Override
-    protected List<TLVElement> getElements() {
-        List<TLVElement> elements = new LinkedList<>();
-        elements.add(dataFilesManifestReference.getRootElement());
-        elements.add(signatureReference.getRootElement());
-        elements.add(annotationsManifestReference.getRootElement());
-        return elements;
-    }
-
-    protected void setReferencesFromTLVElements(List<TLVElement> tlvElements) throws TLVParserException {
-        for (TLVElement element : tlvElements) {
+    //TODO this isn't the best solution
+    private void read(TLVInputStream inputStream) throws IOException, TLVParserException {
+        TLVElement element;
+        while (inputStream.hasNextElement()) {
+            element = inputStream.readElement();
             switch (element.getType()) {
                 case TlvDataFilesManifestReference.DATA_FILES_MANIFEST_REFERENCE:
                     dataFilesManifestReference = new TlvDataFilesManifestReference(readOnce(element));
@@ -98,10 +100,6 @@ public class TlvSignatureManifest extends TlvManifestStructure implements Signat
                     verifyCriticalFlag(element);
             }
         }
-
-        // Check that all mandatory elements present
-        if (dataFilesManifestReference == null || signatureReference == null || annotationsManifestReference == null) {
-            throw new TLVParserException("Missing mandatory elements!");
-        }
     }
+
 }

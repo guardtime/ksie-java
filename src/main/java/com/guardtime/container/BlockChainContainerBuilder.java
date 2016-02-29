@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,7 +32,7 @@ public class BlockChainContainerBuilder {
         this.packagingFactory = packagingFactory;
     }
 
-    public BlockChainContainerBuilder withExistingContainer(InputStream input) {
+    public BlockChainContainerBuilder withExistingContainer(InputStream input) throws IOException {
         return withExistingContainer(packagingFactory.read(input));
     }
 
@@ -41,7 +42,7 @@ public class BlockChainContainerBuilder {
     }
 
     public BlockChainContainerBuilder withDataFile(InputStream input, String name, String mimeType) {
-        return withDataFile(new StreamContainerDocument(input, name, mimeType));
+        return withDataFile(new StreamContainerDocument(input, mimeType, name));
     }
 
     public BlockChainContainerBuilder withDataFile(File file, String mimeType) {
@@ -67,7 +68,7 @@ public class BlockChainContainerBuilder {
     }
 
     public BlockChainContainer build() throws BlockChainContainerException {
-        return packagingFactory.create(existingContainer, documents, annotations);
+        return packagingFactory.create(documents, annotations);
     }
 
     List<ContainerDocument> getDocuments() {

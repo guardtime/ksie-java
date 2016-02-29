@@ -1,7 +1,8 @@
 package com.guardtime.container.manifest;
 
+//TODO remove?
 public enum ContainerManifestMimeType {
-    SIGNATURE("application/ksi-signature"),
+
     ANNOTATIONS_MANIFEST("ksie10/annotmanifest"),
     DATA_MANIFEST("ksie10/datamanifest");
 
@@ -14,4 +15,5 @@ public enum ContainerManifestMimeType {
     public String getType() {
         return type;
     }
+
 }

@@ -3,6 +3,7 @@ package com.guardtime.container.annotation;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -14,10 +15,8 @@ public interface ContainerAnnotation {
 
     String getDomain();
 
-    InputStream getInputStream();
+    InputStream getInputStream() throws IOException;
 
     DataHash getDataHash(HashAlgorithm algorithm) throws IOException;
-
-    String getUri();
 
 }

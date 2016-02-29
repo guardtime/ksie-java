@@ -1,27 +1,27 @@
 package com.guardtime.container.manifest.tlv;
 
-import com.guardtime.ksi.tlv.TLVInputStream;
-import org.junit.Before;
+import com.guardtime.container.util.Pair;
+import com.guardtime.container.util.Util;
+import com.guardtime.ksi.hashing.HashAlgorithm;
+
 import org.junit.Test;
 
-import java.io.InputStream;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TlvAnnotationInfoManifestTest extends AbstractTlvManifestTest {
-    private TlvAnnotationInfoManifest manifest;
 
-    @Before
-    public void setUpManifest() throws Exception {
-        this.manifest = new TlvAnnotationInfoManifest(mockAnnotation, mockDataManifest, "RandomStringPath");
-    }
+    private static final String ANNOTATIO_URI = "annotatio_uri";
 
     @Test
-    public void testInputStreamTlvElementExistence() throws Exception {
-        InputStream is = manifest.getInputStream();
-        testMagic(is, ANNOTATION_INFO_MANIFEST_MAGIC);
+    public void testCreateAnnotationInfoManifest() throws Exception {
+        TlvAnnotationInfoManifest annotationManifest = new TlvAnnotationInfoManifest(Pair.of(ANNOTATIO_URI, mockAnnotation), Pair.of("", mockDataManifest));
 
-        TLVInputStream tlvInputStream = new TLVInputStream(is);
-        testTlvElement(tlvInputStream, DATA_MANIFEST_REFERENCE_TYPE);
-        testTlvElement(tlvInputStream, ANNOTATION_REFERENCE_TYPE);
+        assertNotNull(annotationManifest.getAnnotationReference());
+        assertNotNull(annotationManifest.getDataManifestReference());
+        assertEquals(ANNOTATION_DOMAIN, annotationManifest.getAnnotationReference().getDomain());
+        //TODO hashes
     }
 
+    //TODO read manifest
 }
