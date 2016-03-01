@@ -80,10 +80,14 @@ abstract class AbstractTlvManifestStructure {
 
     protected abstract List<? extends TLVStructure> getElements();
 
+    public byte[] getMagic() {
+        return magic;
+    }
+
     public void writeTo(OutputStream out) throws IOException {
         Util.notNull(out, "Output stream");
         try {
-            out.write(magic);
+            out.write(getMagic());
             for (TLVStructure elem : getElements()) {
                 elem.writeTo(out);
             }
