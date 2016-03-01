@@ -10,6 +10,7 @@ import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVInputStream;
+import com.guardtime.ksi.util.Util;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -47,6 +48,9 @@ public class AbstractTlvManifestTest {
     protected static final byte[] DATA_FILE_CONTENT = "Test".getBytes();
     protected static final String DATA_FILE_MIME_TYPE = "text";
     protected static final String DATA_FILE_NAME = "hello.txt";
+
+    protected static final String SIGNATURE_URI = "/META-INF/signature4.ksig";
+    protected static final String SIGNATURE_TYPE = "ksi-signature";
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -126,6 +130,14 @@ public class AbstractTlvManifestTest {
             reference.addChildElement(hash);
         }
         return reference;
+    }
+
+    protected byte[] join(byte[] ... arrays) {
+        byte[] out = new byte[0];
+        for (byte[] a : arrays) {
+            out = Util.join(out, a);
+        }
+        return out;
     }
 
 }
