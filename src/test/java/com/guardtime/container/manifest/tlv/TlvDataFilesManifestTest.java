@@ -27,9 +27,9 @@ public class TlvDataFilesManifestTest extends AbstractTlvManifestTest {
     }
 
     @Test
-    public void testCreateDataFilesManifestUsingInputStream() throws Exception {
+    public void testReadDataFilesManifest() throws Exception {
         TLVElement reference = createReference(DATA_FILE_REFERENCE_TYPE, DATA_FILE_NAME, DATA_FILE_MIME_TYPE, new DataHash(HashAlgorithm.SHA2_256, new byte[32]));
-        byte[] bytes = com.guardtime.ksi.util.Util.join(DATA_FILES_MANIFEST_MAGIC, reference.getEncoded());
+        byte[] bytes = join(DATA_FILES_MANIFEST_MAGIC, reference.getEncoded());
         TlvDataFilesManifest dataManifest = new TlvDataFilesManifest(new ByteArrayInputStream(bytes));
         InputStream is = dataManifest.getInputStream();
         testMagic(is, DATA_FILES_MANIFEST_MAGIC);

@@ -1,9 +1,11 @@
 package com.guardtime.container.manifest.tlv;
 
+import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.util.Util;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -17,6 +19,19 @@ public class TlvSignatureManifestTest extends AbstractTlvManifestTest {
     private static final String MOCK_DATAFILES_MANIFEST_URI = "/mock/datafiles";
     private static final String MOCK_ANNOTATIONS_MANIFEST_URI = "/mock/annotationsmanifest";
     private static final String MOCK_SIGNATURE_URI = "/mock/signature";
+
+    private TLVElement annotationsManifestReference;
+    private TLVElement signatureReference;
+    private TLVElement dataFilesReference;
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        this.annotationsManifestReference = createReference(ANNOTATIONS_MANIFEST_REFERENCE_TYPE, MOCK_ANNOTATIONS_MANIFEST_URI, ANNOTATION_MANIFEST_TYPE, dataHash);
+        this.dataFilesReference = createReference(DATA_MANIFEST_REFERENCE_TYPE, MOCK_DATAFILES_MANIFEST_URI, DATA_FILE_MIME_TYPE, dataHash);
+        this.signatureReference = createReference(SIGNATURE_REFERENCE_TYPE, MOCK_SIGNATURE_URI, SIGNATURE_TYPE, null);
+    }
 
     @Test
     public void testCreateManifest() throws Exception {
@@ -36,10 +51,6 @@ public class TlvSignatureManifestTest extends AbstractTlvManifestTest {
 
     @Test
     public void testReadManifest() throws Exception {
-        TLVElement annotationsManifestReference = createReference(ANNOTATIONS_MANIFEST_REFERENCE_TYPE, MOCK_ANNOTATIONS_MANIFEST_URI, ANNOTATION_MANIFEST_TYPE, dataHash);
-        TLVElement dataFilesReference = createReference(DATA_MANIFEST_REFERENCE_TYPE, MOCK_DATAFILES_MANIFEST_URI, DATA_FILE_MIME_TYPE, dataHash);
-        TLVElement signatureReference = createReference(SIGNATURE_REFERENCE_TYPE, MOCK_SIGNATURE_URI, SIGNATURE_TYPE, null);
-
         byte[] manifestBytes = join(SIGNATURE_MANIFEST_MAGIC, annotationsManifestReference.getEncoded(), dataFilesReference.getEncoded(), signatureReference.getEncoded());
 
         TlvSignatureManifest manifest = new TlvSignatureManifest(new ByteArrayInputStream(manifestBytes));
@@ -53,6 +64,30 @@ public class TlvSignatureManifestTest extends AbstractTlvManifestTest {
         assertEquals(ANNOTATION_MANIFEST_TYPE, manifest.getAnnotationsManifestReference().getMimeType());
         assertEquals(MOCK_SIGNATURE_URI, manifest.getSignatureReference().getUri());
         assertEquals(SIGNATURE_TYPE, manifest.getSignatureReference().getType());
+    }
+
+    @Test
+    public void testReadManifestWithoutAnnotationManifestReference() throws Exception {
+        expectedException.expect(InvalidManifestException.class);
+        expectedException.expectMessage("Annotations manifest reference is mandatory");
+        byte[] manifestBytes = join(SIGNATURE_MANIFEST_MAGIC, dataFilesReference.getEncoded(), signatureReference.getEncoded());
+        new TlvSignatureManifest(new ByteArrayInputStream(manifestBytes));
+    }
+
+    @Test
+    public void testReadManifestWithoutSignatureManifestReference() throws Exception {
+        expectedException.expect(InvalidManifestException.class);
+        expectedException.expectMessage("Signature manifest reference is mandatory");
+        byte[] manifestBytes = join(SIGNATURE_MANIFEST_MAGIC, annotationsManifestReference.getEncoded(), dataFilesReference.getEncoded());
+        new TlvSignatureManifest(new ByteArrayInputStream(manifestBytes));
+    }
+
+    @Test
+    public void testReadManifestWithoutDataFilesManifestReference() throws Exception {
+        expectedException.expect(InvalidManifestException.class);
+        expectedException.expectMessage("Data files manifest reference is mandatory");
+        byte[] manifestBytes = join(SIGNATURE_MANIFEST_MAGIC, annotationsManifestReference.getEncoded(), signatureReference.getEncoded());
+        new TlvSignatureManifest(new ByteArrayInputStream(manifestBytes));
     }
 
 }

@@ -24,10 +24,7 @@ public class TlvAnnotationReferenceTest extends AbstractTlvManifestTest {
 
     @Test
     public void testReadAnnotationReference() throws Exception {
-        TLVElement element = createReference(ANNOTATION_REFERENCE_TYPE, MOCK_URI, null, dataHash);
-        TLVElement domainElement = new TLVElement(false, false, 0x04);
-        domainElement.setStringContent(ANNOTATION_DOMAIN);
-        element.addChildElement(domainElement);
+        TLVElement element = createAnnotationReferenceElement();
         TlvAnnotationReference reference = new TlvAnnotationReference(element);
         assertEquals(MOCK_URI, reference.getUri());
         assertEquals(ANNOTATION_DOMAIN, reference.getDomain());

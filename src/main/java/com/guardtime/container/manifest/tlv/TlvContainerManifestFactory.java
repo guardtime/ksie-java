@@ -16,7 +16,7 @@ public class TlvContainerManifestFactory implements ContainerManifestFactory<Tlv
     private static final TlvManifestFactoryType TLV_MANIFEST_FACTORY_TYPE = new TlvManifestFactoryType("TLV manifest factory", "tlv");
 
     @Override
-    public TlvSignatureManifest createSignatureManifest(Pair<String, TlvDataFilesManifest> dataFilesManifest, Pair<String, TlvAnnotationsManifest> annotationManifest,  Pair<String, String> signatureReference) throws InvalidManifestException {
+    public TlvSignatureManifest createSignatureManifest(Pair<String, TlvDataFilesManifest> dataFilesManifest, Pair<String, TlvAnnotationsManifest> annotationManifest, Pair<String, String> signatureReference) throws InvalidManifestException {
         Util.notNull(dataFilesManifest, "Document manifest");
         Util.notNull(annotationManifest, "Annotations manifest");
         return new TlvSignatureManifest(dataFilesManifest, annotationManifest, signatureReference);
@@ -24,6 +24,7 @@ public class TlvContainerManifestFactory implements ContainerManifestFactory<Tlv
 
     @Override
     public TlvDataFilesManifest createDataFilesManifest(List<ContainerDocument> files) throws InvalidManifestException {
+        Util.notNull(files, "Document list");
         Util.notEmpty(files, "Document files list");
         return new TlvDataFilesManifest(files);
     }
@@ -42,21 +43,25 @@ public class TlvContainerManifestFactory implements ContainerManifestFactory<Tlv
 
     @Override
     public TlvSignatureManifest readSignatureManifest(InputStream input) throws InvalidManifestException {
+        Util.notNull(input, "Input stream");
         return new TlvSignatureManifest(input);
     }
 
     @Override
     public TlvDataFilesManifest readDataFilesManifest(InputStream input) throws InvalidManifestException {
+        Util.notNull(input, "Input stream");
         return new TlvDataFilesManifest(input);
     }
 
     @Override
     public TlvAnnotationsManifest readAnnotationsManifest(InputStream input) throws InvalidManifestException {
+        Util.notNull(input, "Input stream");
         return new TlvAnnotationsManifest(input);
     }
 
     @Override
     public TlvAnnotationInfoManifest readAnnotationManifest(InputStream input) throws InvalidManifestException {
+        Util.notNull(input, "Input stream");
         return new TlvAnnotationInfoManifest(input);
     }
 

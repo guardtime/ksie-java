@@ -45,12 +45,15 @@ public class AbstractTlvManifestTest {
     protected static final String ANNOTATION_CONTENT = "AnnotationTestContent";
     protected static final String ANNOTATION_DOMAIN = "com.guardtime";
     protected static final String MOCK_URI = "/mock/mock";
+    protected static final String DATA_MANIFEST_TYPE = "ksie10/datamanifest";
     protected static final byte[] DATA_FILE_CONTENT = "Test".getBytes();
     protected static final String DATA_FILE_MIME_TYPE = "text";
     protected static final String DATA_FILE_NAME = "hello.txt";
+    protected static final String DATA_FILE_TYPE = "application/txt";
 
     protected static final String SIGNATURE_URI = "/META-INF/signature4.ksig";
     protected static final String SIGNATURE_TYPE = "ksi-signature";
+    protected static final String ANNOTATION_MANIFEST_URI = "/META-INF/annotation1.tlv";
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -130,6 +133,14 @@ public class AbstractTlvManifestTest {
             reference.addChildElement(hash);
         }
         return reference;
+    }
+
+    protected TLVElement createAnnotationReferenceElement() throws Exception {
+        TLVElement element = createReference(ANNOTATION_REFERENCE_TYPE, MOCK_URI, null, dataHash);
+        TLVElement domainElement = new TLVElement(false, false, 0x04);
+        domainElement.setStringContent(ANNOTATION_DOMAIN);
+        element.addChildElement(domainElement);
+        return element;
     }
 
     protected byte[] join(byte[] ... arrays) {
