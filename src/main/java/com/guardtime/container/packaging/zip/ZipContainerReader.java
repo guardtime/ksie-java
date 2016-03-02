@@ -12,15 +12,8 @@ import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.DataFilesManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.SignatureManifest;
-import com.guardtime.container.packaging.zip.handler.AnnotationContentHandler;
-import com.guardtime.container.packaging.zip.handler.AnnotationManifestHandler;
-import com.guardtime.container.packaging.zip.handler.AnnotationsManifestHandler;
-import com.guardtime.container.packaging.zip.handler.ContentHandler;
-import com.guardtime.container.packaging.zip.handler.DataFileContentHandler;
-import com.guardtime.container.packaging.zip.handler.DataManifestHandler;
-import com.guardtime.container.packaging.zip.handler.ManifestHolder;
-import com.guardtime.container.packaging.zip.handler.SignatureHandler;
-import com.guardtime.container.packaging.zip.handler.UnknownFileHandler;
+import com.guardtime.container.packaging.BCCMimeType;
+import com.guardtime.container.packaging.zip.handler.*;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
@@ -54,6 +47,7 @@ class ZipContainerReader {
     private final AnnotationsManifestHandler annotationsManifestHandler;
     private final AnnotationManifestHandler annotationManifestHandler;
     private final SignatureHandler signatureHandler;
+    private final MimeTypeHandler mimeTypeHandler;
 
     private ContentHandler[] handlers;
 
@@ -63,8 +57,9 @@ class ZipContainerReader {
         this.annotationsManifestHandler = new AnnotationsManifestHandler(manifestFactory);
         this.annotationManifestHandler = new AnnotationManifestHandler(manifestFactory);
         this.signatureHandler = new SignatureHandler(signatureFactory);
+        this.mimeTypeHandler = new MimeTypeHandler();
         this.handlers = new ContentHandler[]{documentHandler, annotationContentHandler, dataManifestHandler,
-                manifestHandler, annotationsManifestHandler, signatureHandler, annotationManifestHandler};
+                manifestHandler, annotationsManifestHandler, signatureHandler, annotationManifestHandler, mimeTypeHandler};
     }
 
     ZipBlockChainContainer read(InputStream input) throws IOException {
@@ -79,7 +74,8 @@ class ZipContainerReader {
             }
         }
         List<SignatureContent> contents = buildSignatures();
-        return new ZipBlockChainContainer(contents);
+        BCCMimeType mimeType = mimeTypeHandler.get(MimeTypeEntry.ENTRY_NAME_MIME_TYPE);
+        return new ZipBlockChainContainer(contents, mimeType);
     }
 
     private void readEntry(ZipInputStream zipInput, ZipEntry entry) throws IOException {
