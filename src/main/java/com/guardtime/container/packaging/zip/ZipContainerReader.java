@@ -79,7 +79,16 @@ class ZipContainerReader {
             }
         }
         List<SignatureContent> contents = buildSignatures();
-        return new ZipBlockChainContainer(contents);
+        List<Pair<String,File>> unknownFiles = getUnknownFiles();
+        return new ZipBlockChainContainer(contents, unknownFiles);
+    }
+
+    private List<Pair<String, File>> getUnknownFiles() {
+        List<Pair<String, File>> returnable = new LinkedList<>();
+        for(String name : unknownFileHandler.getNames()) {
+            returnable.add(Pair.of(name, unknownFileHandler.get(name)));
+        }
+        return returnable;
     }
 
     private void readEntry(ZipInputStream zipInput, ZipEntry entry) throws IOException {
