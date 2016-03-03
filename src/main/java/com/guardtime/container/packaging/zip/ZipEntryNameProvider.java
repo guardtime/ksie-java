@@ -28,7 +28,7 @@ class ZipEntryNameProvider {
         return String.format("/META-INF/manifest%d.%s", ++manifestIndex, manifestSuffix);
     }
 
-    public String nextAnnotationsName() {
+    public String nextAnnotationsManifestName() {
         return String.format("/META-INF/annotmanifest%d.%s", ++annotationsManifestIndex, manifestSuffix);
     }
 

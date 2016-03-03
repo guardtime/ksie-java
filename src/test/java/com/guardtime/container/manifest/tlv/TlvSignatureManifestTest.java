@@ -16,10 +16,6 @@ import static org.junit.Assert.assertNotNull;
 
 public class TlvSignatureManifestTest extends AbstractTlvManifestTest {
 
-    private static final String MOCK_DATAFILES_MANIFEST_URI = "/mock/datafiles";
-    private static final String MOCK_ANNOTATIONS_MANIFEST_URI = "/mock/annotationsmanifest";
-    private static final String MOCK_SIGNATURE_URI = "/mock/signature";
-
     private TLVElement annotationsManifestReference;
     private TLVElement signatureReference;
     private TLVElement dataFilesReference;
@@ -28,25 +24,25 @@ public class TlvSignatureManifestTest extends AbstractTlvManifestTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        this.annotationsManifestReference = createReference(ANNOTATIONS_MANIFEST_REFERENCE_TYPE, MOCK_ANNOTATIONS_MANIFEST_URI, ANNOTATION_MANIFEST_TYPE, dataHash);
-        this.dataFilesReference = createReference(DATA_MANIFEST_REFERENCE_TYPE, MOCK_DATAFILES_MANIFEST_URI, DATA_FILE_MIME_TYPE, dataHash);
-        this.signatureReference = createReference(SIGNATURE_REFERENCE_TYPE, MOCK_SIGNATURE_URI, SIGNATURE_TYPE, null);
+        this.annotationsManifestReference = createReference(ANNOTATIONS_MANIFEST_REFERENCE_TYPE, ANNOTATIONS_MANIFEST_URI, ANNOTATION_MANIFEST_TYPE, dataHash);
+        this.dataFilesReference = createReference(DATA_MANIFEST_REFERENCE_TYPE, DATAFILES_MANIFEST_URI, MIME_TYPE_APPLICATION_TXT, dataHash);
+        this.signatureReference = createReference(SIGNATURE_REFERENCE_TYPE, SIGNATURE_URI, SIGNATURE_TYPE, null);
     }
 
     @Test
     public void testCreateManifest() throws Exception {
-        Pair<String, TlvDataFilesManifest> dataManifest = Pair.of(MOCK_DATAFILES_MANIFEST_URI, mockDataManifest);
-        Pair<String, TlvAnnotationsManifest> annotationsManifest = Pair.of(MOCK_ANNOTATIONS_MANIFEST_URI, mockAnnotationsManifest);
-        Pair<String, String> signatureReference = Pair.of(MOCK_SIGNATURE_URI, SIGNATURE_TYPE);
+        Pair<String, TlvDataFilesManifest> dataManifest = Pair.of(DATAFILES_MANIFEST_URI, mockDataManifest);
+        Pair<String, TlvAnnotationsManifest> annotationsManifest = Pair.of(ANNOTATIONS_MANIFEST_URI, mockAnnotationsManifest);
+        Pair<String, String> signatureReference = Pair.of(SIGNATURE_URI, SIGNATURE_TYPE);
         TlvSignatureManifest manifest = new TlvSignatureManifest(dataManifest, annotationsManifest, signatureReference);
 
         assertArrayEquals(SIGNATURE_MANIFEST_MAGIC, manifest.getMagic());
         assertNotNull(manifest.getDataFilesReference());
         assertNotNull(manifest.getAnnotationsManifestReference());
         assertNotNull(manifest.getSignatureReference());
-        assertEquals(MOCK_DATAFILES_MANIFEST_URI, manifest.getDataFilesReference().getUri());
-        assertEquals(MOCK_ANNOTATIONS_MANIFEST_URI, manifest.getAnnotationsManifestReference().getUri());
-        assertEquals(MOCK_SIGNATURE_URI, manifest.getSignatureReference().getUri());
+        assertEquals(DATAFILES_MANIFEST_URI, manifest.getDataFilesReference().getUri());
+        assertEquals(ANNOTATIONS_MANIFEST_URI, manifest.getAnnotationsManifestReference().getUri());
+        assertEquals(SIGNATURE_URI, manifest.getSignatureReference().getUri());
     }
 
     @Test
@@ -58,11 +54,11 @@ public class TlvSignatureManifestTest extends AbstractTlvManifestTest {
         assertNotNull(manifest.getDataFilesReference());
         assertNotNull(manifest.getAnnotationsManifestReference());
         assertNotNull(manifest.getSignatureReference());
-        assertEquals(MOCK_DATAFILES_MANIFEST_URI, manifest.getDataFilesReference().getUri());
-        assertEquals(DATA_FILE_MIME_TYPE, manifest.getDataFilesReference().getMimeType());
-        assertEquals(MOCK_ANNOTATIONS_MANIFEST_URI, manifest.getAnnotationsManifestReference().getUri());
+        assertEquals(DATAFILES_MANIFEST_URI, manifest.getDataFilesReference().getUri());
+        assertEquals(MIME_TYPE_APPLICATION_TXT, manifest.getDataFilesReference().getMimeType());
+        assertEquals(ANNOTATIONS_MANIFEST_URI, manifest.getAnnotationsManifestReference().getUri());
         assertEquals(ANNOTATION_MANIFEST_TYPE, manifest.getAnnotationsManifestReference().getMimeType());
-        assertEquals(MOCK_SIGNATURE_URI, manifest.getSignatureReference().getUri());
+        assertEquals(SIGNATURE_URI, manifest.getSignatureReference().getUri());
         assertEquals(SIGNATURE_TYPE, manifest.getSignatureReference().getType());
     }
 

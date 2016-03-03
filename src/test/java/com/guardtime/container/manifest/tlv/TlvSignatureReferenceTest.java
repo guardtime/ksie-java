@@ -11,11 +11,9 @@ public class TlvSignatureReferenceTest extends AbstractTlvManifestTest {
     @Test
     public void testCreateSignatureReference() throws Exception {
         TlvSignatureReference reference = new TlvSignatureReference(SIGNATURE_URI, SIGNATURE_TYPE);
-        String uri = reference.getRootElement().getFirstChildElement(0x01).getDecodedString();
-        String mimeType = reference.getRootElement().getFirstChildElement(0x03).getDecodedString();
         assertEquals(SIGNATURE_REFERENCE_TYPE, reference.getElementType());
-        assertEquals(SIGNATURE_URI, uri);
-        assertEquals(SIGNATURE_TYPE, mimeType);
+        assertEquals(SIGNATURE_URI, getUri(reference));
+        assertEquals(SIGNATURE_TYPE, getMimeType(reference));
     }
 
     @Test

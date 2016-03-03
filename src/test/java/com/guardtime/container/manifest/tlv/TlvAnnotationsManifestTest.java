@@ -21,8 +21,8 @@ public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateAnnotationsManifest() throws Exception {
-        Map<ContainerAnnotation, Pair<String, TlvAnnotationInfoManifest>> annotationManifest = new HashMap<>();
-        annotationManifest.put(mockAnnotation, Pair.of(MOCK_URI, mockAnnotationInfoManifest));
+        Map<String, Pair<ContainerAnnotation, TlvAnnotationInfoManifest>> annotationManifest = new HashMap<>();
+        annotationManifest.put(MOCK_URI, Pair.of(mockAnnotation, mockAnnotationInfoManifest));
         TlvAnnotationsManifest manifest = new TlvAnnotationsManifest(annotationManifest);
         assertArrayEquals(ANNOTATIONS_MANIFEST_MAGIC, manifest.getMagic());
         assertNotNull(manifest.getAnnotationManifestReferences());
@@ -31,7 +31,7 @@ public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
 
     @Test
     public void testReadAnnotationsManifest() throws Exception {
-        TLVElement annotationsInfoReference = createReference(ANNOTATION_INFO_REFERENCE_TYPE, MOCK_URI, DATA_FILE_MIME_TYPE, dataHash);
+        TLVElement annotationsInfoReference = createReference(ANNOTATION_INFO_REFERENCE_TYPE, MOCK_URI, MIME_TYPE_APPLICATION_TXT, dataHash);
         byte[] bytes = join(ANNOTATIONS_MANIFEST_MAGIC, annotationsInfoReference.getEncoded());
 
         TlvAnnotationsManifest manifest = new TlvAnnotationsManifest(new ByteArrayInputStream(bytes));
@@ -40,7 +40,7 @@ public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
         assertEquals(1, manifest.getAnnotationManifestReferences().size());
         FileReference annotationsReference = manifest.getAnnotationManifestReferences().get(0);
         assertEquals(MOCK_URI, annotationsReference.getUri());
-        assertEquals(DATA_FILE_MIME_TYPE, annotationsReference.getMimeType());
+        assertEquals(MIME_TYPE_APPLICATION_TXT, annotationsReference.getMimeType());
         assertEquals(dataHash, annotationsReference.getHash());
     }
 

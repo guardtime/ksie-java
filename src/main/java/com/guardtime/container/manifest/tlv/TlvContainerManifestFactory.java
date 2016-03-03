@@ -30,7 +30,7 @@ public class TlvContainerManifestFactory implements ContainerManifestFactory<Tlv
     }
 
     @Override
-    public TlvAnnotationsManifest createAnnotationsManifest(Map<ContainerAnnotation, Pair<String, TlvAnnotationInfoManifest>> annotationManifest) throws InvalidManifestException {
+    public TlvAnnotationsManifest createAnnotationsManifest(Map<String, Pair<ContainerAnnotation, TlvAnnotationInfoManifest>> annotationManifest) throws InvalidManifestException {
         return new TlvAnnotationsManifest(annotationManifest);
     }
 

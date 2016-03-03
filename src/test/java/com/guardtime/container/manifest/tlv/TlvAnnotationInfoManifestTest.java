@@ -26,7 +26,7 @@ public class TlvAnnotationInfoManifestTest extends AbstractTlvManifestTest {
     public void setUp() throws Exception {
         super.setUp();
         this.annotationReference = createAnnotationReferenceElement();
-        this.dataFilesReference = createReference(DATA_MANIFEST_REFERENCE_TYPE, DATA_FILE_NAME, DATA_FILE_TYPE, dataHash);
+        this.dataFilesReference = createReference(DATA_MANIFEST_REFERENCE_TYPE, TEST_FILE_NAME_TEST_TXT, MIME_TYPE_APPLICATION_TXT, dataHash);
     }
 
     @Test
@@ -35,7 +35,7 @@ public class TlvAnnotationInfoManifestTest extends AbstractTlvManifestTest {
 
         assertNotNull(annotationManifest.getAnnotationReference());
         assertNotNull(annotationManifest.getDataManifestReference());
-        assertEquals(ANNOTATION_DOMAIN, annotationManifest.getAnnotationReference().getDomain());
+        assertEquals(ANNOTATION_DOMAIN_COM_GUARDTIME, annotationManifest.getAnnotationReference().getDomain());
         assertEquals(ANNOTATION_MANIFEST_URI, annotationManifest.getAnnotationReference().getUri());
         assertEquals(dataHash, annotationManifest.getAnnotationReference().getHash());
         assertEquals(MOCK_URI, annotationManifest.getDataManifestReference().getUri());
