@@ -18,11 +18,15 @@ import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 public class ZipContainerPackagingFactory implements BlockChainContainerPackagingFactory<ZipBlockChainContainer> {
+
+    public static final String MIME_TYPE_ENTRY_NAME = "mimetype";
+    private static final String CONTAINER_MIME_TYPE = "application/guardtime.ksie10+zip";
 
     private final SignatureFactory signatureFactory;
     private final ContainerManifestFactory manifestFactory;
@@ -66,7 +70,12 @@ public class ZipContainerPackagingFactory implements BlockChainContainerPackagin
         ContainerSignature signature = signatureFactory.create(hash);
         signatureContent.setSignature(signature);
 
-        return new ZipBlockChainContainer(signatureContent);
+        return new ZipBlockChainContainer(signatureContent, new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent()));
+    }
+
+    private byte[] getMimeTypeContent() {
+        // TODO: Append manifest type?
+        return CONTAINER_MIME_TYPE.getBytes(Charset.forName("UTF-8"));
     }
 
     @Override

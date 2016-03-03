@@ -6,7 +6,7 @@ import com.guardtime.container.annotation.FileAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.datafile.FileContainerDocument;
 import com.guardtime.container.manifest.*;
-import com.guardtime.container.packaging.BCCMimeType;
+import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.zip.handler.*;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.util.Pair;
@@ -51,8 +51,8 @@ class ZipContainerReader {
         this.annotationManifestHandler = new AnnotationManifestHandler(manifestFactory);
         this.signatureHandler = new SignatureHandler(signatureFactory);
         this.mimeTypeHandler = new MimeTypeHandler();
-        this.handlers = new ContentHandler[]{documentHandler, annotationContentHandler, dataManifestHandler,
-                manifestHandler, annotationsManifestHandler, signatureHandler, annotationManifestHandler, mimeTypeHandler};
+        this.handlers = new ContentHandler[]{mimeTypeHandler, documentHandler, annotationContentHandler, dataManifestHandler,
+                manifestHandler, annotationsManifestHandler, signatureHandler, annotationManifestHandler};
     }
 
     ZipBlockChainContainer read(InputStream input) throws IOException {
@@ -67,9 +67,15 @@ class ZipContainerReader {
             }
         }
         List<SignatureContent> contents = buildSignatures();
-        BCCMimeType mimeType = mimeTypeHandler.get(MimeTypeEntry.ENTRY_NAME_MIME_TYPE);
+        MimeType mimeType = getMimeType();
         List<Pair<String, File>> unknownFiles = getUnknownFiles();
         return new ZipBlockChainContainer(contents, unknownFiles, mimeType);
+    }
+
+    private MimeType getMimeType() {
+        String uri = ZipContainerPackagingFactory.MIME_TYPE_ENTRY_NAME;
+        byte[] content = mimeTypeHandler.get(uri);
+        return new MimeTypeEntry(uri, content);
     }
 
     private List<Pair<String, File>> getUnknownFiles() {

@@ -1,19 +1,24 @@
 package com.guardtime.container.packaging.zip.handler;
 
-import com.guardtime.container.packaging.BCCMimeType;
-import com.guardtime.container.packaging.FileMimeType;
+import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
+import com.guardtime.ksi.util.Util;
 
-public class MimeTypeHandler extends ContentHandler<BCCMimeType> {
+import java.io.FileInputStream;
+import java.io.IOException;
 
-    private static final String MIMETYPE_FILE_NAME = "mimetype";
+public class MimeTypeHandler extends ContentHandler<byte[]> {
 
     @Override
     public boolean isSupported(String name) {
-        return name.matches(MIMETYPE_FILE_NAME);
+        return name.matches(ZipContainerPackagingFactory.MIME_TYPE_ENTRY_NAME);
     }
 
     @Override
-    public BCCMimeType get(String name) {
-        return new FileMimeType(entries.get(name), name);
+    public byte[] get(String name) {
+        try {
+            return Util.toByteArray(new FileInputStream(entries.get(name)));
+        } catch (IOException e) {
+            return null;
+        }
     }
 }

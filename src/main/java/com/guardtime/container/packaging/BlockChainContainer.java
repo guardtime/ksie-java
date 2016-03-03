@@ -12,4 +12,6 @@ public interface BlockChainContainer {
 
     void writeTo(OutputStream output) throws IOException;
 
+    MimeType getMimeType();
+
 }

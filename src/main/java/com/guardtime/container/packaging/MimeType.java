@@ -2,7 +2,7 @@ package com.guardtime.container.packaging;
 
 import java.io.InputStream;
 
-public interface BCCMimeType {
+public interface MimeType {
     String getUri();
 
     InputStream getInputStream();
