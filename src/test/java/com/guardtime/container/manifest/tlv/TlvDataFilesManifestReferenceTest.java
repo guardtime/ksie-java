@@ -12,21 +12,19 @@ public class TlvDataFilesManifestReferenceTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateDataFilesManifestReference() throws Exception {
-        TlvDataFilesManifest dataManifest = new TlvDataFilesManifest(asList(document));
-        TlvDataFilesManifestReference reference = new TlvDataFilesManifestReference(dataManifest, DATA_FILE_NAME);
-        String uri = reference.getRootElement().getFirstChildElement(0x01).getDecodedString();
-        String mimeType = reference.getRootElement().getFirstChildElement(0x03).getDecodedString();
+        TlvDataFilesManifest dataManifest = new TlvDataFilesManifest(asList(TEST_DOCUMENT_HELLO_TEXT));
+        TlvDataFilesManifestReference reference = new TlvDataFilesManifestReference(dataManifest, TEST_FILE_NAME_TEST_TXT);
         assertEquals(DATA_MANIFEST_REFERENCE_TYPE, reference.getElementType());
-        assertEquals(ContainerManifestMimeType.DATA_MANIFEST.getType(), mimeType);
-        assertEquals(DATA_FILE_NAME, uri);
+        assertEquals(ContainerManifestMimeType.DATA_MANIFEST.getType(), getMimeType(reference));
+        assertEquals(TEST_FILE_NAME_TEST_TXT, getUri(reference));
     }
 
     @Test
     public void testReadDataFilesManifestReference() throws Exception {
-        TLVElement element = createReference(DATA_MANIFEST_REFERENCE_TYPE, DATA_FILE_NAME, DATA_FILE_TYPE, dataHash);
+        TLVElement element = createReference(DATA_MANIFEST_REFERENCE_TYPE, TEST_FILE_NAME_TEST_TXT, MIME_TYPE_APPLICATION_TXT, dataHash);
         TlvDataFilesManifestReference reference = new TlvDataFilesManifestReference(element);
-        assertEquals(DATA_FILE_NAME, reference.getUri());
-        assertEquals(DATA_FILE_TYPE, reference.getMimeType());
+        assertEquals(TEST_FILE_NAME_TEST_TXT, reference.getUri());
+        assertEquals(MIME_TYPE_APPLICATION_TXT, reference.getMimeType());
         assertEquals(dataHash, reference.getHash());
     }
 

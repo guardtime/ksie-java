@@ -24,7 +24,7 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
     public void setUp() throws Exception {
         super.setUp();
         mockedAnnotationPair = Pair.of(MOCK_URI, mockAnnotation);
-        mockedDataManifestPair = Pair.of(DATA_FILE_NAME, mockDataManifest);
+        mockedDataManifestPair = Pair.of(TEST_FILE_NAME_TEST_TXT, mockDataManifest);
     }
 
     @Test
@@ -81,7 +81,7 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateDataFilesManifestOK() throws Exception {
-        TlvDataFilesManifest manifest = factory.createDataFilesManifest(asList(document));
+        TlvDataFilesManifest manifest = factory.createDataFilesManifest(asList(TEST_DOCUMENT_HELLO_TEXT));
         assertNotNull("Manifest was not created", manifest);
         assertEquals(1, manifest.getDataFileReferences().size());
     }

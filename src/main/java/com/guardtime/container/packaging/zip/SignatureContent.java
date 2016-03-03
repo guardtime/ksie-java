@@ -28,7 +28,7 @@ public class SignatureContent {
     private final Pair<String, AnnotationsManifest> annotationsManifest;
     private final List<Pair<String, AnnotationInfoManifest>> annotationManifests;
     private ContainerSignature signature;
-    private  List<Pair<String,ContainerAnnotation>> annotations;
+    private List<Pair<String, ContainerAnnotation>> annotations;
 
     private SignatureContent(List<ContainerDocument> documents,
                              List<Pair<String, ContainerAnnotation>> annotations, Pair<String, DataFilesManifest> dataManifest,
@@ -59,13 +59,26 @@ public class SignatureContent {
     }
 
     public void writeTo(ZipOutputStream output) throws IOException {
-        //TODO check if all files are written to the zip container
         writeDocuments(output);
         writeEntry(new ZipEntry(dataManifest.getLeft()), dataManifest.getRight().getInputStream(), output);
+        writeAnnotations(output);
+        writeAnnotationInfoManifests(output);
         writeEntry(new ZipEntry(annotationsManifest.getLeft()), annotationsManifest.getRight().getInputStream(), output);
         SignatureManifest signatureManifest = manifest.getRight();
         writeEntry(new ZipEntry(manifest.getLeft()), signatureManifest.getInputStream(), output);
         writeSignature(output, signatureManifest);
+    }
+
+    private void writeAnnotationInfoManifests(ZipOutputStream output) throws IOException {
+        for (Pair<String, AnnotationInfoManifest> manifest : annotationManifests) {
+            writeEntry(new ZipEntry(manifest.getLeft()), manifest.getRight().getInputStream(), output);
+        }
+    }
+
+    private void writeAnnotations(ZipOutputStream output) throws IOException {
+        for (Pair<String, ContainerAnnotation> annotation : annotations) {
+            writeEntry(new ZipEntry(annotation.getLeft()), annotation.getRight().getInputStream(), output);
+        }
     }
 
     private void writeSignature(ZipOutputStream output, SignatureManifest signatureManifest) throws IOException {
@@ -95,7 +108,7 @@ public class SignatureContent {
     public static class Builder {
 
         private List<ContainerDocument> documents;
-        private  List<Pair<String,ContainerAnnotation>>  annotations;
+        private List<Pair<String, ContainerAnnotation>> annotations;
         private Pair<String, DataFilesManifest> dataManifest;
         private Pair<String, AnnotationsManifest> annotationsManifest;
         private Pair<String, SignatureManifest> manifest;
@@ -106,7 +119,7 @@ public class SignatureContent {
             return this;
         }
 
-        public Builder withAnnotations( List<Pair<String,ContainerAnnotation>>  annotations) {
+        public Builder withAnnotations(List<Pair<String, ContainerAnnotation>> annotations) {
             this.annotations = annotations;
             return this;
         }

@@ -5,7 +5,7 @@ import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.datafile.FileContainerDocument;
 import com.guardtime.container.datafile.StreamContainerDocument;
 import com.guardtime.container.packaging.BlockChainContainer;
-import com.guardtime.container.packaging.BlockChainContainerPackagingFactory;
+import com.guardtime.container.packaging.ContainerPackagingFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,10 +24,10 @@ public class BlockChainContainerBuilder {
     private final List<ContainerDocument> documents = new LinkedList<>();
     private final List<ContainerAnnotation> annotations = new LinkedList<>();
     
-    private final BlockChainContainerPackagingFactory packagingFactory;
+    private final ContainerPackagingFactory packagingFactory;
     private BlockChainContainer existingContainer;
 
-    public BlockChainContainerBuilder(BlockChainContainerPackagingFactory packagingFactory) {
+    public BlockChainContainerBuilder(ContainerPackagingFactory packagingFactory) {
         notNull(packagingFactory, "Packaging factory");
         this.packagingFactory = packagingFactory;
     }

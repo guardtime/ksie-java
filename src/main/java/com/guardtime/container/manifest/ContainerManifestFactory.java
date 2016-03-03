@@ -14,7 +14,7 @@ public interface ContainerManifestFactory<S extends SignatureManifest, D extends
 
     D createDataFilesManifest(List<ContainerDocument> files) throws InvalidManifestException;
 
-    A createAnnotationsManifest(Map<ContainerAnnotation, Pair<String, AI>> annotationManifests) throws InvalidManifestException;
+    A createAnnotationsManifest(Map<String, Pair<ContainerAnnotation, AI>> annotationManifests) throws InvalidManifestException;
 
     AI createAnnotationManifest(Pair<String, D> dataManifest, Pair<String, ContainerAnnotation> annotation) throws InvalidManifestException;
 

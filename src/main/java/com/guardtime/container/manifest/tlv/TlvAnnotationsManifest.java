@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements AnnotationsManifest {
 
@@ -22,12 +23,13 @@ class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements Ann
 
     private List<TlvAnnotationInfoManifestReference> annotationReferences = new LinkedList<>();
 
-    public TlvAnnotationsManifest(Map<ContainerAnnotation, Pair<String, TlvAnnotationInfoManifest>> annotationManifests) throws InvalidManifestException {
+    public TlvAnnotationsManifest(Map<String, Pair<ContainerAnnotation, TlvAnnotationInfoManifest>> annotationManifests) throws InvalidManifestException {
         super(MAGIC);
         try {
-            for (Pair<String, TlvAnnotationInfoManifest> annotation : annotationManifests.values()) {
-                //TODO annotation type
-                this.annotationReferences.add(new TlvAnnotationInfoManifestReference(annotation.getLeft(), annotation.getRight(), ContainerAnnotationType.FULLY_REMOVABLE));
+            Set<String> uris = annotationManifests.keySet();
+            for (String uri : uris) {
+                Pair<ContainerAnnotation, TlvAnnotationInfoManifest> pair = annotationManifests.get(uri);
+                this.annotationReferences.add(new TlvAnnotationInfoManifestReference(uri, pair.getRight(), pair.getLeft().getAnnotationType()));
             }
         } catch (TLVParserException | IOException e) {
             throw new InvalidManifestException("Failed to generate file reference TLVElement", e);

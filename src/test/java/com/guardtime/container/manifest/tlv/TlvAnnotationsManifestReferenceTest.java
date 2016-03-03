@@ -1,7 +1,6 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.util.Util;
-import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
 
@@ -14,13 +13,10 @@ public class TlvAnnotationsManifestReferenceTest extends AbstractTlvManifestTest
     @Test
     public void testCreateAnnotationsManifestReference() throws Exception {
         TlvAnnotationsManifestReference reference = new TlvAnnotationsManifestReference(MOCK_URI, mockAnnotationsManifest);
-        String uri = reference.getRootElement().getFirstChildElement(0x01).getDecodedString();
-        DataHash hash = reference.getRootElement().getFirstChildElement(0x02).getDecodedDataHash();
-        String type = reference.getRootElement().getFirstChildElement(0x03).getDecodedString();
         assertEquals(ANNOTATIONS_MANIFEST_REFERENCE_TYPE, reference.getElementType());
-        assertEquals(ANNOTATION_MANIFEST_TYPE, type);
-        assertEquals(MOCK_URI, uri);
-        assertEquals(Util.hash(mockAnnotationsManifest.getInputStream(), HashAlgorithm.SHA2_256), hash);
+        assertEquals(ANNOTATION_MANIFEST_TYPE, getMimeType(reference));
+        assertEquals(MOCK_URI, getUri(reference));
+        assertEquals(Util.hash(mockAnnotationsManifest.getInputStream(), HashAlgorithm.SHA2_256), getDataHash(reference));
     }
 
     @Test

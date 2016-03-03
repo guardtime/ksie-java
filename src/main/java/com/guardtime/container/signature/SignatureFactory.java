@@ -4,10 +4,12 @@ import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.InputStream;
 
-public interface SignatureFactory<T extends ContainerSignature> {
+public interface SignatureFactory {
 
-    T create(DataHash hash) throws SignatureException;
+    ContainerSignature create(DataHash hash) throws SignatureException;
 
-    T read(InputStream input) throws SignatureException;
+    ContainerSignature read(InputStream input) throws SignatureException;
+
+    SignatureFactoryType getSignatureFactoryType();
 
 }
