@@ -10,7 +10,7 @@ public class MimeTypeHandler extends ContentHandler<byte[]> {
 
     @Override
     public boolean isSupported(String name) {
-        return name.matches(ZipContainerPackagingFactory.MIME_TYPE_ENTRY_NAME);
+        return name.equals(ZipContainerPackagingFactory.MIME_TYPE_ENTRY_NAME);
     }
 
     @Override
