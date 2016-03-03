@@ -15,6 +15,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.verification.VerificationMode;
 
+import java.io.File;
+import java.net.URL;
+
 import static org.mockito.Mockito.times;
 
 public class AbstractBlockChainContainerTest {
@@ -57,6 +60,11 @@ public class AbstractBlockChainContainerTest {
 //        when(mockedManifestFactory.createAnnotationManifest(Mockito.any(DataFilesManifest.class), Mockito.any(ContainerAnnotation.class), Mockito.anyString())).thenReturn(annotationInfoManifest);
 //        when(mockedManifestFactory.createDataFilesManifest(Mockito.anyListOf(ContainerDocument[].class), Mockito.anyString())).thenReturn(mockedDataFileManifest);
 //        when(mockedManifestFactory.createSignatureManifest(Mockito.any(DataFilesManifest.class), Mockito.any(AnnotationsManifest.class), Mockito.anyString(), Mockito.anyString())).thenReturn(mockedSignatureManifest);
+    }
+
+    protected File loadFile(String filePath) throws Exception {
+        URL url = Thread.currentThread().getContextClassLoader().getResource(filePath);
+        return new File(url.toURI());
     }
 
 }

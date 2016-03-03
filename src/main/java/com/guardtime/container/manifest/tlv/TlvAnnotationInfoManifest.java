@@ -41,9 +41,8 @@ class TlvAnnotationInfoManifest extends AbstractTlvManifestStructure implements 
         } catch (TLVParserException | IOException e) {
             throw new InvalidManifestException(e);
         }
-        if (dataManifestReference == null || annotationReference == null) {
-            throw new InvalidManifestException("Missing mandatory elements!");
-        }
+        checkMandatoryElement(dataManifestReference, "Data manifest reference");
+        checkMandatoryElement(annotationReference, "Annotation reference");
     }
 
     private void read(InputStream stream) throws TLVParserException, IOException {

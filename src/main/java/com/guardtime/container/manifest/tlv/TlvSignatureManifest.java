@@ -28,7 +28,7 @@ class TlvSignatureManifest extends AbstractTlvManifestStructure implements Signa
     private TlvSignatureReference signatureReference;
     private TlvAnnotationsManifestReference annotationsManifestReference;
 
-    public TlvSignatureManifest(Pair<String, TlvDataFilesManifest> dataFilesManifest, Pair<String, TlvAnnotationsManifest> annotationsManifest,  Pair<String, String> signatureReference) throws InvalidManifestException {
+    public TlvSignatureManifest(Pair<String, TlvDataFilesManifest> dataFilesManifest, Pair<String, TlvAnnotationsManifest> annotationsManifest, Pair<String, String> signatureReference) throws InvalidManifestException {
         super(MAGIC);
         try {
             this.dataFilesManifestReference = new TlvDataFilesManifestReference(dataFilesManifest.getRight(), dataFilesManifest.getLeft());
@@ -47,9 +47,9 @@ class TlvSignatureManifest extends AbstractTlvManifestStructure implements Signa
         } catch (TLVParserException | IOException e) {
             throw new InvalidManifestException(e);
         }
-        if (dataFilesManifestReference == null || signatureReference == null || annotationsManifestReference == null) {
-            throw new InvalidManifestException("Missing mandatory elements!");
-        }
+        checkMandatoryElement(dataFilesManifestReference, "Data files manifest reference");
+        checkMandatoryElement(signatureReference, "Signature manifest reference");
+        checkMandatoryElement(annotationsManifestReference, "Annotations manifest reference");
     }
 
     @Override

@@ -8,9 +8,6 @@ import static org.junit.Assert.assertEquals;
 
 public class TlvSignatureReferenceTest extends AbstractTlvManifestTest {
 
-    private static final String SIGNATURE_URI = "/META-INF/signature4.ksig";
-    private static final String SIGNATURE_TYPE = "ksi-signature";
-
     @Test
     public void testCreateSignatureReference() throws Exception {
         TlvSignatureReference reference = new TlvSignatureReference(SIGNATURE_URI, SIGNATURE_TYPE);

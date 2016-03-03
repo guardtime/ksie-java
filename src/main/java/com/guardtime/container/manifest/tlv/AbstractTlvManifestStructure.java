@@ -78,12 +78,22 @@ abstract class AbstractTlvManifestStructure {
         throw new TLVParserException("Multiple TLV 0x" + Integer.toHexString(tlvElementType) + " elements. Only one is allowed.");
     }
 
+    protected void checkMandatoryElement(TLVStructure structure, String name) throws InvalidManifestException {
+        if (structure == null) {
+            throw new InvalidManifestException(name + " is mandatory signature manifest element");
+        }
+    }
+
     protected abstract List<? extends TLVStructure> getElements();
+
+    public byte[] getMagic() {
+        return magic;
+    }
 
     public void writeTo(OutputStream out) throws IOException {
         Util.notNull(out, "Output stream");
         try {
-            out.write(magic);
+            out.write(getMagic());
             for (TLVStructure elem : getElements()) {
                 elem.writeTo(out);
             }
