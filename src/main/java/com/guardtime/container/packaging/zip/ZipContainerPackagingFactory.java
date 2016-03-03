@@ -59,7 +59,8 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
         Util.notEmpty(files, "Data files");
         ContentSigner signer = new ContentSigner(files, annotations);
         SignatureContent signatureContent = signer.sign();
-        return new ZipBlockChainContainer(signatureContent, new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent()));
+        MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
+        return new ZipBlockChainContainer(signatureContent, mimeType);
     }
 
     private byte[] getMimeTypeContent() {
