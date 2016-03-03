@@ -1,62 +1,53 @@
 package com.guardtime.container.manifest.tlv;
 
+import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.datafile.ContainerDocument;
-import com.guardtime.container.datafile.StreamContainerDocument;
 import com.guardtime.container.manifest.AnnotationReference;
-import com.guardtime.container.manifest.FileReference;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
-import com.guardtime.ksi.tlv.TLVInputStream;
+import com.guardtime.ksi.tlv.TLVParserException;
+import com.guardtime.ksi.tlv.TLVStructure;
 import com.guardtime.ksi.util.Util;
 
 import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Arrays;
 
 import static com.guardtime.container.util.Util.hash;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.Mockito.when;
 
-public class AbstractTlvManifestTest {
+public class AbstractTlvManifestTest extends AbstractContainerTest {
 
-    // TODO: Review constants when spec is final
+    protected static final ByteArrayInputStream EMPTY_INPUT_STREAM = new ByteArrayInputStream(new byte[0]);
+    protected static final int TLV_ELEMENT_URI_TYPE = 0x01;
+    protected static final int TLV_ELEMENT_DATA_HASH_TYPE = 0x02;
+    protected static final int TLV_ELEMENT_MIME_TYPE = 0x03;
+    protected static final int TLV_ELEMENT_DOMAIN_TYPE = 0x04;
     protected static final int DATA_MANIFEST_REFERENCE_TYPE = 0xb01;
     protected static final int ANNOTATIONS_MANIFEST_REFERENCE_TYPE = 0xb02;
     protected static final int DATA_FILE_REFERENCE_TYPE = 0xb03;
     protected static final int ANNOTATION_INFO_REFERENCE_TYPE = 0xb04;
     protected static final int ANNOTATION_REFERENCE_TYPE = 0xb05;
     protected static final int SIGNATURE_REFERENCE_TYPE = 0xb06;
+
     protected static final byte[] ANNOTATION_INFO_MANIFEST_MAGIC = "KSIEANNT".getBytes();
     protected static final byte[] ANNOTATIONS_MANIFEST_MAGIC = "KSIEANMF".getBytes();
     protected static final byte[] DATA_FILES_MANIFEST_MAGIC = "KSIEDAMF".getBytes();
     protected static final byte[] SIGNATURE_MANIFEST_MAGIC = "KSIEMFST".getBytes();
+
     protected static final String ANNOTATION_MANIFEST_TYPE = "ksie10/annotmanifest";
-    protected static final String ANNOTATION_CONTENT = "AnnotationTestContent";
-    protected static final String ANNOTATION_DOMAIN = "com.guardtime";
-    protected static final String MOCK_URI = "/mock/mock";
     protected static final String DATA_MANIFEST_TYPE = "ksie10/datamanifest";
-    protected static final byte[] DATA_FILE_CONTENT = "Test".getBytes();
-    protected static final String DATA_FILE_MIME_TYPE = "text";
-    protected static final String DATA_FILE_NAME = "hello.txt";
-    protected static final String DATA_FILE_TYPE = "application/txt";
-
+    protected static final String SIGNATURE_TYPE = "application/ksi-signature";
+    protected static final String MOCK_URI = "/mock/mock";
     protected static final String SIGNATURE_URI = "/META-INF/signature4.ksig";
-    protected static final String SIGNATURE_TYPE = "ksi-signature";
     protected static final String ANNOTATION_MANIFEST_URI = "/META-INF/annotation1.tlv";
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     protected TlvDataFilesManifest mockDataManifest;
@@ -72,63 +63,53 @@ public class AbstractTlvManifestTest {
 
     @Mock
     protected ContainerDocument mockDocument;
-
+    protected DataHash dataHash;
     @Mock
     private AnnotationReference mockAnnotationReference;
 
-    protected DataHash dataHash;
-    protected ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(DATA_FILE_CONTENT), DATA_FILE_MIME_TYPE, DATA_FILE_NAME);
-
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        this.dataHash = hash(new ByteArrayInputStream(DATA_FILE_CONTENT), HashAlgorithm.SHA2_256);
-        when(mockDataManifest.getInputStream()).thenReturn(new ByteArrayInputStream("".getBytes())); // TODO: Maybe give valid TLV stream ?
-        when(mockAnnotationsManifest.getInputStream()).thenReturn(new ByteArrayInputStream("".getBytes())); // TODO: Maybe give valid TLV stream ?
+        super.setUp();
+        this.dataHash = hash(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), HashAlgorithm.SHA2_256);
+        when(mockDataManifest.getInputStream()).thenReturn(EMPTY_INPUT_STREAM);
+        when(mockAnnotationsManifest.getInputStream()).thenReturn(EMPTY_INPUT_STREAM);
 
         when(mockAnnotation.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHash);
         when(mockAnnotation.getAnnotationType()).thenReturn(ContainerAnnotationType.NON_REMOVABLE);
-        when(mockAnnotation.getDomain()).thenReturn(ANNOTATION_DOMAIN);
+        when(mockAnnotation.getDomain()).thenReturn(ANNOTATION_DOMAIN_COM_GUARDTIME);
 
-        when(mockAnnotationInfoManifest.getInputStream()).thenReturn(new ByteArrayInputStream("".getBytes())); // TODO: Maybe give valid TLV stream ?
+        when(mockAnnotationInfoManifest.getInputStream()).thenReturn(EMPTY_INPUT_STREAM);
         when(mockAnnotationInfoManifest.getAnnotationReference()).thenReturn(mockAnnotationReference);
 
-        when(mockAnnotationReference.getDomain()).thenReturn(ANNOTATION_DOMAIN);
+        when(mockAnnotationReference.getDomain()).thenReturn(ANNOTATION_DOMAIN_COM_GUARDTIME);
         when(mockAnnotationReference.getUri()).thenReturn(MOCK_URI);
         when(mockAnnotationReference.getHash()).thenReturn(dataHash);
 
-
         when(mockDocument.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHash);
-        when(mockDocument.getFileName()).thenReturn("RandomFileIsAwesome.txt");
-        when(mockDocument.getMimeType()).thenReturn("application/text");
+        when(mockDocument.getFileName()).thenReturn(TEST_FILE_NAME_TEST_TXT);
+        when(mockDocument.getMimeType()).thenReturn(MIME_TYPE_APPLICATION_TXT);
     }
 
     protected void testMagic(InputStream stream, byte[] magic) throws Exception {
-        // TODO: Improve this. When final spec is out fix the byte array size
-        byte[] data = new byte[8];
-        stream.read(data); // magic
-        assertTrue("Magic doesn't match", Arrays.equals(magic, data));
-    }
-
-    protected void testTlvElement(TLVInputStream stream, int type) throws Exception {
-        TLVElement element = stream.readElement();
-        assertEquals(type, element.getType());
+        byte[] data = new byte[magic.length];
+        stream.read(data);
+        assertArrayEquals("Magic doesn't match", magic, data);
     }
 
     protected TLVElement createReference(int referenceType, String referenceUri, String referenceMime, DataHash dataHash) throws Exception {
         TLVElement reference = new TLVElement(false, false, referenceType);
         if (referenceUri != null) {
-            TLVElement uri = new TLVElement(false, false, 0x01);
+            TLVElement uri = new TLVElement(false, false, TLV_ELEMENT_URI_TYPE); //TODO move to constants
             uri.setStringContent(referenceUri);
             reference.addChildElement(uri);
         }
         if (referenceMime != null) {
-            TLVElement mime = new TLVElement(false, false, 0x03);
+            TLVElement mime = new TLVElement(false, false, TLV_ELEMENT_MIME_TYPE);
             mime.setStringContent(referenceMime);
             reference.addChildElement(mime);
         }
         if (dataHash != null) {
-            TLVElement hash = new TLVElement(false, false, 0x02);
+            TLVElement hash = new TLVElement(false, false, TLV_ELEMENT_DATA_HASH_TYPE);
             hash.setDataHashContent(dataHash);
             reference.addChildElement(hash);
         }
@@ -137,18 +118,38 @@ public class AbstractTlvManifestTest {
 
     protected TLVElement createAnnotationReferenceElement() throws Exception {
         TLVElement element = createReference(ANNOTATION_REFERENCE_TYPE, MOCK_URI, null, dataHash);
-        TLVElement domainElement = new TLVElement(false, false, 0x04);
-        domainElement.setStringContent(ANNOTATION_DOMAIN);
+        TLVElement domainElement = new TLVElement(false, false, TLV_ELEMENT_DOMAIN_TYPE);
+        domainElement.setStringContent(ANNOTATION_DOMAIN_COM_GUARDTIME);
         element.addChildElement(domainElement);
         return element;
     }
 
-    protected byte[] join(byte[] ... arrays) {
+    protected byte[] join(byte[]... arrays) {
         byte[] out = new byte[0];
         for (byte[] a : arrays) {
             out = Util.join(out, a);
         }
         return out;
+    }
+
+    protected String getUri(TLVStructure structure) throws TLVParserException {
+        return getFirstChildElement(structure, TLV_ELEMENT_URI_TYPE).getDecodedString();
+    }
+
+    protected DataHash getDataHash(TLVStructure reference) throws TLVParserException {
+        return getFirstChildElement(reference, TLV_ELEMENT_DATA_HASH_TYPE).getDecodedDataHash();
+    }
+
+    protected String getMimeType(TLVStructure reference) throws TLVParserException {
+        return getFirstChildElement(reference, TLV_ELEMENT_MIME_TYPE).getDecodedString();
+    }
+
+    protected String getDomain(TlvAnnotationReference reference) throws TLVParserException {
+        return getFirstChildElement(reference, TLV_ELEMENT_DOMAIN_TYPE).getDecodedString();
+    }
+
+    protected TLVElement getFirstChildElement(TLVStructure structure, int tag) {
+        return structure.getRootElement().getFirstChildElement(tag);
     }
 
 }
