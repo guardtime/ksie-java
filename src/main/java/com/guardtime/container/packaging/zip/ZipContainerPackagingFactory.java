@@ -11,6 +11,7 @@ import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.manifest.ManifestFactoryType;
 import com.guardtime.container.manifest.SignatureManifest;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
+import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.SignatureFactoryType;

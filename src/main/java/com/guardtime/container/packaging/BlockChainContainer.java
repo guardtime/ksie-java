@@ -1,7 +1,5 @@
 package com.guardtime.container.packaging;
 
-import com.guardtime.container.packaging.zip.SignatureContent;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
