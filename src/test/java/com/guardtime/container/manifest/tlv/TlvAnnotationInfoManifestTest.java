@@ -1,27 +1,72 @@
 package com.guardtime.container.manifest.tlv;
 
+import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.HashAlgorithm;
+import com.guardtime.ksi.tlv.TLVElement;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+
+import static com.guardtime.container.manifest.ContainerManifestMimeType.ANNOTATIONS_MANIFEST;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class TlvAnnotationInfoManifestTest extends AbstractTlvManifestTest {
 
-    private static final String ANNOTATIO_URI = "annotatio_uri";
+    private TLVElement annotationReference;
+    private TLVElement dataFilesReference;
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        this.annotationReference = createAnnotationReferenceElement();
+        this.dataFilesReference = createReference(DATA_MANIFEST_REFERENCE_TYPE, DATA_FILE_NAME, DATA_FILE_TYPE, dataHash);
+    }
 
     @Test
     public void testCreateAnnotationInfoManifest() throws Exception {
-        TlvAnnotationInfoManifest annotationManifest = new TlvAnnotationInfoManifest(Pair.of(ANNOTATIO_URI, mockAnnotation), Pair.of("", mockDataManifest));
+        TlvAnnotationInfoManifest annotationManifest = new TlvAnnotationInfoManifest(Pair.of(ANNOTATION_MANIFEST_URI, mockAnnotation), Pair.of(MOCK_URI, mockDataManifest));
 
         assertNotNull(annotationManifest.getAnnotationReference());
         assertNotNull(annotationManifest.getDataManifestReference());
         assertEquals(ANNOTATION_DOMAIN, annotationManifest.getAnnotationReference().getDomain());
-        //TODO hashes
+        assertEquals(ANNOTATION_MANIFEST_URI, annotationManifest.getAnnotationReference().getUri());
+        assertEquals(dataHash, annotationManifest.getAnnotationReference().getHash());
+        assertEquals(MOCK_URI, annotationManifest.getDataManifestReference().getUri());
+        assertEquals(DATA_MANIFEST_TYPE, annotationManifest.getDataManifestReference().getMimeType());
+        assertEquals(dataHash, annotationManifest.getAnnotationReference().getHash());
     }
 
-    //TODO read manifest
+    @Test
+    public void testReadAnnotationInfoManifest() throws Exception {
+        byte[] bytes = join(ANNOTATION_INFO_MANIFEST_MAGIC, annotationReference.getEncoded(), dataFilesReference.getEncoded());
+        TlvAnnotationInfoManifest annotationInfoManifest = new TlvAnnotationInfoManifest(new ByteArrayInputStream(bytes));
+
+        assertArrayEquals(ANNOTATION_INFO_MANIFEST_MAGIC, annotationInfoManifest.getMagic());
+        assertNotNull(annotationInfoManifest.getDataManifestReference());
+        assertNotNull(annotationInfoManifest.getAnnotationReference());
+    }
+
+    @Test
+    public void testReadAnnotationInfoManifestWithoutDataReference() throws Exception {
+        expectedException.expect(InvalidManifestException.class);
+        expectedException.expectMessage("Data manifest reference is mandatory signature manifest element");
+        byte[] bytes = join(ANNOTATION_INFO_MANIFEST_MAGIC, annotationReference.getEncoded());
+        new TlvAnnotationInfoManifest(new ByteArrayInputStream(bytes));
+    }
+
+    @Test
+    public void testReadAnnotationInfoManifestWithoutAnnotationReference() throws Exception {
+        expectedException.expect(InvalidManifestException.class);
+        expectedException.expectMessage("Annotation reference is mandatory signature manifest element");
+        byte[] bytes = join(ANNOTATION_INFO_MANIFEST_MAGIC, dataFilesReference.getEncoded());
+        new TlvAnnotationInfoManifest(new ByteArrayInputStream(bytes));
+    }
+
 }

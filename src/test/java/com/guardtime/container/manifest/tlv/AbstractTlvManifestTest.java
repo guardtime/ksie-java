@@ -2,13 +2,15 @@ package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
-import com.guardtime.container.annotation.StringAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.datafile.StreamContainerDocument;
+import com.guardtime.container.manifest.AnnotationReference;
+import com.guardtime.container.manifest.FileReference;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVInputStream;
+import com.guardtime.ksi.util.Util;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,9 +41,19 @@ public class AbstractTlvManifestTest {
     protected static final byte[] ANNOTATIONS_MANIFEST_MAGIC = "KSIEANMF".getBytes();
     protected static final byte[] DATA_FILES_MANIFEST_MAGIC = "KSIEDAMF".getBytes();
     protected static final byte[] SIGNATURE_MANIFEST_MAGIC = "KSIEMFST".getBytes();
+    protected static final String ANNOTATION_MANIFEST_TYPE = "ksie10/annotmanifest";
     protected static final String ANNOTATION_CONTENT = "AnnotationTestContent";
     protected static final String ANNOTATION_DOMAIN = "com.guardtime";
     protected static final String MOCK_URI = "/mock/mock";
+    protected static final String DATA_MANIFEST_TYPE = "ksie10/datamanifest";
+    protected static final byte[] DATA_FILE_CONTENT = "Test".getBytes();
+    protected static final String DATA_FILE_MIME_TYPE = "text";
+    protected static final String DATA_FILE_NAME = "hello.txt";
+    protected static final String DATA_FILE_TYPE = "application/txt";
+
+    protected static final String SIGNATURE_URI = "/META-INF/signature4.ksig";
+    protected static final String SIGNATURE_TYPE = "ksi-signature";
+    protected static final String ANNOTATION_MANIFEST_URI = "/META-INF/annotation1.tlv";
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -61,12 +73,10 @@ public class AbstractTlvManifestTest {
     @Mock
     protected ContainerDocument mockDocument;
 
+    @Mock
+    private AnnotationReference mockAnnotationReference;
+
     protected DataHash dataHash;
-
-    protected static final byte[] DATA_FILE_CONTENT = "Test".getBytes();
-    protected static final String DATA_FILE_MIME_TYPE = "text";
-    protected static final String DATA_FILE_NAME = "hello.txt";
-
     protected ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(DATA_FILE_CONTENT), DATA_FILE_MIME_TYPE, DATA_FILE_NAME);
 
     @Before
@@ -81,6 +91,13 @@ public class AbstractTlvManifestTest {
         when(mockAnnotation.getDomain()).thenReturn(ANNOTATION_DOMAIN);
 
         when(mockAnnotationInfoManifest.getInputStream()).thenReturn(new ByteArrayInputStream("".getBytes())); // TODO: Maybe give valid TLV stream ?
+        when(mockAnnotationInfoManifest.getAnnotationReference()).thenReturn(mockAnnotationReference);
+
+        when(mockAnnotationReference.getDomain()).thenReturn(ANNOTATION_DOMAIN);
+        when(mockAnnotationReference.getUri()).thenReturn(MOCK_URI);
+        when(mockAnnotationReference.getHash()).thenReturn(dataHash);
+
+
         when(mockDocument.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHash);
         when(mockDocument.getFileName()).thenReturn("RandomFileIsAwesome.txt");
         when(mockDocument.getMimeType()).thenReturn("application/text");
@@ -117,4 +134,21 @@ public class AbstractTlvManifestTest {
         }
         return reference;
     }
+
+    protected TLVElement createAnnotationReferenceElement() throws Exception {
+        TLVElement element = createReference(ANNOTATION_REFERENCE_TYPE, MOCK_URI, null, dataHash);
+        TLVElement domainElement = new TLVElement(false, false, 0x04);
+        domainElement.setStringContent(ANNOTATION_DOMAIN);
+        element.addChildElement(domainElement);
+        return element;
+    }
+
+    protected byte[] join(byte[] ... arrays) {
+        byte[] out = new byte[0];
+        for (byte[] a : arrays) {
+            out = Util.join(out, a);
+        }
+        return out;
+    }
+
 }

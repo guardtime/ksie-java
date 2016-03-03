@@ -18,6 +18,10 @@ public class FileAnnotation implements ContainerAnnotation {
     private DataHash dataHash;
 
     public FileAnnotation(File file, String mimeType, String domain, ContainerAnnotationType type) {
+        Util.notNull(file, "File");
+        Util.notNull(mimeType, "MIME type");
+        Util.notNull(domain, "Domain");
+        Util.notNull(type, "Container type");
         this.mimeType = mimeType;
         this.file = file;
         this.domain = domain;
@@ -26,7 +30,7 @@ public class FileAnnotation implements ContainerAnnotation {
 
     @Override
     public ContainerAnnotationType getAnnotationType() {
-        return null;
+        return type;
     }
 
     @Override

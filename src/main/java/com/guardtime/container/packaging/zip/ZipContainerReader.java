@@ -5,19 +5,12 @@ import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.FileAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.datafile.FileContainerDocument;
-import com.guardtime.container.manifest.AnnotationInfoManifest;
-import com.guardtime.container.manifest.AnnotationReference;
-import com.guardtime.container.manifest.AnnotationsManifest;
-import com.guardtime.container.manifest.ContainerManifestFactory;
-import com.guardtime.container.manifest.DataFilesManifest;
-import com.guardtime.container.manifest.FileReference;
-import com.guardtime.container.manifest.SignatureManifest;
+import com.guardtime.container.manifest.*;
 import com.guardtime.container.packaging.BCCMimeType;
 import com.guardtime.container.packaging.zip.handler.*;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +68,16 @@ class ZipContainerReader {
         }
         List<SignatureContent> contents = buildSignatures();
         BCCMimeType mimeType = mimeTypeHandler.get(MimeTypeEntry.ENTRY_NAME_MIME_TYPE);
-        return new ZipBlockChainContainer(contents, mimeType);
+        List<Pair<String, File>> unknownFiles = getUnknownFiles();
+        return new ZipBlockChainContainer(contents, unknownFiles, mimeType);
+    }
+
+    private List<Pair<String, File>> getUnknownFiles() {
+        List<Pair<String, File>> returnable = new LinkedList<>();
+        for (String name : unknownFileHandler.getNames()) {
+            returnable.add(Pair.of(name, unknownFileHandler.get(name)));
+        }
+        return returnable;
     }
 
     private void readEntry(ZipInputStream zipInput, ZipEntry entry) throws IOException {
@@ -115,7 +117,7 @@ class ZipContainerReader {
         List<? extends FileReference> annotationManifestReferences = annotationsManifest.getAnnotationManifestReferences();
         List<Pair<String, AnnotationInfoManifest>> annotationReferences = getAnnotationManifests(annotationManifestReferences);
 
-        List<Pair<String,ContainerAnnotation>> annotations = getAnnotations(annotationManifestReferences);
+        List<Pair<String, ContainerAnnotation>> annotations = getAnnotations(annotationManifestReferences);
 
         //TODO check annotation and data file names inside the container
         SignatureContent signatureContent = new SignatureContent.Builder()
@@ -131,8 +133,8 @@ class ZipContainerReader {
         return signatureContent;
     }
 
-    private  List<Pair<String,ContainerAnnotation>>  getAnnotations(List<? extends FileReference> manifestReferences) {
-        List<Pair<String,ContainerAnnotation>>  annotations = new ArrayList<>();
+    private List<Pair<String, ContainerAnnotation>> getAnnotations(List<? extends FileReference> manifestReferences) {
+        List<Pair<String, ContainerAnnotation>> annotations = new ArrayList<>();
         for (FileReference manifestReference : manifestReferences) {
             String reference = manifestReference.getUri();
             AnnotationInfoManifest manifest = annotationManifestHandler.get(reference);
