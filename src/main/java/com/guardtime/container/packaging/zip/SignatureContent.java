@@ -59,7 +59,6 @@ public class SignatureContent {
     }
 
     public void writeTo(ZipOutputStream output) throws IOException {
-        //TODO mimetype
         writeDocuments(output);
         writeEntry(new ZipEntry(dataManifest.getLeft()), dataManifest.getRight().getInputStream(), output);
         writeAnnotations(output);
