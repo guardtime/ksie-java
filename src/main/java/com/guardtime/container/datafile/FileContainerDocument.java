@@ -54,6 +54,11 @@ public class FileContainerDocument implements ContainerDocument {
     }
 
     @Override
+    public boolean isWritable() {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "{type=File" +
                 ", fileName=" + fileName +
