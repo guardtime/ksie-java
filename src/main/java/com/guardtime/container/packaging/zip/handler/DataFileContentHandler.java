@@ -9,7 +9,7 @@ public class DataFileContentHandler extends ContentHandler<File> {
 
     @Override
     public boolean isSupported(String name) {
-        return !name.startsWith("META-INF/") && !name.startsWith("/META-INF/");
+        return !matchesDirectory(name, "META-INF");
     }
 
     @Override

@@ -18,7 +18,8 @@ public class DataManifestHandler extends ContentHandler<DataFilesManifest> {
 
     @Override
     public boolean isSupported(String name) {
-        return name.startsWith("/META-INF/datamanifest"); //TODO
+        return matchesDirectory(name, "META-INF") &&
+                fileNameStartsWith(name, "datamanifest");
     }
 
     @Override

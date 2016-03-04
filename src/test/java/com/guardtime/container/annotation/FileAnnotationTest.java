@@ -16,36 +16,28 @@ public class FileAnnotationTest extends AbstractContainerTest {
     public void testCreateFileAnnotationWithoutInputFile_ThrowNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("File must be present");
-        new FileAnnotation(null, MIME_TYPE_APPLICATION_TXT, ANNOTATION_DOMAIN_COM_GUARDTIME, ContainerAnnotationType.NON_REMOVABLE);
-    }
-
-    @Test
-    public void testCreateFileAnnotationWithoutMimeType_ThrowNullPointerException() throws Exception {
-        expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("MIME type must be present");
-        new FileAnnotation(new File(TEST_FILE_PATH_TEST_TXT), null, ANNOTATION_DOMAIN_COM_GUARDTIME, ContainerAnnotationType.NON_REMOVABLE);
+        new FileAnnotation(null, ANNOTATION_DOMAIN_COM_GUARDTIME, ContainerAnnotationType.NON_REMOVABLE);
     }
 
     @Test
     public void testCreateFileAnnotationWithoutDomain_ThrowNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Domain must be present");
-        new FileAnnotation(new File(TEST_FILE_PATH_TEST_TXT), MIME_TYPE_APPLICATION_TXT, null, ContainerAnnotationType.NON_REMOVABLE);
+        new FileAnnotation(new File(TEST_FILE_PATH_TEST_TXT), null, ContainerAnnotationType.NON_REMOVABLE);
     }
 
     @Test
     public void testCreateFileAnnotationWithoutAnnotationType_ThrowNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Container type must be present");
-        new FileAnnotation(new File(TEST_FILE_PATH_TEST_TXT), MIME_TYPE_APPLICATION_TXT, ANNOTATION_DOMAIN_COM_GUARDTIME, null);
+        new FileAnnotation(new File(TEST_FILE_PATH_TEST_TXT), ANNOTATION_DOMAIN_COM_GUARDTIME, null);
     }
 
     @Test
     public void testCreateNewFileAnnotation() throws Exception {
-        FileAnnotation annotation = new FileAnnotation(loadFile(TEST_FILE_PATH_TEST_TXT), MIME_TYPE_APPLICATION_TXT, ANNOTATION_DOMAIN_COM_GUARDTIME, ContainerAnnotationType.NON_REMOVABLE);
+        FileAnnotation annotation = new FileAnnotation(loadFile(TEST_FILE_PATH_TEST_TXT), ANNOTATION_DOMAIN_COM_GUARDTIME, ContainerAnnotationType.NON_REMOVABLE);
         assertEquals(ANNOTATION_DOMAIN_COM_GUARDTIME, annotation.getDomain());
         assertEquals(ContainerAnnotationType.NON_REMOVABLE, annotation.getAnnotationType());
-        assertEquals(MIME_TYPE_APPLICATION_TXT, annotation.getMimeType());
         assertNotNull(annotation.getDataHash(HashAlgorithm.SHA2_256));
     }
 

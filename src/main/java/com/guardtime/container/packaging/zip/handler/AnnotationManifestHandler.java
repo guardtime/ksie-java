@@ -16,9 +16,13 @@ public class AnnotationManifestHandler extends ContentHandler<AnnotationInfoMani
         this.manifestFactory = manifestFactory;
     }
 
+    /**
+     * CARE! Can match annotation file! Must be used after annotation filter has been run.
+     */
     @Override
     public boolean isSupported(String name) {
-        return name.startsWith("/META-INF/annotation"); //TODO
+        return matchesDirectory(name, "META-INF") &&
+                fileNameStartsWith(name, "annotation");
     }
 
     @Override

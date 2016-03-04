@@ -18,7 +18,8 @@ public class AnnotationsManifestHandler extends ContentHandler<AnnotationsManife
 
     @Override
     public boolean isSupported(String name) {
-        return name.startsWith("/META-INF/annotmanifest"); //TODO
+        return matchesDirectory(name, "META-INF") &&
+                fileNameStartsWith(name, "annotmanifest");
     }
 
     @Override
