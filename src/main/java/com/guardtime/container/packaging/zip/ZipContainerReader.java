@@ -6,6 +6,7 @@ import com.guardtime.container.annotation.FileAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.datafile.FileContainerDocument;
 import com.guardtime.container.manifest.*;
+import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.zip.handler.*;
 import com.guardtime.container.signature.SignatureFactory;
@@ -40,6 +41,7 @@ class ZipContainerReader {
     private final AnnotationsManifestHandler annotationsManifestHandler;
     private final AnnotationManifestHandler annotationManifestHandler;
     private final SignatureHandler signatureHandler;
+    private final MimeTypeHandler mimeTypeHandler;
 
     private ContentHandler[] handlers;
 
@@ -49,7 +51,8 @@ class ZipContainerReader {
         this.annotationsManifestHandler = new AnnotationsManifestHandler(manifestFactory);
         this.annotationManifestHandler = new AnnotationManifestHandler(manifestFactory);
         this.signatureHandler = new SignatureHandler(signatureFactory);
-        this.handlers = new ContentHandler[]{documentHandler, annotationContentHandler, dataManifestHandler,
+        this.mimeTypeHandler = new MimeTypeHandler();
+        this.handlers = new ContentHandler[]{mimeTypeHandler, documentHandler, annotationContentHandler, dataManifestHandler,
                 manifestHandler, annotationsManifestHandler, signatureHandler, annotationManifestHandler};
     }
 
@@ -65,8 +68,15 @@ class ZipContainerReader {
             }
         }
         List<SignatureContent> contents = buildSignatures();
+        MimeType mimeType = getMimeType();
         List<Pair<String, File>> unknownFiles = getUnknownFiles();
-        return new ZipBlockChainContainer(contents, unknownFiles);
+        return new ZipBlockChainContainer(contents, unknownFiles, mimeType);
+    }
+
+    private MimeType getMimeType() {
+        String uri = ZipContainerPackagingFactory.MIME_TYPE_ENTRY_NAME;
+        byte[] content = mimeTypeHandler.get(uri);
+        return new MimeTypeEntry(uri, content);
     }
 
     private List<Pair<String, File>> getUnknownFiles() {

@@ -7,6 +7,7 @@ import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.DataFilesManifest;
 import com.guardtime.container.manifest.SignatureManifest;
 import com.guardtime.container.packaging.BlockChainContainer;
+import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
@@ -15,23 +16,26 @@ import com.guardtime.ksi.util.Util;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 class ZipBlockChainContainer implements BlockChainContainer {
 
     private List<SignatureContent> signatureContents = new LinkedList<>();
-    private MimeTypeEntry mimeType;
+    private MimeType mimeType;
     private List<Pair<String, File>> unknownFiles = new LinkedList<>();
 
-    public ZipBlockChainContainer(SignatureContent signatureContent) {
+    public ZipBlockChainContainer(SignatureContent signatureContent, MimeType mimeType) {
         this.signatureContents.add(signatureContent);
-        this.mimeType = new MimeTypeEntry();
+        this.mimeType = mimeType;
     }
 
-    public ZipBlockChainContainer(List<SignatureContent> signatureContents, List<Pair<String, File>> unknownFiles) {
+    public ZipBlockChainContainer(List<SignatureContent> signatureContents, List<Pair<String, File>> unknownFiles, MimeType mimeType) {
         this.signatureContents = signatureContents;
         this.unknownFiles = unknownFiles;
+        this.mimeType = mimeType;
     }
 
     @Override
@@ -42,16 +46,33 @@ class ZipBlockChainContainer implements BlockChainContainer {
     @Override
     public void writeTo(OutputStream output) throws IOException {
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(output))) {
-            writeEntry(new ZipEntry(mimeType.getUri()), mimeType.getInputStream(), zipOutputStream);
+            writeMimeTypeEntry(zipOutputStream);
             writeSignatures(signatureContents, zipOutputStream);
             writeExcessFiles(zipOutputStream);
         }
+    }
+
+    @Override
+    public MimeType getMimeType() {
+        return mimeType;
     }
 
     private void writeExcessFiles(ZipOutputStream zipOutputStream) throws IOException {
         for (Pair<String, File> file : unknownFiles) {
             writeEntry(new ZipEntry(file.getLeft()), new FileInputStream(file.getRight()), zipOutputStream);
         }
+    }
+
+    private void writeMimeTypeEntry(ZipOutputStream zipOutputStream) throws IOException {
+        ZipEntry mimeTypeEntry = new ZipEntry(mimeType.getUri());
+        byte[] data = Util.toByteArray(mimeType.getInputStream());
+        mimeTypeEntry.setSize(data.length);
+        mimeTypeEntry.setCompressedSize(data.length);
+        Checksum checksum = new CRC32();
+        checksum.update(data, 0, data.length);
+        mimeTypeEntry.setCrc(checksum.getValue());
+        mimeTypeEntry.setMethod(ZipEntry.STORED);
+        writeEntry(mimeTypeEntry, mimeType.getInputStream(), zipOutputStream);
     }
 
     private void writeSignatures(List<SignatureContent> signatureContents, ZipOutputStream zipOutputStream) throws IOException {
