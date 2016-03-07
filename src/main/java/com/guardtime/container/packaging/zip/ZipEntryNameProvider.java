@@ -8,16 +8,26 @@ class ZipEntryNameProvider {
     private final String manifestSuffix;
     private final String signatureSuffix;
 
-    int dataManifestIndex;
-    int manifestIndex;
-    int signatureIndex;
-    int annotationsManifestIndex;
-    int annotationManifestIndex;
-    int annotationIndex;
+    int dataManifestIndex = 0;
+    int manifestIndex = 0;
+    int signatureIndex = 0;
+    int annotationsManifestIndex = 0;
+    int annotationManifestIndex = 0;
+    int annotationIndex = 0;
 
     ZipEntryNameProvider(String manifestSuffix, String signatureSuffix) {
         this.manifestSuffix = manifestSuffix;
         this.signatureSuffix = signatureSuffix;
+    }
+
+    public ZipEntryNameProvider(String manifestSuffix, String signatureSuffix, int dataManifestIndex, int manifestIndex, int signatureIndex, int annotationsManifestIndex, int annotationManifestIndex, int annotationIndex) {
+        this(manifestSuffix, signatureSuffix);
+        this.dataManifestIndex = dataManifestIndex;
+        this.manifestIndex = manifestIndex;
+        this.signatureIndex = signatureIndex;
+        this.annotationsManifestIndex = annotationsManifestIndex;
+        this.annotationManifestIndex = annotationManifestIndex;
+        this.annotationIndex = annotationIndex;
     }
 
     public String nextDataManifestName() {

@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 public class AnnotationsManifestHandler extends ContentHandler<AnnotationsManifest> {
+    private int maxIndex = 0;
 
     private final ContainerManifestFactory manifestFactory;
 
@@ -22,6 +23,13 @@ public class AnnotationsManifestHandler extends ContentHandler<AnnotationsManife
     }
 
     @Override
+    public void add(String name, File file) {
+        super.add(name, file);
+        int index = Integer.parseInt(name.replaceAll("[^0-9]", ""));
+        if(index > maxIndex) maxIndex = index;
+    }
+
+    @Override
     public AnnotationsManifest get(String name) {
         try {
             File file = entries.get(name);
@@ -29,6 +37,10 @@ public class AnnotationsManifestHandler extends ContentHandler<AnnotationsManife
         } catch (BlockChainContainerException | FileNotFoundException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public int getMaxIndex() {
+        return maxIndex;
     }
 
 }

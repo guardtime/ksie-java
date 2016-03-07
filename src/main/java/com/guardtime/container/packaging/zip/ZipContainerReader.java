@@ -42,6 +42,9 @@ class ZipContainerReader {
     private final SignatureHandler signatureHandler;
     private final MimeTypeHandler mimeTypeHandler;
 
+    private final String manifestSuffix;
+    private final String signatureSuffix;
+
     private ContentHandler[] handlers;
 
     ZipContainerReader(ContainerManifestFactory manifestFactory, SignatureFactory signatureFactory) {
@@ -53,6 +56,8 @@ class ZipContainerReader {
         this.mimeTypeHandler = new MimeTypeHandler();
         this.handlers = new ContentHandler[]{mimeTypeHandler, documentHandler, annotationContentHandler, dataManifestHandler,
                 manifestHandler, annotationsManifestHandler, signatureHandler, annotationManifestHandler};
+        this.manifestSuffix = manifestFactory.getManifestFactoryType().getManifestFileExtension();
+        this.signatureSuffix = signatureFactory.getSignatureFactoryType().getSignatureFileExtension();
     }
 
     ZipBlockChainContainer read(InputStream input) throws IOException {
@@ -69,7 +74,17 @@ class ZipContainerReader {
         List<SignatureContent> contents = buildSignatures();
         MimeType mimeType = getMimeType();
         List<Pair<String, File>> unknownFiles = getUnknownFiles();
-        return new ZipBlockChainContainer(contents, unknownFiles, mimeType);
+        ZipEntryNameProvider nameProvider = new ZipEntryNameProvider(
+                manifestSuffix,
+                signatureSuffix,
+                dataManifestHandler.getMaxIndex(),
+                manifestHandler.getMaxIndex(),
+                signatureHandler.getMaxIndex(),
+                annotationManifestHandler.getMaxIndex(),
+                annotationManifestHandler.getMaxIndex(),
+                annotationContentHandler.getMaxIndex()
+        );
+        return new ZipBlockChainContainer(contents, unknownFiles, mimeType, nameProvider);
     }
 
     private MimeType getMimeType() {
