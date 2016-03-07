@@ -56,6 +56,11 @@ public class StringAnnotation implements ContainerAnnotation {
     }
 
     @Override
+    public boolean writable() {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "StringAnnotation {" +
                 "mimeType='" + mimeType + "\'" +

@@ -41,4 +41,9 @@ public class MissingAnnotation implements ContainerAnnotation {
     public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
         return hash;
     }
+
+    @Override
+    public boolean writable() {
+        return false;
+    }
 }

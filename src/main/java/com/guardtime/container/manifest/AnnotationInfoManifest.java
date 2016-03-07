@@ -11,4 +11,6 @@ public interface AnnotationInfoManifest {
 
     InputStream getInputStream() throws IOException;
 
+    boolean writable();
+
 }

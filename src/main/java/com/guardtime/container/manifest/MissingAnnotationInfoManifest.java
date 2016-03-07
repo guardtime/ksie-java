@@ -18,4 +18,9 @@ public class MissingAnnotationInfoManifest implements AnnotationInfoManifest {
     public InputStream getInputStream() throws IOException {
         return null;
     }
+
+    @Override
+    public boolean writable() {
+        return false;
+    }
 }

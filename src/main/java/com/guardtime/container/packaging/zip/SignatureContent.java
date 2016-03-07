@@ -71,13 +71,17 @@ public class SignatureContent {
 
     private void writeAnnotationInfoManifests(ZipOutputStream output) throws IOException {
         for (Pair<String, AnnotationInfoManifest> manifest : annotationManifests) {
-            writeEntry(new ZipEntry(manifest.getLeft()), manifest.getRight().getInputStream(), output);
+            if(manifest.getRight().writable()){
+                writeEntry(new ZipEntry(manifest.getLeft()), manifest.getRight().getInputStream(), output);
+            }
         }
     }
 
     private void writeAnnotations(ZipOutputStream output) throws IOException {
         for (Pair<String, ContainerAnnotation> annotation : annotations) {
-            writeEntry(new ZipEntry(annotation.getLeft()), annotation.getRight().getInputStream(), output);
+            if(annotation.getRight().writable()){
+                writeEntry(new ZipEntry(annotation.getLeft()), annotation.getRight().getInputStream(), output);
+            }
         }
     }
 

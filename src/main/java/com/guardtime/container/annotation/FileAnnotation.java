@@ -56,4 +56,9 @@ public class FileAnnotation implements ContainerAnnotation {
         return dataHash;
     }
 
+    @Override
+    public boolean writable() {
+        return true;
+    }
+
 }
