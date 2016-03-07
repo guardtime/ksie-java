@@ -23,7 +23,7 @@ public class EmptyContainerDocument implements ContainerDocument {
 
     @Override
     public String getFileName() {
-        return null;
+        return fileName;
     }
 
     @Override
