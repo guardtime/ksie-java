@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -109,71 +108,116 @@ class ZipContainerReader {
         return signatures;
     }
 
-    private SignatureContent buildSignature(String manifestName) {
-        SignatureManifest manifest = manifestHandler.get(manifestName);
-        FileReference dataFileReference = manifest.getDataFilesReference();
-        String dataFileReferenceUri = dataFileReference.getUri();
-        DataFilesManifest dataManifest = dataManifestHandler.get(dataFileReferenceUri);
-
-        List<? extends FileReference> documentReferences = dataManifest.getDataFileReferences();
-        List<ContainerDocument> documents = getDocuments(documentReferences);
-
-        FileReference annotationsManifestReference = manifest.getAnnotationsManifestReference();
-        AnnotationsManifest annotationsManifest = annotationsManifestHandler.get(annotationsManifestReference.getUri());
-        List<? extends FileReference> annotationManifestReferences = annotationsManifest.getAnnotationManifestReferences();
-        List<Pair<String, AnnotationInfoManifest>> annotationReferences = getAnnotationManifests(annotationManifestReferences);
-
-        List<Pair<String, ContainerAnnotation>> annotations = getAnnotations(annotationManifestReferences);
+    private SignatureContent buildSignature(String manifestPath) {
+        GroupParser groupParser = new GroupParser(manifestPath);
 
         //TODO check annotation and data file names inside the container
         SignatureContent signatureContent = new SignatureContent.Builder()
-                .withDocuments(documents)
-                .withManifest(Pair.of(manifestName, manifest))
-                .withDataManifest(Pair.of(dataFileReferenceUri, dataManifest))
-                .withAnnotationsManifest(Pair.of(annotationsManifestReference.getUri(), annotationsManifest))
-                .withAnnotationManifests(annotationReferences)
-                .withAnnotations(annotations)
+                .withDocuments(groupParser.getDocuments())
+                .withManifest(groupParser.getManifest())
+                .withDataManifest(groupParser.getDataManifest())
+                .withAnnotationsManifest(groupParser.getAnnotationsManifest())
+                .withAnnotationManifests(groupParser.getAnnotationManifests())
+                .withAnnotations(groupParser.getAnnotations())
                 .build();
 
-        signatureContent.setSignature(signatureHandler.get(manifest.getSignatureReference().getUri()));
+        String signatureUri = groupParser.getManifest().getRight().getSignatureReference().getUri();
+        signatureContent.setSignature(signatureHandler.get(signatureUri));
         return signatureContent;
-    }
-
-    private List<Pair<String, ContainerAnnotation>> getAnnotations(List<? extends FileReference> manifestReferences) {
-        List<Pair<String, ContainerAnnotation>> annotations = new ArrayList<>();
-        for (FileReference manifestReference : manifestReferences) {
-            String reference = manifestReference.getUri();
-            AnnotationInfoManifest manifest = annotationManifestHandler.get(reference);
-            AnnotationReference annotReference = manifest.getAnnotationReference();
-            ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getUri());
-            File annotationFile = annotationContentHandler.get(annotReference.getUri());
-            ContainerAnnotation annotation = new FileAnnotation(annotationFile, annotReference.getUri(), annotReference.getDomain(), type);
-            annotations.add(Pair.of(annotationFile.getName(), annotation));
-        }
-        return annotations;
-    }
-
-    private List<Pair<String, AnnotationInfoManifest>> getAnnotationManifests(List<? extends FileReference> manifestReferences) {
-        List<Pair<String, AnnotationInfoManifest>> manifests = new LinkedList<>();
-        for (FileReference manifestReference : manifestReferences) {
-            String reference = manifestReference.getUri();
-            AnnotationInfoManifest manifest = annotationManifestHandler.get(reference);
-            manifests.add(Pair.of(reference, manifest));
-        }
-        return manifests;
-    }
-
-    private List<ContainerDocument> getDocuments(List<? extends FileReference> references) {
-        List<ContainerDocument> documents = new LinkedList<>();
-        for (FileReference reference : references) {
-            File file = documentHandler.get(reference.getUri());
-            documents.add(new FileContainerDocument(file, reference.getMimeType(), reference.getUri()));
-        }
-        return documents;
     }
 
     private File createTempFile() throws IOException {
         return Util.createTempFile("ksie_", ".tmp");
     }
 
+    private class GroupParser {
+        Pair<String, SignatureManifest> manifest;
+        Pair<String, DataFilesManifest> dataManifest;
+        Pair<String, AnnotationsManifest> annotationsManifest;
+        List<Pair<String, AnnotationInfoManifest>> annotationManifests = new LinkedList<>();
+        List<Pair<String, ContainerAnnotation>> annotations = new LinkedList<>();
+        List<ContainerDocument> documents = new LinkedList<>();
+
+        public GroupParser(String manifestPath) {
+            this.manifest = Pair.of(manifestPath, manifestHandler.get(manifestPath));;
+            this.dataManifest = getDataManifestPair();
+            this.annotationsManifest = getAnnotationsManifestPair();
+
+            populateAnnotationsWithManifests();
+            populateDocuments();
+        }
+
+        public Pair<String, SignatureManifest> getManifest() {
+            return manifest;
+        }
+
+        public Pair<String, DataFilesManifest> getDataManifest() {
+            return dataManifest;
+        }
+
+        public Pair<String, AnnotationsManifest> getAnnotationsManifest() {
+            return annotationsManifest;
+        }
+
+        public List<Pair<String, AnnotationInfoManifest>> getAnnotationManifests() {
+            return annotationManifests;
+        }
+
+        public List<Pair<String, ContainerAnnotation>> getAnnotations() {
+            return annotations;
+        }
+
+        public List<ContainerDocument> getDocuments() {
+            return documents;
+        }
+
+        private Pair<String, AnnotationsManifest> getAnnotationsManifestPair() {
+            FileReference annotationsManifestReference = manifest.getRight().getAnnotationsManifestReference();
+            return Pair.of(
+                    annotationsManifestReference.getUri(),
+                    annotationsManifestHandler.get(annotationsManifestReference.getUri())
+            );
+        }
+
+        private Pair<String, DataFilesManifest> getDataManifestPair() {
+            FileReference dataFileReference = manifest.getRight().getDataFilesReference();
+            return Pair.of(dataFileReference.getUri(), dataManifestHandler.get(dataFileReference.getUri()));
+        }
+
+        private void populateDocuments() {
+            for (FileReference reference : dataManifest.getRight().getDataFileReferences()) {
+                File file = documentHandler.get(reference.getUri());
+                documents.add(new FileContainerDocument(file, reference.getMimeType(), reference.getUri()));
+            }
+        }
+
+        private void populateAnnotationsWithManifests() {
+            for (FileReference manifestReference : annotationsManifest.getRight().getAnnotationManifestReferences()) {
+                Pair<String, AnnotationInfoManifest> annotationInfoManifest = getAnnotationInfoManifest(manifestReference);
+                annotationManifests.add(annotationInfoManifest);
+
+                Pair<String, ContainerAnnotation> annotation = getContainerAnnotation(manifestReference, annotationInfoManifest.getRight());
+                annotations.add(annotation);
+            }
+        }
+
+        private Pair<String, AnnotationInfoManifest> getAnnotationInfoManifest(FileReference manifestReference) {
+            String manifestReferenceUri = manifestReference.getUri();
+            AnnotationInfoManifest annotationInfoManifest = annotationManifestHandler.get(manifestReferenceUri);
+            return Pair.of(manifestReferenceUri, annotationInfoManifest);
+        }
+
+        private Pair<String, ContainerAnnotation> getContainerAnnotation(FileReference manifestReference, AnnotationInfoManifest annotationInfoManifest) {
+            AnnotationReference annotationReference = annotationInfoManifest.getAnnotationReference();
+            ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getUri());
+            File annotationFile = annotationContentHandler.get(annotationReference.getUri());
+            ContainerAnnotation annotation;
+            if(annotationFile == null) {
+                annotation = null;// TODO: missing annotation
+            } else {
+                annotation = new FileAnnotation(annotationFile, annotationReference.getUri(), annotationReference.getDomain(), type);
+            }
+            return Pair.of(annotationFile.getName(), annotation);
+        }
+    }
 }
