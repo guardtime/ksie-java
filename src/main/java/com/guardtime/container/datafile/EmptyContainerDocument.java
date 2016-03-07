@@ -7,13 +7,16 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class DataHashContainerDocument implements ContainerDocument {
-    private String mimeType;
-    private DataHash hash;
+public class EmptyContainerDocument implements ContainerDocument {
+    private final String fileName;
+    private final String mimeType;
+    private final DataHash hash;
 
-    public DataHashContainerDocument(String mimeType, DataHash hash) {
+    public EmptyContainerDocument(String fileName, String mimeType, DataHash hash) {
+        Util.notNull(fileName, "File name");
         Util.notNull(mimeType, "MIME type");
         Util.notNull(hash, "Data hash");
+        this.fileName = fileName;
         this.mimeType = mimeType;
         this.hash = hash;
     }

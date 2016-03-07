@@ -1,5 +1,6 @@
 package com.guardtime.container.datafile;
 
+import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -10,25 +11,25 @@ import java.io.ByteArrayInputStream;
 
 import static org.junit.Assert.*;
 
-public class DataHashContainerDocumentTest {
+public class EmptyContainerDocumentTest extends AbstractContainerTest {
 
-    private static final String APPLICATION_TEXT = "application/text";
-    private DataHashContainerDocument document;
+    private static final String DOCUMENT_NAME = "Not_added_document_doc";
+    private EmptyContainerDocument document;
 
     @Before
     public void setUp() {
         DataHash hash = Util.hash(new ByteArrayInputStream("".getBytes()), HashAlgorithm.SHA2_256);
-        document = new DataHashContainerDocument(APPLICATION_TEXT, hash);
+        document = new EmptyContainerDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, hash);
     }
 
     @Test
     public void testGetFileName() throws Exception {
-        assertNull(document.getFileName());
+        assertNotNull(document.getFileName());
     }
 
     @Test
     public void testGetMimeType() throws Exception {
-        assertEquals(APPLICATION_TEXT, document.getMimeType());
+        assertEquals(MIME_TYPE_APPLICATION_TXT, document.getMimeType());
     }
 
     @Test
