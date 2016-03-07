@@ -3,6 +3,7 @@ package com.guardtime.container.packaging.zip.handler;
 import com.guardtime.container.manifest.AnnotationInfoManifest;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.InvalidManifestException;
+import com.guardtime.container.manifest.MissingAnnotationInfoManifest;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,10 +25,13 @@ public class AnnotationManifestHandler extends ContentHandler<AnnotationInfoMani
     @Override
     public AnnotationInfoManifest get(String name) {
         File file = entries.get(name);
+        if (file == null) {
+            return new MissingAnnotationInfoManifest();
+        }
         try (FileInputStream input = new FileInputStream(file)) {
             return manifestFactory.readAnnotationManifest(input);
         } catch (InvalidManifestException | IOException e) {
-            throw new RuntimeException(e); //TODO
+            throw new RuntimeException(e); //TODO: invalid annotationInfoManifest
         }
     }
 

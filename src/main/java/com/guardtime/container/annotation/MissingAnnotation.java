@@ -8,10 +8,18 @@ import java.io.InputStream;
 
 public class MissingAnnotation implements ContainerAnnotation {
     private final ContainerAnnotationType type;
-    private final 
+    private final String domain;
+    private final DataHash hash;
+
+    public MissingAnnotation(ContainerAnnotationType type, String domain, DataHash hash) {
+        this.type = type;
+        this.domain = domain;
+        this.hash = hash;
+    }
+
     @Override
     public ContainerAnnotationType getAnnotationType() {
-        return null;
+        return type;
     }
 
     @Override
@@ -21,7 +29,7 @@ public class MissingAnnotation implements ContainerAnnotation {
 
     @Override
     public String getDomain() {
-        return null;
+        return domain;
     }
 
     @Override
@@ -31,6 +39,6 @@ public class MissingAnnotation implements ContainerAnnotation {
 
     @Override
     public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
-        return null;
+        return hash;
     }
 }

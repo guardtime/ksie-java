@@ -3,6 +3,7 @@ package com.guardtime.container.packaging.zip;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.FileAnnotation;
+import com.guardtime.container.annotation.MissingAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.datafile.FileContainerDocument;
 import com.guardtime.container.manifest.*;
@@ -196,8 +197,10 @@ class ZipContainerReader {
                 Pair<String, AnnotationInfoManifest> annotationInfoManifest = getAnnotationInfoManifest(manifestReference);
                 annotationManifests.add(annotationInfoManifest);
 
-                Pair<String, ContainerAnnotation> annotation = getContainerAnnotation(manifestReference, annotationInfoManifest.getRight());
-                annotations.add(annotation);
+                if(annotationInfoManifest.getRight().getAnnotationReference() != null) {
+                    Pair<String, ContainerAnnotation> annotation = getContainerAnnotation(manifestReference, annotationInfoManifest.getRight());
+                    annotations.add(annotation);
+                }
             }
         }
 
@@ -213,11 +216,11 @@ class ZipContainerReader {
             File annotationFile = annotationContentHandler.get(annotationReference.getUri());
             ContainerAnnotation annotation;
             if(annotationFile == null) {
-                annotation = null;// TODO: missing annotation
+                annotation = new MissingAnnotation(type, annotationReference.getDomain(), annotationReference.getHash());
             } else {
                 annotation = new FileAnnotation(annotationFile, annotationReference.getUri(), annotationReference.getDomain(), type);
             }
-            return Pair.of(annotationFile.getName(), annotation);
+            return Pair.of(annotationReference.getUri(), annotation);
         }
     }
 }
