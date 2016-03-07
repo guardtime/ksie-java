@@ -1,20 +1,26 @@
 package com.guardtime.container.packaging.zip;
 
+import com.guardtime.container.packaging.MimeType;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 
-class MimeTypeEntry {
+class MimeTypeEntry implements MimeType {
 
-    public static final String ENTRY_NAME_MIME_TYPE = "mimetype";
-    public static final String CONTAINER_MIME_TYPE = "application/guardtime.ksie10+zip";
+    private final String uri;
+    private final byte[] content;
 
-    String getUri() {
-        return ENTRY_NAME_MIME_TYPE;
+    public MimeTypeEntry(String uri, byte[] content) {
+        this.uri = uri;
+        this.content = content;
     }
 
-    InputStream getInputStream() {
-        return new ByteArrayInputStream(CONTAINER_MIME_TYPE.getBytes(Charset.forName("UTF-8")));
+    public String getUri() {
+        return uri;
+    }
+
+    public InputStream getInputStream() {
+        return new ByteArrayInputStream(content);
     }
 
 }
