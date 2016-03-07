@@ -127,7 +127,7 @@ class ZipContainerReader {
         List<Pair<String, ContainerAnnotation>> annotations = getAnnotations(annotationManifestReferences);
 
         //TODO check annotation and data file names inside the container
-        SignatureContent signatureContent = new SignatureContent.Builder()
+        ZipSignatureContent signatureContent = new ZipSignatureContent.Builder()
                 .withDocuments(documents)
                 .withManifest(Pair.of(manifestName, manifest))
                 .withDataManifest(Pair.of(dataFileReferenceUri, dataManifest))

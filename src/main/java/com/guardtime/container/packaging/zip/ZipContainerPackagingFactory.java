@@ -105,7 +105,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             SignatureManifest signatureManifest = manifestFactory.createSignatureManifest(dataFilesManifest, annotationsManifestPair,
                     Pair.of(nameProvider.nextSignatureName(), signatureFactoryType.getSignatureMimeType()));
 
-            SignatureContent signatureContent = new SignatureContent.Builder()
+            ZipSignatureContent signatureContent = new ZipSignatureContent.Builder()
                     .withDocuments(documents)
                     .withDataManifest(dataFilesManifest)
                     .withAnnotations(annotationPairs)
