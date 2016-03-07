@@ -63,6 +63,18 @@ public class ZipSignatureContent implements SignatureContent {
         return manifest.getRight().getDataHash(HashAlgorithm.SHA2_256);
     }
 
+    public void writeTo(OutputStream outputStream) throws IOException {
+        try (ZipOutputStream output = (ZipOutputStream) outputStream) {
+            writeDocuments(output);
+            writeEntry(new ZipEntry(dataManifest.getLeft()), dataManifest.getRight().getInputStream(), output);
+            writeAnnotations(output);
+            writeAnnotationInfoManifests(output);
+            writeEntry(new ZipEntry(annotationsManifest.getLeft()), annotationsManifest.getRight().getInputStream(), output);
+            writeEntry(new ZipEntry(manifest.getLeft()), manifest.getRight().getInputStream(), output);
+            writeSignature(output);
+        }
+    }
+
     public Pair<String, DataFilesManifest> getDataManifest() {
         return dataManifest;
     }
@@ -77,22 +89,6 @@ public class ZipSignatureContent implements SignatureContent {
 
     public List<Pair<String, AnnotationInfoManifest>> getAnnotationManifests() {
         return annotationManifests;
-    }
-
-    public void writeTo(OutputStream outputStream) throws IOException {
-        try (ZipOutputStream output = (ZipOutputStream) outputStream) {
-            writeDocuments(output);
-            Pair<String, DataFilesManifest> dataManifest = getDataManifest();
-            writeEntry(new ZipEntry(dataManifest.getLeft()), dataManifest.getRight().getInputStream(), output);
-            writeAnnotations(output);
-            writeAnnotationInfoManifests(output);
-            Pair<String, AnnotationsManifest> annotationsManifest = getAnnotationsManifest();
-            writeEntry(new ZipEntry(annotationsManifest.getLeft()), annotationsManifest.getRight().getInputStream(), output);
-            Pair<String, SignatureManifest> manifest = getSignatureManifest();
-            SignatureManifest signatureManifest = manifest.getRight();
-            writeEntry(new ZipEntry(manifest.getLeft()), signatureManifest.getInputStream(), output);
-            writeSignature(output);
-        }
     }
 
     private void writeAnnotationInfoManifests(ZipOutputStream output) throws IOException {
