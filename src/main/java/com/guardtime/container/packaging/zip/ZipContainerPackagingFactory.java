@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +32,9 @@ import java.util.Map;
 public class ZipContainerPackagingFactory implements ContainerPackagingFactory<ZipBlockChainContainer> {
 
     private static final Logger logger = LoggerFactory.getLogger(ZipContainerPackagingFactory.class);
+
+    public static final String MIME_TYPE_ENTRY_NAME = "mimetype";
+    private static final String CONTAINER_MIME_TYPE = "application/guardtime.ksie10+zip";
 
     private final SignatureFactory signatureFactory;
     private final ContainerManifestFactory manifestFactory;
@@ -55,7 +59,13 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
         Util.notEmpty(files, "Data files");
         ContentSigner signer = new ContentSigner(files, annotations);
         SignatureContent signatureContent = signer.sign();
-        return new ZipBlockChainContainer(signatureContent);
+        MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
+        return new ZipBlockChainContainer(signatureContent, mimeType);
+    }
+
+    private byte[] getMimeTypeContent() {
+        // TODO: Append manifest type?
+        return CONTAINER_MIME_TYPE.getBytes(Charset.forName("UTF-8"));
     }
 
     @Override
