@@ -27,12 +27,12 @@ public abstract class ContentHandler<T> {
         return entries.keySet();
     }
 
-    protected boolean matchesDirectory(String str, String dirName) {
-        return str.matches("/?" + dirName + ".*");
+    protected boolean matchesSingleDirectory(String str, String dirName) {
+        return str.matches("/?" + dirName + "/[^/]*");
     }
 
-    protected boolean fileNameStartsWith(String str, String startStrnig) {
+    protected boolean fileNameStartsWith(String str, String startString) {
         int startingIndex = str.contains("/") ? str.lastIndexOf("/") + 1 : 0;
-        return str.substring(startingIndex).startsWith(startStrnig);
+        return str.substring(startingIndex).startsWith(startString);
     }
 }

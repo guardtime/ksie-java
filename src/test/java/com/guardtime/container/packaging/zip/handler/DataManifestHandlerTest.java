@@ -7,6 +7,8 @@ import static org.junit.Assert.*;
 
 public class DataManifestHandlerTest extends AbstractContentHandlerTest {
 
+    private static final String VALID_DATAMANIFEST_PATH = "/META-INF/datamanifest1.tlv_json_xml_bak";
+    private static final String INVALID_DATAMANIFEST_PATH = "funky_music.mp3";
     private DataManifestHandler handler;
 
     @Before
@@ -16,13 +18,11 @@ public class DataManifestHandlerTest extends AbstractContentHandlerTest {
 
     @Test
     public void testIsSupported() throws Exception {
-        String validString = "/META-INF/datamanifest1.tlv_json_xml_bak";
-        assertTrue("Failed to identify supported filename string.", handler.isSupported(validString));
+        assertTrue("Failed to identify supported filename string.", handler.isSupported(VALID_DATAMANIFEST_PATH));
     }
 
     @Test
     public void testIsSupportedDoesntValidateInvalidFile() throws Exception {
-        String validString = "funky_music.mp3";
-        assertFalse("Identified unsupported filename string.", handler.isSupported(validString));
+        assertFalse("Identified unsupported filename string.", handler.isSupported(INVALID_DATAMANIFEST_PATH));
     }
 }

@@ -8,6 +8,8 @@ import static org.junit.Assert.assertTrue;
 
 public class AnnotationsManifestHandlerTest extends AbstractContentHandlerTest {
 
+    private static final String VALID_ANNOTATIONS_MANIFEST_PATH = "/META-INF/annotmanifest1.tlv_json_xml_sql";
+    private static final String INVALID_ANNOTATIONS_MANIFEST_PATH = "funky_music.mp3";
     private AnnotationsManifestHandler handler;
 
     @Before
@@ -17,13 +19,11 @@ public class AnnotationsManifestHandlerTest extends AbstractContentHandlerTest {
 
     @Test
     public void testIsSupported() throws Exception {
-        String validString = "/META-INF/annotmanifest1.tlv_json_xml_sql";
-        assertTrue("Failed to identify supported filename string.", handler.isSupported(validString));
+        assertTrue("Failed to identify supported filename string.", handler.isSupported(VALID_ANNOTATIONS_MANIFEST_PATH));
     }
 
     @Test
     public void testIsSupportedDoesntValidateInvalidFile() throws Exception {
-        String validString = "funky_music.mp3";
-        assertFalse("Identified unsupported filename string.", handler.isSupported(validString));
+        assertFalse("Identified unsupported filename string.", handler.isSupported(INVALID_ANNOTATIONS_MANIFEST_PATH));
     }
 }

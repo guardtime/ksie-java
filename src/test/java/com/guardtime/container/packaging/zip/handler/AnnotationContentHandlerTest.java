@@ -8,6 +8,8 @@ import static org.junit.Assert.assertTrue;
 
 public class AnnotationContentHandlerTest {
 
+    private static final String VALID_ANNOTATION_PATH = "/META-INF/annotation1.dat";
+    private static final String INVALID_ANNOTATION_PATH = "funky_music.mp3";
     private AnnotationContentHandler handler;
 
     @Before
@@ -17,13 +19,11 @@ public class AnnotationContentHandlerTest {
 
     @Test
     public void testIsSupported() throws Exception {
-        String validString = "/META-INF/annotation1.dat";
-        assertTrue("Failed to identify supported filename string.", handler.isSupported(validString));
+        assertTrue("Failed to identify supported filename string.", handler.isSupported(VALID_ANNOTATION_PATH));
     }
 
     @Test
     public void testIsSupportedDoesntValidateInvalidFile() throws Exception {
-        String validString = "funky_music.mp3";
-        assertFalse("Identified unsupported filename string.", handler.isSupported(validString));
+        assertFalse("Identified unsupported filename string.", handler.isSupported(INVALID_ANNOTATION_PATH));
     }
 }

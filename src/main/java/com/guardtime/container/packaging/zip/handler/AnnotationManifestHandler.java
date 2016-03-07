@@ -21,7 +21,7 @@ public class AnnotationManifestHandler extends ContentHandler<AnnotationInfoMani
      */
     @Override
     public boolean isSupported(String name) {
-        return matchesDirectory(name, "META-INF") &&
+        return matchesSingleDirectory(name, "META-INF") &&
                 fileNameStartsWith(name, "annotation");
     }
 

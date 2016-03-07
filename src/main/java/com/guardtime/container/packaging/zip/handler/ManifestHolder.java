@@ -18,7 +18,7 @@ public class ManifestHolder extends ContentHandler<SignatureManifest> {
 
     @Override
     public boolean isSupported(String name) {
-        return matchesDirectory(name, "META-INF") &&
+        return matchesSingleDirectory(name, "META-INF") &&
                 fileNameStartsWith(name, "manifest");
     }
 

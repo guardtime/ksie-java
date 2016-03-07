@@ -10,6 +10,8 @@ import static org.junit.Assert.*;
 
 public class SignatureHandlerTest {
 
+    private static final String VALID_SIGNATURE_PATH = "/META-INF/signature1.ksig";
+    private static final String INVALID_SIGNATURE_PATH = "funky_music.mp3";
     private SignatureHandler handler;
 
     @Mock
@@ -23,13 +25,11 @@ public class SignatureHandlerTest {
 
     @Test
     public void testIsSupported() throws Exception {
-        String validString = "/META-INF/signature1.ksig";
-        assertTrue("Failed to identify supported filename string.", handler.isSupported(validString));
+        assertTrue("Failed to identify supported filename string.", handler.isSupported(VALID_SIGNATURE_PATH));
     }
 
     @Test
     public void testIsSupportedDoesntValidateInvalidFile() throws Exception {
-        String validString = "funky_music.mp3";
-        assertFalse("Identified unsupported filename string.", handler.isSupported(validString));
+        assertFalse("Identified unsupported filename string.", handler.isSupported(INVALID_SIGNATURE_PATH));
     }
 }

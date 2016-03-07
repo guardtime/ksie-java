@@ -7,6 +7,8 @@ import static org.junit.Assert.*;
 
 public class DataFileContentHandlerTest {
 
+    private static final String VALID_DOCUMENT_PATH = "important_document_is_important.doc";
+    private static final String INVALID_DOCUMENT_PATH = "/META-INF/manifest1.tlv";
     private DataFileContentHandler handler;
 
     @Before
@@ -16,13 +18,11 @@ public class DataFileContentHandlerTest {
 
     @Test
     public void testIsSupported() throws Exception {
-        String validString = "important_document_is_important.doc";
-        assertTrue("Failed to identify supported filename string.", handler.isSupported(validString));
+        assertTrue("Failed to identify supported filename string.", handler.isSupported(VALID_DOCUMENT_PATH));
     }
 
     @Test
     public void testIsSupportedDoesntValidateInvalidFile() throws Exception {
-        String validString = "/META-INF/manifest1.tlv";
-        assertFalse("Identified unsupported filename string.", handler.isSupported(validString));
+        assertFalse("Identified unsupported filename string.", handler.isSupported(INVALID_DOCUMENT_PATH));
     }
 }

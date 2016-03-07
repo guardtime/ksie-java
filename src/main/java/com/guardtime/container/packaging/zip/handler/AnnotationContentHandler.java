@@ -6,7 +6,7 @@ public class AnnotationContentHandler extends ContentHandler<File> {
 
     @Override
     public boolean isSupported(String name) {
-        return matchesDirectory(name, "META-INF") &&
+        return matchesSingleDirectory(name, "META-INF") &&
                 fileNameStartsWith(name, "annotation") &&
                 name.endsWith(".dat"); // All annotations are .dat
     }
