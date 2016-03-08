@@ -8,7 +8,6 @@ import com.guardtime.container.datafile.EmptyContainerDocument;
 import com.guardtime.container.datafile.FileContainerDocument;
 import com.guardtime.container.manifest.*;
 import com.guardtime.container.packaging.MimeType;
-import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.zip.handler.*;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.util.Pair;
@@ -68,7 +67,7 @@ class ZipContainerReader {
                 readEntry(zipInput, entry);
             }
         }
-        List<SignatureContent> contents = buildSignatures();
+        List<ZipSignatureContent> contents = buildSignatures();
         MimeType mimeType = getMimeType();
         List<Pair<String, File>> unknownFiles = getUnknownFiles();
         return new ZipBlockChainContainer(contents, unknownFiles, mimeType);
@@ -102,16 +101,16 @@ class ZipContainerReader {
         unknownFileHandler.add(name, tempFile);
     }
 
-    private List<SignatureContent> buildSignatures() {
+    private List<ZipSignatureContent> buildSignatures() {
         Set<String> signatureManifests = manifestHandler.getNames();
-        List<SignatureContent> signatures = new LinkedList<>();
+        List<ZipSignatureContent> signatures = new LinkedList<>();
         for (String manifest : signatureManifests) {
             signatures.add(buildSignature(manifest));
         }
         return signatures;
     }
 
-    private SignatureContent buildSignature(String manifestName) {
+    private ZipSignatureContent buildSignature(String manifestName) {
         SignatureManifest manifest = manifestHandler.get(manifestName);
         FileReference dataFileReference = manifest.getDataFilesReference();
         String dataFileReferenceUri = dataFileReference.getUri();

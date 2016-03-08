@@ -9,8 +9,6 @@ import com.guardtime.container.manifest.SignatureManifest;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 
 public interface SignatureContent {
@@ -28,6 +26,4 @@ public interface SignatureContent {
     Pair<String, SignatureManifest> getSignatureManifest();
 
     List<Pair<String, AnnotationInfoManifest>> getAnnotationManifests();
-
-    void writeTo(OutputStream output) throws IOException;
 }

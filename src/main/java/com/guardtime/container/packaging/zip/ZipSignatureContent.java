@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class ZipSignatureContent implements SignatureContent {
+class ZipSignatureContent implements SignatureContent {
 
     private final List<ContainerDocument> documents;
     private final Pair<String, DataFilesManifest> dataManifest;
