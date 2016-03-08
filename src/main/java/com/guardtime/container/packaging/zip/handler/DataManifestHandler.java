@@ -19,7 +19,7 @@ public class DataManifestHandler extends ContentHandler<DataFilesManifest> {
     @Override
     public boolean isSupported(String name) {
         return matchesSingleDirectory(name, "META-INF") &&
-                fileNameStartsWith(name, "datamanifest");
+                fileNameMatches(name, "datamanifest[0-9]+." + manifestFactory.getManifestFactoryType().getManifestFileExtension());
     }
 
     @Override

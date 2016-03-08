@@ -8,7 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 public class AnnotationManifestHandlerTest extends AbstractContentHandlerTest {
 
-    private static final String VALID_ANNOTATION_MANIFEST_PATH = "/META-INF/annotation1.tlv_json_xml_bak";
+    private static final String VALID_ANNOTATION_MANIFEST_PATH = "/META-INF/annotation1.tlv";
     private static final String INVALID_ANNOTATION_MANIFEST_PATH = "funky_music.mp3";
     private AnnotationManifestHandler handler;
 

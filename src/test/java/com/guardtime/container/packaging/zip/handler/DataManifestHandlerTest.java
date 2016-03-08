@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 
 public class DataManifestHandlerTest extends AbstractContentHandlerTest {
 
-    private static final String VALID_DATAMANIFEST_PATH = "/META-INF/datamanifest1.tlv_json_xml_bak";
+    private static final String VALID_DATAMANIFEST_PATH = "/META-INF/datamanifest1.tlv";
     private static final String INVALID_DATAMANIFEST_PATH = "funky_music.mp3";
     private DataManifestHandler handler;
 

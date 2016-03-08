@@ -1,12 +1,14 @@
 package com.guardtime.container.packaging.zip.handler;
 
 import com.guardtime.container.signature.SignatureFactory;
+import com.guardtime.container.signature.SignatureFactoryType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
 public class SignatureHandlerTest {
 
@@ -17,9 +19,14 @@ public class SignatureHandlerTest {
     @Mock
     private SignatureFactory mockSignatureFactory;
 
+    @Mock
+    private SignatureFactoryType mockFactoryType;
+
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+        when(mockFactoryType.getSignatureFileExtension()).thenReturn("ksig");
+        when(mockSignatureFactory.getSignatureFactoryType()).thenReturn(mockFactoryType);
         handler = new SignatureHandler(mockSignatureFactory);
     }
 

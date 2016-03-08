@@ -31,8 +31,8 @@ public abstract class ContentHandler<T> {
         return str.matches("/?" + dirName + "/[^/]*");
     }
 
-    protected boolean fileNameStartsWith(String str, String startString) {
+    protected boolean fileNameMatches(String str, String regex) {
         int startingIndex = str.contains("/") ? str.lastIndexOf("/") + 1 : 0;
-        return str.substring(startingIndex).startsWith(startString);
+        return str.substring(startingIndex).matches(regex);
     }
 }

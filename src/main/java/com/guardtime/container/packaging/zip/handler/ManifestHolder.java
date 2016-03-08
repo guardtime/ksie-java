@@ -19,7 +19,7 @@ public class ManifestHolder extends ContentHandler<SignatureManifest> {
     @Override
     public boolean isSupported(String name) {
         return matchesSingleDirectory(name, "META-INF") &&
-                fileNameStartsWith(name, "manifest");
+                fileNameMatches(name, "manifest[0-9]+." + manifestFactory.getManifestFactoryType().getManifestFileExtension());
     }
 
     @Override

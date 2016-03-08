@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 
 public class ManifestHolderTest extends AbstractContentHandlerTest {
 
-    private static final String VALID_MANIFEST_PATH = "/META-INF/manifest1.tlv_json_xml_bak";
+    private static final String VALID_MANIFEST_PATH = "/META-INF/manifest1.tlv";
     private static final String INVALID_MANIFEST_PATH = "funky_music.mp3";
     private ManifestHolder handler;
 

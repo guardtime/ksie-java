@@ -19,7 +19,7 @@ public class AnnotationsManifestHandler extends ContentHandler<AnnotationsManife
     @Override
     public boolean isSupported(String name) {
         return matchesSingleDirectory(name, "META-INF") &&
-                fileNameStartsWith(name, "annotmanifest");
+                fileNameMatches(name, "annotmanifest[0-9]+." + manifestFactory.getManifestFactoryType().getManifestFileExtension());
     }
 
     @Override
