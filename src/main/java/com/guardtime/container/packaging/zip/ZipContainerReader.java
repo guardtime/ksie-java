@@ -18,10 +18,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -46,6 +43,7 @@ class ZipContainerReader {
     private final String signatureSuffix;
 
     private ContentHandler[] handlers;
+    private int maxAnnotationIndex = 0;
 
     ZipContainerReader(ContainerManifestFactory manifestFactory, SignatureFactory signatureFactory) {
         this.manifestHandler = new ManifestHolder(manifestFactory);
@@ -74,15 +72,17 @@ class ZipContainerReader {
         List<SignatureContent> contents = buildSignatures();
         MimeType mimeType = getMimeType();
         List<Pair<String, File>> unknownFiles = getUnknownFiles();
+        int maxManifestIndex = Collections.max(Arrays.asList(
+                manifestHandler.getMaxIndex(),
+                signatureHandler.getMaxIndex(),
+                dataManifestHandler.getMaxIndex(),
+                annotationsManifestHandler.getMaxIndex()
+        ));
         ZipEntryNameProvider nameProvider = new ZipEntryNameProvider(
                 manifestSuffix,
                 signatureSuffix,
-                dataManifestHandler.getMaxIndex(),
-                manifestHandler.getMaxIndex(),
-                signatureHandler.getMaxIndex(),
-                annotationManifestHandler.getMaxIndex(),
-                annotationManifestHandler.getMaxIndex(),
-                annotationContentHandler.getMaxIndex()
+                maxManifestIndex,
+                maxAnnotationIndex
         );
         return new ZipBlockChainContainer(contents, unknownFiles, mimeType, nameProvider);
     }
@@ -154,9 +154,15 @@ class ZipContainerReader {
         return signatureContent;
     }
 
+    private void updateParsedMaxAnnotationIndex(FileReference reference) {
+        int index = Util.extractIntegerFrom(reference.getUri());
+        if (index > maxAnnotationIndex) maxAnnotationIndex = index;
+    }
+
     private List<Pair<String, ContainerAnnotation>> getAnnotations(List<? extends FileReference> manifestReferences) {
         List<Pair<String, ContainerAnnotation>> annotations = new ArrayList<>();
         for (FileReference manifestReference : manifestReferences) {
+            updateParsedMaxAnnotationIndex(manifestReference);
             String reference = manifestReference.getUri();
             AnnotationInfoManifest manifest = annotationManifestHandler.get(reference);
             AnnotationReference annotReference = manifest.getAnnotationReference();

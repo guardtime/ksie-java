@@ -3,6 +3,7 @@ package com.guardtime.container.packaging.zip.handler;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.manifest.SignatureManifest;
+import com.guardtime.container.util.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,8 +26,8 @@ public class ManifestHolder extends ContentHandler<SignatureManifest> {
     @Override
     public void add(String name, File file) {
         super.add(name, file);
-        int index = Integer.parseInt(name.replaceAll("[^0-9]", ""));
-        if(index > maxIndex) maxIndex = index;
+        int index = Util.extractIntegerFrom(name);
+        if (index > maxIndex) maxIndex = index;
     }
 
     @Override

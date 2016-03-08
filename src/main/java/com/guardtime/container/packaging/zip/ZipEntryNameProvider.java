@@ -20,14 +20,14 @@ class ZipEntryNameProvider {
         this.signatureSuffix = signatureSuffix;
     }
 
-    public ZipEntryNameProvider(String manifestSuffix, String signatureSuffix, int dataManifestIndex, int manifestIndex, int signatureIndex, int annotationsManifestIndex, int annotationManifestIndex, int annotationIndex) {
+    public ZipEntryNameProvider(String manifestSuffix, String signatureSuffix, int parsedManifestIndex, int parsedAnnotationIndex) {
         this(manifestSuffix, signatureSuffix);
-        this.dataManifestIndex = dataManifestIndex;
-        this.manifestIndex = manifestIndex;
-        this.signatureIndex = signatureIndex;
-        this.annotationsManifestIndex = annotationsManifestIndex;
-        this.annotationManifestIndex = annotationManifestIndex;
-        this.annotationIndex = annotationIndex;
+        this.dataManifestIndex = parsedManifestIndex;
+        this.manifestIndex = parsedManifestIndex;
+        this.signatureIndex = parsedManifestIndex;
+        this.annotationsManifestIndex = parsedManifestIndex;
+        this.annotationManifestIndex = parsedAnnotationIndex;
+        this.annotationIndex = parsedAnnotationIndex;
     }
 
     public String nextDataManifestName() {

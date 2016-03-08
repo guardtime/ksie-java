@@ -3,6 +3,7 @@ package com.guardtime.container.packaging.zip.handler;
 import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureFactory;
+import com.guardtime.container.util.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,8 +26,8 @@ public class SignatureHandler extends ContentHandler<ContainerSignature> {
     @Override
     public void add(String name, File file) {
         super.add(name, file);
-        int index = Integer.parseInt(name.replaceAll("[^0-9]", ""));
-        if(index > maxIndex) maxIndex = index;
+        int index = Util.extractIntegerFrom(name);
+        if (index > maxIndex) maxIndex = index;
     }
 
     @Override
