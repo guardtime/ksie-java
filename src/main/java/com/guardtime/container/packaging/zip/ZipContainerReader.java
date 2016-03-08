@@ -4,6 +4,7 @@ import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.FileAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
+import com.guardtime.container.datafile.EmptyContainerDocument;
 import com.guardtime.container.datafile.FileContainerDocument;
 import com.guardtime.container.manifest.*;
 import com.guardtime.container.packaging.MimeType;
@@ -187,8 +188,14 @@ class ZipContainerReader {
     private List<ContainerDocument> getDocuments(List<? extends FileReference> references) {
         List<ContainerDocument> documents = new LinkedList<>();
         for (FileReference reference : references) {
-            File file = documentHandler.get(reference.getUri());
-            documents.add(new FileContainerDocument(file, reference.getMimeType(), reference.getUri()));
+            String documentUri = reference.getUri();
+            File file = documentHandler.get(documentUri);
+            if (file == null) {
+                // either removed or was never present in the first place, verifier will decide
+                documents.add(new EmptyContainerDocument(documentUri, reference.getMimeType(), reference.getHash()));
+            } else {
+                documents.add(new FileContainerDocument(file, reference.getMimeType(), documentUri));
+            }
         }
         return documents;
     }
