@@ -132,12 +132,12 @@ class ZipContainerReader {
     }
 
     private class GroupParser {
-        Pair<String, SignatureManifest> manifest;
-        Pair<String, DataFilesManifest> dataManifest;
-        Pair<String, AnnotationsManifest> annotationsManifest;
-        List<Pair<String, AnnotationInfoManifest>> annotationManifests = new LinkedList<>();
-        List<Pair<String, ContainerAnnotation>> annotations = new LinkedList<>();
-        List<ContainerDocument> documents = new LinkedList<>();
+        private Pair<String, SignatureManifest> manifest;
+        private Pair<String, DataFilesManifest> dataManifest;
+        private Pair<String, AnnotationsManifest> annotationsManifest;
+        private List<Pair<String, AnnotationInfoManifest>> annotationManifests = new LinkedList<>();
+        private List<Pair<String, ContainerAnnotation>> annotations = new LinkedList<>();
+        private List<ContainerDocument> documents = new LinkedList<>();
 
         public GroupParser(String manifestPath) {
             this.manifest = Pair.of(manifestPath, manifestHandler.get(manifestPath));;
@@ -181,8 +181,8 @@ class ZipContainerReader {
         }
 
         private Pair<String, DataFilesManifest> getDataManifestPair() {
-            FileReference dataFileReference = manifest.getRight().getDataFilesReference();
-            return Pair.of(dataFileReference.getUri(), dataManifestHandler.get(dataFileReference.getUri()));
+            FileReference datamanifestReference = manifest.getRight().getDataFilesReference();
+            return Pair.of(datamanifestReference.getUri(), dataManifestHandler.get(datamanifestReference.getUri()));
         }
 
         private void populateDocuments() {
