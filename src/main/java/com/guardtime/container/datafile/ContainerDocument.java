@@ -17,5 +17,7 @@ public interface ContainerDocument {
 
     DataHash getDataHash(HashAlgorithm algorithm) throws IOException;
 
+    boolean isWritable();
+
 }
 

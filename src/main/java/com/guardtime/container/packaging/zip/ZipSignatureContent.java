@@ -113,7 +113,9 @@ public class ZipSignatureContent implements SignatureContent {
 
     private void writeDocuments(ZipOutputStream zipOutputStream) throws IOException {
         for (ContainerDocument dataFile : documents) {
-            writeEntry(new ZipEntry(dataFile.getFileName()), dataFile.getInputStream(), zipOutputStream);
+            if (dataFile.isWritable()) {
+                writeEntry(new ZipEntry(dataFile.getFileName()), dataFile.getInputStream(), zipOutputStream);
+            }
         }
     }
 
