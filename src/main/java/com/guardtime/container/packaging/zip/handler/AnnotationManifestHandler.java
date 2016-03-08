@@ -25,13 +25,10 @@ public class AnnotationManifestHandler extends ContentHandler<AnnotationInfoMani
     @Override
     public AnnotationInfoManifest get(String name) {
         File file = entries.get(name);
-        if (file == null) {
-            return new MissingAnnotationInfoManifest();
-        }
         try (FileInputStream input = new FileInputStream(file)) {
             return manifestFactory.readAnnotationManifest(input);
         } catch (InvalidManifestException | IOException e) {
-            throw new RuntimeException(e); //TODO: invalid annotationInfoManifest
+            return new MissingAnnotationInfoManifest(); //TODO: Do we care why we failed to parse? Functionally it is missing but in reality it might be corrupt?
         }
     }
 

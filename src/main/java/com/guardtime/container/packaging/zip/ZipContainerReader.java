@@ -10,6 +10,7 @@ import com.guardtime.container.datafile.FileContainerDocument;
 import com.guardtime.container.manifest.*;
 import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.zip.handler.*;
+import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
@@ -123,8 +124,7 @@ class ZipContainerReader {
                 .withAnnotations(groupParser.getAnnotations())
                 .build();
 
-        String signatureUri = groupParser.getManifest().getRight().getSignatureReference().getUri();
-        signatureContent.setSignature(signatureHandler.get(signatureUri));
+        signatureContent.setSignature(groupParser.getSignature());
         return signatureContent;
     }
 
@@ -141,12 +141,17 @@ class ZipContainerReader {
         private List<ContainerDocument> documents = new LinkedList<>();
 
         public GroupParser(String manifestPath) {
-            this.manifest = Pair.of(manifestPath, manifestHandler.get(manifestPath));;
-            this.dataManifest = getDataManifestPair();
-            this.annotationsManifest = getAnnotationsManifestPair();
+            try {
+                this.manifest = Pair.of(manifestPath, manifestHandler.get(manifestPath));
+                this.dataManifest = getDataManifestPair();
+                this.annotationsManifest = getAnnotationsManifestPair();
 
-            populateAnnotationsWithManifests();
-            populateDocuments();
+                populateAnnotationsWithManifests();
+                populateDocuments();
+            } catch (FileParsingException e) {
+                logger.info("Manifest '{}' failed to parse", manifestPath);
+                this.manifest = null;
+            }
         }
 
         public Pair<String, SignatureManifest> getManifest() {
@@ -175,18 +180,29 @@ class ZipContainerReader {
 
         private Pair<String, AnnotationsManifest> getAnnotationsManifestPair() {
             FileReference annotationsManifestReference = manifest.getRight().getAnnotationsManifestReference();
-            return Pair.of(
-                    annotationsManifestReference.getUri(),
-                    annotationsManifestHandler.get(annotationsManifestReference.getUri())
-            );
+            try {
+                return Pair.of(
+                        annotationsManifestReference.getUri(),
+                        annotationsManifestHandler.get(annotationsManifestReference.getUri())
+                );
+            } catch (FileParsingException e) {
+                logger.info("Manifest '{}' failed to parse", annotationsManifestReference.getUri());
+                return null;
+            }
         }
 
         private Pair<String, DataFilesManifest> getDataManifestPair() {
-            FileReference datamanifestReference = manifest.getRight().getDataFilesReference();
-            return Pair.of(datamanifestReference.getUri(), dataManifestHandler.get(datamanifestReference.getUri()));
+            FileReference dataManifestReference = manifest.getRight().getDataFilesReference();
+            try {
+                return Pair.of(dataManifestReference.getUri(), dataManifestHandler.get(dataManifestReference.getUri()));
+            } catch (FileParsingException e) {
+                logger.info("Manifest '{}' failed to parse", dataManifestReference.getUri());
+                return null;
+            }
         }
 
         private void populateDocuments() {
+            if(dataManifest == null) return;
             for (FileReference reference : dataManifest.getRight().getDataFileReferences()) {
                 String documentUri = reference.getUri();
                 File file = documentHandler.get(documentUri);
@@ -200,6 +216,7 @@ class ZipContainerReader {
         }
 
         private void populateAnnotationsWithManifests() {
+            if(annotationsManifest == null) return;
             for (FileReference manifestReference : annotationsManifest.getRight().getAnnotationManifestReferences()) {
                 Pair<String, AnnotationInfoManifest> annotationInfoManifest = getAnnotationInfoManifest(manifestReference);
                 annotationManifests.add(annotationInfoManifest);
@@ -228,6 +245,16 @@ class ZipContainerReader {
                 annotation = new FileAnnotation(annotationFile, annotationReference.getUri(), annotationReference.getDomain(), type);
             }
             return Pair.of(annotationReference.getUri(), annotation);
+        }
+
+        public ContainerSignature getSignature() {
+            String signatureUri = manifest.getRight().getSignatureReference().getUri();
+            try {
+                return signatureHandler.get(signatureUri);
+            } catch (FileParsingException e) {
+                logger.info("No valid signature in container at '{}'", signatureUri);
+                return null;
+            }
         }
     }
 }

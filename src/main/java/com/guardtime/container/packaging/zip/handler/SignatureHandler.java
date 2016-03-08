@@ -22,12 +22,12 @@ public class SignatureHandler extends ContentHandler<ContainerSignature> {
     }
 
     @Override
-    public ContainerSignature get(String name) {
+    public ContainerSignature get(String name) throws FileParsingException {
         try {
             File file = entries.get(name);
             return signatureFactory.read(new FileInputStream(file));
         } catch (BlockChainContainerException | FileNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new FileParsingException(e);
         }
     }
 
