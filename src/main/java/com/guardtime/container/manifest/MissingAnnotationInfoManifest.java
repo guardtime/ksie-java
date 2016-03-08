@@ -20,7 +20,7 @@ public class MissingAnnotationInfoManifest implements AnnotationInfoManifest {
     }
 
     @Override
-    public boolean writable() {
+    public boolean isWritable() {
         return false;
     }
 }

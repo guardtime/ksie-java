@@ -43,7 +43,7 @@ public class MissingAnnotation implements ContainerAnnotation {
     }
 
     @Override
-    public boolean writable() {
+    public boolean isWritable() {
         return false;
     }
 }

@@ -57,7 +57,7 @@ public class FileAnnotation implements ContainerAnnotation {
     }
 
     @Override
-    public boolean writable() {
+    public boolean isWritable() {
         return true;
     }
 

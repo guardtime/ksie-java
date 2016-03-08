@@ -56,7 +56,7 @@ public class StringAnnotation implements ContainerAnnotation {
     }
 
     @Override
-    public boolean writable() {
+    public boolean isWritable() {
         return true;
     }
 

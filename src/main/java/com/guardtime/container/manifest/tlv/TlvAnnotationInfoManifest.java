@@ -79,7 +79,7 @@ class TlvAnnotationInfoManifest extends AbstractTlvManifestStructure implements 
     }
 
     @Override
-    public boolean writable() {
+    public boolean isWritable() {
         return true;
     }
 
