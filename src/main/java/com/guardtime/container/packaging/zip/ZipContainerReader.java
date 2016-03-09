@@ -116,12 +116,12 @@ class ZipContainerReader {
         String dataFileReferenceUri = dataFileReference.getUri();
         DataFilesManifest dataManifest = dataManifestHandler.get(dataFileReferenceUri);
 
-        List<? extends FileReference> documentReferences = dataManifest.getDataFileReferences();
+        List<? extends FileReference> documentReferences = dataManifest.getDataFileReferences(); // TODO: NullPointerException threat
         List<ContainerDocument> documents = getDocuments(documentReferences);
 
         FileReference annotationsManifestReference = manifest.getAnnotationsManifestReference();
         AnnotationsManifest annotationsManifest = annotationsManifestHandler.get(annotationsManifestReference.getUri());
-        List<? extends FileReference> annotationManifestReferences = annotationsManifest.getAnnotationManifestReferences();
+        List<? extends FileReference> annotationManifestReferences = annotationsManifest.getAnnotationManifestReferences(); // TODO: NullPointerException threat
         List<Pair<String, AnnotationInfoManifest>> annotationReferences = getAnnotationManifests(annotationManifestReferences);
 
         List<Pair<String, ContainerAnnotation>> annotations = getAnnotations(annotationManifestReferences);
@@ -143,13 +143,14 @@ class ZipContainerReader {
     private List<Pair<String, ContainerAnnotation>> getAnnotations(List<? extends FileReference> manifestReferences) {
         List<Pair<String, ContainerAnnotation>> annotations = new ArrayList<>();
         for (FileReference manifestReference : manifestReferences) {
+            // TODO: Try to simplify this!
             String reference = manifestReference.getUri();
             AnnotationInfoManifest manifest = annotationManifestHandler.get(reference);
-            AnnotationReference annotReference = manifest.getAnnotationReference();
-            ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getUri());
+            AnnotationReference annotReference = manifest.getAnnotationReference(); // TODO: NullPointerException threat
+            ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getMimeType()); // TODO: getMimeType() seems way too unintuitive to get the AnnotationType string
             File annotationFile = annotationContentHandler.get(annotReference.getUri());
-            ContainerAnnotation annotation = new FileAnnotation(annotationFile, annotReference.getUri(), annotReference.getDomain(), type);
-            annotations.add(Pair.of(annotationFile.getName(), annotation));
+            ContainerAnnotation annotation = new FileAnnotation(annotationFile, annotReference.getDomain(), type);
+            annotations.add(Pair.of(annotReference.getUri(), annotation));
         }
         return annotations;
     }
