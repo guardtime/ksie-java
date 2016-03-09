@@ -9,8 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class DataManifestHandler extends ContentHandler<DataFilesManifest> {
-    private int maxIndex = 0;
+public class DataManifestHandler extends IndexedContentHandler<DataFilesManifest> {
 
     private final ContainerManifestFactory manifestFactory;
 
@@ -24,13 +23,6 @@ public class DataManifestHandler extends ContentHandler<DataFilesManifest> {
     }
 
     @Override
-    public void add(String name, File file) {
-        super.add(name, file);
-        int index = Util.extractIntegerFrom(name);
-        if (index > maxIndex) maxIndex = index;
-    }
-
-    @Override
     public DataFilesManifest get(String name) {
         File file = entries.get(name);
         try (FileInputStream input = new FileInputStream(file)) {
@@ -38,10 +30,6 @@ public class DataManifestHandler extends ContentHandler<DataFilesManifest> {
         } catch (InvalidManifestException | IOException e) {
             throw new RuntimeException(e); // TODO
         }
-    }
-
-    public int getMaxIndex() {
-        return maxIndex;
     }
 
 }
