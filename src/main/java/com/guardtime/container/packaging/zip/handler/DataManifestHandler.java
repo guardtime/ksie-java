@@ -19,7 +19,8 @@ public class DataManifestHandler extends IndexedContentHandler<DataFilesManifest
 
     @Override
     public boolean isSupported(String name) {
-        return name.startsWith("/META-INF/datamanifest"); //TODO
+        return matchesSingleDirectory(name, "META-INF") &&
+                fileNameMatches(name, "datamanifest[0-9]+." + manifestFactory.getManifestFactoryType().getManifestFileExtension());
     }
 
     @Override

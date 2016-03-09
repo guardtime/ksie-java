@@ -51,7 +51,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     public ZipBlockChainContainer create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws BlockChainContainerException {
         Util.notEmpty(files, "Data files");
         ContentSigner signer = new ContentSigner(files, annotations);
-        SignatureContent signatureContent = signer.sign();
+        ZipSignatureContent signatureContent = signer.sign();
         MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
         return new ZipBlockChainContainer(signatureContent, mimeType, signer.getNameProvider());
     }
@@ -67,7 +67,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
         // TODO: Currently not possible in the implementation but should be possible to add signature without adding files.
         Util.notEmpty(files, "Data files");
         ContentSigner signer = new ContentSigner(files, annotations, existingSignature.getNameProvider());
-        SignatureContent signatureContent = signer.sign();
+        ZipSignatureContent signatureContent = signer.sign();
         existingSignature.getSignatureContents().add(signatureContent);
         return existingSignature;
     }
@@ -97,7 +97,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             this.nameProvider = nameProvider;
         }
 
-        public SignatureContent sign() throws BlockChainContainerException {
+        public ZipSignatureContent sign() throws BlockChainContainerException {
             ManifestFactoryType manifestFactoryType = manifestFactory.getManifestFactoryType();
             SignatureFactoryType signatureFactoryType = signatureFactory.getSignatureFactoryType();
             logger.info("'{}' is used to create and read container manifests", manifestFactoryType.getName());
@@ -110,7 +110,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             SignatureManifest signatureManifest = manifestFactory.createSignatureManifest(dataFilesManifest, annotationsManifestPair,
                     Pair.of(nameProvider.nextSignatureName(), signatureFactoryType.getSignatureMimeType()));
 
-            SignatureContent signatureContent = new SignatureContent.Builder()
+            ZipSignatureContent signatureContent = new ZipSignatureContent.Builder()
                     .withDocuments(documents)
                     .withDataManifest(dataFilesManifest)
                     .withAnnotations(annotationPairs)

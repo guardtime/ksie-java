@@ -11,8 +11,6 @@ public interface ContainerAnnotation {
 
     ContainerAnnotationType getAnnotationType();
 
-    String getMimeType();
-
     String getDomain();
 
     InputStream getInputStream() throws IOException;

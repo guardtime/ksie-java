@@ -15,18 +15,18 @@ import java.util.zip.ZipOutputStream;
 
 class ZipBlockChainContainer implements BlockChainContainer {
 
-    private List<SignatureContent> signatureContents = new LinkedList<>();
+    private List<ZipSignatureContent> signatureContents = new LinkedList<>();
     private MimeType mimeType;
     private List<Pair<String, File>> unknownFiles = new LinkedList<>();
     private ZipEntryNameProvider nameProvider;
 
-    public ZipBlockChainContainer(SignatureContent signatureContent, MimeType mimeType, ZipEntryNameProvider nameProvider) {
+    public ZipBlockChainContainer(ZipSignatureContent signatureContent, MimeType mimeType, ZipEntryNameProvider nameProvider) {
         this.signatureContents.add(signatureContent);
         this.mimeType = mimeType;
         this.nameProvider = nameProvider;
     }
 
-    public ZipBlockChainContainer(List<SignatureContent> signatureContents, List<Pair<String, File>> unknownFiles, MimeType mimeType, ZipEntryNameProvider nameProvider) {
+    public ZipBlockChainContainer(List<ZipSignatureContent> signatureContents, List<Pair<String, File>> unknownFiles, MimeType mimeType, ZipEntryNameProvider nameProvider) {
         this.signatureContents = signatureContents;
         this.unknownFiles = unknownFiles;
         this.mimeType = mimeType;
@@ -34,7 +34,7 @@ class ZipBlockChainContainer implements BlockChainContainer {
     }
 
     @Override
-    public List<SignatureContent> getSignatureContents() {
+    public List<ZipSignatureContent> getSignatureContents() {
         return signatureContents;
     }
 
@@ -74,8 +74,8 @@ class ZipBlockChainContainer implements BlockChainContainer {
         writeEntry(mimeTypeEntry, mimeType.getInputStream(), zipOutputStream);
     }
 
-    private void writeSignatures(List<SignatureContent> signatureContents, ZipOutputStream zipOutputStream) throws IOException {
-        for (SignatureContent signatureContent : signatureContents) {
+    private void writeSignatures(List<ZipSignatureContent> signatureContents, ZipOutputStream zipOutputStream) throws IOException {
+        for (ZipSignatureContent signatureContent : signatureContents) {
             signatureContent.writeTo(zipOutputStream);
         }
     }

@@ -34,7 +34,6 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
         super.setUp();
         when(mockedAnnotation.getAnnotationType()).thenReturn(ContainerAnnotationType.NON_REMOVABLE);
         when(mockedAnnotation.getDomain()).thenReturn(ANNOTATION_DOMAIN_COM_GUARDTIME);
-        when(mockedAnnotation.getMimeType()).thenReturn(MIME_TYPE_APPLICATION_TXT);
         annotations.add(new StringAnnotation(ContainerAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME));
     }
 
