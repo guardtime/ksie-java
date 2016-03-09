@@ -23,7 +23,7 @@ public class ManifestHolder extends ContentHandler<SignatureManifest> {
     }
 
     @Override
-    public SignatureManifest get(String name) {
+    public SignatureManifest getEntry(String name) {
         File file = entries.get(name);
         try (FileInputStream input = new FileInputStream(file)) {
             return manifestFactory.readSignatureManifest(input);

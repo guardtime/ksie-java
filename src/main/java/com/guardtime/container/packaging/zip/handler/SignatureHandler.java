@@ -23,7 +23,7 @@ public class SignatureHandler extends ContentHandler<ContainerSignature> {
     }
 
     @Override
-    public ContainerSignature get(String name) {
+    public ContainerSignature getEntry(String name) {
         try {
             File file = entries.get(name);
             return signatureFactory.read(new FileInputStream(file));

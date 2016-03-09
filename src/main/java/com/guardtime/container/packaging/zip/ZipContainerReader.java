@@ -36,12 +36,13 @@ class ZipContainerReader {
     private final DataFileContentHandler documentHandler = new DataFileContentHandler();
     private final AnnotationContentHandler annotationContentHandler = new AnnotationContentHandler();
     private final UnknownFileHandler unknownFileHandler = new UnknownFileHandler();
+    private final MimeTypeHandler mimeTypeHandler = new MimeTypeHandler();
+    ;
     private final ManifestHolder manifestHandler;
     private final DataManifestHandler dataManifestHandler;
     private final AnnotationsManifestHandler annotationsManifestHandler;
     private final AnnotationManifestHandler annotationManifestHandler;
     private final SignatureHandler signatureHandler;
-    private final MimeTypeHandler mimeTypeHandler;
 
     private ContentHandler[] handlers;
 
@@ -51,7 +52,6 @@ class ZipContainerReader {
         this.annotationsManifestHandler = new AnnotationsManifestHandler(manifestFactory);
         this.annotationManifestHandler = new AnnotationManifestHandler(manifestFactory);
         this.signatureHandler = new SignatureHandler(signatureFactory);
-        this.mimeTypeHandler = new MimeTypeHandler();
         this.handlers = new ContentHandler[]{mimeTypeHandler, documentHandler, annotationContentHandler, dataManifestHandler,
                 manifestHandler, annotationsManifestHandler, signatureHandler, annotationManifestHandler};
     }
@@ -81,8 +81,9 @@ class ZipContainerReader {
 
     private List<Pair<String, File>> getUnknownFiles() {
         List<Pair<String, File>> returnable = new LinkedList<>();
-        for (String name : unknownFileHandler.getNames()) {
-            returnable.add(Pair.of(name, unknownFileHandler.get(name)));
+        returnable.addAll(unknownFileHandler.getUnrequestedFiles());
+        for (ContentHandler handler : handlers) {
+            returnable.addAll(handler.getUnrequestedFiles());
         }
         return returnable;
     }

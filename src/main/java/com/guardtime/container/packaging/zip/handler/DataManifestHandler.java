@@ -23,7 +23,7 @@ public class DataManifestHandler extends ContentHandler<DataFilesManifest> {
     }
 
     @Override
-    public DataFilesManifest get(String name) {
+    public DataFilesManifest getEntry(String name) {
         File file = entries.get(name);
         try (FileInputStream input = new FileInputStream(file)) {
             return manifestFactory.readDataFilesManifest(input);

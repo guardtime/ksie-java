@@ -23,7 +23,7 @@ public class DataFileContentHandler extends ContentHandler<File> {
     }
 
     @Override
-    public File get(String name) {
+    public File getEntry(String name) {
         return entries.get(name);
     }
 

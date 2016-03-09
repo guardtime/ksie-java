@@ -39,4 +39,21 @@ public class Pair<L, R> {
         return right;
     }
 
+
+    @Override
+    public boolean equals(Object obj){
+        if(obj instanceof Pair){
+            Pair<L, R> pair = (Pair) obj;
+            if (left.equals(pair.left) && right.equals(pair.right)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode(){
+        return left.hashCode() + right.hashCode();
+    }
+
 }

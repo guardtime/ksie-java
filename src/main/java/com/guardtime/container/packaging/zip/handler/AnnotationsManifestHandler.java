@@ -23,7 +23,7 @@ public class AnnotationsManifestHandler extends ContentHandler<AnnotationsManife
     }
 
     @Override
-    public AnnotationsManifest get(String name) {
+    public AnnotationsManifest getEntry(String name) {
         try {
             File file = entries.get(name);
             return manifestFactory.readAnnotationsManifest(new FileInputStream(file));
