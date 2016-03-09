@@ -67,7 +67,7 @@ class ZipContainerReader {
                 readEntry(zipInput, entry);
             }
         }
-        List<SignatureContent> contents = buildSignatures();
+        List<ZipSignatureContent> contents = buildSignatures();
         MimeType mimeType = getMimeType();
         List<Pair<String, File>> unknownFiles = getUnknownFiles();
         return new ZipBlockChainContainer(contents, unknownFiles, mimeType);
@@ -101,16 +101,16 @@ class ZipContainerReader {
         unknownFileHandler.add(name, tempFile);
     }
 
-    private List<SignatureContent> buildSignatures() {
+    private List<ZipSignatureContent> buildSignatures() {
         Set<String> signatureManifests = manifestHandler.getNames();
-        List<SignatureContent> signatures = new LinkedList<>();
+        List<ZipSignatureContent> signatures = new LinkedList<>();
         for (String manifest : signatureManifests) {
             signatures.add(buildSignature(manifest));
         }
         return signatures;
     }
 
-    private SignatureContent buildSignature(String manifestName) {
+    private ZipSignatureContent buildSignature(String manifestName) {
         SignatureManifest manifest = manifestHandler.get(manifestName);
         FileReference dataFileReference = manifest.getDataFilesReference();
         String dataFileReferenceUri = dataFileReference.getUri();
@@ -127,7 +127,7 @@ class ZipContainerReader {
         List<Pair<String, ContainerAnnotation>> annotations = getAnnotations(annotationManifestReferences);
 
         //TODO check annotation and data file names inside the container
-        SignatureContent signatureContent = new SignatureContent.Builder()
+        ZipSignatureContent signatureContent = new ZipSignatureContent.Builder()
                 .withDocuments(documents)
                 .withManifest(Pair.of(manifestName, manifest))
                 .withDataManifest(Pair.of(dataFileReferenceUri, dataManifest))
