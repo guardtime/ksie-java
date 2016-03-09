@@ -15,7 +15,7 @@ public class DataFileContentHandler extends ContentHandler<File> {
     }
 
     private boolean matchesMetaFolder(String name) {
-        return name.startsWith("META-INF/") || name.startsWith("/META-INF/");
+        return matchesSingleDirectory(name, "META-INF");
     }
 
     private boolean matchesMimeTypeFile(String name) {

@@ -11,18 +11,15 @@ import java.io.InputStream;
 
 public class FileAnnotation implements ContainerAnnotation {
 
-    private final String mimeType;
     private final File file;
     private final String domain;
     private final ContainerAnnotationType type;
     private DataHash dataHash;
 
-    public FileAnnotation(File file, String mimeType, String domain, ContainerAnnotationType type) {
+    public FileAnnotation(File file, String domain, ContainerAnnotationType type) {
         Util.notNull(file, "File");
-        Util.notNull(mimeType, "MIME type");
         Util.notNull(domain, "Domain");
         Util.notNull(type, "Container type");
-        this.mimeType = mimeType;
         this.file = file;
         this.domain = domain;
         this.type = type;
@@ -31,11 +28,6 @@ public class FileAnnotation implements ContainerAnnotation {
     @Override
     public ContainerAnnotationType getAnnotationType() {
         return type;
-    }
-
-    @Override
-    public String getMimeType() {
-        return mimeType;
     }
 
     @Override

@@ -18,7 +18,8 @@ public class SignatureHandler extends ContentHandler<ContainerSignature> {
 
     @Override
     public boolean isSupported(String name) {
-        return name.startsWith("/META-INF/signature");
+        return matchesSingleDirectory(name, "META-INF") &&
+                fileNameMatches(name, "signature[0-9]+." + signatureFactory.getSignatureFactoryType().getSignatureFileExtension());
     }
 
     @Override

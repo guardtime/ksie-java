@@ -7,6 +7,7 @@ import com.guardtime.container.manifest.AnnotationInfoManifest;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.DataFilesManifest;
 import com.guardtime.container.manifest.SignatureManifest;
+import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
@@ -15,12 +16,12 @@ import com.guardtime.ksi.util.Util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-//TODO extract interface
-public class SignatureContent {
+class ZipSignatureContent implements SignatureContent {
 
     private final List<ContainerDocument> documents;
     private final Pair<String, DataFilesManifest> dataManifest;
@@ -30,10 +31,10 @@ public class SignatureContent {
     private ContainerSignature signature;
     private List<Pair<String, ContainerAnnotation>> annotations;
 
-    private SignatureContent(List<ContainerDocument> documents,
-                             List<Pair<String, ContainerAnnotation>> annotations, Pair<String, DataFilesManifest> dataManifest,
-                             Pair<String, AnnotationsManifest> annotationsManifest, Pair<String, SignatureManifest> manifest,
-                             List<Pair<String, AnnotationInfoManifest>> annotationManifests) {
+    private ZipSignatureContent(List<ContainerDocument> documents,
+                                List<Pair<String, ContainerAnnotation>> annotations, Pair<String, DataFilesManifest> dataManifest,
+                                Pair<String, AnnotationsManifest> annotationsManifest, Pair<String, SignatureManifest> manifest,
+                                List<Pair<String, AnnotationInfoManifest>> annotationManifests) {
         this.documents = documents;
         this.annotations = annotations;
         this.dataManifest = dataManifest;
@@ -58,15 +59,36 @@ public class SignatureContent {
         this.signature = signature;
     }
 
-    public void writeTo(ZipOutputStream output) throws IOException {
-        writeDocuments(output);
-        writeEntry(new ZipEntry(dataManifest.getLeft()), dataManifest.getRight().getInputStream(), output);
-        writeAnnotations(output);
-        writeAnnotationInfoManifests(output);
-        writeEntry(new ZipEntry(annotationsManifest.getLeft()), annotationsManifest.getRight().getInputStream(), output);
-        SignatureManifest signatureManifest = manifest.getRight();
-        writeEntry(new ZipEntry(manifest.getLeft()), signatureManifest.getInputStream(), output);
-        writeSignature(output, signatureManifest);
+    public DataHash getSignatureInputHash() throws BlockChainContainerException {
+        return manifest.getRight().getDataHash(HashAlgorithm.SHA2_256);
+    }
+
+    public void writeTo(OutputStream outputStream) throws IOException {
+        try (ZipOutputStream output = (ZipOutputStream) outputStream) {
+            writeDocuments(output);
+            writeEntry(new ZipEntry(dataManifest.getLeft()), dataManifest.getRight().getInputStream(), output);
+            writeAnnotations(output);
+            writeAnnotationInfoManifests(output);
+            writeEntry(new ZipEntry(annotationsManifest.getLeft()), annotationsManifest.getRight().getInputStream(), output);
+            writeEntry(new ZipEntry(manifest.getLeft()), manifest.getRight().getInputStream(), output);
+            writeSignature(output);
+        }
+    }
+
+    public Pair<String, DataFilesManifest> getDataManifest() {
+        return dataManifest;
+    }
+
+    public Pair<String, AnnotationsManifest> getAnnotationsManifest() {
+        return annotationsManifest;
+    }
+
+    public Pair<String, SignatureManifest> getSignatureManifest() {
+        return manifest;
+    }
+
+    public List<Pair<String, AnnotationInfoManifest>> getAnnotationManifests() {
+        return annotationManifests;
     }
 
     private void writeAnnotationInfoManifests(ZipOutputStream output) throws IOException {
@@ -85,8 +107,8 @@ public class SignatureContent {
         }
     }
 
-    private void writeSignature(ZipOutputStream output, SignatureManifest signatureManifest) throws IOException {
-        String signatureUri = signatureManifest.getSignatureReference().getUri();
+    private void writeSignature(ZipOutputStream output) throws IOException {
+        String signatureUri = manifest.getRight().getSignatureReference().getUri();
         ZipEntry signatureEntry = new ZipEntry(signatureUri);
         output.putNextEntry(signatureEntry);
         signature.writeTo(output);
@@ -105,10 +127,6 @@ public class SignatureContent {
         output.putNextEntry(entry);
         Util.copyData(input, output);
         output.closeEntry();
-    }
-
-    public DataHash getSignatureInputHash() throws BlockChainContainerException {
-        return manifest.getRight().getDataHash(HashAlgorithm.SHA2_256);
     }
 
     public static class Builder {
@@ -150,8 +168,8 @@ public class SignatureContent {
             return this;
         }
 
-        public SignatureContent build() {
-            return new SignatureContent(documents, annotations, dataManifest, annotationsManifest, manifest, annotationManifests);
+        public ZipSignatureContent build() {
+            return new ZipSignatureContent(documents, annotations, dataManifest, annotationsManifest, manifest, annotationManifests);
         }
     }
 

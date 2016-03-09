@@ -18,7 +18,8 @@ public class ManifestHolder extends ContentHandler<SignatureManifest> {
 
     @Override
     public boolean isSupported(String name) {
-        return name.startsWith("/META-INF/manifest") || name.startsWith("META-INF/manifest"); //TODO
+        return matchesSingleDirectory(name, "META-INF") &&
+                fileNameMatches(name, "manifest[0-9]+." + manifestFactory.getManifestFactoryType().getManifestFileExtension());
     }
 
     @Override

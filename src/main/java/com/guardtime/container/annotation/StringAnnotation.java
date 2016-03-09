@@ -13,7 +13,6 @@ import static com.guardtime.container.util.Util.notNull;
 
 public class StringAnnotation implements ContainerAnnotation {
 
-    private final String mimeType = "application/txt";
     private final String content;
     private final String domain;
     private final ContainerAnnotationType type;
@@ -30,11 +29,6 @@ public class StringAnnotation implements ContainerAnnotation {
     @Override
     public ContainerAnnotationType getAnnotationType() {
         return type;
-    }
-
-    @Override
-    public String getMimeType() {
-        return mimeType;
     }
 
     @Override
@@ -63,7 +57,6 @@ public class StringAnnotation implements ContainerAnnotation {
     @Override
     public String toString() {
         return "StringAnnotation {" +
-                "mimeType='" + mimeType + "\'" +
                 ", domain='" + domain + "\'}";
     }
 

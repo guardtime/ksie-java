@@ -23,11 +23,6 @@ public class MissingAnnotation implements ContainerAnnotation {
     }
 
     @Override
-    public String getMimeType() {
-        return null;
-    }
-
-    @Override
     public String getDomain() {
         return domain;
     }
