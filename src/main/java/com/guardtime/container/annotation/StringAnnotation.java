@@ -50,11 +50,6 @@ public class StringAnnotation implements ContainerAnnotation {
     }
 
     @Override
-    public boolean isWritable() {
-        return true;
-    }
-
-    @Override
     public String toString() {
         return "StringAnnotation {" +
                 ", domain='" + domain + "\'}";

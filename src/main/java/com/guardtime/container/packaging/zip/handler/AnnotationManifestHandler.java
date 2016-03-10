@@ -3,7 +3,6 @@ package com.guardtime.container.packaging.zip.handler;
 import com.guardtime.container.manifest.AnnotationInfoManifest;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.InvalidManifestException;
-import com.guardtime.container.manifest.MissingAnnotationInfoManifest;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,7 +28,7 @@ public class AnnotationManifestHandler extends ContentHandler<AnnotationInfoMani
         try (FileInputStream input = new FileInputStream(file)) {
             return manifestFactory.readAnnotationManifest(input);
         } catch (InvalidManifestException | IOException e) {
-            return new MissingAnnotationInfoManifest(); //TODO: Do we care why we failed to parse? Functionally it is missing but in reality it might be corrupt?
+            return null;
         }
     }
 

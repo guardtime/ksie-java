@@ -17,6 +17,4 @@ public interface ContainerAnnotation {
 
     DataHash getDataHash(HashAlgorithm algorithm) throws IOException;
 
-    boolean isWritable();
-
 }

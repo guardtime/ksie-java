@@ -101,9 +101,7 @@ class ZipSignatureContent implements SignatureContent {
 
     private void writeAnnotations(ZipOutputStream output) throws IOException {
         for (Pair<String, ContainerAnnotation> annotation : annotations) {
-            if(annotation.getRight().isWritable()){
-                writeEntry(new ZipEntry(annotation.getLeft()), annotation.getRight().getInputStream(), output);
-            }
+            writeEntry(new ZipEntry(annotation.getLeft()), annotation.getRight().getInputStream(), output);
         }
     }
 
