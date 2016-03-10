@@ -47,7 +47,7 @@ class ZipEntryNameProvider {
     }
 
     public String nextAnnotationManifestName() {
-        return String.format("/META-INF/annotation%d.%s", ++annotationManifestIndex, signatureSuffix);
+        return String.format("/META-INF/annotation%d.%s", ++annotationManifestIndex, manifestSuffix);
     }
 
     public String nextAnnotationDataFileName() {

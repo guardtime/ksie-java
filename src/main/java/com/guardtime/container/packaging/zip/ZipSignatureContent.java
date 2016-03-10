@@ -63,16 +63,14 @@ class ZipSignatureContent implements SignatureContent {
         return manifest.getRight().getDataHash(HashAlgorithm.SHA2_256);
     }
 
-    public void writeTo(OutputStream outputStream) throws IOException {
-        try (ZipOutputStream output = (ZipOutputStream) outputStream) {
-            writeDocuments(output);
-            writeEntry(new ZipEntry(dataManifest.getLeft()), dataManifest.getRight().getInputStream(), output);
-            writeAnnotations(output);
-            writeAnnotationInfoManifests(output);
-            writeEntry(new ZipEntry(annotationsManifest.getLeft()), annotationsManifest.getRight().getInputStream(), output);
-            writeEntry(new ZipEntry(manifest.getLeft()), manifest.getRight().getInputStream(), output);
-            writeSignature(output);
-        }
+    public void writeTo(ZipOutputStream output) throws IOException {
+        writeDocuments(output);
+        writeEntry(new ZipEntry(dataManifest.getLeft()), dataManifest.getRight().getInputStream(), output);
+        writeAnnotations(output);
+        writeAnnotationInfoManifests(output);
+        writeEntry(new ZipEntry(annotationsManifest.getLeft()), annotationsManifest.getRight().getInputStream(), output);
+        writeEntry(new ZipEntry(manifest.getLeft()), manifest.getRight().getInputStream(), output);
+        writeSignature(output);
     }
 
     public Pair<String, DataFilesManifest> getDataManifest() {

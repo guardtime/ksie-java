@@ -68,7 +68,11 @@ public class BlockChainContainerBuilder {
     }
 
     public BlockChainContainer build() throws BlockChainContainerException {
-        return packagingFactory.create(documents, annotations);
+        if(existingContainer == null){
+            return packagingFactory.create(documents, annotations);
+        } else {
+            return packagingFactory.create(existingContainer, documents, annotations);
+        }
     }
 
     List<ContainerDocument> getDocuments() {
