@@ -25,6 +25,13 @@ import static org.mockito.Mockito.when;
 
 public class ZipContainerReaderTest {
 
+    private static final String CONTAINER_WITH_ONE_DOCUMENT = "containers/container-one-file.ksie";
+    private static final String EMPTY_CONTAINER = "containers/container-empty.ksie";
+    private static final String CONTAINER_WITH_EXTRA_FILES = "containers/container-extra-files.ksie";
+    private static final String CONTAINER_WITH_NO_DOCUMENTS = "containers/container-no-documents.ksie";
+    private static final String CONTAINER_WITH_MULTIPLE_ANNOTATIONS = "containers/container-multiple-annotations.ksie";
+    private static final String CONTAINER_WITH_MULTIPLE_SIGNATURES = "containers/container-multiple-signatures.ksie";
+    private static final String CONTAINER_WITH_BROKEN_SIGNATURE = "containers/container-broken-signature.ksie";
     private ZipContainerReader reader;
 
     @Mock
@@ -53,7 +60,7 @@ public class ZipContainerReaderTest {
 
     @Test
     public void testReadContainerFileWithDocument() throws Exception {
-        InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource("containers/container-one-file.ksie").toURI()));
+        InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource(CONTAINER_WITH_ONE_DOCUMENT).toURI()));
         ZipBlockChainContainer result = reader.read(input);
         assertNotNull(result);
         assertFalse(result.getSignatureContents().isEmpty());
@@ -64,7 +71,7 @@ public class ZipContainerReaderTest {
 
     @Test
     public void testReadEmptyContainerFile() throws Exception {
-        InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource("containers/container-empty.ksie").toURI()));
+        InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource(EMPTY_CONTAINER).toURI()));
         ZipBlockChainContainer result = reader.read(input);
         // TODO: What is the actual expected behaviour for this? Exception or container with no signatureContent and no mimetype?
         assertNotNull(result);
@@ -73,7 +80,7 @@ public class ZipContainerReaderTest {
 
     @Test
     public void testReadContainerFileWithExtraFiles() throws Exception {
-        InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource("containers/container-extra-files.ksie").toURI()));
+        InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource(CONTAINER_WITH_EXTRA_FILES).toURI()));
         ZipBlockChainContainer result = reader.read(input);
         assertNotNull(result);
         assertFalse(result.getSignatureContents().isEmpty());
@@ -82,7 +89,7 @@ public class ZipContainerReaderTest {
 
     @Test
     public void testReadContainerFileWithoutDocuments() throws Exception {
-        InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource("containers/container-no-documents.ksie").toURI()));
+        InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource(CONTAINER_WITH_NO_DOCUMENTS).toURI()));
         ZipBlockChainContainer result = reader.read(input);
         assertNotNull(result);
         assertFalse(result.getSignatureContents().isEmpty());
@@ -95,7 +102,7 @@ public class ZipContainerReaderTest {
 
     @Test
     public void testReadContainerFileWithMultipleAnnotations() throws Exception {
-        InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource("containers/container-one-file-3-annotations.ksie").toURI()));
+        InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource(CONTAINER_WITH_MULTIPLE_ANNOTATIONS).toURI()));
         ZipBlockChainContainer result = reader.read(input);
         assertNotNull(result);
         assertFalse(result.getSignatureContents().isEmpty());
@@ -104,12 +111,21 @@ public class ZipContainerReaderTest {
         }
     }
 
-    // test empty container                 --- DONE!
-    // test extra files container           --- DONE!
-    // test no documents container          --- DONE!
-    // test one document container          --- DONE!
-    // test multiple annotations container  --- DONE!
-    // test multiple signatures container // TODO: get container with multiple signatures
-    // test broken container (missing files)  // TODO: make multiple signature container and break one of them, preferably at random  (look into executing shell commands ExecuteShellCommand com = new ExecuteShellCommand();System.out.println(com.executeCommand("ls"));)
+    @Test
+    public void testReadContainerFileWithMultipleSignatures() throws Exception {
+        InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource(CONTAINER_WITH_MULTIPLE_SIGNATURES).toURI()));
+        ZipBlockChainContainer result = reader.read(input);
+        assertNotNull(result);
+        assertTrue(result.getSignatureContents().size() > 1);
+    }
+
+    @Test
+    public void testReadContainerFileWithBrokenSignatures() throws Exception {
+        InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource(CONTAINER_WITH_BROKEN_SIGNATURE).toURI()));
+        ZipBlockChainContainer result = reader.read(input);
+        assertNotNull(result);
+        assertFalse(result.getSignatureContents().isEmpty());
+        assertFalse(result.getUnknownFiles().isEmpty());
+    }
 
 }
