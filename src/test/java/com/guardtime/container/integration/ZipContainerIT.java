@@ -5,7 +5,7 @@
 //import com.guardtime.container.manifest.ContainerManifestFactory;
 //import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 //import com.guardtime.container.packaging.BlockChainContainer;
-//import com.guardtime.container.packaging.zip.SignatureContent;
+//import com.guardtime.container.packaging.SignatureContent;
 //import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 //import com.guardtime.container.signature.SignatureFactory;
 //import com.guardtime.container.signature.ksi.KsiSignatureFactory;

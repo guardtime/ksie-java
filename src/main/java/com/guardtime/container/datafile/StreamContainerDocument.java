@@ -47,6 +47,11 @@ public class StreamContainerDocument implements ContainerDocument {
     }
 
     @Override
+    public boolean isWritable() {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "{type=Stream" +
                 ", fileName=" + containerDocument.getFileName() +
