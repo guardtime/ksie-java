@@ -49,6 +49,11 @@ class ZipBlockChainContainer implements BlockChainContainer {
         return mimeType;
     }
 
+    @Override
+    public List<Pair<String, File>> getUnknownFiles() {
+        return unknownFiles;
+    }
+
     private void writeExcessFiles(ZipOutputStream zipOutputStream) throws IOException {
         for (Pair<String, File> file : unknownFiles) {
             writeEntry(new ZipEntry(file.getLeft()), new FileInputStream(file.getRight()), zipOutputStream);
@@ -78,5 +83,4 @@ class ZipBlockChainContainer implements BlockChainContainer {
         Util.copyData(input, output);
         output.closeEntry();
     }
-
 }
