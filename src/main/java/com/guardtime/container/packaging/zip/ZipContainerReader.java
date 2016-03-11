@@ -76,6 +76,7 @@ class ZipContainerReader {
     private MimeType getMimeType() {
         String uri = ZipContainerPackagingFactory.MIME_TYPE_ENTRY_NAME;
         byte[] content = mimeTypeHandler.get(uri);
+        if(content == null) return null;
         return new MimeTypeEntry(uri, content);
     }
 
