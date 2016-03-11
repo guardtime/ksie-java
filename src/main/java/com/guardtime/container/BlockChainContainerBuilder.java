@@ -23,7 +23,7 @@ public class BlockChainContainerBuilder {
 
     private final List<ContainerDocument> documents = new LinkedList<>();
     private final List<ContainerAnnotation> annotations = new LinkedList<>();
-    
+
     private final ContainerPackagingFactory packagingFactory;
     private BlockChainContainer existingContainer;
 
@@ -68,7 +68,7 @@ public class BlockChainContainerBuilder {
     }
 
     public BlockChainContainer build() throws BlockChainContainerException {
-        if(existingContainer == null){
+        if (existingContainer == null) {
             return packagingFactory.create(documents, annotations);
         } else {
             return packagingFactory.create(existingContainer, documents, annotations);

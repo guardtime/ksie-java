@@ -3,7 +3,6 @@ package com.guardtime.container.packaging.zip.handler;
 import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureFactory;
-import com.guardtime.container.util.Util;
 
 import java.io.File;
 import java.io.FileInputStream;

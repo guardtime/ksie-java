@@ -3,7 +3,6 @@ package com.guardtime.container.packaging.zip.handler;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.DataFilesManifest;
 import com.guardtime.container.manifest.InvalidManifestException;
-import com.guardtime.container.util.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
