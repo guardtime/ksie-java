@@ -17,7 +17,7 @@ public class MimeTypeHandler extends ContentHandler<byte[]> {
     public byte[] get(String name) {
         try {
             return Util.toByteArray(new FileInputStream(entries.get(name)));
-        } catch (IOException e) {
+        } catch (NullPointerException | IOException e) {
             return null;
         }
     }

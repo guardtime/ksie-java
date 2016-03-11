@@ -52,6 +52,11 @@ class ZipBlockChainContainer implements BlockChainContainer {
         return mimeType;
     }
 
+    @Override
+    public List<Pair<String, File>> getUnknownFiles() {
+        return unknownFiles;
+    }
+
     public ZipEntryNameProvider getNameProvider() {
         return nameProvider;
     }
@@ -85,5 +90,4 @@ class ZipBlockChainContainer implements BlockChainContainer {
         Util.copyData(input, output);
         output.closeEntry();
     }
-
 }
