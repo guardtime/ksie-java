@@ -1,11 +1,12 @@
 package com.guardtime.container.packaging.zip;
 
-import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.*;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
+import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.signature.SignatureException;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.SignatureFactoryType;
 import com.guardtime.container.util.Pair;
@@ -41,19 +42,29 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     }
 
     @Override
-    public ZipBlockChainContainer read(InputStream input) throws IOException {
+    public ZipBlockChainContainer read(InputStream input) throws InvalidPackageException {
         Util.notNull(input, "Input stream");
-        ZipContainerReader reader = new ZipContainerReader(manifestFactory, signatureFactory);
-        return reader.read(input);
+        try {
+            ZipContainerReader reader = new ZipContainerReader(manifestFactory, signatureFactory);
+            return reader.read(input);
+        } catch (IOException e) {
+            throw new InvalidPackageException("Failed to parse ZipBlockChainContainer from stream", e);
+        }
     }
 
     @Override
-    public ZipBlockChainContainer create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws BlockChainContainerException {
+    public ZipBlockChainContainer create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
         Util.notEmpty(files, "Data files");
-        ContentSigner signer = new ContentSigner(files, annotations);
-        ZipSignatureContent signatureContent = signer.sign();
-        MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
-        return new ZipBlockChainContainer(signatureContent, mimeType);
+        try {
+            ContentSigner signer = new ContentSigner(files, annotations);
+            ZipSignatureContent signatureContent = signer.sign();
+            MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
+            return new ZipBlockChainContainer(signatureContent, mimeType);
+        } catch (IOException | InvalidManifestException e) {
+            throw new InvalidPackageException("Failed to create ZipBlockChainContainer internal structure!", e);
+        } catch (SignatureException e) {
+            throw new InvalidPackageException("Failed to sign ZipBlockChainContainer!", e);
+        }
     }
 
     private byte[] getMimeTypeContent() {
@@ -62,7 +73,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     }
 
     @Override
-    public ZipBlockChainContainer create(ZipBlockChainContainer existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws BlockChainContainerException {
+    public ZipBlockChainContainer create(ZipBlockChainContainer existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
         // TODO implement
         return null;
     }
@@ -82,7 +93,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             this.annotations = annotations;
         }
 
-        public ZipSignatureContent sign() throws BlockChainContainerException {
+        public ZipSignatureContent sign() throws InvalidManifestException, SignatureException, IOException {
             ManifestFactoryType manifestFactoryType = manifestFactory.getManifestFactoryType();
             SignatureFactoryType signatureFactoryType = signatureFactory.getSignatureFactoryType();
             this.nameProvider = new ZipEntryNameProvider(manifestFactoryType.getManifestFileExtension(), signatureFactoryType.getSignatureFileExtension());

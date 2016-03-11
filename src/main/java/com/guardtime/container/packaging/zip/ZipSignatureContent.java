@@ -1,6 +1,5 @@
 package com.guardtime.container.packaging.zip;
 
-import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.AnnotationInfoManifest;
@@ -59,7 +58,7 @@ class ZipSignatureContent implements SignatureContent {
         this.signature = signature;
     }
 
-    public DataHash getSignatureInputHash() throws BlockChainContainerException {
+    public DataHash getSignatureInputHash() throws IOException {
         return manifest.getRight().getDataHash(HashAlgorithm.SHA2_256);
     }
 
