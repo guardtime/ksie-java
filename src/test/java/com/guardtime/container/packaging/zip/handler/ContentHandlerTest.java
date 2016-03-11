@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 
 public class ContentHandlerTest extends AbstractContentHandlerTest {
 
-    private Pair<String, File> REQUESTABLE_PATH_FILE_PAIR;
-    private Pair<String, File> UNREQUESTED_PATH_FILE_PAIR;
+    private Pair<String, File> requestablePathFilePair;
+    private Pair<String, File> unrequestedPathFilePair;
     private ContentHandler handler;
 
     @Mock
@@ -25,19 +25,19 @@ public class ContentHandlerTest extends AbstractContentHandlerTest {
 
     @Before
     public void setUpEntries() throws Exception {
-        REQUESTABLE_PATH_FILE_PAIR = Pair.of("name.txt", mockFile1);
-        UNREQUESTED_PATH_FILE_PAIR = Pair.of("awesomesouce2.txt", mockFile2);
+        requestablePathFilePair = Pair.of("name.txt", mockFile1);
+        unrequestedPathFilePair = Pair.of("awesomesouce2.txt", mockFile2);
         handler = new TestContentHandler();
-        handler.add(REQUESTABLE_PATH_FILE_PAIR.getLeft(), REQUESTABLE_PATH_FILE_PAIR.getRight());
-        handler.add(UNREQUESTED_PATH_FILE_PAIR.getLeft(), UNREQUESTED_PATH_FILE_PAIR.getRight());
+        handler.add(requestablePathFilePair.getLeft(), requestablePathFilePair.getRight());
+        handler.add(unrequestedPathFilePair.getLeft(), unrequestedPathFilePair.getRight());
     }
 
     @Test
     public void testGetUnrequestedFiles() throws Exception {
-        handler.get(REQUESTABLE_PATH_FILE_PAIR.getLeft());
+        handler.get(requestablePathFilePair.getLeft());
         List<Pair<String, File>> unrequested = handler.getUnrequestedFiles();
-        assertFalse(unrequested.contains(REQUESTABLE_PATH_FILE_PAIR));
-        assertTrue(unrequested.contains(UNREQUESTED_PATH_FILE_PAIR));
+        assertFalse(unrequested.contains(requestablePathFilePair));
+        assertTrue(unrequested.contains(unrequestedPathFilePair));
     }
 
     private class TestContentHandler extends ContentHandler<File> {

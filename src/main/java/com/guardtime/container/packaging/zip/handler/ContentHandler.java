@@ -24,8 +24,9 @@ public abstract class ContentHandler<T> {
     }
 
     public T get(String name) {
+        T returnable = getEntry(name);
         markEntryRequested(name);
-        return getEntry(name);
+        return returnable;
     }
 
     public abstract T getEntry(String name);
