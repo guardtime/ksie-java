@@ -155,8 +155,7 @@ class ZipContainerReader {
             // TODO: Try to simplify this!
             String reference = manifestReference.getUri();
             try {
-                AnnotationInfoManifest manifest = null;
-                manifest = annotationManifestHandler.get(reference);
+                AnnotationInfoManifest manifest = annotationManifestHandler.get(reference);
                 AnnotationReference annotReference = manifest.getAnnotationReference(); // TODO: NullPointerException threat
                 ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getMimeType()); // TODO: getMimeType() seems way too unintuitive to get the AnnotationType string
                 File annotationFile = annotationContentHandler.get(annotReference.getUri());
@@ -174,8 +173,7 @@ class ZipContainerReader {
         for (FileReference manifestReference : manifestReferences) {
             String reference = manifestReference.getUri();
             try {
-                AnnotationInfoManifest manifest = null;
-                manifest = annotationManifestHandler.get(reference);
+                AnnotationInfoManifest manifest = annotationManifestHandler.get(reference);
                 manifests.add(Pair.of(reference, manifest));
             } catch (ContentParsingException e) {
                 logger.info("Failed to parse annotation manifest '{}'", reference);
