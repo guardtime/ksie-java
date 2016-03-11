@@ -23,12 +23,12 @@ public class ManifestHolder extends ContentHandler<SignatureManifest> {
     }
 
     @Override
-    public SignatureManifest get(String name) {
+    public SignatureManifest get(String name) throws ContentParsingException {
         File file = entries.get(name);
         try (FileInputStream input = new FileInputStream(file)) {
             return manifestFactory.readSignatureManifest(input);
         } catch (InvalidManifestException | IOException e) {
-            throw new RuntimeException(e); //TODO
+            throw new ContentParsingException(e);
         }
     }
 

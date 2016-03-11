@@ -74,9 +74,14 @@ class ZipContainerReader {
     }
 
     private MimeType getMimeType() {
-        String uri = ZipContainerPackagingFactory.MIME_TYPE_ENTRY_NAME;
-        byte[] content = mimeTypeHandler.get(uri);
-        return new MimeTypeEntry(uri, content);
+        try {
+            String uri = ZipContainerPackagingFactory.MIME_TYPE_ENTRY_NAME;
+            byte[] content = mimeTypeHandler.get(uri);
+            return new MimeTypeEntry(uri, content);
+        } catch (ContentParsingException e) {
+            logger.info("Failed to parse MIME type.");
+            return null;
+        }
     }
 
     private List<Pair<String, File>> getUnknownFiles() {
@@ -105,12 +110,16 @@ class ZipContainerReader {
         Set<String> signatureManifests = manifestHandler.getNames();
         List<ZipSignatureContent> signatures = new LinkedList<>();
         for (String manifest : signatureManifests) {
-            signatures.add(buildSignature(manifest));
+            try {
+                signatures.add(buildSignature(manifest));
+            } catch (ContentParsingException e) {
+                logger.info("Parsing SignatureContent failed for '{}'", manifest);
+            }
         }
         return signatures;
     }
 
-    private ZipSignatureContent buildSignature(String manifestName) {
+    private ZipSignatureContent buildSignature(String manifestName) throws ContentParsingException {
         SignatureManifest manifest = manifestHandler.get(manifestName);
         FileReference dataFileReference = manifest.getDataFilesReference();
         String dataFileReferenceUri = dataFileReference.getUri();
@@ -145,12 +154,17 @@ class ZipContainerReader {
         for (FileReference manifestReference : manifestReferences) {
             // TODO: Try to simplify this!
             String reference = manifestReference.getUri();
-            AnnotationInfoManifest manifest = annotationManifestHandler.get(reference);
-            AnnotationReference annotReference = manifest.getAnnotationReference(); // TODO: NullPointerException threat
-            ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getMimeType()); // TODO: getMimeType() seems way too unintuitive to get the AnnotationType string
-            File annotationFile = annotationContentHandler.get(annotReference.getUri());
-            ContainerAnnotation annotation = new FileAnnotation(annotationFile, annotReference.getDomain(), type);
-            annotations.add(Pair.of(annotReference.getUri(), annotation));
+            try {
+                AnnotationInfoManifest manifest = null;
+                manifest = annotationManifestHandler.get(reference);
+                AnnotationReference annotReference = manifest.getAnnotationReference(); // TODO: NullPointerException threat
+                ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getMimeType()); // TODO: getMimeType() seems way too unintuitive to get the AnnotationType string
+                File annotationFile = annotationContentHandler.get(annotReference.getUri());
+                ContainerAnnotation annotation = new FileAnnotation(annotationFile, annotReference.getDomain(), type);
+                annotations.add(Pair.of(annotReference.getUri(), annotation));
+            } catch (ContentParsingException e) {
+                logger.info("Failed to parse annotation '{}'", reference);
+            }
         }
         return annotations;
     }
@@ -159,8 +173,13 @@ class ZipContainerReader {
         List<Pair<String, AnnotationInfoManifest>> manifests = new LinkedList<>();
         for (FileReference manifestReference : manifestReferences) {
             String reference = manifestReference.getUri();
-            AnnotationInfoManifest manifest = annotationManifestHandler.get(reference);
-            manifests.add(Pair.of(reference, manifest));
+            try {
+                AnnotationInfoManifest manifest = null;
+                manifest = annotationManifestHandler.get(reference);
+                manifests.add(Pair.of(reference, manifest));
+            } catch (ContentParsingException e) {
+                logger.info("Failed to parse annotation manifest '{}'", reference);
+            }
         }
         return manifests;
     }

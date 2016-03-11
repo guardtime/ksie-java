@@ -21,7 +21,7 @@ public abstract class ContentHandler<T> {
         entries.put(name, file);
     }
 
-    public abstract T get(String name);
+    public abstract T get(String name) throws ContentParsingException;
 
     public Set<String> getNames() {
         return entries.keySet();
