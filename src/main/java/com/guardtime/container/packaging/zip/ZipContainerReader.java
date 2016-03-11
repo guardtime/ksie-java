@@ -1,5 +1,6 @@
 package com.guardtime.container.packaging.zip;
 
+import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.zip.handler.*;
@@ -24,7 +25,7 @@ import java.util.zip.ZipInputStream;
  */
 class ZipContainerReader {
 
-    private static final Logger logger = LoggerFactory.getLogger(ZipContainerReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZipContainerReader.class);
 
     private final DataFileContentHandler documentHandler = new DataFileContentHandler();
     private final AnnotationContentHandler annotationContentHandler = new AnnotationContentHandler();
@@ -48,6 +49,7 @@ class ZipContainerReader {
         this.mimeTypeHandler = new MimeTypeHandler();
         this.handlers = new ContentHandler[]{mimeTypeHandler, documentHandler, annotationContentHandler, dataManifestHandler,
                 manifestHandler, annotationsManifestHandler, signatureHandler, annotationManifestHandler};
+
         this.signatureContentHandler = new SignatureContentHandler(documentHandler, annotationContentHandler, manifestHandler,
                 dataManifestHandler, annotationsManifestHandler, annotationManifestHandler, signatureHandler);
     }
@@ -57,7 +59,7 @@ class ZipContainerReader {
             ZipEntry entry;
             while ((entry = zipInput.getNextEntry()) != null) {
                 if (entry.isDirectory()) {
-                    logger.trace("Skipping directory '{}'", entry.getName());
+                    LOGGER.trace("Skipping directory '{}'", entry.getName());
                     continue;
                 }
                 readEntry(zipInput, entry);
@@ -89,7 +91,7 @@ class ZipContainerReader {
         com.guardtime.ksi.util.Util.copyData(zipInput, new FileOutputStream(tempFile));
         for (ContentHandler handler : handlers) {
             if (handler.isSupported(name)) {
-                logger.info("Reading zip entry '{}'. Using handler '{}' ", name, handler.getClass().getName());
+                LOGGER.info("Reading zip entry '{}'. Using handler '{}' ", name, handler.getClass().getName());
                 handler.add(name, tempFile);
                 return;
             }
@@ -101,7 +103,11 @@ class ZipContainerReader {
         Set<String> signatureManifests = manifestHandler.getNames();
         List<ZipSignatureContent> signatures = new LinkedList<>();
         for (String manifest : signatureManifests) {
-            signatures.add(signatureContentHandler.get(manifest));
+            try {
+                signatures.add(signatureContentHandler.get(manifest));
+            } catch (BlockChainContainerException e) {
+                LOGGER.info("Failed to parse SignatureContent for manifest '{}'", manifest);
+            }
         }
         return signatures;
     }
