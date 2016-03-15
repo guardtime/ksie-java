@@ -82,8 +82,8 @@ class ZipContainerReader {
         int maxAnnotationIndex = Collections.max(Arrays.asList(
                 this.maxAnnotationIndex,
                 annotationContentHandler.getMaxIndex(),
-                annotationManifestHandler.getMaxIndex()
-                // TODO: get max index from annotatmanifest that is not grouped to a SignatureContent
+                annotationManifestHandler.getMaxIndex(),
+                annotationsManifestHandler.getMaxAnnotationManifestIndex()
         ));
         ZipEntryNameProvider nameProvider = new ZipEntryNameProvider(
                 manifestSuffix,
