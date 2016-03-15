@@ -6,6 +6,7 @@ import com.guardtime.container.manifest.InvalidManifestException;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class AnnotationManifestHandler extends ContentHandler<AnnotationInfoManifest> {
@@ -27,8 +28,12 @@ public class AnnotationManifestHandler extends ContentHandler<AnnotationInfoMani
         File file = entries.get(name);
         try (FileInputStream input = new FileInputStream(file)) {
             return manifestFactory.readAnnotationManifest(input);
-        } catch (InvalidManifestException | IOException e) {
-            throw new ContentParsingException(e);
+        } catch (InvalidManifestException e) {
+            throw new ContentParsingException("Failed to parse content of annotation manifest file", e);
+        } catch (FileNotFoundException e) {
+            throw new ContentParsingException("Failed to locate requested file in filesystem", e);
+        } catch (IOException e) {
+            throw new ContentParsingException("Failed to read file", e);
         }
     }
 

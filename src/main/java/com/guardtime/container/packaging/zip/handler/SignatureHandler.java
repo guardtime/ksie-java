@@ -1,7 +1,7 @@
 package com.guardtime.container.packaging.zip.handler;
 
-import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.signature.SignatureException;
 import com.guardtime.container.signature.SignatureFactory;
 
 import java.io.File;
@@ -27,8 +27,10 @@ public class SignatureHandler extends ContentHandler<ContainerSignature> {
         try {
             File file = entries.get(name);
             return signatureFactory.read(new FileInputStream(file));
-        } catch (BlockChainContainerException | FileNotFoundException e) {
-            throw new ContentParsingException(e);
+        } catch (FileNotFoundException e) {
+            throw new ContentParsingException("Failed to locate requested file in filesystem", e);
+        } catch (SignatureException e) {
+            throw new ContentParsingException("Failed to parse content of signature file", e);
         }
     }
 

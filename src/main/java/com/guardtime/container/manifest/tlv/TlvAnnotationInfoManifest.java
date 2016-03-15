@@ -38,8 +38,10 @@ class TlvAnnotationInfoManifest extends AbstractTlvManifestStructure implements 
         super(MAGIC, stream);
         try {
             read(stream);
-        } catch (TLVParserException | IOException e) {
-            throw new InvalidManifestException(e);
+        } catch (TLVParserException e) {
+            throw new InvalidManifestException("Failed to parse TlvAnnotationInfoManifest from InputStream", e);
+        } catch (IOException e) {
+            throw new InvalidManifestException("Failed to read InputStream", e);
         }
         checkMandatoryElement(dataManifestReference, "Data manifest reference");
         checkMandatoryElement(annotationReference, "Annotation reference");

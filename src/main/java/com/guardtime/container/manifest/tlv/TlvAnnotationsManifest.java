@@ -40,8 +40,10 @@ class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements Ann
         super(MAGIC, stream);
         try {
             read(stream);
-        } catch (TLVParserException | IOException e) {
-            throw new InvalidManifestException(e);
+        } catch (TLVParserException e) {
+            throw new InvalidManifestException("Failed to parse TlvAnnotationsManifest from InputStream", e);
+        } catch (IOException e) {
+            throw new InvalidManifestException("Failed to read InputStream", e);
         }
     }
 

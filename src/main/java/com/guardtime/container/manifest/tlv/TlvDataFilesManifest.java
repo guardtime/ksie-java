@@ -25,7 +25,7 @@ class TlvDataFilesManifest extends AbstractTlvManifestStructure implements DataF
                 this.documents.add(new TlvDataFileReference(doc));
             }
         } catch (TLVParserException | IOException e) {
-            throw new InvalidManifestException("Failed to generate file reference TLVElement", e);
+            throw new InvalidManifestException("Failed to generate TlvDataFilesManifest", e);
         }
     }
 
@@ -33,8 +33,10 @@ class TlvDataFilesManifest extends AbstractTlvManifestStructure implements DataF
         super(MAGIC, stream);
         try {
             read(stream);
-        } catch (TLVParserException | IOException e) {
-            throw new InvalidManifestException("Failed to read file reference", e);
+        } catch (TLVParserException e) {
+            throw new InvalidManifestException("Failed to parse TlvDataFilesManifest from InputStream", e);
+        } catch (IOException e) {
+            throw new InvalidManifestException("Failed to read InputStream", e);
         }
     }
 

@@ -44,8 +44,10 @@ class TlvSignatureManifest extends AbstractTlvManifestStructure implements Signa
         try {
             TLVInputStream inputStream = toTlvInputStream(stream);
             read(inputStream);
-        } catch (TLVParserException | IOException e) {
-            throw new InvalidManifestException(e);
+        } catch (TLVParserException e) {
+            throw new InvalidManifestException("Failed to parse content of InputStream",e);
+        } catch (IOException e) {
+            throw new InvalidManifestException("Failed to read InputStream", e);
         }
         checkMandatoryElement(dataFilesManifestReference, "Data files manifest reference");
         checkMandatoryElement(signatureReference, "Signature manifest reference");
