@@ -79,7 +79,7 @@ class ZipContainerReader {
             byte[] content = mimeTypeHandler.get(uri);
             return new MimeTypeEntry(uri, content);
         } catch (ContentParsingException e) {
-            logger.info("Failed to parse MIME type.");
+            logger.info("Failed to parse MIME type. Reason: '{}", e.getMessage());
             return null;
         }
     }
@@ -113,7 +113,7 @@ class ZipContainerReader {
             try {
                 signatures.add(buildSignature(manifest));
             } catch (ContentParsingException e) {
-                logger.info("Parsing SignatureContent failed for '{}'", manifest);
+                logger.info("Parsing SignatureContent failed for '{}'. Reason: '{}'", manifest, e.getMessage());
             }
         }
         return signatures;
@@ -162,7 +162,7 @@ class ZipContainerReader {
                 ContainerAnnotation annotation = new FileAnnotation(annotationFile, annotReference.getDomain(), type);
                 annotations.add(Pair.of(annotReference.getUri(), annotation));
             } catch (ContentParsingException e) {
-                logger.info("Failed to parse annotation '{}'", reference);
+                logger.info("Failed to parse annotation '{}'. Reason: '{}'", reference, e.getMessage());
             }
         }
         return annotations;
@@ -176,7 +176,7 @@ class ZipContainerReader {
                 AnnotationInfoManifest manifest = annotationManifestHandler.get(reference);
                 manifests.add(Pair.of(reference, manifest));
             } catch (ContentParsingException e) {
-                logger.info("Failed to parse annotation manifest '{}'", reference);
+                logger.info("Failed to parse annotation manifest '{}'. Reason: '{}'", reference, e.getMessage());
             }
         }
         return manifests;

@@ -48,7 +48,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             ZipContainerReader reader = new ZipContainerReader(manifestFactory, signatureFactory);
             return reader.read(input);
         } catch (IOException e) {
-            throw new InvalidPackageException("Failed to parse ZipBlockChainContainer from stream", e);
+            throw new InvalidPackageException("Failed to parse InputStream", e);
         }
     }
 
