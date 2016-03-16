@@ -23,12 +23,12 @@ public class AnnotationManifestHandler extends ContentHandler<AnnotationInfoMani
     }
 
     @Override
-    public AnnotationInfoManifest get(String name) {
+    protected AnnotationInfoManifest getEntry(String name) throws FileParsingException {
         File file = entries.get(name);
         try (FileInputStream input = new FileInputStream(file)) {
             return manifestFactory.readAnnotationManifest(input);
         } catch (InvalidManifestException | IOException e) {
-            return null;
+            throw new FileParsingException(e);
         }
     }
 
