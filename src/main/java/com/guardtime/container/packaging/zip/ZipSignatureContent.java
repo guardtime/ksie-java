@@ -90,7 +90,9 @@ class ZipSignatureContent implements SignatureContent {
 
     private void writeAnnotationInfoManifests(ZipOutputStream output) throws IOException {
         for (Pair<String, AnnotationInfoManifest> manifest : annotationManifests) {
-            writeEntry(new ZipEntry(manifest.getLeft()), manifest.getRight().getInputStream(), output);
+            if(manifest.getRight().isWritable()){
+                writeEntry(new ZipEntry(manifest.getLeft()), manifest.getRight().getInputStream(), output);
+            }
         }
     }
 
