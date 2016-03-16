@@ -111,7 +111,7 @@ class SignatureContentHandler {
                 try {
                     documents.add(fetchDocumentFromHandler(reference));
                 } catch (ContentParsingException e) {
-                    throw new RuntimeException("Programming bug! This should never happen. Investigate why DataFileContentHandler threw exception.", e);
+                    throw new RuntimeException("Programming bug! This should never happen. Investigate why DataFileContentHandler#getEntry() threw exception.", e);
                 }
             }
         }

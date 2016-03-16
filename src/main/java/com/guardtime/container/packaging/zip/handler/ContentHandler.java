@@ -9,8 +9,7 @@ import java.util.*;
  * Helper class for reading specific type of zip file entry. To check if zip entry can be used by current handler use
  * the {@link ContentHandler#isSupported(String)} method.
  *
- * @param <T>
- *         type of the entry
+ * @param <T> type of the entry
  */
 public abstract class ContentHandler<T> {
 

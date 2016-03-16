@@ -141,7 +141,6 @@ class ZipContainerReader {
         return signatures;
     }
 
-
     private File createTempFile() throws IOException {
         return Util.createTempFile("ksie_", ".tmp");
     }
