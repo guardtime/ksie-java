@@ -23,12 +23,13 @@ public class DataManifestHandler extends ContentHandler<DataFilesManifest> {
     }
 
     @Override
-    public DataFilesManifest getEntry(String name) {
+    protected DataFilesManifest getEntry(String name) throws FileParsingException {
         File file = entries.get(name);
+        if (file == null) throw new FileParsingException("No file for name '" + name + "'");
         try (FileInputStream input = new FileInputStream(file)) {
             return manifestFactory.readDataFilesManifest(input);
         } catch (InvalidManifestException | IOException e) {
-            throw new RuntimeException(e); // TODO
+            throw new FileParsingException(e);
         }
     }
 

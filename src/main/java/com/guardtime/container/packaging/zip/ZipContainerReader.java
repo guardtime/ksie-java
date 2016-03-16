@@ -1,12 +1,7 @@
 package com.guardtime.container.packaging.zip;
 
-import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.annotation.ContainerAnnotationType;
-import com.guardtime.container.annotation.FileAnnotation;
-import com.guardtime.container.datafile.ContainerDocument;
-import com.guardtime.container.datafile.EmptyContainerDocument;
-import com.guardtime.container.datafile.FileContainerDocument;
-import com.guardtime.container.manifest.*;
+import com.guardtime.container.BlockChainContainerException;
+import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.zip.handler.*;
 import com.guardtime.container.signature.SignatureFactory;
@@ -19,7 +14,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -31,18 +25,18 @@ import java.util.zip.ZipInputStream;
  */
 class ZipContainerReader {
 
-    private static final Logger logger = LoggerFactory.getLogger(ZipContainerReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZipContainerReader.class);
 
     private final DataFileContentHandler documentHandler = new DataFileContentHandler();
     private final AnnotationContentHandler annotationContentHandler = new AnnotationContentHandler();
     private final UnknownFileHandler unknownFileHandler = new UnknownFileHandler();
     private final MimeTypeHandler mimeTypeHandler = new MimeTypeHandler();
-    ;
     private final ManifestHolder manifestHandler;
     private final DataManifestHandler dataManifestHandler;
     private final AnnotationsManifestHandler annotationsManifestHandler;
     private final AnnotationManifestHandler annotationManifestHandler;
     private final SignatureHandler signatureHandler;
+    private final SignatureContentHandler signatureContentHandler;
 
     private ContentHandler[] handlers;
 
@@ -54,6 +48,9 @@ class ZipContainerReader {
         this.signatureHandler = new SignatureHandler(signatureFactory);
         this.handlers = new ContentHandler[]{mimeTypeHandler, documentHandler, annotationContentHandler, dataManifestHandler,
                 manifestHandler, annotationsManifestHandler, signatureHandler, annotationManifestHandler};
+
+        this.signatureContentHandler = new SignatureContentHandler(documentHandler, annotationContentHandler, manifestHandler,
+                dataManifestHandler, annotationsManifestHandler, annotationManifestHandler, signatureHandler);
     }
 
     ZipBlockChainContainer read(InputStream input) throws IOException {
@@ -61,7 +58,7 @@ class ZipContainerReader {
             ZipEntry entry;
             while ((entry = zipInput.getNextEntry()) != null) {
                 if (entry.isDirectory()) {
-                    logger.trace("Skipping directory '{}'", entry.getName());
+                    LOGGER.trace("Skipping directory '{}'", entry.getName());
                     continue;
                 }
                 readEntry(zipInput, entry);
@@ -74,10 +71,13 @@ class ZipContainerReader {
     }
 
     private MimeType getMimeType() {
-        String uri = ZipContainerPackagingFactory.MIME_TYPE_ENTRY_NAME;
-        byte[] content = mimeTypeHandler.get(uri);
-        if(content == null) return null;
-        return new MimeTypeEntry(uri, content);
+        try {
+            String uri = ZipContainerPackagingFactory.MIME_TYPE_ENTRY_NAME;
+            byte[] content = mimeTypeHandler.get(uri);
+            return new MimeTypeEntry(uri, content);
+        } catch (FileParsingException e) {
+            return null;
+        }
     }
 
     private List<Pair<String, File>> getUnknownFiles() {
@@ -95,7 +95,7 @@ class ZipContainerReader {
         com.guardtime.ksi.util.Util.copyData(zipInput, new FileOutputStream(tempFile));
         for (ContentHandler handler : handlers) {
             if (handler.isSupported(name)) {
-                logger.info("Reading zip entry '{}'. Using handler '{}' ", name, handler.getClass().getName());
+                LOGGER.info("Reading zip entry '{}'. Using handler '{}' ", name, handler.getClass().getName());
                 handler.add(name, tempFile);
                 return;
             }
@@ -107,79 +107,13 @@ class ZipContainerReader {
         Set<String> signatureManifests = manifestHandler.getNames();
         List<ZipSignatureContent> signatures = new LinkedList<>();
         for (String manifest : signatureManifests) {
-            signatures.add(buildSignature(manifest));
-        }
-        return signatures;
-    }
-
-    private ZipSignatureContent buildSignature(String manifestName) {
-        SignatureManifest manifest = manifestHandler.get(manifestName);
-        FileReference dataFileReference = manifest.getDataFilesReference();
-        String dataFileReferenceUri = dataFileReference.getUri();
-        DataFilesManifest dataManifest = dataManifestHandler.get(dataFileReferenceUri);
-
-        List<? extends FileReference> documentReferences = dataManifest.getDataFileReferences(); // TODO: NullPointerException threat
-        List<ContainerDocument> documents = getDocuments(documentReferences);
-
-        FileReference annotationsManifestReference = manifest.getAnnotationsManifestReference();
-        AnnotationsManifest annotationsManifest = annotationsManifestHandler.get(annotationsManifestReference.getUri());
-        List<? extends FileReference> annotationManifestReferences = annotationsManifest.getAnnotationManifestReferences(); // TODO: NullPointerException threat
-        List<Pair<String, AnnotationInfoManifest>> annotationReferences = getAnnotationManifests(annotationManifestReferences);
-
-        List<Pair<String, ContainerAnnotation>> annotations = getAnnotations(annotationManifestReferences);
-
-        //TODO check annotation and data file names inside the container
-        ZipSignatureContent signatureContent = new ZipSignatureContent.Builder()
-                .withDocuments(documents)
-                .withManifest(Pair.of(manifestName, manifest))
-                .withDataManifest(Pair.of(dataFileReferenceUri, dataManifest))
-                .withAnnotationsManifest(Pair.of(annotationsManifestReference.getUri(), annotationsManifest))
-                .withAnnotationManifests(annotationReferences)
-                .withAnnotations(annotations)
-                .build();
-
-        signatureContent.setSignature(signatureHandler.get(manifest.getSignatureReference().getUri()));
-        return signatureContent;
-    }
-
-    private List<Pair<String, ContainerAnnotation>> getAnnotations(List<? extends FileReference> manifestReferences) {
-        List<Pair<String, ContainerAnnotation>> annotations = new ArrayList<>();
-        for (FileReference manifestReference : manifestReferences) {
-            // TODO: Try to simplify this!
-            String reference = manifestReference.getUri();
-            AnnotationInfoManifest manifest = annotationManifestHandler.get(reference);
-            AnnotationReference annotReference = manifest.getAnnotationReference(); // TODO: NullPointerException threat
-            ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getMimeType()); // TODO: getMimeType() seems way too unintuitive to get the AnnotationType string
-            File annotationFile = annotationContentHandler.get(annotReference.getUri());
-            ContainerAnnotation annotation = new FileAnnotation(annotationFile, annotReference.getDomain(), type);
-            annotations.add(Pair.of(annotReference.getUri(), annotation));
-        }
-        return annotations;
-    }
-
-    private List<Pair<String, AnnotationInfoManifest>> getAnnotationManifests(List<? extends FileReference> manifestReferences) {
-        List<Pair<String, AnnotationInfoManifest>> manifests = new LinkedList<>();
-        for (FileReference manifestReference : manifestReferences) {
-            String reference = manifestReference.getUri();
-            AnnotationInfoManifest manifest = annotationManifestHandler.get(reference);
-            manifests.add(Pair.of(reference, manifest));
-        }
-        return manifests;
-    }
-
-    private List<ContainerDocument> getDocuments(List<? extends FileReference> references) {
-        List<ContainerDocument> documents = new LinkedList<>();
-        for (FileReference reference : references) {
-            String documentUri = reference.getUri();
-            File file = documentHandler.get(documentUri);
-            if (file == null) {
-                // either removed or was never present in the first place, verifier will decide
-                documents.add(new EmptyContainerDocument(documentUri, reference.getMimeType(), reference.getHash()));
-            } else {
-                documents.add(new FileContainerDocument(file, reference.getMimeType(), documentUri));
+            try {
+                signatures.add(signatureContentHandler.get(manifest));
+            } catch (BlockChainContainerException e) {
+                LOGGER.info("Failed to parse SignatureContent for manifest '{}'", manifest);
             }
         }
-        return documents;
+        return signatures;
     }
 
     private File createTempFile() throws IOException {

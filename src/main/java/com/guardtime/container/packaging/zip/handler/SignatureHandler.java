@@ -6,7 +6,7 @@ import com.guardtime.container.signature.SignatureFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class SignatureHandler extends ContentHandler<ContainerSignature> {
 
@@ -23,12 +23,13 @@ public class SignatureHandler extends ContentHandler<ContainerSignature> {
     }
 
     @Override
-    public ContainerSignature getEntry(String name) {
-        try {
-            File file = entries.get(name);
-            return signatureFactory.read(new FileInputStream(file));
-        } catch (BlockChainContainerException | FileNotFoundException e) {
-            throw new RuntimeException(e);
+    protected ContainerSignature getEntry(String name) throws FileParsingException {
+        File file = entries.get(name);
+        if (file == null) throw new FileParsingException("No file for name '" + name + "'");
+        try (FileInputStream input = new FileInputStream(file)) {
+            return signatureFactory.read(input);
+        } catch (BlockChainContainerException | IOException e) {
+            throw new FileParsingException(e);
         }
     }
 

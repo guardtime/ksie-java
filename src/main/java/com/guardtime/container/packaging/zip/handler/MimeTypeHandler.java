@@ -14,11 +14,11 @@ public class MimeTypeHandler extends ContentHandler<byte[]> {
     }
 
     @Override
-    public byte[] getEntry(String name) {
+    protected byte[] getEntry(String name) throws FileParsingException {
         try {
             return Util.toByteArray(new FileInputStream(entries.get(name)));
         } catch (NullPointerException | IOException e) {
-            return null;
+            throw new FileParsingException(e);
         }
     }
 }

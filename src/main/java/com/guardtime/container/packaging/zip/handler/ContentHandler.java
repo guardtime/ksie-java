@@ -23,13 +23,13 @@ public abstract class ContentHandler<T> {
         unrequestedEntries.add(name);
     }
 
-    public T get(String name) {
+    public T get(String name) throws FileParsingException {
         T returnable = getEntry(name);
         markEntryRequested(name);
         return returnable;
     }
 
-    public abstract T getEntry(String name);
+    protected abstract T getEntry(String name) throws FileParsingException;
 
     public Set<String> getNames() {
         return entries.keySet();

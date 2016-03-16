@@ -10,7 +10,7 @@ public class UnknownFileHandler extends ContentHandler<File> {
     }
 
     @Override
-    public File getEntry(String name) {
+    protected File getEntry(String name) {
         return entries.get(name);
     }
 

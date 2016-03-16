@@ -6,7 +6,7 @@ import com.guardtime.container.manifest.ContainerManifestFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class AnnotationsManifestHandler extends ContentHandler<AnnotationsManifest> {
 
@@ -23,12 +23,13 @@ public class AnnotationsManifestHandler extends ContentHandler<AnnotationsManife
     }
 
     @Override
-    public AnnotationsManifest getEntry(String name) {
-        try {
-            File file = entries.get(name);
-            return manifestFactory.readAnnotationsManifest(new FileInputStream(file));
-        } catch (BlockChainContainerException | FileNotFoundException e) {
-            throw new RuntimeException(e);
+    protected AnnotationsManifest getEntry(String name) throws FileParsingException {
+        File file = entries.get(name);
+        if (file == null) throw new FileParsingException("No file for name '" + name + "'");
+        try (FileInputStream input = new FileInputStream(file)) {
+            return manifestFactory.readAnnotationsManifest(input);
+        } catch (BlockChainContainerException | IOException e) {
+            throw new FileParsingException(e);
         }
     }
 
