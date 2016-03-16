@@ -3,6 +3,7 @@ package com.guardtime.container.packaging.zip.handler;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 import com.guardtime.ksi.util.Util;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,7 +18,8 @@ public class MimeTypeHandler extends ContentHandler<byte[]> {
     @Override
     public byte[] get(String name) throws ContentParsingException {
         try {
-            return Util.toByteArray(new FileInputStream(entries.get(name)));
+            File file = fetchFileFromEntries(name);
+            return Util.toByteArray(new FileInputStream(file));
         } catch (FileNotFoundException e) {
             throw new ContentParsingException("Failed to locate requested file in filesystem", e);
         } catch (IOException e) {

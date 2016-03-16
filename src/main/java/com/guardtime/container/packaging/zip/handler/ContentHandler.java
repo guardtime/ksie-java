@@ -9,7 +9,8 @@ import java.util.TreeMap;
  * Helper class for reading specific type of zip file entry. To check if zip entry can be used by current handler use
  * the {@link ContentHandler#isSupported(String)} method.
  *
- * @param <T> type of the entry
+ * @param <T>
+ *         type of the entry
  */
 public abstract class ContentHandler<T> {
 
@@ -34,5 +35,11 @@ public abstract class ContentHandler<T> {
     protected boolean fileNameMatches(String str, String regex) {
         int startingIndex = str.contains("/") ? str.lastIndexOf("/") + 1 : 0;
         return str.substring(startingIndex).matches(regex);
+    }
+
+    protected File fetchFileFromEntries(String name) throws ContentParsingException {
+        File file = entries.get(name);
+        if(file == null) throw new ContentParsingException("Failed to fetch file '" + name + "' from entries.");
+        return file;
     }
 }

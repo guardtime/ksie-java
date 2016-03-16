@@ -25,7 +25,7 @@ public class SignatureHandler extends ContentHandler<ContainerSignature> {
     @Override
     public ContainerSignature get(String name) throws ContentParsingException {
         try {
-            File file = entries.get(name);
+            File file = fetchFileFromEntries(name);
             return signatureFactory.read(new FileInputStream(file));
         } catch (FileNotFoundException e) {
             throw new ContentParsingException("Failed to locate requested file in filesystem", e);
