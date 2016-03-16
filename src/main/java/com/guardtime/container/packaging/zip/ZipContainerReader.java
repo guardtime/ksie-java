@@ -13,9 +13,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -37,6 +35,9 @@ class ZipContainerReader {
     private final SignatureHandler signatureHandler;
     private final SignatureContentHandler signatureContentHandler;
 
+    private final String manifestSuffix;
+    private final String signatureSuffix;
+
     private ContentHandler[] handlers;
 
     ZipContainerReader(ContainerManifestFactory manifestFactory, SignatureFactory signatureFactory) {
@@ -47,6 +48,9 @@ class ZipContainerReader {
         this.signatureHandler = new SignatureHandler(signatureFactory);
         this.handlers = new ContentHandler[]{mimeTypeHandler, documentHandler, annotationContentHandler, dataManifestHandler,
                 manifestHandler, annotationsManifestHandler, signatureHandler, annotationManifestHandler};
+
+        this.manifestSuffix = manifestFactory.getManifestFactoryType().getManifestFileExtension();
+        this.signatureSuffix = signatureFactory.getSignatureFactoryType().getSignatureFileExtension();
 
         this.signatureContentHandler = new SignatureContentHandler(documentHandler, annotationContentHandler, manifestHandler,
                 dataManifestHandler, annotationsManifestHandler, annotationManifestHandler, signatureHandler);
@@ -66,7 +70,28 @@ class ZipContainerReader {
         List<ZipSignatureContent> contents = buildSignatures();
         MimeType mimeType = getMimeType();
         List<Pair<String, File>> unknownFiles = getUnknownFiles();
-        return new ZipBlockChainContainer(contents, unknownFiles, mimeType);
+        ZipEntryNameProvider nameProvider = getNameProvider();
+        return new ZipBlockChainContainer(contents, unknownFiles, mimeType, nameProvider);
+    }
+
+    private ZipEntryNameProvider getNameProvider() {
+        int maxManifestIndex = Collections.max(Arrays.asList(
+                manifestHandler.getMaxIndex(),
+                signatureHandler.getMaxIndex(),
+                dataManifestHandler.getMaxIndex(),
+                annotationsManifestHandler.getMaxIndex()
+        ));
+        int maxAnnotationIndex = Collections.max(Arrays.asList(
+                annotationContentHandler.getMaxIndex(),
+                annotationManifestHandler.getMaxIndex(),
+                annotationsManifestHandler.getMaxAnnotationManifestIndex()
+        ));
+        return new ZipEntryNameProvider(
+                manifestSuffix,
+                signatureSuffix,
+                maxManifestIndex,
+                maxAnnotationIndex
+        );
     }
 
     private MimeType getMimeType() {

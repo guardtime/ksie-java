@@ -119,7 +119,7 @@ class SignatureContentHandler {
         private ContainerDocument fetchDocumentFromHandler(FileReference reference) throws ContentParsingException {
             String documentUri = reference.getUri();
             File file = documentHandler.get(documentUri);
-            if(file == null) {
+            if (file == null) {
                 // either removed or was never present in the first place, verifier will decide
                 return new EmptyContainerDocument(documentUri, reference.getMimeType(), reference.getHash());
             } else {
@@ -131,10 +131,10 @@ class SignatureContentHandler {
             if (annotationsManifest == null) return;
             for (FileReference manifestReference : annotationsManifest.getRight().getAnnotationManifestReferences()) {
                 Pair<String, AnnotationInfoManifest> annotationInfoManifest = getAnnotationInfoManifest(manifestReference);
-                if(annotationInfoManifest != null) {
+                if (annotationInfoManifest != null) {
                     annotationManifests.add(annotationInfoManifest);
                     Pair<String, ContainerAnnotation> annotation = getContainerAnnotation(manifestReference, annotationInfoManifest.getRight());
-                    if(annotation != null) annotations.add(annotation);
+                    if (annotation != null) annotations.add(annotation);
                 }
             }
         }

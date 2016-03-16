@@ -18,16 +18,19 @@ class ZipBlockChainContainer implements BlockChainContainer {
     private List<ZipSignatureContent> signatureContents = new LinkedList<>();
     private MimeType mimeType;
     private List<Pair<String, File>> unknownFiles = new LinkedList<>();
+    private ZipEntryNameProvider nameProvider;
 
-    public ZipBlockChainContainer(ZipSignatureContent signatureContent, MimeType mimeType) {
+    public ZipBlockChainContainer(ZipSignatureContent signatureContent, MimeType mimeType, ZipEntryNameProvider nameProvider) {
         this.signatureContents.add(signatureContent);
         this.mimeType = mimeType;
+        this.nameProvider = nameProvider;
     }
 
-    public ZipBlockChainContainer(List<ZipSignatureContent> signatureContents, List<Pair<String, File>> unknownFiles, MimeType mimeType) {
+    public ZipBlockChainContainer(List<ZipSignatureContent> signatureContents, List<Pair<String, File>> unknownFiles, MimeType mimeType, ZipEntryNameProvider nameProvider) {
         this.signatureContents = signatureContents;
         this.unknownFiles = unknownFiles;
         this.mimeType = mimeType;
+        this.nameProvider = nameProvider;
     }
 
     @Override
@@ -52,6 +55,10 @@ class ZipBlockChainContainer implements BlockChainContainer {
     @Override
     public List<Pair<String, File>> getUnknownFiles() {
         return unknownFiles;
+    }
+
+    public ZipEntryNameProvider getNameProvider() {
+        return nameProvider;
     }
 
     private void writeExcessFiles(ZipOutputStream zipOutputStream) throws IOException {
