@@ -53,7 +53,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
         ContentSigner signer = new ContentSigner(files, annotations);
         ZipSignatureContent signatureContent = signer.sign();
         MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
-        return new ZipBlockChainContainer(signatureContent, mimeType);
+        return new ZipBlockChainContainer(signatureContent, mimeType, signer.getNameProvider());
     }
 
     private byte[] getMimeTypeContent() {
@@ -63,8 +63,13 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
 
     @Override
     public ZipBlockChainContainer create(ZipBlockChainContainer existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws BlockChainContainerException {
-        // TODO implement
-        return null;
+        Util.notNull(existingSignature, "BlockChainContainer");
+        // TODO: Currently not possible in the implementation but should be possible to add signature without adding files.
+        Util.notEmpty(files, "Data files");
+        ContentSigner signer = new ContentSigner(files, annotations, existingSignature.getNameProvider());
+        ZipSignatureContent signatureContent = signer.sign();
+        existingSignature.getSignatureContents().add(signatureContent);
+        return existingSignature;
     }
 
     class ContentSigner {
@@ -80,15 +85,23 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
         public ContentSigner(List<ContainerDocument> documents, List<ContainerAnnotation> annotations) {
             this.documents = documents;
             this.annotations = annotations;
+
+            ManifestFactoryType manifestFactoryType = manifestFactory.getManifestFactoryType();
+            SignatureFactoryType signatureFactoryType = signatureFactory.getSignatureFactoryType();
+            this.nameProvider = new ZipEntryNameProvider(manifestFactoryType.getManifestFileExtension(), signatureFactoryType.getSignatureFileExtension());
+        }
+
+        public ContentSigner(List<ContainerDocument> documents, List<ContainerAnnotation> annotations, ZipEntryNameProvider nameProvider) {
+            this.documents = documents;
+            this.annotations = annotations;
+            this.nameProvider = nameProvider;
         }
 
         public ZipSignatureContent sign() throws BlockChainContainerException {
             ManifestFactoryType manifestFactoryType = manifestFactory.getManifestFactoryType();
             SignatureFactoryType signatureFactoryType = signatureFactory.getSignatureFactoryType();
-            this.nameProvider = new ZipEntryNameProvider(manifestFactoryType.getManifestFileExtension(), signatureFactoryType.getSignatureFileExtension());
             logger.info("'{}' is used to create and read container manifests", manifestFactoryType.getName());
             logger.info("'{}' is used to create and read container signatures", signatureFactoryType.getName());
-
             Pair<String, DataFilesManifest> dataFilesManifest = Pair.of(nameProvider.nextDataManifestName(), manifestFactory.createDataFilesManifest(documents));
             processAnnotations(dataFilesManifest);
             AnnotationsManifest annotationsManifest = manifestFactory.createAnnotationsManifest(annotationsManifestContent);
@@ -110,6 +123,10 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             ContainerSignature signature = signatureFactory.create(hash);
             signatureContent.setSignature(signature);
             return signatureContent;
+        }
+
+        public ZipEntryNameProvider getNameProvider() {
+            return nameProvider;
         }
 
         private void processAnnotations(Pair<String, DataFilesManifest> dataFilesManifest) throws InvalidManifestException {

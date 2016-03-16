@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class DataManifestHandler extends ContentHandler<DataFilesManifest> {
+public class DataManifestHandler extends IndexedContentHandler<DataFilesManifest> {
 
     private final ContainerManifestFactory manifestFactory;
 

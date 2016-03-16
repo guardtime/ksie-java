@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class AnnotationManifestHandler extends ContentHandler<AnnotationInfoManifest> {
+public class AnnotationManifestHandler extends IndexedContentHandler<AnnotationInfoManifest> {
 
     private final ContainerManifestFactory manifestFactory;
 

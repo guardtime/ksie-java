@@ -11,6 +11,7 @@ import com.guardtime.container.manifest.*;
 import com.guardtime.container.packaging.zip.handler.*;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
+import com.guardtime.container.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,8 @@ class SignatureContentHandler {
     private final AnnotationsManifestHandler annotationsManifestHandler;
     private final AnnotationManifestHandler annotationManifestHandler;
     private final SignatureHandler signatureHandler;
+
+    private int maxAnnotationIndex = 0;
 
     public SignatureContentHandler(DataFileContentHandler documentHandler, AnnotationContentHandler annotationContentHandler,
                                    ManifestHolder manifestHandler, DataManifestHandler dataManifestHandler,
@@ -56,6 +59,10 @@ class SignatureContentHandler {
 
         signatureContent.setSignature(group.signature);
         return signatureContent;
+    }
+
+    public int getMaxAnnotationIndex() {
+        return maxAnnotationIndex;
     }
 
     private class SignatureContentGroup {
@@ -133,9 +140,15 @@ class SignatureContentHandler {
             }
         }
 
+        private void updateParsedMaxAnnotationIndex(FileReference reference) {
+            int index = Util.extractIntegerFrom(reference.getUri());
+            if (index > maxAnnotationIndex) maxAnnotationIndex = index;
+        }
+
         private void populateAnnotationsWithManifests() {
             if (annotationsManifest == null) return;
             for (FileReference manifestReference : annotationsManifest.getRight().getAnnotationManifestReferences()) {
+                updateParsedMaxAnnotationIndex(manifestReference);
                 try {
                     Pair<String, AnnotationInfoManifest> annotationInfoManifest = getAnnotationInfoManifest(manifestReference);
                     annotationManifests.add(annotationInfoManifest);

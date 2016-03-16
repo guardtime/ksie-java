@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class SignatureHandler extends ContentHandler<ContainerSignature> {
+public class SignatureHandler extends IndexedContentHandler<ContainerSignature> {
 
     private final SignatureFactory signatureFactory;
 
