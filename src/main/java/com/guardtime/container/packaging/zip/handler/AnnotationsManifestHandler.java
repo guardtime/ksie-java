@@ -9,7 +9,7 @@ import com.guardtime.container.util.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class AnnotationsManifestHandler extends IndexedContentHandler<AnnotationsManifest> {
 
@@ -26,11 +26,12 @@ public class AnnotationsManifestHandler extends IndexedContentHandler<Annotation
     }
 
     @Override
-    public AnnotationsManifest get(String name) throws FileParsingException {
-        try {
-            File file = entries.get(name);
-            return manifestFactory.readAnnotationsManifest(new FileInputStream(file));
-        } catch (BlockChainContainerException | FileNotFoundException e) {
+    protected AnnotationsManifest getEntry(String name) throws FileParsingException {
+        File file = entries.get(name);
+        if (file == null) throw new FileParsingException("No file for name '" + name + "'");
+        try (FileInputStream input = new FileInputStream(file)) {
+            return manifestFactory.readAnnotationsManifest(input);
+        } catch (BlockChainContainerException | IOException e) {
             throw new FileParsingException(e);
         }
     }

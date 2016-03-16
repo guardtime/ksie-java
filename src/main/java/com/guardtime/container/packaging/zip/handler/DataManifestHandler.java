@@ -23,8 +23,9 @@ public class DataManifestHandler extends IndexedContentHandler<DataFilesManifest
     }
 
     @Override
-    public DataFilesManifest get(String name) throws FileParsingException {
+    protected DataFilesManifest getEntry(String name) throws FileParsingException {
         File file = entries.get(name);
+        if (file == null) throw new FileParsingException("No file for name '" + name + "'");
         try (FileInputStream input = new FileInputStream(file)) {
             return manifestFactory.readDataFilesManifest(input);
         } catch (InvalidManifestException | IOException e) {
