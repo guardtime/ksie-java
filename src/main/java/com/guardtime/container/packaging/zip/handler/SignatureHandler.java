@@ -1,11 +1,12 @@
 package com.guardtime.container.packaging.zip.handler;
 
-import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.signature.SignatureException;
 import com.guardtime.container.signature.SignatureFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class SignatureHandler extends IndexedContentHandler<ContainerSignature> {
@@ -23,13 +24,14 @@ public class SignatureHandler extends IndexedContentHandler<ContainerSignature> 
     }
 
     @Override
-    protected ContainerSignature getEntry(String name) throws FileParsingException {
-        File file = entries.get(name);
-        if (file == null) throw new FileParsingException("No file for name '" + name + "'");
-        try (FileInputStream input = new FileInputStream(file)) {
-            return signatureFactory.read(input);
-        } catch (BlockChainContainerException | IOException e) {
-            throw new FileParsingException(e);
+    protected ContainerSignature getEntry(String name) throws ContentParsingException {
+        try {
+            File file = fetchFileFromEntries(name);
+            return signatureFactory.read(new FileInputStream(file));
+        } catch (SignatureException e) {
+            throw new ContentParsingException("Failed to parse content of signature file", e);
+        } catch (FileNotFoundException e) {
+            throw new ContentParsingException("Failed to locate requested file in filesystem", e);
         }
     }
 

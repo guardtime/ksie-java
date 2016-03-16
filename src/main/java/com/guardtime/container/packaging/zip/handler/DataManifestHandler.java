@@ -6,6 +6,7 @@ import com.guardtime.container.manifest.InvalidManifestException;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class DataManifestHandler extends IndexedContentHandler<DataFilesManifest> {
@@ -23,13 +24,16 @@ public class DataManifestHandler extends IndexedContentHandler<DataFilesManifest
     }
 
     @Override
-    protected DataFilesManifest getEntry(String name) throws FileParsingException {
-        File file = entries.get(name);
-        if (file == null) throw new FileParsingException("No file for name '" + name + "'");
+    protected DataFilesManifest getEntry(String name) throws ContentParsingException {
+        File file = fetchFileFromEntries(name);
         try (FileInputStream input = new FileInputStream(file)) {
             return manifestFactory.readDataFilesManifest(input);
-        } catch (InvalidManifestException | IOException e) {
-            throw new FileParsingException(e);
+        } catch (InvalidManifestException e) {
+            throw new ContentParsingException("Failed to parse content of datamanifest file", e);
+        } catch (FileNotFoundException e) {
+            throw new ContentParsingException("Failed to locate requested file in filesystem", e);
+        } catch (IOException e) {
+            throw new ContentParsingException("Failed to read file", e);
         }
     }
 

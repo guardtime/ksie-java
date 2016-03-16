@@ -1,9 +1,9 @@
 package com.guardtime.container.manifest.tlv;
 
-import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.manifest.SignatureManifest;
+import com.guardtime.container.signature.SignatureException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
@@ -44,8 +44,10 @@ class TlvSignatureManifest extends AbstractTlvManifestStructure implements Signa
         try {
             TLVInputStream inputStream = toTlvInputStream(stream);
             read(inputStream);
-        } catch (TLVParserException | IOException e) {
-            throw new InvalidManifestException(e);
+        } catch (TLVParserException e) {
+            throw new InvalidManifestException("Failed to parse content of InputStream",e);
+        } catch (IOException e) {
+            throw new InvalidManifestException("Failed to read InputStream", e);
         }
         checkMandatoryElement(dataFilesManifestReference, "Data files manifest reference");
         checkMandatoryElement(signatureReference, "Signature manifest reference");
@@ -53,12 +55,8 @@ class TlvSignatureManifest extends AbstractTlvManifestStructure implements Signa
     }
 
     @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) throws BlockChainContainerException {
-        try {
-            return Util.hash(getInputStream(), algorithm);
-        } catch (IOException e) {
-            throw new BlockChainContainerException(e);
-        }
+    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException{
+        return Util.hash(getInputStream(), algorithm);
     }
 
     @Override

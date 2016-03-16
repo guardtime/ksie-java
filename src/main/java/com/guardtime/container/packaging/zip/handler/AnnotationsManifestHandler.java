@@ -1,6 +1,5 @@
 package com.guardtime.container.packaging.zip.handler;
 
-import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.FileReference;
@@ -9,6 +8,7 @@ import com.guardtime.container.util.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class AnnotationsManifestHandler extends IndexedContentHandler<AnnotationsManifest> {
@@ -26,13 +26,16 @@ public class AnnotationsManifestHandler extends IndexedContentHandler<Annotation
     }
 
     @Override
-    protected AnnotationsManifest getEntry(String name) throws FileParsingException {
-        File file = entries.get(name);
-        if (file == null) throw new FileParsingException("No file for name '" + name + "'");
+    protected AnnotationsManifest getEntry(String name) throws ContentParsingException {
+        File file = fetchFileFromEntries(name);
         try (FileInputStream input = new FileInputStream(file)) {
             return manifestFactory.readAnnotationsManifest(input);
-        } catch (BlockChainContainerException | IOException e) {
-            throw new FileParsingException(e);
+        } catch (InvalidManifestException e) {
+            throw new ContentParsingException("Failed to parse content of annotmanifest file", e);
+        } catch (FileNotFoundException e) {
+            throw new ContentParsingException("Failed to locate requested file in filesystem", e);
+        } catch (IOException e) {
+            throw new ContentParsingException("Failed to read file", e);
         }
     }
 
@@ -46,7 +49,7 @@ public class AnnotationsManifestHandler extends IndexedContentHandler<Annotation
                     if(index > max) max = index;
                 }
             } catch (Exception e) {
-                // We don't care about the manifests we can't access, ignore em
+                // We don't care about the manifests we can't access, ignore them
             }
         }
         return max;

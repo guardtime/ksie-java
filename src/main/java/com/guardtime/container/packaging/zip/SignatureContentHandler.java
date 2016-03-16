@@ -1,6 +1,5 @@
 package com.guardtime.container.packaging.zip;
 
-import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.FileAnnotation;
@@ -11,7 +10,6 @@ import com.guardtime.container.manifest.*;
 import com.guardtime.container.packaging.zip.handler.*;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
-import com.guardtime.container.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +29,6 @@ class SignatureContentHandler {
     private final AnnotationManifestHandler annotationManifestHandler;
     private final SignatureHandler signatureHandler;
 
-    private int maxAnnotationIndex = 0;
-
     public SignatureContentHandler(DataFileContentHandler documentHandler, AnnotationContentHandler annotationContentHandler,
                                    ManifestHolder manifestHandler, DataManifestHandler dataManifestHandler,
                                    AnnotationsManifestHandler annotationsManifestHandler, AnnotationManifestHandler annotationManifestHandler,
@@ -46,7 +42,7 @@ class SignatureContentHandler {
         this.signatureHandler = signatureHandler;
     }
 
-    public ZipSignatureContent get(String manifestPath) throws BlockChainContainerException {
+    public ZipSignatureContent get(String manifestPath) throws ContentParsingException {
         SignatureContentGroup group = new SignatureContentGroup(manifestPath);
         ZipSignatureContent signatureContent = new ZipSignatureContent.Builder()
                 .withManifest(group.manifest)
@@ -61,10 +57,6 @@ class SignatureContentHandler {
         return signatureContent;
     }
 
-    public int getMaxAnnotationIndex() {
-        return maxAnnotationIndex;
-    }
-
     private class SignatureContentGroup {
 
         Pair<String, SignatureManifest> manifest;
@@ -76,7 +68,7 @@ class SignatureContentHandler {
         ContainerSignature signature;
 
 
-        public SignatureContentGroup(String manifestPath) throws BlockChainContainerException {
+        public SignatureContentGroup(String manifestPath) throws ContentParsingException {
             this.manifest = getManifest(manifestPath);
             this.dataManifest = getDataManifest();
             this.annotationsManifest = getAnnotationsManifest();
@@ -86,13 +78,8 @@ class SignatureContentHandler {
             fetchSignature();
         }
 
-        private Pair<String, SignatureManifest> getManifest(String manifestPath) throws BlockChainContainerException {
-            try {
-                return Pair.of(manifestPath, manifestHandler.get(manifestPath));
-            } catch (FileParsingException e) {
-                LOGGER.info("Manifest '{}' failed to parse", manifestPath);
-                throw new BlockChainContainerException(e); // Can't gather SignatureContent without the main manifest
-            }
+        private Pair<String, SignatureManifest> getManifest(String manifestPath) throws ContentParsingException {
+            return Pair.of(manifestPath, manifestHandler.get(manifestPath));
         }
 
         private Pair<String, AnnotationsManifest> getAnnotationsManifest() {
@@ -102,8 +89,8 @@ class SignatureContentHandler {
                         annotationsManifestReference.getUri(),
                         annotationsManifestHandler.get(annotationsManifestReference.getUri())
                 );
-            } catch (FileParsingException e) {
-                LOGGER.info("Manifest '{}' failed to parse", annotationsManifestReference.getUri());
+            } catch (ContentParsingException e) {
+                LOGGER.info("Manifest '{}' failed to parse. Reason: '{}'", annotationsManifestReference.getUri(), e.getMessage());
                 return null;
             }
         }
@@ -112,8 +99,8 @@ class SignatureContentHandler {
             FileReference dataManifestReference = manifest.getRight().getDataFilesReference();
             try {
                 return Pair.of(dataManifestReference.getUri(), dataManifestHandler.get(dataManifestReference.getUri()));
-            } catch (FileParsingException e) {
-                LOGGER.info("Manifest '{}' failed to parse", dataManifestReference.getUri());
+            } catch (ContentParsingException e) {
+                LOGGER.info("Manifest '{}' failed to parse. Reason: '{}'", dataManifestReference.getUri(), e.getMessage());
                 return null;
             }
         }
@@ -123,16 +110,16 @@ class SignatureContentHandler {
             for (FileReference reference : dataManifest.getRight().getDataFileReferences()) {
                 try {
                     documents.add(fetchDocumentFromHandler(reference));
-                } catch (FileParsingException e) {
-                    throw new RuntimeException("Programming bug! This should never happen. Investigate why DataFileContentHandler threw exception.", e);
+                } catch (ContentParsingException e) {
+                    throw new RuntimeException("Programming bug! This should never happen. Investigate why DataFileContentHandler#getEntry() threw exception.", e);
                 }
             }
         }
 
-        private ContainerDocument fetchDocumentFromHandler(FileReference reference) throws FileParsingException {
+        private ContainerDocument fetchDocumentFromHandler(FileReference reference) throws ContentParsingException {
             String documentUri = reference.getUri();
             File file = documentHandler.get(documentUri);
-            if(file == null) {
+            if (file == null) {
                 // either removed or was never present in the first place, verifier will decide
                 return new EmptyContainerDocument(documentUri, reference.getMimeType(), reference.getHash());
             } else {
@@ -140,49 +127,47 @@ class SignatureContentHandler {
             }
         }
 
-        private void updateParsedMaxAnnotationIndex(FileReference reference) {
-            int index = Util.extractIntegerFrom(reference.getUri());
-            if (index > maxAnnotationIndex) maxAnnotationIndex = index;
-        }
-
         private void populateAnnotationsWithManifests() {
             if (annotationsManifest == null) return;
             for (FileReference manifestReference : annotationsManifest.getRight().getAnnotationManifestReferences()) {
-                updateParsedMaxAnnotationIndex(manifestReference);
-                try {
-                    Pair<String, AnnotationInfoManifest> annotationInfoManifest = getAnnotationInfoManifest(manifestReference);
+                Pair<String, AnnotationInfoManifest> annotationInfoManifest = getAnnotationInfoManifest(manifestReference);
+                if (annotationInfoManifest != null) {
                     annotationManifests.add(annotationInfoManifest);
                     Pair<String, ContainerAnnotation> annotation = getContainerAnnotation(manifestReference, annotationInfoManifest.getRight());
-                    annotations.add(annotation);
-                } catch (FileParsingException e) {
-                    // drop it since we failed to parse annotation and/or manifest
+                    if (annotation != null) annotations.add(annotation);
                 }
             }
         }
 
-        private Pair<String, AnnotationInfoManifest> getAnnotationInfoManifest(FileReference manifestReference) throws FileParsingException {
-            Pair<String, AnnotationInfoManifest> returnable = null;
-            String manifestReferenceUri = manifestReference.getUri();
-            AnnotationInfoManifest annotationInfoManifest = annotationManifestHandler.get(manifestReferenceUri);
-            if (annotationInfoManifest != null) {
-                returnable = Pair.of(manifestReferenceUri, annotationInfoManifest);
+        private Pair<String, AnnotationInfoManifest> getAnnotationInfoManifest(FileReference manifestReference) {
+            try {
+                String manifestReferenceUri = manifestReference.getUri();
+                AnnotationInfoManifest annotationInfoManifest = annotationManifestHandler.get(manifestReferenceUri);
+                return Pair.of(manifestReferenceUri, annotationInfoManifest);
+            } catch (ContentParsingException e) {
+                LOGGER.info("Failed to parse annotation manifest for '{}'. Reason: '{}'", manifestReference.getUri(), e.getMessage());
+                return null;
             }
-            return returnable;
         }
 
-        private Pair<String, ContainerAnnotation> getContainerAnnotation(FileReference manifestReference, AnnotationInfoManifest annotationInfoManifest) throws FileParsingException {
-            AnnotationReference annotationReference = annotationInfoManifest.getAnnotationReference();
-            ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getMimeType());
-            File annotationFile = annotationContentHandler.get(annotationReference.getUri());
-            ContainerAnnotation annotation = new FileAnnotation(annotationFile, annotationReference.getDomain(), type);
-            return Pair.of(annotationReference.getUri(), annotation);
+        private Pair<String, ContainerAnnotation> getContainerAnnotation(FileReference manifestReference, AnnotationInfoManifest annotationInfoManifest) {
+            try {
+                AnnotationReference annotationReference = annotationInfoManifest.getAnnotationReference();
+                ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getMimeType());
+                File annotationFile = annotationContentHandler.get(annotationReference.getUri());
+                ContainerAnnotation annotation = new FileAnnotation(annotationFile, annotationReference.getDomain(), type);
+                return Pair.of(annotationReference.getUri(), annotation);
+            } catch (ContentParsingException e) {
+                LOGGER.info("Failed to parse annotation for '{}'. Reason: '{}'", manifestReference.getUri(), e.getMessage());
+                return null;
+            }
         }
 
         private void fetchSignature() {
             String signatureUri = manifest.getRight().getSignatureReference().getUri();
             try {
                 signature = signatureHandler.get(signatureUri);
-            } catch (FileParsingException e) {
+            } catch (ContentParsingException e) {
                 LOGGER.info("No valid signature in container at '{}'", signatureUri);
                 signature = null;
             }

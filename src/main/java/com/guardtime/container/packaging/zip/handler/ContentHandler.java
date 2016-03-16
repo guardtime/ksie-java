@@ -23,13 +23,13 @@ public abstract class ContentHandler<T> {
         unrequestedEntries.add(name);
     }
 
-    public T get(String name) throws FileParsingException {
+    public T get(String name) throws ContentParsingException {
         T returnable = getEntry(name);
         markEntryRequested(name);
         return returnable;
     }
 
-    protected abstract T getEntry(String name) throws FileParsingException;
+    protected abstract T getEntry(String name) throws ContentParsingException;
 
     public Set<String> getNames() {
         return entries.keySet();
@@ -50,6 +50,12 @@ public abstract class ContentHandler<T> {
     protected boolean fileNameMatches(String str, String regex) {
         int startingIndex = str.contains("/") ? str.lastIndexOf("/") + 1 : 0;
         return str.substring(startingIndex).matches(regex);
+    }
+
+    protected File fetchFileFromEntries(String name) throws ContentParsingException {
+        File file = entries.get(name);
+        if (file == null) throw new ContentParsingException("Failed to fetch file '" + name + "' from entries.");
+        return file;
     }
 
     private void markEntryRequested(String name) {

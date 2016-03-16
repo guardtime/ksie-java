@@ -1,6 +1,5 @@
 package com.guardtime.container.packaging.zip;
 
-import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.zip.handler.*;
@@ -71,6 +70,11 @@ class ZipContainerReader {
         List<ZipSignatureContent> contents = buildSignatures();
         MimeType mimeType = getMimeType();
         List<Pair<String, File>> unknownFiles = getUnknownFiles();
+        ZipEntryNameProvider nameProvider = getNameProvider();
+        return new ZipBlockChainContainer(contents, unknownFiles, mimeType, nameProvider);
+    }
+
+    private ZipEntryNameProvider getNameProvider() {
         int maxManifestIndex = Collections.max(Arrays.asList(
                 manifestHandler.getMaxIndex(),
                 signatureHandler.getMaxIndex(),
@@ -78,18 +82,16 @@ class ZipContainerReader {
                 annotationsManifestHandler.getMaxIndex()
         ));
         int maxAnnotationIndex = Collections.max(Arrays.asList(
-                signatureContentHandler.getMaxAnnotationIndex(),
                 annotationContentHandler.getMaxIndex(),
                 annotationManifestHandler.getMaxIndex(),
                 annotationsManifestHandler.getMaxAnnotationManifestIndex()
         ));
-        ZipEntryNameProvider nameProvider = new ZipEntryNameProvider(
+        return new ZipEntryNameProvider(
                 manifestSuffix,
                 signatureSuffix,
                 maxManifestIndex,
                 maxAnnotationIndex
         );
-        return new ZipBlockChainContainer(contents, unknownFiles, mimeType, nameProvider);
     }
 
     private MimeType getMimeType() {
@@ -97,7 +99,8 @@ class ZipContainerReader {
             String uri = ZipContainerPackagingFactory.MIME_TYPE_ENTRY_NAME;
             byte[] content = mimeTypeHandler.get(uri);
             return new MimeTypeEntry(uri, content);
-        } catch (FileParsingException e) {
+        } catch (ContentParsingException e) {
+            LOGGER.info("Failed to parse MIME type. Reason: '{}", e.getMessage());
             return null;
         }
     }
@@ -131,8 +134,8 @@ class ZipContainerReader {
         for (String manifest : signatureManifests) {
             try {
                 signatures.add(signatureContentHandler.get(manifest));
-            } catch (BlockChainContainerException e) {
-                LOGGER.info("Failed to parse SignatureContent for manifest '{}'", manifest);
+            } catch (ContentParsingException e) {
+                LOGGER.info("Parsing SignatureContent failed for '{}'. Reason: '{}'", manifest, e.getMessage());
             }
         }
         return signatures;

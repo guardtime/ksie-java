@@ -6,6 +6,7 @@ import com.guardtime.container.datafile.FileContainerDocument;
 import com.guardtime.container.datafile.StreamContainerDocument;
 import com.guardtime.container.packaging.BlockChainContainer;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
+import com.guardtime.container.packaging.InvalidPackageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +33,7 @@ public class BlockChainContainerBuilder {
         this.packagingFactory = packagingFactory;
     }
 
-    public BlockChainContainerBuilder withExistingContainer(InputStream input) throws IOException {
+    public BlockChainContainerBuilder withExistingContainer(InputStream input) throws InvalidPackageException {
         return withExistingContainer(packagingFactory.read(input));
     }
 

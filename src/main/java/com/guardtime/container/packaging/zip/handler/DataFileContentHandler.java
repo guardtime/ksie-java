@@ -24,7 +24,7 @@ public class DataFileContentHandler extends ContentHandler<File> {
 
     @Override
     protected File getEntry(String name) {
-        return  entries.get(name);
+        return entries.get(name);
     }
 
 }
