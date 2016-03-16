@@ -28,7 +28,7 @@ public class AnnotationManifestHandler extends ContentHandler<AnnotationInfoMani
         try (FileInputStream input = new FileInputStream(file)) {
             return manifestFactory.readAnnotationManifest(input);
         } catch (InvalidManifestException | IOException e) {
-            throw new RuntimeException(e); //TODO
+            return null;
         }
     }
 

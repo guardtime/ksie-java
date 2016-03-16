@@ -23,12 +23,12 @@ public class AnnotationsManifestHandler extends ContentHandler<AnnotationsManife
     }
 
     @Override
-    public AnnotationsManifest get(String name) {
+    public AnnotationsManifest get(String name) throws FileParsingException {
         try {
             File file = entries.get(name);
             return manifestFactory.readAnnotationsManifest(new FileInputStream(file));
         } catch (BlockChainContainerException | FileNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new FileParsingException(e);
         }
     }
 
