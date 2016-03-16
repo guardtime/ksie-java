@@ -7,6 +7,7 @@ import com.guardtime.container.signature.SignatureFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class SignatureHandler extends ContentHandler<ContainerSignature> {
 
@@ -23,14 +24,14 @@ public class SignatureHandler extends ContentHandler<ContainerSignature> {
     }
 
     @Override
-    public ContainerSignature get(String name) throws ContentParsingException {
+    protected ContainerSignature getEntry(String name) throws ContentParsingException {
         try {
             File file = fetchFileFromEntries(name);
             return signatureFactory.read(new FileInputStream(file));
-        } catch (FileNotFoundException e) {
-            throw new ContentParsingException("Failed to locate requested file in filesystem", e);
         } catch (SignatureException e) {
             throw new ContentParsingException("Failed to parse content of signature file", e);
+        } catch (FileNotFoundException e) {
+            throw new ContentParsingException("Failed to locate requested file in filesystem", e);
         }
     }
 

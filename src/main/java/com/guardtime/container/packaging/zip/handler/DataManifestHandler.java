@@ -24,7 +24,7 @@ public class DataManifestHandler extends ContentHandler<DataFilesManifest> {
     }
 
     @Override
-    public DataFilesManifest get(String name) throws ContentParsingException {
+    protected DataFilesManifest getEntry(String name) throws ContentParsingException {
         File file = fetchFileFromEntries(name);
         try (FileInputStream input = new FileInputStream(file)) {
             return manifestFactory.readDataFilesManifest(input);

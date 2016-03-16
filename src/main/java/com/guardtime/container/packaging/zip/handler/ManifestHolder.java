@@ -24,7 +24,7 @@ public class ManifestHolder extends ContentHandler<SignatureManifest> {
     }
 
     @Override
-    public SignatureManifest get(String name) throws ContentParsingException {
+    protected SignatureManifest getEntry(String name) throws ContentParsingException {
         File file = fetchFileFromEntries(name);
         try (FileInputStream input = new FileInputStream(file)) {
             return manifestFactory.readSignatureManifest(input);

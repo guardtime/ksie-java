@@ -24,7 +24,7 @@ public class AnnotationsManifestHandler extends ContentHandler<AnnotationsManife
     }
 
     @Override
-    public AnnotationsManifest get(String name) throws ContentParsingException {
+    protected AnnotationsManifest getEntry(String name) throws ContentParsingException {
         File file = fetchFileFromEntries(name);
         try (FileInputStream input = new FileInputStream(file)) {
             return manifestFactory.readAnnotationsManifest(input);

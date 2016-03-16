@@ -108,14 +108,22 @@ class SignatureContentHandler {
         private void populateDocuments() {
             if (dataManifest == null) return;
             for (FileReference reference : dataManifest.getRight().getDataFileReferences()) {
-                String documentUri = reference.getUri();
-                File file = documentHandler.get(documentUri);
-                if (file == null) {
-                    // either removed or was never present in the first place, verifier will decide
-                    documents.add(new EmptyContainerDocument(documentUri, reference.getMimeType(), reference.getHash()));
-                } else {
-                    documents.add(new FileContainerDocument(file, reference.getMimeType(), documentUri));
+                try {
+                    documents.add(fetchDocumentFromHandler(reference));
+                } catch (ContentParsingException e) {
+                    throw new RuntimeException("Programming bug! This should never happen. Investigate why DataFileContentHandler threw exception.", e);
                 }
+            }
+        }
+
+        private ContainerDocument fetchDocumentFromHandler(FileReference reference) throws ContentParsingException {
+            String documentUri = reference.getUri();
+            File file = documentHandler.get(documentUri);
+            if(file == null) {
+                // either removed or was never present in the first place, verifier will decide
+                return new EmptyContainerDocument(documentUri, reference.getMimeType(), reference.getHash());
+            } else {
+                return new FileContainerDocument(file, reference.getMimeType(), documentUri);
             }
         }
 
@@ -123,10 +131,10 @@ class SignatureContentHandler {
             if (annotationsManifest == null) return;
             for (FileReference manifestReference : annotationsManifest.getRight().getAnnotationManifestReferences()) {
                 Pair<String, AnnotationInfoManifest> annotationInfoManifest = getAnnotationInfoManifest(manifestReference);
-                if (annotationInfoManifest != null) {
+                if(annotationInfoManifest != null) {
                     annotationManifests.add(annotationInfoManifest);
                     Pair<String, ContainerAnnotation> annotation = getContainerAnnotation(manifestReference, annotationInfoManifest.getRight());
-                    if (annotation != null) annotations.add(annotation);
+                    if(annotation != null) annotations.add(annotation);
                 }
             }
         }
@@ -137,21 +145,22 @@ class SignatureContentHandler {
                 AnnotationInfoManifest annotationInfoManifest = annotationManifestHandler.get(manifestReferenceUri);
                 return Pair.of(manifestReferenceUri, annotationInfoManifest);
             } catch (ContentParsingException e) {
-                LOGGER.info("Annotation manifest '{}' failed to parse. Reason: '{}'", manifestReference.getUri(), e.getMessage());
+                LOGGER.info("Failed to parse annotation manifest for '{}'. Reason: '{}'", manifestReference.getUri(), e.getMessage());
                 return null;
             }
         }
 
         private Pair<String, ContainerAnnotation> getContainerAnnotation(FileReference manifestReference, AnnotationInfoManifest annotationInfoManifest) {
-            Pair<String, ContainerAnnotation> returnable = null;
-            AnnotationReference annotationReference = annotationInfoManifest.getAnnotationReference();
-            ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getMimeType());
-            File annotationFile = annotationContentHandler.get(annotationReference.getUri());
-            if (annotationFile != null) {
+            try {
+                AnnotationReference annotationReference = annotationInfoManifest.getAnnotationReference();
+                ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getMimeType());
+                File annotationFile = annotationContentHandler.get(annotationReference.getUri());
                 ContainerAnnotation annotation = new FileAnnotation(annotationFile, annotationReference.getDomain(), type);
-                returnable = Pair.of(annotationReference.getUri(), annotation);
+                return Pair.of(annotationReference.getUri(), annotation);
+            } catch (ContentParsingException e) {
+                LOGGER.info("Failed to parse annotation for '{}'. Reason: '{}'", manifestReference.getUri(), e.getMessage());
+                return null;
             }
-            return returnable;
         }
 
         private void fetchSignature() {
