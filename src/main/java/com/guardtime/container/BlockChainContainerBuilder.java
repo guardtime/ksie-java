@@ -33,10 +33,6 @@ public class BlockChainContainerBuilder {
         this.packagingFactory = packagingFactory;
     }
 
-    public BlockChainContainerBuilder withExistingContainer(InputStream input) throws InvalidPackageException {
-        return withExistingContainer(packagingFactory.read(input));
-    }
-
     public BlockChainContainerBuilder withExistingContainer(BlockChainContainer existingContainer) {
         this.existingContainer = existingContainer;
         return this;

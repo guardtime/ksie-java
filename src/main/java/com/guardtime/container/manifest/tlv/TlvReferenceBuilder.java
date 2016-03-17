@@ -22,12 +22,8 @@ class TlvReferenceBuilder {
         return this;
     }
 
-    //TODO code duplication
     public TlvReferenceBuilder withUriElement(String uri) throws TLVParserException {
-        TLVElement element = new TLVElement(false, false, URI_TYPE);
-        element.setStringContent(uri);
-        this.elements.add(element);
-        return this;
+        return withStringElementWithType(uri, URI_TYPE);
     }
 
     public TlvReferenceBuilder withHashElement(DataHash hash) throws TLVParserException {
@@ -38,17 +34,11 @@ class TlvReferenceBuilder {
     }
 
     public TlvReferenceBuilder withMimeTypeElement(String mimeType) throws TLVParserException {
-        TLVElement element = new TLVElement(false, false, MIME_TYPE);
-        element.setStringContent(mimeType);
-        this.elements.add(element);
-        return this;
+        return withStringElementWithType(mimeType, MIME_TYPE);
     }
 
     public TlvReferenceBuilder withDomainElement(String domain) throws TLVParserException {
-        TLVElement element = new TLVElement(false, false, DOMAIN_TYPE);
-        element.setStringContent(domain);
-        this.elements.add(element);
-        return this;
+        return withStringElementWithType(domain, DOMAIN_TYPE);
     }
 
     public TLVElement build() throws TLVParserException {
@@ -57,5 +47,12 @@ class TlvReferenceBuilder {
             element.addChildElement(elem);
         }
         return element;
+    }
+
+    private TlvReferenceBuilder withStringElementWithType(String uri, int type) throws TLVParserException {
+        TLVElement element = new TLVElement(false, false, type);
+        element.setStringContent(uri);
+        this.elements.add(element);
+        return this;
     }
 }

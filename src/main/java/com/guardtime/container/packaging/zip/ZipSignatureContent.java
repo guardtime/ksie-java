@@ -49,6 +49,22 @@ class ZipSignatureContent implements SignatureContent {
         return annotations;
     }
 
+    public Pair<String, DataFilesManifest> getDataManifest() {
+        return dataManifest;
+    }
+
+    public Pair<String, AnnotationsManifest> getAnnotationsManifest() {
+        return annotationsManifest;
+    }
+
+    public Pair<String, SignatureManifest> getSignatureManifest() {
+        return manifest;
+    }
+
+    public List<Pair<String, AnnotationInfoManifest>> getAnnotationManifests() {
+        return annotationManifests;
+    }
+
     public ContainerSignature getSignature() {
         return signature;
     }
@@ -71,27 +87,9 @@ class ZipSignatureContent implements SignatureContent {
         writeSignature(output);
     }
 
-    public Pair<String, DataFilesManifest> getDataManifest() {
-        return dataManifest;
-    }
-
-    public Pair<String, AnnotationsManifest> getAnnotationsManifest() {
-        return annotationsManifest;
-    }
-
-    public Pair<String, SignatureManifest> getSignatureManifest() {
-        return manifest;
-    }
-
-    public List<Pair<String, AnnotationInfoManifest>> getAnnotationManifests() {
-        return annotationManifests;
-    }
-
     private void writeAnnotationInfoManifests(ZipOutputStream output) throws IOException {
         for (Pair<String, AnnotationInfoManifest> manifest : annotationManifests) {
-            if(manifest.getRight().isWritable()){
-                writeEntry(new ZipEntry(manifest.getLeft()), manifest.getRight().getInputStream(), output);
-            }
+            writeEntry(new ZipEntry(manifest.getLeft()), manifest.getRight().getInputStream(), output);
         }
     }
 

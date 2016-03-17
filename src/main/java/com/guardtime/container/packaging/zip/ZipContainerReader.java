@@ -28,7 +28,7 @@ class ZipContainerReader {
     private final AnnotationContentHandler annotationContentHandler = new AnnotationContentHandler();
     private final UnknownFileHandler unknownFileHandler = new UnknownFileHandler();
     private final MimeTypeHandler mimeTypeHandler = new MimeTypeHandler();
-    private final ManifestHolder manifestHandler;
+    private final ManifestHandler manifestHandler;
     private final DataManifestHandler dataManifestHandler;
     private final AnnotationsManifestHandler annotationsManifestHandler;
     private final AnnotationManifestHandler annotationManifestHandler;
@@ -41,7 +41,7 @@ class ZipContainerReader {
     private ContentHandler[] handlers;
 
     ZipContainerReader(ContainerManifestFactory manifestFactory, SignatureFactory signatureFactory) {
-        this.manifestHandler = new ManifestHolder(manifestFactory);
+        this.manifestHandler = new ManifestHandler(manifestFactory);
         this.dataManifestHandler = new DataManifestHandler(manifestFactory);
         this.annotationsManifestHandler = new AnnotationsManifestHandler(manifestFactory);
         this.annotationManifestHandler = new AnnotationManifestHandler(manifestFactory);

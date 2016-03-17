@@ -75,7 +75,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     @Override
     public ZipBlockChainContainer create(ZipBlockChainContainer existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
         Util.notNull(existingSignature, "BlockChainContainer");
-        // TODO: Currently not possible in the implementation but should be possible to add signature without adding files.
+        // TODO: Possibility to add signature without adding data files.
         Util.notEmpty(files, "Data files");
         try {
             ContentSigner signer = new ContentSigner(files, annotations, existingSignature.getNameProvider());

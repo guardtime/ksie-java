@@ -1,5 +1,6 @@
 package com.guardtime.container.datafile;
 
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -37,7 +38,10 @@ public class EmptyContainerDocument implements ContainerDocument {
     }
 
     @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
+    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException, DataHashException {
+        if(!hash.getAlgorithm().equals(algorithm)) {
+            throw new DataHashException("Unable to convert pre-generated hash to algorithm '" + algorithm.getName() + "'");
+        }
         return hash;
     }
 

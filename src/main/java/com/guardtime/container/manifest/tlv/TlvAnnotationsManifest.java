@@ -1,7 +1,6 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.InvalidManifestException;
@@ -19,7 +18,7 @@ import java.util.Set;
 
 class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements AnnotationsManifest {
 
-    private static final byte[] MAGIC = "KSIEANMF".getBytes();  // TODO: Verify from spec
+    private static final byte[] MAGIC = "KSIEANMF".getBytes();
 
     private List<TlvAnnotationInfoManifestReference> annotationReferences = new LinkedList<>();
 

@@ -80,9 +80,4 @@ class TlvAnnotationInfoManifest extends AbstractTlvManifestStructure implements 
         return dataManifestReference;
     }
 
-    @Override
-    public boolean isWritable() {
-        return true;
-    }
-
 }

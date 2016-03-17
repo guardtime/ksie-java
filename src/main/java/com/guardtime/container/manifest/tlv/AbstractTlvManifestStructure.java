@@ -8,11 +8,7 @@ import com.guardtime.ksi.tlv.TLVInputStream;
 import com.guardtime.ksi.tlv.TLVParserException;
 import com.guardtime.ksi.tlv.TLVStructure;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -80,7 +76,7 @@ abstract class AbstractTlvManifestStructure {
 
     protected void checkMandatoryElement(TLVStructure structure, String name) throws InvalidManifestException {
         if (structure == null) {
-            throw new InvalidManifestException(name + " is mandatory signature manifest element");
+            throw new InvalidManifestException(name + " is mandatory manifest element");
         }
     }
 
@@ -113,7 +109,10 @@ abstract class AbstractTlvManifestStructure {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AbstractTlvManifestStructure that = (AbstractTlvManifestStructure) o;
-        if (!Arrays.equals(this.magic, that.magic)) return false;
+        if (!Arrays.equals(this.getMagic(), that.getMagic())) return false;
+        if (this.getElements() == null) {
+            return that.getElements() == null;
+        }
         if (that.getElements() == null) return false;
         return this.getElements().equals(that.getElements());
     }
@@ -121,7 +120,7 @@ abstract class AbstractTlvManifestStructure {
     @Override
     public int hashCode() {
         int code = 1;
-        code += Arrays.hashCode(magic);
+        code += Arrays.hashCode(getMagic());
         for (TLVStructure element : getElements()) {
             code += element.hashCode();
         }

@@ -2,6 +2,7 @@ package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.tlv.TlvFileReference;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 
@@ -15,7 +16,7 @@ class TlvDataFileReference extends TlvFileReference {
         super(root);
     }
 
-    public TlvDataFileReference(ContainerDocument document) throws TLVParserException, IOException {
+    public TlvDataFileReference(ContainerDocument document) throws TLVParserException, IOException, DataHashException {
         super(document.getFileName(), document.getDataHash(DEFAULT_HASH_ALGORITHM), document.getMimeType());
     }
 
