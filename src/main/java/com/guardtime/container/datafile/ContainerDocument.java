@@ -1,6 +1,7 @@
 package com.guardtime.container.datafile;
 
 
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
@@ -15,7 +16,7 @@ public interface ContainerDocument {
 
     InputStream getInputStream() throws IOException;
 
-    DataHash getDataHash(HashAlgorithm algorithm) throws IOException;
+    DataHash getDataHash(HashAlgorithm algorithm) throws IOException, DataHashException;
 
     boolean isWritable();
 

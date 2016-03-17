@@ -3,6 +3,7 @@ package com.guardtime.container.manifest.tlv;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.DataFilesManifest;
 import com.guardtime.container.manifest.InvalidManifestException;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVInputStream;
 import com.guardtime.ksi.tlv.TLVParserException;
@@ -14,7 +15,7 @@ import java.util.List;
 
 class TlvDataFilesManifest extends AbstractTlvManifestStructure implements DataFilesManifest {
 
-    private static final byte[] MAGIC = "KSIEDAMF".getBytes();  // TODO: Verify from spec
+    private static final byte[] MAGIC = "KSIEDAMF".getBytes();
 
     private List<TlvDataFileReference> documents = new LinkedList<>();
 
@@ -24,7 +25,7 @@ class TlvDataFilesManifest extends AbstractTlvManifestStructure implements DataF
             for (ContainerDocument doc : documents) {
                 this.documents.add(new TlvDataFileReference(doc));
             }
-        } catch (TLVParserException | IOException e) {
+        } catch (DataHashException | TLVParserException | IOException e) {
             throw new InvalidManifestException("Failed to generate TlvDataFilesManifest", e);
         }
     }

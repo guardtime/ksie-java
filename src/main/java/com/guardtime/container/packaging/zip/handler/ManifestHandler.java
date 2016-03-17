@@ -9,11 +9,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class ManifestHolder extends IndexedContentHandler<SignatureManifest> {
+public class ManifestHandler extends IndexedContentHandler<SignatureManifest> {
 
     private final ContainerManifestFactory manifestFactory;
 
-    public ManifestHolder(ContainerManifestFactory manifestFactory) {
+    public ManifestHandler(ContainerManifestFactory manifestFactory) {
         this.manifestFactory = manifestFactory;
     }
 

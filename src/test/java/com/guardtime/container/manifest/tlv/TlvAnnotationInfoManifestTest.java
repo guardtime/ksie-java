@@ -2,19 +2,13 @@ package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.util.Pair;
-import com.guardtime.container.util.Util;
-import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 
-import static com.guardtime.container.manifest.ContainerManifestMimeType.ANNOTATIONS_MANIFEST;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class TlvAnnotationInfoManifestTest extends AbstractTlvManifestTest {
 
@@ -56,7 +50,7 @@ public class TlvAnnotationInfoManifestTest extends AbstractTlvManifestTest {
     @Test
     public void testReadAnnotationInfoManifestWithoutDataReference() throws Exception {
         expectedException.expect(InvalidManifestException.class);
-        expectedException.expectMessage("Data manifest reference is mandatory signature manifest element");
+        expectedException.expectMessage("Data manifest reference is mandatory manifest element");
         byte[] bytes = join(ANNOTATION_INFO_MANIFEST_MAGIC, annotationReference.getEncoded());
         new TlvAnnotationInfoManifest(new ByteArrayInputStream(bytes));
     }
@@ -64,7 +58,7 @@ public class TlvAnnotationInfoManifestTest extends AbstractTlvManifestTest {
     @Test
     public void testReadAnnotationInfoManifestWithoutAnnotationReference() throws Exception {
         expectedException.expect(InvalidManifestException.class);
-        expectedException.expectMessage("Annotation reference is mandatory signature manifest element");
+        expectedException.expectMessage("Annotation reference is mandatory manifest element");
         byte[] bytes = join(ANNOTATION_INFO_MANIFEST_MAGIC, dataFilesReference.getEncoded());
         new TlvAnnotationInfoManifest(new ByteArrayInputStream(bytes));
     }

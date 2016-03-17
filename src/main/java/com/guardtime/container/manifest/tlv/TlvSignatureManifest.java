@@ -3,7 +3,6 @@ package com.guardtime.container.manifest.tlv;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.manifest.SignatureManifest;
-import com.guardtime.container.signature.SignatureException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
@@ -22,7 +21,7 @@ import static java.util.Arrays.asList;
 //TODO fix reference object
 class TlvSignatureManifest extends AbstractTlvManifestStructure implements SignatureManifest {
 
-    private static final byte[] MAGIC = "KSIEMFST".getBytes();  // TODO: Verify from spec
+    private static final byte[] MAGIC = "KSIEMFST".getBytes();
 
     private TlvDataFilesManifestReference dataFilesManifestReference;
     private TlvSignatureReference signatureReference;
@@ -45,7 +44,7 @@ class TlvSignatureManifest extends AbstractTlvManifestStructure implements Signa
             TLVInputStream inputStream = toTlvInputStream(stream);
             read(inputStream);
         } catch (TLVParserException e) {
-            throw new InvalidManifestException("Failed to parse content of InputStream",e);
+            throw new InvalidManifestException("Failed to parse content of InputStream", e);
         } catch (IOException e) {
             throw new InvalidManifestException("Failed to read InputStream", e);
         }
@@ -55,12 +54,12 @@ class TlvSignatureManifest extends AbstractTlvManifestStructure implements Signa
     }
 
     @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException{
+    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
         return Util.hash(getInputStream(), algorithm);
     }
 
     @Override
-    public FileReference getDataFilesReference() {
+    public FileReference getDataFilesManifestReference() {
         return dataFilesManifestReference;
     }
 

@@ -1,8 +1,6 @@
 package com.guardtime.container.manifest.tlv;
 
-import com.guardtime.container.manifest.ContainerManifestMimeType;
 import com.guardtime.ksi.tlv.TLVElement;
-
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
@@ -15,7 +13,7 @@ public class TlvDataFilesManifestReferenceTest extends AbstractTlvManifestTest {
         TlvDataFilesManifest dataManifest = new TlvDataFilesManifest(asList(TEST_DOCUMENT_HELLO_TEXT));
         TlvDataFilesManifestReference reference = new TlvDataFilesManifestReference(dataManifest, TEST_FILE_NAME_TEST_TXT);
         assertEquals(DATA_MANIFEST_REFERENCE_TYPE, reference.getElementType());
-        assertEquals(ContainerManifestMimeType.DATA_MANIFEST.getType(), getMimeType(reference));
+        assertEquals(DATA_MANIFEST_TYPE, getMimeType(reference));
         assertEquals(TEST_FILE_NAME_TEST_TXT, getUri(reference));
     }
 

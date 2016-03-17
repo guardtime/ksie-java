@@ -8,7 +8,7 @@ abstract class IndexedContentHandler<T> extends ContentHandler<T> {
     private int maxIndex;
 
     @Override
-    public void add(String name, File file){
+    public void add(String name, File file) {
         super.add(name, file);
         updateMaxIndex(name);
     }

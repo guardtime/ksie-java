@@ -3,7 +3,6 @@ package com.guardtime.container.manifest.tlv;
 import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.tlv.TLVElement;
-import com.guardtime.ksi.util.Util;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,10 +36,10 @@ public class TlvSignatureManifestTest extends AbstractTlvManifestTest {
         TlvSignatureManifest manifest = new TlvSignatureManifest(dataManifest, annotationsManifest, signatureReference);
 
         assertArrayEquals(SIGNATURE_MANIFEST_MAGIC, manifest.getMagic());
-        assertNotNull(manifest.getDataFilesReference());
+        assertNotNull(manifest.getDataFilesManifestReference());
         assertNotNull(manifest.getAnnotationsManifestReference());
         assertNotNull(manifest.getSignatureReference());
-        assertEquals(DATAFILES_MANIFEST_URI, manifest.getDataFilesReference().getUri());
+        assertEquals(DATAFILES_MANIFEST_URI, manifest.getDataFilesManifestReference().getUri());
         assertEquals(ANNOTATIONS_MANIFEST_URI, manifest.getAnnotationsManifestReference().getUri());
         assertEquals(SIGNATURE_URI, manifest.getSignatureReference().getUri());
     }
@@ -51,11 +50,11 @@ public class TlvSignatureManifestTest extends AbstractTlvManifestTest {
 
         TlvSignatureManifest manifest = new TlvSignatureManifest(new ByteArrayInputStream(manifestBytes));
         assertArrayEquals(SIGNATURE_MANIFEST_MAGIC, manifest.getMagic());
-        assertNotNull(manifest.getDataFilesReference());
+        assertNotNull(manifest.getDataFilesManifestReference());
         assertNotNull(manifest.getAnnotationsManifestReference());
         assertNotNull(manifest.getSignatureReference());
-        assertEquals(DATAFILES_MANIFEST_URI, manifest.getDataFilesReference().getUri());
-        assertEquals(MIME_TYPE_APPLICATION_TXT, manifest.getDataFilesReference().getMimeType());
+        assertEquals(DATAFILES_MANIFEST_URI, manifest.getDataFilesManifestReference().getUri());
+        assertEquals(MIME_TYPE_APPLICATION_TXT, manifest.getDataFilesManifestReference().getMimeType());
         assertEquals(ANNOTATIONS_MANIFEST_URI, manifest.getAnnotationsManifestReference().getUri());
         assertEquals(ANNOTATION_MANIFEST_TYPE, manifest.getAnnotationsManifestReference().getMimeType());
         assertEquals(SIGNATURE_URI, manifest.getSignatureReference().getUri());

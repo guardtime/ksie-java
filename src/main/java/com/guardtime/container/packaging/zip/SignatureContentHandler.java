@@ -23,14 +23,14 @@ class SignatureContentHandler {
 
     private final DataFileContentHandler documentHandler;
     private final AnnotationContentHandler annotationContentHandler;
-    private final ManifestHolder manifestHandler;
+    private final ManifestHandler manifestHandler;
     private final DataManifestHandler dataManifestHandler;
     private final AnnotationsManifestHandler annotationsManifestHandler;
     private final AnnotationManifestHandler annotationManifestHandler;
     private final SignatureHandler signatureHandler;
 
     public SignatureContentHandler(DataFileContentHandler documentHandler, AnnotationContentHandler annotationContentHandler,
-                                   ManifestHolder manifestHandler, DataManifestHandler dataManifestHandler,
+                                   ManifestHandler manifestHandler, DataManifestHandler dataManifestHandler,
                                    AnnotationsManifestHandler annotationsManifestHandler, AnnotationManifestHandler annotationManifestHandler,
                                    SignatureHandler signatureHandler) {
         this.documentHandler = documentHandler;
@@ -96,7 +96,7 @@ class SignatureContentHandler {
         }
 
         private Pair<String, DataFilesManifest> getDataManifest() {
-            FileReference dataManifestReference = manifest.getRight().getDataFilesReference();
+            FileReference dataManifestReference = manifest.getRight().getDataFilesManifestReference();
             try {
                 return Pair.of(dataManifestReference.getUri(), dataManifestHandler.get(dataManifestReference.getUri()));
             } catch (ContentParsingException e) {

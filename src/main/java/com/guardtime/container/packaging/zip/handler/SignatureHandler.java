@@ -7,7 +7,6 @@ import com.guardtime.container.signature.SignatureFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 public class SignatureHandler extends IndexedContentHandler<ContainerSignature> {
 
