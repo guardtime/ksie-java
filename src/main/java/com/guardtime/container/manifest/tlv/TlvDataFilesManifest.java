@@ -2,9 +2,10 @@ package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.DataFilesManifest;
-import com.guardtime.container.manifest.reference.DataFileReference;
-import com.guardtime.container.manifest.reference.tlv.TlvDataFileReference;
+import com.guardtime.container.manifest.InvalidManifestException;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.ksi.tlv.TLVElement;
+import com.guardtime.ksi.tlv.TLVInputStream;
 import com.guardtime.ksi.tlv.TLVParserException;
 
 import java.io.IOException;
@@ -12,54 +13,52 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-public class TlvDataFilesManifest extends TlvManifestStructure implements DataFilesManifest {
-    private static final byte[] MAGIC = "KSIEDAMF".getBytes();  // TODO: Verify from spec
+class TlvDataFilesManifest extends AbstractTlvManifestStructure implements DataFilesManifest {
+
+    private static final byte[] MAGIC = "KSIEDAMF".getBytes();
+
     private List<TlvDataFileReference> documents = new LinkedList<>();
 
-    public TlvDataFilesManifest(List<ContainerDocument> documents, String uri) throws TLVParserException {
-        super(uri);
-        fillMapFromContainerDocuments(documents);
-    }
-
-    public TlvDataFilesManifest(InputStream stream, String uri) throws TLVParserException {
-        super(uri, stream);
-        fillMapFromTLVElements(parseElementsFromStream(stream));
-    }
-
-    @Override
-    protected byte[] getMagic() {
-        return MAGIC;
-    }
-
-    @Override
-    protected List<TLVElement> getElements() {
-        List<TLVElement> returnable = new LinkedList<>();
-        for (TlvDataFileReference ref : documents) {
-            returnable.add(ref.getRootElement());
-        }
-        return returnable;
-    }
-
-    private void fillMapFromContainerDocuments(List<ContainerDocument> documents) throws TLVParserException {
+    public TlvDataFilesManifest(List<ContainerDocument> documents) throws InvalidManifestException {
+        super(MAGIC);
         try {
             for (ContainerDocument doc : documents) {
-                TlvDataFileReference ref = new TlvDataFileReference(doc);
-                this.documents.add(ref);
+                this.documents.add(new TlvDataFileReference(doc));
             }
-        } catch (IOException e) {
-            throw new TLVParserException("Failed to generate file reference TLVElement", e);
+        } catch (DataHashException | TLVParserException | IOException e) {
+            throw new InvalidManifestException("Failed to generate TlvDataFilesManifest", e);
         }
     }
 
-    protected void fillMapFromTLVElements(List<TLVElement> tlvElements) throws TLVParserException {
-        for (TLVElement element : tlvElements) {
-            TlvDataFileReference ref = new TlvDataFileReference(element);
-            documents.add(ref);
+    public TlvDataFilesManifest(InputStream stream) throws InvalidManifestException {
+        super(MAGIC, stream);
+        try {
+            read(stream);
+        } catch (TLVParserException e) {
+            throw new InvalidManifestException("Failed to parse TlvDataFilesManifest from InputStream", e);
+        } catch (IOException e) {
+            throw new InvalidManifestException("Failed to read InputStream", e);
         }
     }
 
     @Override
-    public List<? extends DataFileReference> getDataFileReferences() {
+    public List<TlvDataFileReference> getDataFileReferences() {
         return documents;
     }
+
+    @Override
+    protected List<TlvDataFileReference> getElements() {
+        return documents;
+    }
+
+    private void read(InputStream stream) throws TLVParserException, IOException {
+        TLVInputStream input = toTlvInputStream(stream);
+        TLVElement element;
+        while (input.hasNextElement()) {
+            element = input.readElement();
+            //TODO unknown elements must be handled correctly
+            documents.add(new TlvDataFileReference(element));
+        }
+    }
+
 }

@@ -1,26 +1,63 @@
 package com.guardtime.container;
 
-import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.annotation.ContainerAnnotationType;
-import com.guardtime.container.annotation.StringContainerAnnotation;
-import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.datafile.StreamContainerDocument;
+import com.guardtime.container.manifest.ContainerManifestFactory;
+import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.BlockChainContainer;
+import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
+import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.signature.SignatureFactoryType;
+import com.guardtime.ksi.hashing.DataHash;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class BlockChainContainerBuilderTest extends AbstractBlockChainContainerTest {
+
+public class BlockChainContainerBuilderTest extends AbstractContainerTest {
 
     @Mock
-    private BlockChainContainer blockChainContainer;
+    private BlockChainContainer mockedContainer;
+
+    @Mock
+    private SignatureFactoryType mockedSignatureFactoryType;
+
+    private ContainerSignature mockedSignature = new ContainerSignature() {
+        //TODO remove
+        @Override
+        public void writeTo(OutputStream output) {
+            try {
+                output.write("TEST-SIGNATURE".getBytes());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    };
+
+    private ZipContainerPackagingFactory packagingFactory;
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        when(mockedSignatureFactory.create(Mockito.any(DataHash.class))).thenReturn(mockedSignature);
+        ContainerManifestFactory manifestFactory = new TlvContainerManifestFactory();
+        when(mockedSignatureFactory.getSignatureFactoryType()).thenReturn(mockedSignatureFactoryType);
+        when(mockedSignatureFactoryType.getSignatureMimeType()).thenReturn("application/ksi-signature");
+        when(mockedSignatureFactoryType.getSignatureFileExtension()).thenReturn("ksi");
+        when(mockedSignatureFactoryType.getName()).thenReturn("Mocked Signature Factory");
+        this.packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, manifestFactory);
+    }
 
     @Test
     public void testCreateBuilder() throws Exception {
@@ -38,7 +75,7 @@ public class BlockChainContainerBuilderTest extends AbstractBlockChainContainerT
     @Test
     public void testAddDocumentToContainer() throws Exception {
         BlockChainContainerBuilder builder = new BlockChainContainerBuilder(mockedPackagingFactory);
-        StreamContainerDocument content = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
+        StreamContainerDocument content = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
         builder.withDataFile(content);
         assertEquals(1, builder.getDocuments().size());
     }
@@ -46,23 +83,21 @@ public class BlockChainContainerBuilderTest extends AbstractBlockChainContainerT
     @Test
     public void testAddAnnotationToContainer() throws Exception {
         BlockChainContainerBuilder builder = new BlockChainContainerBuilder(mockedPackagingFactory);
-        StringContainerAnnotation annotation = new StringContainerAnnotation(ContainerAnnotationType.NON_REMOVABLE, "42", "com.guardtime");
-        builder.withAnnotation(annotation);
+        builder.withAnnotation(MOCKED_ANNOTATION);
         assertEquals(1, builder.getAnnotations().size());
     }
 
     @Test
-    public void testBuildContainer() throws Exception {
-        when(mockedPackagingFactory.create(Mockito.any(BlockChainContainer.class), Mockito.anyListOf(ContainerDocument.class), Mockito.anyListOf(ContainerAnnotation.class))).thenReturn(blockChainContainer);
-        BlockChainContainerBuilder builder = new BlockChainContainerBuilder(mockedPackagingFactory);
+    public void testCreateSignature() throws Exception {
+        BlockChainContainerBuilder builder = new BlockChainContainerBuilder(packagingFactory);
+        builder.withDataFile(TEST_DOCUMENT_HELLO_TEXT);
+        builder.withDataFile(TEST_DOCUMENT_HELLO_PDF);
 
-        BlockChainContainer container = builder.
-                withDataFile(new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)).
-                withAnnotation(new StringContainerAnnotation(ContainerAnnotationType.NON_REMOVABLE, "42", "com.guardtime")).
-                build();
-
+        builder.withAnnotation(MOCKED_ANNOTATION);
+        BlockChainContainer container = builder.build();
         assertNotNull(container);
-        verify(mockedPackagingFactory, ONE_EXECUTION).create(Mockito.any(BlockChainContainer.class), Mockito.anyList(), Mockito.anyList());
+        assertNotNull(container.getSignatureContents());
+        assertFalse(container.getSignatureContents().isEmpty());
     }
 
 }

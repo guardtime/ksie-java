@@ -2,6 +2,7 @@ package com.guardtime.container.signature.ksi;
 
 import com.guardtime.container.signature.SignatureException;
 import com.guardtime.container.signature.SignatureFactory;
+import com.guardtime.container.signature.SignatureFactoryType;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.exceptions.KSIException;
@@ -10,7 +11,9 @@ import com.guardtime.ksi.unisignature.KSISignature;
 
 import java.io.InputStream;
 
-public class KsiSignatureFactory implements SignatureFactory<KsiContainerSignature> {
+public class KsiSignatureFactory implements SignatureFactory {
+
+    private static final KsiSignatureFactoryType SIGNATURE_FACTORY_TYPE = new KsiSignatureFactoryType();
 
     private final KSI ksi;
 
@@ -40,5 +43,10 @@ public class KsiSignatureFactory implements SignatureFactory<KsiContainerSignatu
             throw new SignatureException(e);
         }
     }
-    
+
+    @Override
+    public SignatureFactoryType getSignatureFactoryType() {
+        return SIGNATURE_FACTORY_TYPE;
+    }
+
 }

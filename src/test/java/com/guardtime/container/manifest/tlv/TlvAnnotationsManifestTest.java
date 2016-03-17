@@ -1,30 +1,62 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.ksi.tlv.TLVInputStream;
-import com.guardtime.ksi.tlv.TLVParserException;
-import org.junit.Before;
+import com.guardtime.container.manifest.FileReference;
+import com.guardtime.container.manifest.InvalidManifestException;
+import com.guardtime.container.util.Pair;
+import com.guardtime.ksi.tlv.TLVElement;
+
 import org.junit.Test;
 
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
-    private TlvAnnotationsManifest manifest;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-    @Before
-    public void setupManifest() throws TLVParserException {
-        Map<ContainerAnnotation, TlvAnnotationInfoManifest> map = new HashMap<>();
-        map.put(mockAnnotation, mockAnnotationInfoManifest);
-        this.manifest = new TlvAnnotationsManifest(map, "Non-important-for-test");
+public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
+
+    @Test
+    public void testCreateAnnotationsManifest() throws Exception {
+        Map<String, Pair<ContainerAnnotation, TlvAnnotationInfoManifest>> annotationManifest = new HashMap<>();
+        annotationManifest.put(MOCK_URI, Pair.of(mockAnnotation, mockAnnotationInfoManifest));
+        TlvAnnotationsManifest manifest = new TlvAnnotationsManifest(annotationManifest);
+        assertArrayEquals(ANNOTATIONS_MANIFEST_MAGIC, manifest.getMagic());
+        assertNotNull(manifest.getAnnotationManifestReferences());
+        assertNotNull(manifest.getAnnotationManifestReferences().get(0));
     }
 
     @Test
-    public void testInputStreamTlvElementExistence() throws Exception {
-        InputStream is = manifest.getInputStream();
-        testMagic(is, ANNOTATIONS_MANIFEST_MAGIC);
+    public void testReadAnnotationsManifest() throws Exception {
+        TLVElement annotationsInfoReference = createReference(ANNOTATION_INFO_REFERENCE_TYPE, MOCK_URI, MIME_TYPE_APPLICATION_TXT, dataHash);
+        byte[] bytes = join(ANNOTATIONS_MANIFEST_MAGIC, annotationsInfoReference.getEncoded());
 
-        testTlvElement(new TLVInputStream(is), ANNOTATION_INFO_REFERENCE_TYPE);
+        TlvAnnotationsManifest manifest = new TlvAnnotationsManifest(new ByteArrayInputStream(bytes));
+        assertArrayEquals(ANNOTATIONS_MANIFEST_MAGIC, manifest.getMagic());
+        assertNotNull(manifest.getAnnotationManifestReferences());
+        assertEquals(1, manifest.getAnnotationManifestReferences().size());
+        FileReference annotationsReference = manifest.getAnnotationManifestReferences().get(0);
+        assertEquals(MOCK_URI, annotationsReference.getUri());
+        assertEquals(MIME_TYPE_APPLICATION_TXT, annotationsReference.getMimeType());
+        assertEquals(dataHash, annotationsReference.getHash());
     }
+
+    @Test
+    public void testReadAnnotationsManifestUsingInvalidMagicBytes() throws Exception {
+        expectedException.expect(InvalidManifestException.class);
+        expectedException.expectMessage("Invalid magic for manifest type");
+        new TlvAnnotationsManifest(new ByteArrayInputStream(DATA_FILES_MANIFEST_MAGIC));
+    }
+
+    @Test
+    public void testReadAnnotationsManifestWithoutAnnotationReferences() throws Exception {
+        TlvAnnotationsManifest manifest = new TlvAnnotationsManifest(new ByteArrayInputStream(ANNOTATIONS_MANIFEST_MAGIC));
+        assertArrayEquals(ANNOTATIONS_MANIFEST_MAGIC, manifest.getMagic());
+        assertNotNull(manifest.getAnnotationManifestReferences());
+        assertTrue(manifest.getAnnotationManifestReferences().isEmpty());
+    }
+
 }

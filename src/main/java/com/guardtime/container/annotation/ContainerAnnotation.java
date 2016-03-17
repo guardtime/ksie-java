@@ -10,14 +10,10 @@ public interface ContainerAnnotation {
 
     ContainerAnnotationType getAnnotationType();
 
-    String getMimeType();
-
     String getDomain();
 
-    InputStream getInputStream();
+    InputStream getInputStream() throws IOException;
 
     DataHash getDataHash(HashAlgorithm algorithm) throws IOException;
-
-    String getUri();
 
 }

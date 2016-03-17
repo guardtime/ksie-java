@@ -5,8 +5,10 @@ import java.io.InputStream;
 
 public interface AnnotationInfoManifest {
 
+    AnnotationReference getAnnotationReference();
+
+    FileReference getDataManifestReference();
 
     InputStream getInputStream() throws IOException;
 
-    String getUri();
 }

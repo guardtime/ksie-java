@@ -41,6 +41,10 @@ public final class Util {
         return tempFile;
     }
 
+    public static Integer extractIntegerFrom(String str) {
+        return Integer.parseInt(str.replaceAll("[^0-9]", ""));
+    }
+
     private Util() {
     }
 }

@@ -5,11 +5,13 @@ import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.datafile.FileContainerDocument;
 import com.guardtime.container.datafile.StreamContainerDocument;
 import com.guardtime.container.packaging.BlockChainContainer;
-import com.guardtime.container.packaging.BlockChainContainerPackagingFactory;
+import com.guardtime.container.packaging.ContainerPackagingFactory;
+import com.guardtime.container.packaging.InvalidPackageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,17 +24,13 @@ public class BlockChainContainerBuilder {
 
     private final List<ContainerDocument> documents = new LinkedList<>();
     private final List<ContainerAnnotation> annotations = new LinkedList<>();
-    
-    private final BlockChainContainerPackagingFactory packagingFactory;
+
+    private final ContainerPackagingFactory packagingFactory;
     private BlockChainContainer existingContainer;
 
-    public BlockChainContainerBuilder(BlockChainContainerPackagingFactory packagingFactory) {
+    public BlockChainContainerBuilder(ContainerPackagingFactory packagingFactory) {
         notNull(packagingFactory, "Packaging factory");
         this.packagingFactory = packagingFactory;
-    }
-
-    public BlockChainContainerBuilder withExistingContainer(InputStream input) {
-        return withExistingContainer(packagingFactory.read(input));
     }
 
     public BlockChainContainerBuilder withExistingContainer(BlockChainContainer existingContainer) {
@@ -41,7 +39,7 @@ public class BlockChainContainerBuilder {
     }
 
     public BlockChainContainerBuilder withDataFile(InputStream input, String name, String mimeType) {
-        return withDataFile(new StreamContainerDocument(input, name, mimeType));
+        return withDataFile(new StreamContainerDocument(input, mimeType, name));
     }
 
     public BlockChainContainerBuilder withDataFile(File file, String mimeType) {
@@ -67,7 +65,11 @@ public class BlockChainContainerBuilder {
     }
 
     public BlockChainContainer build() throws BlockChainContainerException {
-        return packagingFactory.create(existingContainer, documents, annotations);
+        if (existingContainer == null) {
+            return packagingFactory.create(documents, annotations);
+        } else {
+            return packagingFactory.create(existingContainer, documents, annotations);
+        }
     }
 
     List<ContainerDocument> getDocuments() {

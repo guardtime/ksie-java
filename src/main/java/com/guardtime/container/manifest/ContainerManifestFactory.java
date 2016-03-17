@@ -1,9 +1,8 @@
 package com.guardtime.container.manifest;
 
-
-import com.guardtime.container.BlockChainContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
+import com.guardtime.container.util.Pair;
 
 import java.io.InputStream;
 import java.util.List;
@@ -11,20 +10,22 @@ import java.util.Map;
 
 public interface ContainerManifestFactory<S extends SignatureManifest, D extends DataFilesManifest, A extends AnnotationsManifest, AI extends AnnotationInfoManifest> {
 
-    S createSignatureManifest(D dataFilesManifest, A annotationManifest, String manifestUri, String signatureURI) throws BlockChainContainerException;
+    S createSignatureManifest(Pair<String, D> dataFilesManifest, Pair<String, A> annotationManifest, Pair<String, String> signatureReference) throws InvalidManifestException;
 
-    D createDataFilesManifest(List<ContainerDocument> files, String manifestUri) throws BlockChainContainerException;
+    D createDataFilesManifest(List<ContainerDocument> files) throws InvalidManifestException;
 
-    A createAnnotationsManifest(Map<ContainerAnnotation, AI> annotationManifests, String manifestUri) throws BlockChainContainerException;
+    A createAnnotationsManifest(Map<String, Pair<ContainerAnnotation, AI>> annotationManifests) throws InvalidManifestException;
 
-    AI createAnnotationManifest(D dataManifest, ContainerAnnotation annotation, String manifestUri) throws BlockChainContainerException;
+    AI createAnnotationManifest(Pair<String, D> dataManifest, Pair<String, ContainerAnnotation> annotation) throws InvalidManifestException;
 
-    S readSignatureManifest(InputStream input, String manifestUri) throws BlockChainContainerException;
+    S readSignatureManifest(InputStream input) throws InvalidManifestException;
 
-    D readDataFilesManifest(InputStream input, String manifestUri) throws BlockChainContainerException;
+    D readDataFilesManifest(InputStream input) throws InvalidManifestException;
 
-    A readAnnotationsManifest(InputStream input, String manifestUri) throws BlockChainContainerException;
+    A readAnnotationsManifest(InputStream input) throws InvalidManifestException;
 
-    AI readAnnotationManifest(InputStream input, String manifestUri) throws BlockChainContainerException;
+    AI readAnnotationManifest(InputStream input) throws InvalidManifestException;
+
+    ManifestFactoryType getManifestFactoryType();
 
 }
