@@ -6,7 +6,7 @@ import com.guardtime.container.verification.result.VerificationResult;
 
 import java.util.List;
 
-public interface SignatureContentRule {
+public interface SignatureContentRule extends Rule{
 
     List<? extends VerificationResult> verify(SignatureContent content, VerificationContext context);
 
@@ -19,6 +19,4 @@ public interface SignatureContentRule {
      * @return - Boolean stating whether running the rule won't provide additional valuable information.
      */
     boolean shouldBeIgnored(SignatureContent content, VerificationContext context);
-
-    RuleState getState();
 }
