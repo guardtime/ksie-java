@@ -1,22 +1,24 @@
 package com.guardtime.container.verification.policy.rule;
 
+import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.result.VerificationResult;
 
 import java.util.List;
 
-public interface VerificationRule {
+public interface SignatureContentRule {
 
-    List<? extends VerificationResult> verify(VerificationContext context);
+    List<? extends VerificationResult> verify(SignatureContent content, VerificationContext context);
 
     /**
      * States if the rule is to be ignored.
      * Convenience method to prevent manually checking against RuleState.IGNORE
      * Also provides the ability to ignore the rule if a previously processed rules result makes it unnecessary
-     * @param previousResults - Results from previously run rules. May be empty.
+     * @param content    Currently verifiable SignatureContent e.g. complete data structure associated with a signature
+     * @param context    Currently verifiable context containing complete container and results of performed rules
      * @return - Boolean stating whether running the rule won't provide additional valuable information.
      */
-    boolean shouldBeIgnored(List<VerificationResult> previousResults);
+    boolean shouldBeIgnored(SignatureContent content, VerificationContext context);
 
     RuleState getState();
 }
