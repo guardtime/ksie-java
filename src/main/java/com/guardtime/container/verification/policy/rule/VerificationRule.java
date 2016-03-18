@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface VerificationRule {
 
-    List<? extends VerificationResult> verify(VerificationContext context);
+    List<VerificationResult> verify(VerificationContext context);
 
     /**
      * States if the rule is to be ignored.
