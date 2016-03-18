@@ -1,6 +1,6 @@
 package com.guardtime.container.verification.result;
 
-import com.guardtime.container.verification.policy.rule.ContainerRule;
+import com.guardtime.container.verification.policy.rule.Rule;
 
 public interface VerificationResult {
 
@@ -8,5 +8,5 @@ public interface VerificationResult {
 
     RuleResult getResult();
 
-    ContainerRule getRule();
+    Rule getRule();
 }

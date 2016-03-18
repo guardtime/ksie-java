@@ -5,7 +5,7 @@ import com.guardtime.container.verification.result.VerificationResult;
 
 import java.util.List;
 
-public interface ContainerRule {
+public interface ContainerRule extends Rule{
 
     List<VerificationResult> verify(VerificationContext context);
 
@@ -17,6 +17,4 @@ public interface ContainerRule {
      * @return - Boolean stating whether running the rule won't provide additional valuable information.
      */
     boolean shouldBeIgnored(List<VerificationResult> previousResults);
-
-    RuleState getState();
 }
