@@ -5,7 +5,7 @@ import com.guardtime.container.verification.result.VerificationResult;
 
 import java.util.List;
 
-public interface VerificationRule {
+public interface ContainerRule {
 
     List<VerificationResult> verify(VerificationContext context);
 
