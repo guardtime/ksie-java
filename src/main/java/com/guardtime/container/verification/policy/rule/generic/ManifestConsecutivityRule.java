@@ -6,6 +6,7 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.context.VerificationContext;
+import com.guardtime.container.verification.policy.rule.ContainerRule;
 import com.guardtime.container.verification.policy.rule.RuleState;
 import com.guardtime.container.verification.policy.rule.VerificationRule;
 import com.guardtime.container.verification.result.GenericVerificationResult;
@@ -15,7 +16,7 @@ import com.guardtime.container.verification.result.VerificationResult;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ManifestConsecutivityRule implements VerificationRule {
+public class ManifestConsecutivityRule implements ContainerRule {
     private final RuleState state;
 
     public ManifestConsecutivityRule() {
