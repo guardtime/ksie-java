@@ -3,8 +3,8 @@ package com.guardtime.container.verification;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.policy.VerificationPolicy;
-import com.guardtime.container.verification.policy.rule.ContainerRule;
-import com.guardtime.container.verification.policy.rule.SignatureContentRule;
+import com.guardtime.container.verification.rule.ContainerRule;
+import com.guardtime.container.verification.rule.SignatureContentRule;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.result.VerifierResult;
 

@@ -13,7 +13,13 @@ import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.policy.RecommendedVerificationPolicy;
 import com.guardtime.container.verification.result.RuleResult;
 import com.guardtime.container.verification.result.VerifierResult;
+import com.guardtime.container.verification.rule.ksi.CalendarBasedSignatureIntegrityRule;
+import com.guardtime.container.verification.rule.zip.MimeTypeIntegrityRule;
+import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.unisignature.KSISignature;
+import com.guardtime.ksi.unisignature.verifier.VerificationResult;
+import com.guardtime.ksi.unisignature.verifier.policies.CalendarBasedVerificationPolicy;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -45,6 +51,12 @@ public class VerifierIT {
     @Mock
     private SignatureFactory mockSignatureFactory;
 
+    @Mock
+    private KSI mockKSI;
+
+    @Mock
+    private VerificationResult mockResult;
+
     private ContainerSignature mockedSignature = new ContainerSignature() {
 
         @Override
@@ -61,8 +73,9 @@ public class VerifierIT {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         when(mockSignatureFactory.getSignatureFactoryType()).thenReturn(new KsiSignatureFactoryType());
-        when(mockSignatureFactory.create(Mockito.any(DataHash.class))).thenReturn(mockedSignature);
         when(mockSignatureFactory.read(Mockito.any(InputStream.class))).thenReturn(mockedSignature);
+        when(mockKSI.read(Mockito.any(byte[].class))).thenReturn(Mockito.mock(KSISignature.class));
+        when(mockKSI.verify(Mockito.any(KSISignature.class), Mockito.any(CalendarBasedVerificationPolicy.class))).thenReturn(mockResult);
         TlvContainerManifestFactory manifestFactory = new TlvContainerManifestFactory();
         factory = new ZipContainerPackagingFactory(mockSignatureFactory, manifestFactory);
     }
@@ -74,9 +87,13 @@ public class VerifierIT {
 
     @Test
     public void testGenericVerification() throws Exception {
+        when(mockResult.isOk()).thenReturn(true);
         BlockChainContainer container = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
         VerificationContext context = new SimpleVerificationContext(container);
-        RecommendedVerificationPolicy policy = new RecommendedVerificationPolicy();
+        RecommendedVerificationPolicy policy = new RecommendedVerificationPolicy.Builder()
+                .withMimeTypeRule(new MimeTypeIntegrityRule())
+                .withSignatureRule(new CalendarBasedSignatureIntegrityRule(mockKSI))
+                .build();
         BlockChainContainerVerifier verifier = new BlockChainContainerVerifier(policy);
         VerifierResult result = verifier.verify(context);
         assertEquals(RuleResult.OK, result.getVerificationResult());

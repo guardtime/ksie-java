@@ -1,4 +1,4 @@
-package com.guardtime.container.verification.policy.rule;
+package com.guardtime.container.verification.rule;
 
 public enum RuleState {
     FAIL("RULE_FAIL"),

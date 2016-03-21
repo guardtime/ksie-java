@@ -1,4 +1,4 @@
-package com.guardtime.container.verification.policy.rule;
+package com.guardtime.container.verification.rule;
 
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.verification.context.VerificationContext;

@@ -1,4 +1,4 @@
-package com.guardtime.container.verification.policy.rule.generic;
+package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.datafile.EmptyContainerDocument;
@@ -8,8 +8,8 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.context.VerificationContext;
-import com.guardtime.container.verification.policy.rule.RuleState;
-import com.guardtime.container.verification.policy.rule.SignatureContentRule;
+import com.guardtime.container.verification.rule.RuleState;
+import com.guardtime.container.verification.rule.SignatureContentRule;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleResult;
 import com.guardtime.container.verification.result.VerificationResult;

@@ -1,6 +1,6 @@
 package com.guardtime.container.verification.result;
 
-import com.guardtime.container.verification.policy.rule.Rule;
+import com.guardtime.container.verification.rule.Rule;
 
 public class GenericVerificationResult implements VerificationResult {
     private final RuleResult result;

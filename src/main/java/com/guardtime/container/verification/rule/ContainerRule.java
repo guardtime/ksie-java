@@ -1,4 +1,4 @@
-package com.guardtime.container.verification.policy.rule;
+package com.guardtime.container.verification.rule;
 
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.result.VerificationResult;
