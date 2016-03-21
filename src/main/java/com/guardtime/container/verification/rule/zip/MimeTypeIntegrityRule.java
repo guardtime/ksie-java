@@ -4,6 +4,7 @@ import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleResult;
+import com.guardtime.container.verification.result.TerminatingVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.ContainerRule;
 import com.guardtime.container.verification.rule.RuleState;
@@ -27,17 +28,17 @@ public class MimeTypeIntegrityRule implements ContainerRule {
 
     @Override
     public List<VerificationResult> verify(VerificationContext context) {
-        RuleResult result = getFailureResult();
         MimeType mimetype = context.getContainer().getMimeType();
+        VerificationResult result = new TerminatingVerificationResult(RuleResult.OK, this, mimetype);
         try {
             byte[] realContent = Util.toByteArray(mimetype.getInputStream());
             if (Arrays.equals(expectedContent, realContent)) {
-                result = RuleResult.OK;
+                result = new GenericVerificationResult(RuleResult.OK, this, mimetype);
             }
         } catch (IOException e) {
             // TODO: Log exception?
         }
-        return Arrays.asList((VerificationResult) new GenericVerificationResult(result, this, context.getContainer().getMimeType()));
+        return Arrays.asList(result);
     }
 
     @Override

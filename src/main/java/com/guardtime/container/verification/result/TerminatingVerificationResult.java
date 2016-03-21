@@ -2,12 +2,12 @@ package com.guardtime.container.verification.result;
 
 import com.guardtime.container.verification.rule.Rule;
 
-public class GenericVerificationResult implements VerificationResult {
+public class TerminatingVerificationResult implements VerificationResult {
     private final RuleResult result;
     private final String rule;
     private final Object tested;
 
-    public GenericVerificationResult(RuleResult result, Rule rule, Object tested) {
+    public TerminatingVerificationResult(RuleResult result, Rule rule, Object tested) {
         this.result = result;
         this.rule = rule.getName();
         this.tested = tested;
@@ -30,6 +30,7 @@ public class GenericVerificationResult implements VerificationResult {
 
     @Override
     public boolean terminatesVerification() {
-        return false;
+        return true;
     }
 }
+

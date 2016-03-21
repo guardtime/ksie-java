@@ -7,4 +7,6 @@ public interface VerificationResult {
     RuleResult getResult();
 
     String getRuleName();
+
+    boolean terminatesVerification();
 }

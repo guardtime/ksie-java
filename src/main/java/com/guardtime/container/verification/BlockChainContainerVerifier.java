@@ -3,14 +3,19 @@ package com.guardtime.container.verification;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.policy.VerificationPolicy;
-import com.guardtime.container.verification.rule.ContainerRule;
-import com.guardtime.container.verification.rule.SignatureContentRule;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.result.VerifierResult;
+import com.guardtime.container.verification.rule.ContainerRule;
+import com.guardtime.container.verification.rule.SignatureContentRule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class BlockChainContainerVerifier {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlockChainContainerVerifier.class);
+
     private VerificationPolicy policy;
 
     public BlockChainContainerVerifier(VerificationPolicy policy) {
@@ -26,33 +31,46 @@ public class BlockChainContainerVerifier {
      * @return VerificationResult based on the updated VerificationContext
      */
     public VerifierResult verify(VerificationContext context) {
-        verifyGeneralRules(context);
-        List<? extends SignatureContent> signatureContents = context.getContainer().getSignatureContents();
-        for (SignatureContent content : signatureContents) {
-            verifySignatureContentRules(content, context);
+        try {
+            verifyGeneralRules(context);
+            List<? extends SignatureContent> signatureContents = context.getContainer().getSignatureContents();
+            for (SignatureContent content : signatureContents) {
+                verifySignatureContentRules(content, context);
+            }
+        } catch (VerificationTerminationException e) {
+            LOGGER.info(e.getMessage());
         }
         return new VerifierResult(context);
     }
 
-    private List<VerificationResult> verifySignatureContentRules(SignatureContent content, VerificationContext context) {
-        List<VerificationResult> results = context.getResults();
-        List<SignatureContentRule> signatureContentRules = policy.getSignatureContentRules();
-        for (SignatureContentRule rule : signatureContentRules) {
-            if (rule.shouldBeIgnored(content, context)) continue;
-            results.addAll(rule.verify(content, context));
-        }
-
-        return results;
-    }
-
-    private List<VerificationResult> verifyGeneralRules(VerificationContext context) {
+    private void verifyGeneralRules(VerificationContext context) throws VerificationTerminationException {
         List<VerificationResult> results = context.getResults();
         List<ContainerRule> generalRules = policy.getGeneralRules();
         for (ContainerRule rule : generalRules) {
             if (rule.shouldBeIgnored(results)) continue;
-            results.addAll(rule.verify(context));
+            List<VerificationResult> verificationResults = rule.verify(context);
+            results.addAll(verificationResults);
+            checkResults(verificationResults);
         }
-        return results;
+    }
+
+    private void verifySignatureContentRules(SignatureContent content, VerificationContext context) throws VerificationTerminationException {
+        List<VerificationResult> results = context.getResults();
+        List<SignatureContentRule> signatureContentRules = policy.getSignatureContentRules();
+        for (SignatureContentRule rule : signatureContentRules) {
+            if (rule.shouldBeIgnored(content, context)) continue;
+            List<? extends VerificationResult> verificationResults = rule.verify(content, context);
+            results.addAll(verificationResults);
+            checkResults(verificationResults);
+        }
+    }
+
+    private void checkResults(List<? extends VerificationResult> verificationResults) throws VerificationTerminationException {
+        for (VerificationResult result : verificationResults) {
+            if (result.terminatesVerification()) {
+                throw new VerificationTerminationException("Rule " + result.getRuleName() + " resulted in verification termination!");
+            }
+        }
     }
 
 }

@@ -33,11 +33,11 @@ public class RecommendedVerificationPolicy implements VerificationPolicy {
     }
 
     public static class Builder {
-        private ContainerRule mimetypeRule;
+        private ContainerRule mimeTypeRule;
         private SignatureContentRule signatureRule;
 
         public Builder withMimeTypeRule(ContainerRule rule) {
-            this.mimetypeRule = rule;
+            this.mimeTypeRule = rule;
             return this;
         }
 
@@ -47,7 +47,7 @@ public class RecommendedVerificationPolicy implements VerificationPolicy {
         }
 
         public RecommendedVerificationPolicy build() {
-            return new RecommendedVerificationPolicy(mimetypeRule, signatureRule);
+            return new RecommendedVerificationPolicy(mimeTypeRule, signatureRule);
         }
     }
 }
