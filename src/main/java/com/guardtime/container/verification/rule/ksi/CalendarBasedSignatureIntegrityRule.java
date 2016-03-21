@@ -20,6 +20,7 @@ import java.util.List;
 
 public class CalendarBasedSignatureIntegrityRule implements SignatureContentRule {
     private final RuleState state;
+    private final String name;
     private final KSI ksi;
 
     public CalendarBasedSignatureIntegrityRule(KSI ksi) {
@@ -29,6 +30,7 @@ public class CalendarBasedSignatureIntegrityRule implements SignatureContentRule
     public CalendarBasedSignatureIntegrityRule(KSI ksi, RuleState state) {
         this.ksi = ksi;
         this.state = state;
+        this.name = "KSIE_VERIFY_MANIFEST_SIGNATURE";
     }
 
     @Override
@@ -46,7 +48,7 @@ public class CalendarBasedSignatureIntegrityRule implements SignatureContentRule
         } catch (KSIException | IOException e) {
             // TODO: log exception ?
         }
-        return Arrays.asList((VerificationResult) new GenericVerificationResult(ruleResult, this, contentSignature));
+        return Arrays.asList((VerificationResult) new GenericVerificationResult(ruleResult, name, contentSignature));
     }
 
     @Override
@@ -54,17 +56,7 @@ public class CalendarBasedSignatureIntegrityRule implements SignatureContentRule
         return state == RuleState.IGNORE;
     }
 
-    @Override
-    public RuleState getState() {
-        return state;
-    }
-
-    @Override
-    public String getName() {
-        return "KSIE_VERIFY_MANIFEST_SIGNATURE";
-    }
-
     private RuleResult getFailureResult() {
-        return getState() == RuleState.WARN ? RuleResult.WARN : RuleResult.NOK;
+        return state == RuleState.WARN ? RuleResult.WARN : RuleResult.NOK;
     }
 }

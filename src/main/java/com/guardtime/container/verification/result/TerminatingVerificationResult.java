@@ -1,15 +1,13 @@
 package com.guardtime.container.verification.result;
 
-import com.guardtime.container.verification.rule.Rule;
-
 public class TerminatingVerificationResult implements VerificationResult {
     private final RuleResult result;
     private final String rule;
     private final Object tested;
 
-    public TerminatingVerificationResult(RuleResult result, Rule rule, Object tested) {
+    public TerminatingVerificationResult(RuleResult result, String rule, Object tested) {
         this.result = result;
-        this.rule = rule.getName();
+        this.rule = rule;
         this.tested = tested;
     }
 

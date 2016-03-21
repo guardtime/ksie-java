@@ -39,13 +39,7 @@ import static org.mockito.Mockito.when;
 
 public class VerifierIT {
 
-    private static final String CONTAINER_WITH_ONE_DOCUMENT = "containers/container-one-file.ksie";
-    private static final String EMPTY_CONTAINER = "containers/container-empty.ksie";
-    private static final String CONTAINER_WITH_EXTRA_FILES = "containers/container-extra-files.ksie";
-    private static final String CONTAINER_WITH_NO_DOCUMENTS = "containers/container-no-documents.ksie";
-    private static final String CONTAINER_WITH_MULTIPLE_ANNOTATIONS = "containers/container-multiple-annotations.ksie";
     private static final String CONTAINER_WITH_MULTIPLE_SIGNATURES = "containers/container-multiple-signatures.ksie";
-    private static final String CONTAINER_WITH_BROKEN_SIGNATURE = "containers/container-broken-signature.ksie";
     private ZipContainerPackagingFactory factory;
 
     @Mock
@@ -80,22 +74,39 @@ public class VerifierIT {
         factory = new ZipContainerPackagingFactory(mockSignatureFactory, manifestFactory);
     }
 
-    private BlockChainContainer getContainer(String containerPath) throws IOException, URISyntaxException, InvalidPackageException {
+    private VerificationContext getVerificationContext(String containerPath) throws IOException, URISyntaxException, InvalidPackageException {
         InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource(containerPath).toURI()));
-        return factory.read(input);
+        BlockChainContainer container = factory.read(input);
+        return new SimpleVerificationContext(container);
     }
 
-    @Test
-    public void testGenericVerification() throws Exception {
-        when(mockResult.isOk()).thenReturn(true);
-        BlockChainContainer container = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
-        VerificationContext context = new SimpleVerificationContext(container);
-        RecommendedVerificationPolicy policy = new RecommendedVerificationPolicy.Builder()
+    private RecommendedVerificationPolicy getRecommendedVerificationPolicy() {
+        return new RecommendedVerificationPolicy.Builder()
                 .withMimeTypeRule(new MimeTypeIntegrityRule())
                 .withSignatureRule(new CalendarBasedSignatureIntegrityRule(mockKSI))
                 .build();
+    }
+
+    private VerifierResult getGenericVerifierResult() throws IOException, URISyntaxException, InvalidPackageException {
+        VerificationContext context = getVerificationContext(CONTAINER_WITH_MULTIPLE_SIGNATURES);
+        RecommendedVerificationPolicy policy = getRecommendedVerificationPolicy();
         BlockChainContainerVerifier verifier = new BlockChainContainerVerifier(policy);
-        VerifierResult result = verifier.verify(context);
+        return verifier.verify(context);
+    }
+
+    @Test
+    public void testGenericVerificationWithValidContainer() throws Exception {
+        when(mockResult.isOk()).thenReturn(true);
+        VerifierResult result = getGenericVerifierResult();
+
         assertEquals(RuleResult.OK, result.getVerificationResult());
+    }
+
+    @Test
+    public void testGenericVerificationWithBrokenContainer() throws Exception {
+        when(mockResult.isOk()).thenReturn(false); // Make it seem like the container is broken
+        VerifierResult result = getGenericVerifierResult();
+
+        assertEquals(RuleResult.NOK, result.getVerificationResult());
     }
 }

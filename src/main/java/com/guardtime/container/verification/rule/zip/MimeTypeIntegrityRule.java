@@ -16,6 +16,7 @@ import java.util.List;
 
 public class MimeTypeIntegrityRule implements ContainerRule {
     private final RuleState state;
+    private final String name;
     private byte[] expectedContent = "application/guardtime.ksie10+zip".getBytes(); // TODO: Set the expected content
 
     public MimeTypeIntegrityRule() {
@@ -24,16 +25,17 @@ public class MimeTypeIntegrityRule implements ContainerRule {
 
     public MimeTypeIntegrityRule(RuleState state) {
         this.state = state;
+        this.name = "KSIE_VERIFY_MIME_TYPE";
     }
 
     @Override
     public List<VerificationResult> verify(VerificationContext context) {
         MimeType mimetype = context.getContainer().getMimeType();
-        VerificationResult result = new TerminatingVerificationResult(RuleResult.OK, this, mimetype);
+        VerificationResult result = new TerminatingVerificationResult(getFailureResult(), name, mimetype);
         try {
             byte[] realContent = Util.toByteArray(mimetype.getInputStream());
             if (Arrays.equals(expectedContent, realContent)) {
-                result = new GenericVerificationResult(RuleResult.OK, this, mimetype);
+                result = new GenericVerificationResult(RuleResult.OK, name, mimetype);
             }
         } catch (IOException e) {
             // TODO: Log exception?
@@ -46,17 +48,7 @@ public class MimeTypeIntegrityRule implements ContainerRule {
         return state == RuleState.IGNORE;
     }
 
-    @Override
-    public RuleState getState() {
-        return state;
-    }
-
-    @Override
-    public String getName() {
-        return "KSIE_VERIFY_MIME_TYPE";
-    }
-
     private RuleResult getFailureResult() {
-        return getState() == RuleState.WARN ? RuleResult.WARN : RuleResult.NOK;
+        return state == RuleState.WARN ? RuleResult.WARN : RuleResult.NOK;
     }
 }

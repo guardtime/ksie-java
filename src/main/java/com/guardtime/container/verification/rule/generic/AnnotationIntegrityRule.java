@@ -22,14 +22,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class AnnotationIntegrityRule implements SignatureContentRule {
+    private final String name;
     private final RuleState state;
 
     public AnnotationIntegrityRule() {
-        state = RuleState.FAIL;
+        this(RuleState.FAIL);
     }
 
     public AnnotationIntegrityRule(RuleState state) {
         this.state = state;
+        this.name = null; // TODO: Look into option of having nested rules or nested policies inside rules or sth and how the naming of such rules should be handled.
     }
 
     @Override
@@ -44,16 +46,6 @@ public class AnnotationIntegrityRule implements SignatureContentRule {
             }
         }
         return false;
-    }
-
-    @Override
-    public RuleState getState() {
-        return state;
-    }
-
-    @Override
-    public String getName() {
-        return null;
     }
 
     @Override
@@ -79,7 +71,7 @@ public class AnnotationIntegrityRule implements SignatureContentRule {
                     // TODO: log exception?
                 }
             }
-            results.add(new GenericVerificationResult(result, this, reference));
+            results.add(new GenericVerificationResult(result, name, reference));
         }
         return results;
     }
@@ -121,7 +113,7 @@ public class AnnotationIntegrityRule implements SignatureContentRule {
     }
 
     private RuleResult getFailureResult() {
-        return getState() == RuleState.WARN ? RuleResult.WARN : RuleResult.NOK;
+        return state == RuleState.WARN ? RuleResult.WARN : RuleResult.NOK;
     }
 
 

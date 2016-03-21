@@ -6,7 +6,7 @@ import com.guardtime.container.verification.result.VerificationResult;
 
 import java.util.List;
 
-public interface SignatureContentRule extends Rule{
+public interface SignatureContentRule {
 
     List<? extends VerificationResult> verify(SignatureContent content, VerificationContext context);
 

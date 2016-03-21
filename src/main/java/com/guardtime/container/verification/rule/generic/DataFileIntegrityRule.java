@@ -20,25 +20,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class DataFileIntegrityRule implements SignatureContentRule {
-
+    private final String name;
     private final RuleState state;
 
     public DataFileIntegrityRule() {
-        state = RuleState.FAIL;
+        this(RuleState.FAIL);
     }
 
     public DataFileIntegrityRule(RuleState state) {
         this.state = state;
-    }
-
-    @Override
-    public RuleState getState() {
-        return state;
-    }
-
-    @Override
-    public String getName() {
-        return null; // TODO: Look into option of having nested rules or nested policies inside rules or sth and how the naming of such rules should be handled.
+        this.name = null; // TODO: Look into option of having nested rules or nested policies inside rules or sth and how the naming of such rules should be handled.
     }
 
     @Override
@@ -62,7 +53,7 @@ public class DataFileIntegrityRule implements SignatureContentRule {
         DataFilesManifest dataFilesManifest = content.getDataManifest().getRight();
         for (FileReference reference : dataFilesManifest.getDataFileReferences()) {
             RuleResult result = verifyReference(content, reference);
-            results.add(new GenericVerificationResult(result, this, reference));
+            results.add(new GenericVerificationResult(result, name, reference));
         }
         return results;
     }
@@ -92,6 +83,6 @@ public class DataFileIntegrityRule implements SignatureContentRule {
     }
 
     private RuleResult getFailureResult() {
-        return getState() == RuleState.WARN ? RuleResult.WARN : RuleResult.NOK;
+        return state == RuleState.WARN ? RuleResult.WARN : RuleResult.NOK;
     }
 }

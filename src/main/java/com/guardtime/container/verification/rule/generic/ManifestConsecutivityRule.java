@@ -16,14 +16,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ManifestConsecutivityRule implements ContainerRule {
+    private final String name;
     private final RuleState state;
 
     public ManifestConsecutivityRule() {
-        state = RuleState.FAIL;
+        this(RuleState.FAIL);
     }
 
     public ManifestConsecutivityRule(RuleState state) {
         this.state = state;
+        this.name = "KSIE_VERIFY_MANIFEST_INDEX";
     }
 
     @Override
@@ -39,7 +41,7 @@ public class ManifestConsecutivityRule implements ContainerRule {
                 result = RuleResult.OK;
             }
             expectedIndex = index + 1;
-            results.add(new GenericVerificationResult(result, this, manifest));
+            results.add(new GenericVerificationResult(result, name, manifest));
         }
         return results;
     }
@@ -49,17 +51,7 @@ public class ManifestConsecutivityRule implements ContainerRule {
         return state == RuleState.IGNORE;
     }
 
-    @Override
-    public RuleState getState() {
-        return state;
-    }
-
-    @Override
-    public String getName() {
-        return "KSIE_VERIFY_MANIFEST_INDEX";
-    }
-
     private RuleResult getFailureResult() {
-        return getState() == RuleState.WARN ? RuleResult.WARN : RuleResult.NOK;
+        return state == RuleState.WARN ? RuleResult.WARN : RuleResult.NOK;
     }
 }
