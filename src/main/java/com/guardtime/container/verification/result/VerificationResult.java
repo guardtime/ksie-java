@@ -1,12 +1,10 @@
 package com.guardtime.container.verification.result;
 
-import com.guardtime.container.verification.policy.rule.Rule;
-
 public interface VerificationResult {
 
-    Object getTested();
+    Object getTested(); // TODO: Rethink this as it may bee to ambiguous at the moment
 
     RuleResult getResult();
 
-    Rule getRule();
+    String getRuleName();
 }

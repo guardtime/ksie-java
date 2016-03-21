@@ -8,7 +8,6 @@ import com.guardtime.container.verification.policy.rule.SignatureContentRule;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.result.VerifierResult;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class BlockChainContainerVerifier {
@@ -27,18 +26,18 @@ public class BlockChainContainerVerifier {
      * @return VerificationResult based on the updated VerificationContext
      */
     public VerifierResult verify(VerificationContext context) {
-        List<VerificationResult> results = context.getResults();
-        results.addAll(verifyGeneralRules(context));
+        verifyGeneralRules(context);
         List<? extends SignatureContent> signatureContents = context.getContainer().getSignatureContents();
         for (SignatureContent content : signatureContents) {
-            results.addAll(verifySignatureContentRules(content, context));
+            verifySignatureContentRules(content, context);
         }
         return new VerifierResult(context);
     }
 
     private List<VerificationResult> verifySignatureContentRules(SignatureContent content, VerificationContext context) {
-        List<VerificationResult> results = new LinkedList<>();
-        for (SignatureContentRule rule : policy.getSignatureContentRules()) {
+        List<VerificationResult> results = context.getResults();
+        List<SignatureContentRule> signatureContentRules = policy.getSignatureContentRules();
+        for (SignatureContentRule rule : signatureContentRules) {
             if (rule.shouldBeIgnored(content, context)) continue;
             results.addAll(rule.verify(content, context));
         }
@@ -47,8 +46,9 @@ public class BlockChainContainerVerifier {
     }
 
     private List<VerificationResult> verifyGeneralRules(VerificationContext context) {
-        List<VerificationResult> results = new LinkedList<>();
-        for (ContainerRule rule : policy.getGeneralRules()) {
+        List<VerificationResult> results = context.getResults();
+        List<ContainerRule> generalRules = policy.getGeneralRules();
+        for (ContainerRule rule : generalRules) {
             if (rule.shouldBeIgnored(results)) continue;
             results.addAll(rule.verify(context));
         }

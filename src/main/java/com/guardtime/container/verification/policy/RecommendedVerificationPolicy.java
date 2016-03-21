@@ -2,7 +2,6 @@ package com.guardtime.container.verification.policy;
 
 import com.guardtime.container.verification.policy.rule.ContainerRule;
 import com.guardtime.container.verification.policy.rule.SignatureContentRule;
-import com.guardtime.container.verification.policy.rule.VerificationRule;
 import com.guardtime.container.verification.policy.rule.generic.*;
 
 import java.util.LinkedList;

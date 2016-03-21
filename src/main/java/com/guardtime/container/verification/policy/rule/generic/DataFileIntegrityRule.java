@@ -4,24 +4,22 @@ import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.datafile.EmptyContainerDocument;
 import com.guardtime.container.manifest.DataFilesManifest;
 import com.guardtime.container.manifest.FileReference;
-import com.guardtime.container.packaging.BlockChainContainer;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.policy.rule.RuleState;
-import com.guardtime.container.verification.policy.rule.VerificationRule;
+import com.guardtime.container.verification.policy.rule.SignatureContentRule;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DataFileIntegrityRule implements VerificationRule {
+public class DataFileIntegrityRule implements SignatureContentRule {
 
     private final RuleState state;
 
@@ -34,29 +32,21 @@ public class DataFileIntegrityRule implements VerificationRule {
     }
 
     @Override
-    public boolean shouldBeIgnored(List<VerificationResult> previousResults) {
-        return state == RuleState.IGNORE;
-    }
-
-    @Override
     public RuleState getState() {
         return state;
     }
 
     @Override
-    public List<VerificationResult> verify(VerificationContext context) {
-        BlockChainContainer container = context.getContainer();
-        List<VerificationResult> results = new LinkedList<>();
-        for (SignatureContent content : container.getSignatureContents()) {
-            if (skipSignatureContent(content, context)) continue;
-            results.addAll(verifySignatureContent(content, context));
-        }
-        return results;
+    public String getName() {
+        return null; // TODO: Look into option of having nested rules or nested policies inside rules or sth and how the naming of such rules should be handled.
     }
 
-    private boolean skipSignatureContent(SignatureContent content, VerificationContext context) {
+    @Override
+    public boolean shouldBeIgnored(SignatureContent content, VerificationContext context) {
+        if (state == RuleState.IGNORE) return true;
+
         Pair<String, DataFilesManifest> dataManifest = content.getDataManifest();
-        if(dataManifest == null) return true;
+        if (dataManifest == null) return true;
         DataFilesManifest dataFilesManifest = dataManifest.getRight();
         for (VerificationResult result : context.getResults()) {
             if (result.getTested().equals(dataFilesManifest)) {
@@ -66,7 +56,8 @@ public class DataFileIntegrityRule implements VerificationRule {
         return false;
     }
 
-    private Collection<? extends VerificationResult> verifySignatureContent(SignatureContent content, VerificationContext context) {
+    @Override
+    public List<VerificationResult> verify(SignatureContent content, VerificationContext context) {
         List<VerificationResult> results = new LinkedList<>();
         DataFilesManifest dataFilesManifest = content.getDataManifest().getRight();
         for (FileReference reference : dataFilesManifest.getDataFileReferences()) {
@@ -80,16 +71,15 @@ public class DataFileIntegrityRule implements VerificationRule {
         try {
             ContainerDocument document = getDocumentForReference(reference, content);
             DataHash referenceHash = reference.getHash();
-            if (document == null
-                    || document instanceof EmptyContainerDocument
-                    || !document.getDataHash(referenceHash.getAlgorithm()).equals(referenceHash)) {
-                return getFailureResult();
+            if (document != null) {
+                if(document instanceof EmptyContainerDocument || document.getDataHash(referenceHash.getAlgorithm()).equals(referenceHash)) {
+                    return RuleResult.OK;
+                }
             }
         } catch (IOException | DataHashException e) {
-            // log exception?
-            return getFailureResult();
+            // TODO: log exception?
         }
-        return RuleResult.OK;
+        return getFailureResult();
     }
 
     private ContainerDocument getDocumentForReference(FileReference reference, SignatureContent content) {
