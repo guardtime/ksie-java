@@ -1,13 +1,13 @@
 package com.guardtime.container.verification.rule;
 
 import com.guardtime.container.verification.context.VerificationContext;
-import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.result.RuleVerificationResult;
 
 import java.util.List;
 
-public interface ContainerRule {
+public interface Rule {
 
-    List<VerificationResult> verify(VerificationContext context);
+    List<RuleVerificationResult> verify(VerificationContext context);
 
     /**
      * States if the rule is to be ignored.
@@ -16,5 +16,5 @@ public interface ContainerRule {
      * @param previousResults - Results from previously run rules. May be empty.
      * @return - Boolean stating whether running the rule won't provide additional valuable information.
      */
-    boolean shouldBeIgnored(List<VerificationResult> previousResults);
+    boolean shouldBeIgnored(List<RuleVerificationResult> previousResults);
 }

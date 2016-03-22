@@ -11,16 +11,17 @@ public class VerifierResult {
         this.context = context;
     }
 
-    public List<VerificationResult> getResults() {
+    public List<RuleVerificationResult> getResults() {
         return context.getResults();
     }
 
     public RuleResult getVerificationResult() {
         RuleResult returnable = RuleResult.OK;
-        for(VerificationResult result : getResults()) {
+        for(RuleVerificationResult result : getResults()) {
             RuleResult ruleResult = result.getResult();
             if(ruleResult.isMoreImportant(returnable)) {
                 returnable = ruleResult;
+                if(returnable == RuleResult.NOK) break; // No need to check once max failure level reached
             }
         }
         return returnable;

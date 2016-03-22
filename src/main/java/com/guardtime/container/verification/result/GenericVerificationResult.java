@@ -1,6 +1,6 @@
 package com.guardtime.container.verification.result;
 
-public class GenericVerificationResult implements VerificationResult {
+public class GenericVerificationResult implements RuleVerificationResult {
     private final RuleResult result;
     private final String rule;
     private final Object tested;
@@ -12,7 +12,7 @@ public class GenericVerificationResult implements VerificationResult {
     }
 
     @Override
-    public Object getTested() {
+    public Object getTested() { // TODO: Improve as Object is too dangerous and ambiguous
         return tested;
     }
 

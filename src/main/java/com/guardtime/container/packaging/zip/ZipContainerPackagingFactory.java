@@ -67,7 +67,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
         }
     }
 
-    private byte[] getMimeTypeContent() {
+    public byte[] getMimeTypeContent() {
         // TODO: Append manifest type?
         return CONTAINER_MIME_TYPE.getBytes(Charset.forName("UTF-8"));
     }

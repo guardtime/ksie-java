@@ -5,32 +5,30 @@ import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.context.VerificationContext;
-import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.container.verification.rule.SignatureContentRule;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleResult;
-import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class AnnotationsManifestIntegrityRule implements SignatureContentRule {
+public class AnnotationsManifestIntegrityRule extends SignatureContentRule {
     private final String name;
-    private final RuleState state;
 
     public AnnotationsManifestIntegrityRule() {
         this(RuleState.FAIL);
     }
 
     public AnnotationsManifestIntegrityRule(RuleState state) {
-        this.state = state;
+        super(state);
         this.name = "KSIE_VERIFY_ANNOTATIONS_MANIFEST";
     }
 
     @Override
-    public List<VerificationResult> verify(SignatureContent content, VerificationContext context) {
+    protected List<RuleVerificationResult> verifySignatureContent(SignatureContent content, VerificationContext context) {
         RuleResult result = getFailureResult();
         FileReference annotationsManifestReference = content.getSignatureManifest().getRight().getAnnotationsManifestReference();
         try {
@@ -43,15 +41,7 @@ public class AnnotationsManifestIntegrityRule implements SignatureContentRule {
         } catch (NullPointerException | IOException e) {
             // TODO: log exception?
         }
-        return Arrays.asList((VerificationResult) new GenericVerificationResult(result, name, annotationsManifestReference));
+        return Arrays.asList((RuleVerificationResult) new GenericVerificationResult(result, name, annotationsManifestReference));
     }
 
-    @Override
-    public boolean shouldBeIgnored(SignatureContent content, VerificationContext context) {
-        return state == RuleState.IGNORE;
-    }
-
-    private RuleResult getFailureResult() {
-        return state == RuleState.WARN ? RuleResult.WARN : RuleResult.NOK;
-    }
 }

@@ -7,19 +7,20 @@ import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.ksi.KsiSignatureFactoryType;
-import com.guardtime.container.verification.BlockChainContainerVerifier;
+import com.guardtime.container.verification.ContainerVerifier;
 import com.guardtime.container.verification.context.SimpleVerificationContext;
 import com.guardtime.container.verification.context.VerificationContext;
-import com.guardtime.container.verification.policy.RecommendedVerificationPolicy;
+import com.guardtime.container.verification.policy.DefaultVerificationPolicy;
 import com.guardtime.container.verification.result.RuleResult;
 import com.guardtime.container.verification.result.VerifierResult;
-import com.guardtime.container.verification.rule.ksi.CalendarBasedSignatureIntegrityRule;
-import com.guardtime.container.verification.rule.zip.MimeTypeIntegrityRule;
+import com.guardtime.container.verification.rule.Rule;
+import com.guardtime.container.verification.rule.generic.MimeTypeIntegrityRule;
+import com.guardtime.container.verification.rule.ksi.KsiPolicyBasedSignatureIntegrityRule;
 import com.guardtime.ksi.KSI;
-import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.verifier.VerificationResult;
 import com.guardtime.ksi.unisignature.verifier.policies.CalendarBasedVerificationPolicy;
+import com.guardtime.ksi.unisignature.verifier.policies.KeyBasedVerificationPolicy;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -32,9 +33,9 @@ import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 public class VerifierIT {
@@ -80,17 +81,17 @@ public class VerifierIT {
         return new SimpleVerificationContext(container);
     }
 
-    private RecommendedVerificationPolicy getRecommendedVerificationPolicy() {
-        return new RecommendedVerificationPolicy.Builder()
-                .withMimeTypeRule(new MimeTypeIntegrityRule())
-                .withSignatureRule(new CalendarBasedSignatureIntegrityRule(mockKSI))
-                .build();
+    private DefaultVerificationPolicy getRecommendedVerificationPolicy() {
+        return new DefaultVerificationPolicy(Arrays.asList((Rule)
+                new MimeTypeIntegrityRule(factory),
+                new KsiPolicyBasedSignatureIntegrityRule(mockKSI, new KeyBasedVerificationPolicy())
+        ));
     }
 
     private VerifierResult getGenericVerifierResult() throws IOException, URISyntaxException, InvalidPackageException {
         VerificationContext context = getVerificationContext(CONTAINER_WITH_MULTIPLE_SIGNATURES);
-        RecommendedVerificationPolicy policy = getRecommendedVerificationPolicy();
-        BlockChainContainerVerifier verifier = new BlockChainContainerVerifier(policy);
+        DefaultVerificationPolicy policy = getRecommendedVerificationPolicy();
+        ContainerVerifier verifier = new ContainerVerifier(policy);
         return verifier.verify(context);
     }
 

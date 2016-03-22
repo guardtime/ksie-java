@@ -1,6 +1,6 @@
 package com.guardtime.container.verification.result;
 
-public interface VerificationResult {
+public interface RuleVerificationResult {
 
     Object getTested(); // TODO: Rethink this as it may bee to ambiguous at the moment
 

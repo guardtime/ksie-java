@@ -1,6 +1,6 @@
 package com.guardtime.container.verification.result;
 
-public class TerminatingVerificationResult implements VerificationResult {
+public class TerminatingVerificationResult implements RuleVerificationResult {
     private final RuleResult result;
     private final String rule;
     private final Object tested;

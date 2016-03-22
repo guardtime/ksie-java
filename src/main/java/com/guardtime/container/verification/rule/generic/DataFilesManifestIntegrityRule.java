@@ -6,33 +6,31 @@ import com.guardtime.container.manifest.SignatureManifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.context.VerificationContext;
-import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.container.verification.rule.SignatureContentRule;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleResult;
-import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DataFilesManifestIntegrityRule implements SignatureContentRule {
+public class DataFilesManifestIntegrityRule extends SignatureContentRule {
     private final String name;
-    private final RuleState state;
 
     public DataFilesManifestIntegrityRule() {
         this(RuleState.FAIL);
     }
 
     public DataFilesManifestIntegrityRule(RuleState state) {
-        this.state = state;
+        super(state);
         this.name = "KSIE_VERIFY_DATA_FILES_MANIFEST";
     }
 
     @Override
-    public List<VerificationResult> verify(SignatureContent content, VerificationContext context) {
-        List<VerificationResult> results = new LinkedList<>();
+    protected List<RuleVerificationResult> verifySignatureContent(SignatureContent content, VerificationContext context) {
+        List<RuleVerificationResult> results = new LinkedList<>();
         RuleResult result = getFailureResult();
         FileReference dataFilesManifestReference = content.getSignatureManifest().getRight().getDataFilesManifestReference();
         try {
@@ -49,17 +47,9 @@ public class DataFilesManifestIntegrityRule implements SignatureContentRule {
         return results;
     }
 
+
     private DataHash getDataHashFromSignatureManifest(SignatureContent content) {
         SignatureManifest manifest = content.getSignatureManifest().getRight();
         return manifest.getDataFilesManifestReference().getHash();
-    }
-
-    @Override
-    public boolean shouldBeIgnored(SignatureContent content, VerificationContext context) {
-        return state == RuleState.IGNORE;
-    }
-
-    private RuleResult getFailureResult() {
-        return state == RuleState.WARN ? RuleResult.WARN : RuleResult.NOK;
     }
 }

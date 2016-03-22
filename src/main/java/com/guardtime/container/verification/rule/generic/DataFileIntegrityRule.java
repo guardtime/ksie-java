@@ -8,48 +8,32 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.context.VerificationContext;
-import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.container.verification.rule.SignatureContentRule;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleResult;
-import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DataFileIntegrityRule implements SignatureContentRule {
+public class DataFileIntegrityRule extends SignatureContentRule {
     private final String name;
-    private final RuleState state;
 
     public DataFileIntegrityRule() {
         this(RuleState.FAIL);
     }
 
     public DataFileIntegrityRule(RuleState state) {
-        this.state = state;
+        super(state);
         this.name = null; // TODO: Look into option of having nested rules or nested policies inside rules or sth and how the naming of such rules should be handled.
     }
 
     @Override
-    public boolean shouldBeIgnored(SignatureContent content, VerificationContext context) {
-        if (state == RuleState.IGNORE) return true;
-
-        Pair<String, DataFilesManifest> dataManifest = content.getDataManifest();
-        if (dataManifest == null) return true;
-        DataFilesManifest dataFilesManifest = dataManifest.getRight();
-        for (VerificationResult result : context.getResults()) {
-            if (result.getTested().equals(dataFilesManifest)) {
-                return result.getResult() == RuleResult.NOK;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public List<VerificationResult> verify(SignatureContent content, VerificationContext context) {
-        List<VerificationResult> results = new LinkedList<>();
+    protected List<RuleVerificationResult> verifySignatureContent(SignatureContent content, VerificationContext context) {
+        List<RuleVerificationResult> results = new LinkedList<>();
+        if (shouldIgnoreContent(content, context)) return results;
         DataFilesManifest dataFilesManifest = content.getDataManifest().getRight();
         for (FileReference reference : dataFilesManifest.getDataFileReferences()) {
             RuleResult result = verifyReference(content, reference);
@@ -58,12 +42,24 @@ public class DataFileIntegrityRule implements SignatureContentRule {
         return results;
     }
 
+    private boolean shouldIgnoreContent(SignatureContent content, VerificationContext context) {
+        Pair<String, DataFilesManifest> dataManifest = content.getDataManifest();
+        if (dataManifest == null) return true;
+        DataFilesManifest dataFilesManifest = dataManifest.getRight();
+        for (RuleVerificationResult result : context.getResults()) {
+            if (result.getTested().equals(dataFilesManifest)) {
+                return result.getResult() == RuleResult.NOK;
+            }
+        }
+        return false;
+    }
+
     private RuleResult verifyReference(SignatureContent content, FileReference reference) {
         try {
             ContainerDocument document = getDocumentForReference(reference, content);
             DataHash referenceHash = reference.getHash();
             if (document != null) {
-                if(document instanceof EmptyContainerDocument || document.getDataHash(referenceHash.getAlgorithm()).equals(referenceHash)) {
+                if (document instanceof EmptyContainerDocument || document.getDataHash(referenceHash.getAlgorithm()).equals(referenceHash)) {
                     return RuleResult.OK;
                 }
             }
@@ -80,9 +76,5 @@ public class DataFileIntegrityRule implements SignatureContentRule {
             }
         }
         return null;
-    }
-
-    private RuleResult getFailureResult() {
-        return state == RuleState.WARN ? RuleResult.WARN : RuleResult.NOK;
     }
 }

@@ -10,37 +10,32 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.context.VerificationContext;
-import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.container.verification.rule.SignatureContentRule;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleResult;
-import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class AnnotationIntegrityRule implements SignatureContentRule {
+public class AnnotationIntegrityRule extends SignatureContentRule {
     private final String name;
-    private final RuleState state;
 
     public AnnotationIntegrityRule() {
         this(RuleState.FAIL);
     }
 
     public AnnotationIntegrityRule(RuleState state) {
-        this.state = state;
+        super(state);
         this.name = null; // TODO: Look into option of having nested rules or nested policies inside rules or sth and how the naming of such rules should be handled.
     }
 
-    @Override
-    public boolean shouldBeIgnored(SignatureContent content, VerificationContext context) {
-        if (state == RuleState.IGNORE) return true;
-
+    public boolean shouldIgnoredContent(SignatureContent content, VerificationContext context) {
         SignatureManifest signatureManifest = content.getSignatureManifest().getRight();
         FileReference annotationsManifestReference = signatureManifest.getAnnotationsManifestReference();
-        for (VerificationResult result : context.getResults()) {
+        for (RuleVerificationResult result : context.getResults()) {
             if (result.getTested().equals(annotationsManifestReference)) {
                 return result.getResult() == RuleResult.NOK;
             }
@@ -49,8 +44,9 @@ public class AnnotationIntegrityRule implements SignatureContentRule {
     }
 
     @Override
-    public List<VerificationResult> verify(SignatureContent content, VerificationContext context) {
-        List<VerificationResult> results = new LinkedList<>();
+    protected List<RuleVerificationResult> verifySignatureContent(SignatureContent content, VerificationContext context) {
+        List<RuleVerificationResult> results = new LinkedList<>();
+        if (shouldIgnoredContent(content, context)) return results;
         AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
 
         for (FileReference reference : annotationsManifest.getAnnotationManifestReferences()) {
@@ -110,10 +106,6 @@ public class AnnotationIntegrityRule implements SignatureContentRule {
             }
         }
         return null;
-    }
-
-    private RuleResult getFailureResult() {
-        return state == RuleState.WARN ? RuleResult.WARN : RuleResult.NOK;
     }
 
 
