@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MimeTypeIntegrityRule extends GenericRule {
-    private final String name;
+    private static final String KSIE_VERIFY_MIME_TYPE = "KSIE_VERIFY_MIME_TYPE";
     private final byte[] expectedContent;
 
     public MimeTypeIntegrityRule(ContainerPackagingFactory factory) {
@@ -24,18 +24,17 @@ public class MimeTypeIntegrityRule extends GenericRule {
 
     public MimeTypeIntegrityRule(RuleState state, ContainerPackagingFactory factory) {
         super(state);
-        this.name = "KSIE_VERIFY_MIME_TYPE";
         this.expectedContent = factory.getMimeTypeContent();
     }
 
     @Override
     public List<RuleVerificationResult> verify(VerificationContext context) {
         MimeType mimetype = context.getContainer().getMimeType();
-        RuleVerificationResult result = new TerminatingVerificationResult(getFailureResult(), name, mimetype);
+        RuleVerificationResult result = new TerminatingVerificationResult(getFailureResult(), KSIE_VERIFY_MIME_TYPE, mimetype);
         try {
             byte[] realContent = Util.toByteArray(mimetype.getInputStream());
             if (Arrays.equals(expectedContent, realContent)) {
-                result = new GenericVerificationResult(RuleResult.OK, name, mimetype);
+                result = new GenericVerificationResult(RuleResult.OK, KSIE_VERIFY_MIME_TYPE, mimetype);
             }
         } catch (IOException e) {
             // TODO: Log exception?

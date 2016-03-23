@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class DefaultVerificationPolicy implements VerificationPolicy {
-    private List<Rule> rules = new LinkedList<>();
+    private List<Rule> rules = new LinkedList<>(); // TODO: Make into map of string(rule name) and rule. This will allow overriding same rules with rules that have different parameters
 
     public DefaultVerificationPolicy(List<Rule> extraRules) {
         rules.add(new ManifestConsecutivityRule());

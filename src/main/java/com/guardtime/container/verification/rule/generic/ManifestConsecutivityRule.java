@@ -6,16 +6,17 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.context.VerificationContext;
-import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleResult;
+import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.rule.RuleState;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class ManifestConsecutivityRule extends GenericRule {
-    private final String name;
+
+    private static final String KSIE_VERIFY_MANIFEST_INDEX = "KSIE_VERIFY_MANIFEST_INDEX";
 
     public ManifestConsecutivityRule() {
         this(RuleState.FAIL);
@@ -23,7 +24,6 @@ public class ManifestConsecutivityRule extends GenericRule {
 
     public ManifestConsecutivityRule(RuleState state) {
         super(state);
-        this.name = "KSIE_VERIFY_MANIFEST_INDEX";
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ManifestConsecutivityRule extends GenericRule {
                 result = RuleResult.OK;
             }
             expectedIndex = index + 1;
-            results.add(new GenericVerificationResult(result, name, manifest));
+            results.add(new GenericVerificationResult(result, KSIE_VERIFY_MANIFEST_INDEX, manifest));
         }
         return results;
     }

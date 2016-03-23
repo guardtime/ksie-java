@@ -19,7 +19,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class DataFileIntegrityRule extends SignatureContentRule {
-    private final String name;
+
+    private static final String KSIE_VERIFY_DATA_FILE = "KSIE_VERIFY_DATA_FILE";
 
     public DataFileIntegrityRule() {
         this(RuleState.FAIL);
@@ -27,7 +28,6 @@ public class DataFileIntegrityRule extends SignatureContentRule {
 
     public DataFileIntegrityRule(RuleState state) {
         super(state);
-        this.name = null; // TODO: Look into option of having nested rules or nested policies inside rules or sth and how the naming of such rules should be handled.
     }
 
     @Override
@@ -37,7 +37,7 @@ public class DataFileIntegrityRule extends SignatureContentRule {
         DataFilesManifest dataFilesManifest = content.getDataManifest().getRight();
         for (FileReference reference : dataFilesManifest.getDataFileReferences()) {
             RuleResult result = verifyReference(content, reference);
-            results.add(new GenericVerificationResult(result, name, reference));
+            results.add(new GenericVerificationResult(result, KSIE_VERIFY_DATA_FILE, reference));
         }
         return results;
     }
@@ -48,7 +48,7 @@ public class DataFileIntegrityRule extends SignatureContentRule {
         DataFilesManifest dataFilesManifest = dataManifest.getRight();
         for (RuleVerificationResult result : context.getResults()) {
             if (result.getTested().equals(dataFilesManifest)) {
-                return result.getResult() == RuleResult.NOK;
+                return RuleResult.NOK.equals(result.getResult());
             }
         }
         return false;
@@ -58,12 +58,10 @@ public class DataFileIntegrityRule extends SignatureContentRule {
         try {
             ContainerDocument document = getDocumentForReference(reference, content);
             DataHash referenceHash = reference.getHash();
-            if (document != null) {
-                if (document instanceof EmptyContainerDocument || document.getDataHash(referenceHash.getAlgorithm()).equals(referenceHash)) {
-                    return RuleResult.OK;
-                }
+            if (document.getDataHash(referenceHash.getAlgorithm()).equals(referenceHash)) {
+                return RuleResult.OK;
             }
-        } catch (IOException | DataHashException e) {
+        } catch (NullPointerException | IOException | DataHashException e) {
             // TODO: log exception?
         }
         return getFailureResult();
@@ -72,7 +70,10 @@ public class DataFileIntegrityRule extends SignatureContentRule {
     private ContainerDocument getDocumentForReference(FileReference reference, SignatureContent content) {
         for (ContainerDocument document : content.getDocuments()) {
             if (reference.getUri().equals(document.getFileName())) {
-                return document;
+                if(document.isWritable()) {
+                    return document;
+                }
+                break;
             }
         }
         return null;

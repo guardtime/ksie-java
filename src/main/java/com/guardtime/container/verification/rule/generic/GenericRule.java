@@ -16,10 +16,10 @@ public abstract class GenericRule implements Rule {
 
     @Override
     public boolean shouldBeIgnored(List<RuleVerificationResult> previousResults) {
-        return state == RuleState.IGNORE;
+        return RuleState.IGNORE.equals(state);
     }
 
     protected RuleResult getFailureResult() {
-        return state == RuleState.WARN ? RuleResult.WARN : RuleResult.NOK;
+        return RuleState.WARN.equals(state) ? RuleResult.WARN : RuleResult.NOK;
     }
 }

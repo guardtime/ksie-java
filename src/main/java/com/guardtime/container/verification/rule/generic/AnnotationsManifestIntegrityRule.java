@@ -16,7 +16,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class AnnotationsManifestIntegrityRule extends SignatureContentRule {
-    private final String name;
+
+    private static final String KSIE_VERIFY_ANNOTATIONS_MANIFEST = "KSIE_VERIFY_ANNOTATIONS_MANIFEST";
 
     public AnnotationsManifestIntegrityRule() {
         this(RuleState.FAIL);
@@ -24,7 +25,6 @@ public class AnnotationsManifestIntegrityRule extends SignatureContentRule {
 
     public AnnotationsManifestIntegrityRule(RuleState state) {
         super(state);
-        this.name = "KSIE_VERIFY_ANNOTATIONS_MANIFEST";
     }
 
     @Override
@@ -41,7 +41,7 @@ public class AnnotationsManifestIntegrityRule extends SignatureContentRule {
         } catch (NullPointerException | IOException e) {
             // TODO: log exception?
         }
-        return Arrays.asList((RuleVerificationResult) new GenericVerificationResult(result, name, annotationsManifestReference));
+        return Arrays.asList((RuleVerificationResult) new GenericVerificationResult(result, KSIE_VERIFY_ANNOTATIONS_MANIFEST, annotationsManifestReference));
     }
 
 }

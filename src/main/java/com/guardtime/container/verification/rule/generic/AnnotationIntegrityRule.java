@@ -21,7 +21,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class AnnotationIntegrityRule extends SignatureContentRule {
-    private final String name;
+
+    private static final String KSIE_VERIFY_ANNOTATION_DATA = "KSIE_VERIFY_ANNOTATION_DATA";
+    private static final String KSIE_VERIFY_ANNOTATION_MANIFEST = "KSIE_VERIFY_ANNOTATION_MANIFEST";
 
     public AnnotationIntegrityRule() {
         this(RuleState.FAIL);
@@ -29,7 +31,6 @@ public class AnnotationIntegrityRule extends SignatureContentRule {
 
     public AnnotationIntegrityRule(RuleState state) {
         super(state);
-        this.name = null; // TODO: Look into option of having nested rules or nested policies inside rules or sth and how the naming of such rules should be handled.
     }
 
     public boolean shouldIgnoredContent(SignatureContent content, VerificationContext context) {
@@ -37,7 +38,7 @@ public class AnnotationIntegrityRule extends SignatureContentRule {
         FileReference annotationsManifestReference = signatureManifest.getAnnotationsManifestReference();
         for (RuleVerificationResult result : context.getResults()) {
             if (result.getTested().equals(annotationsManifestReference)) {
-                return result.getResult() == RuleResult.NOK;
+                return RuleResult.NOK.equals(result.getResult());
             }
         }
         return false;
@@ -47,54 +48,57 @@ public class AnnotationIntegrityRule extends SignatureContentRule {
     protected List<RuleVerificationResult> verifySignatureContent(SignatureContent content, VerificationContext context) {
         List<RuleVerificationResult> results = new LinkedList<>();
         if (shouldIgnoredContent(content, context)) return results;
-        AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
 
+        AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
         for (FileReference reference : annotationsManifest.getAnnotationManifestReferences()) {
-            RuleResult result = getFailureResult(); //RuleResult.OK;
             AnnotationInfoManifest annotationInfoManifest = getAnnotationInfoManifestForReference(reference, content);
-            if (annotationInfoManifest == null) {
-                result = getMissingManifestResult(reference);
-            } else {
-                try {
-                    DataHash expectedDataHash = reference.getHash();
-                    DataHash realDataHash = Util.hash(annotationInfoManifest.getInputStream(), expectedDataHash.getAlgorithm());
-                    if (realDataHash.equals(expectedDataHash)) {
-                        result = RuleResult.OK;
-                    } else {
-                        result = verifyAnnotation(reference, annotationInfoManifest, content);
-                    }
-                } catch (IOException e) {
-                    // TODO: log exception?
-                }
+            RuleResult result = getAnnotationManifestResult(reference, annotationInfoManifest);
+            results.add(new GenericVerificationResult(result, KSIE_VERIFY_ANNOTATION_MANIFEST, reference));
+            if (RuleResult.OK.equals(result)) {
+                // Manifest was OK, need to verify data
+                results.add(verifyAnnotation(reference, annotationInfoManifest, content));
             }
-            results.add(new GenericVerificationResult(result, name, reference));
         }
         return results;
     }
 
-    private RuleResult verifyAnnotation(FileReference reference, AnnotationInfoManifest annotationInfoManifest, SignatureContent content) {
+    private RuleResult getAnnotationManifestResult(FileReference reference, AnnotationInfoManifest annotationInfoManifest) {
         RuleResult result = getFailureResult();
         try {
-            ContainerAnnotation annotation = getAnnotationForManifest(annotationInfoManifest, content);
-            if (annotation == null) {
-                result = getMissingAnnotationResult(reference);
-            } else {
-                DataHash expextedDataHash = annotationInfoManifest.getDataManifestReference().getHash();
-                DataHash realDataHash = annotation.getDataHash(expextedDataHash.getAlgorithm());
-                if (realDataHash.equals(expextedDataHash)) {
-                    result = RuleResult.OK;
-                }
+            DataHash expectedDataHash = reference.getHash();
+            DataHash realDataHash = Util.hash(annotationInfoManifest.getInputStream(), expectedDataHash.getAlgorithm());
+            if (realDataHash.equals(expectedDataHash)) {
+                result = RuleResult.OK;
             }
         } catch (IOException e) {
             // TODO: log exception?
+            result = getMissingManifestResult(reference);
         }
         return result;
+    }
+
+    private RuleVerificationResult verifyAnnotation(FileReference reference, AnnotationInfoManifest annotationInfoManifest, SignatureContent content) {
+        RuleResult result = getFailureResult();
+        try {
+            ContainerAnnotation annotation = getAnnotationForManifest(annotationInfoManifest, content);
+            DataHash expextedDataHash = annotationInfoManifest.getAnnotationReference().getHash();
+            DataHash realDataHash = annotation.getDataHash(expextedDataHash.getAlgorithm());
+            if (realDataHash.equals(expextedDataHash)) {
+                result = RuleResult.OK;
+            }
+        } catch (NullPointerException | IOException e) {
+            // TODO: log exception?
+            result = getMissingAnnotationResult(reference);
+        }
+        return new GenericVerificationResult(result, KSIE_VERIFY_ANNOTATION_DATA, reference);
     }
 
     private ContainerAnnotation getAnnotationForManifest(AnnotationInfoManifest annotationInfoManifest, SignatureContent content) {
         String annotationUri = annotationInfoManifest.getAnnotationReference().getUri();
         for (Pair<String, ContainerAnnotation> annotation : content.getAnnotations()) {
-            if (annotationUri.equals(annotation.getLeft())) return annotation.getRight();
+            if (annotationUri.equals(annotation.getLeft())) {
+                return annotation.getRight();
+            }
         }
         return null;
     }
@@ -111,13 +115,13 @@ public class AnnotationIntegrityRule extends SignatureContentRule {
 
     private RuleResult getMissingManifestResult(FileReference reference) {
         ContainerAnnotationType type = ContainerAnnotationType.fromContent(reference.getMimeType());
-        if (type == ContainerAnnotationType.FULLY_REMOVABLE) return RuleResult.OK;
+        if (ContainerAnnotationType.FULLY_REMOVABLE.equals(type)) return RuleResult.OK;
         return getFailureResult();
     }
 
     private RuleResult getMissingAnnotationResult(FileReference reference) {
         ContainerAnnotationType type = ContainerAnnotationType.fromContent(reference.getMimeType());
-        if (type == ContainerAnnotationType.NON_REMOVABLE) return getFailureResult();
+        if (ContainerAnnotationType.NON_REMOVABLE.equals(type)) return getFailureResult();
         return RuleResult.OK;
     }
 }

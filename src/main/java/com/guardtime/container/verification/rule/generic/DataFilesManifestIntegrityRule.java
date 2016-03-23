@@ -17,7 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class DataFilesManifestIntegrityRule extends SignatureContentRule {
-    private final String name;
+
+    private static final String KSIE_VERIFY_DATA_FILES_MANIFEST = "KSIE_VERIFY_DATA_FILES_MANIFEST";
 
     public DataFilesManifestIntegrityRule() {
         this(RuleState.FAIL);
@@ -25,7 +26,6 @@ public class DataFilesManifestIntegrityRule extends SignatureContentRule {
 
     public DataFilesManifestIntegrityRule(RuleState state) {
         super(state);
-        this.name = "KSIE_VERIFY_DATA_FILES_MANIFEST";
     }
 
     @Override
@@ -43,7 +43,7 @@ public class DataFilesManifestIntegrityRule extends SignatureContentRule {
         } catch (NullPointerException | IOException e) {
             // TODO: log exception?
         }
-        results.add(new GenericVerificationResult(result, name, dataFilesManifestReference));
+        results.add(new GenericVerificationResult(result, KSIE_VERIFY_DATA_FILES_MANIFEST, dataFilesManifestReference));
         return results;
     }
 
