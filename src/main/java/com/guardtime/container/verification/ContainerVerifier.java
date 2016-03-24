@@ -13,8 +13,6 @@ import java.util.List;
 
 public class ContainerVerifier {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ContainerVerifier.class);
-
     private VerificationPolicy policy;
 
     public ContainerVerifier(VerificationPolicy policy) {

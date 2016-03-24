@@ -42,7 +42,7 @@ public class DataFilesManifestIntegrityRule extends SignatureContentRule {
                 result = RuleResult.OK;
             }
         } catch (NullPointerException | IOException e) {
-            // TODO: log exception?
+            LOGGER.debug("Verifying datamanifest failed!", e);
         }
         results.add(Pair.of(dataFilesManifestReference, new GenericVerificationResult(result, this)));
         return results;

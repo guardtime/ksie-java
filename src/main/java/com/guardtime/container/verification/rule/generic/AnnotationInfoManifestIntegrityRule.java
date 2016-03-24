@@ -65,7 +65,7 @@ public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule {
                 result = RuleResult.OK;
             }
         } catch (IOException e) {
-            // TODO: log exception?
+            LOGGER.debug("Verifying annotation manifest failed!", e);
             result = getMissingManifestResult(reference);
         }
         return result;

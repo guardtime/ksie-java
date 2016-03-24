@@ -59,7 +59,7 @@ public class DataFileIntegrityRule extends SignatureContentRule {
                 return RuleResult.OK;
             }
         } catch (NullPointerException | IOException | DataHashException e) {
-            // TODO: log exception?
+            LOGGER.debug("Verifying data file failed!", e);
         }
         return getFailureResult();
     }

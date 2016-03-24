@@ -1,4 +1,4 @@
-package com.guardtime.container.verification.rule.ksi;
+package com.guardtime.container.verification.rule.generic.ksi;
 
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
@@ -47,7 +47,7 @@ public class KsiPolicyBasedSignatureIntegrityRule extends SignatureContentRule {
                 ruleResult = RuleResult.OK;
             }
         } catch (KSIException | IOException e) {
-            // TODO: log exception ?
+            LOGGER.debug("Verifying signature failed!", e);
         }
         List<Pair<? extends Object, ? extends RuleVerificationResult>> returnable = new LinkedList<>();
         returnable.add(Pair.of(contentSignature, new GenericVerificationResult(ruleResult, this)));

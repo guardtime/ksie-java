@@ -15,7 +15,7 @@ import com.guardtime.container.verification.result.RuleResult;
 import com.guardtime.container.verification.result.VerifierResult;
 import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.generic.MimeTypeIntegrityRule;
-import com.guardtime.container.verification.rule.ksi.KsiPolicyBasedSignatureIntegrityRule;
+import com.guardtime.container.verification.rule.generic.ksi.KsiPolicyBasedSignatureIntegrityRule;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.verifier.VerificationResult;

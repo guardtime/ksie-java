@@ -41,7 +41,7 @@ public class AnnotationsManifestIntegrityRule extends SignatureContentRule {
                 result = RuleResult.OK;
             }
         } catch (NullPointerException | IOException e) {
-            // TODO: log exception?
+            LOGGER.debug("Verifying annotmanifest failed!", e);
         }
         results.add(Pair.of(annotationsManifestReference, new GenericVerificationResult(result, this)));
         return results;

@@ -88,7 +88,7 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule {
                 result = RuleResult.OK;
             }
         } catch (NullPointerException | IOException e) {
-            // TODO: log exception?
+            LOGGER.debug("Verifying annotation data failed!", e);
             result = getMissingAnnotationResult(reference);
         }
         return Pair.of(reference, new GenericVerificationResult(result, this));

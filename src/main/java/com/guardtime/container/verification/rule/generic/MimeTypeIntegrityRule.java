@@ -39,7 +39,7 @@ public class MimeTypeIntegrityRule extends GenericRule {
                 result = Pair.of(mimetype, new GenericVerificationResult(RuleResult.OK, this));
             }
         } catch (IOException e) {
-            // TODO: Log exception?
+            LOGGER.debug("Verifying MIME type failed!", e);
         }
         List<Pair<? extends Object, ? extends RuleVerificationResult>> returnable = new LinkedList<>();
         returnable.add(result);
