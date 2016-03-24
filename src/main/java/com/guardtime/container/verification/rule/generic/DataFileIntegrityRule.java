@@ -34,10 +34,10 @@ public class DataFileIntegrityRule extends SignatureContentRule {
     protected List<Pair<? extends Object, ? extends RuleVerificationResult>> verifySignatureContent(SignatureContent content, VerificationContext context) {
         List<Pair<? extends Object, ? extends RuleVerificationResult>> results = new LinkedList<>();
         if (shouldIgnoreContent(content, context)) return results;
+
         DataFilesManifest dataFilesManifest = content.getDataManifest().getRight();
         for (FileReference reference : dataFilesManifest.getDataFileReferences()) {
-            RuleResult result = verifyReference(content, reference);
-            results.add(Pair.of(reference, new GenericVerificationResult(result, this)));
+            results.add(verifyReference(content, reference));
         }
         return results;
     }
@@ -51,20 +51,23 @@ public class DataFileIntegrityRule extends SignatureContentRule {
         return false;
     }
 
-    private RuleResult verifyReference(SignatureContent content, FileReference reference) {
+    private Pair<FileReference, GenericVerificationResult> verifyReference(SignatureContent content, FileReference reference) {
+        RuleResult result = getFailureResult();
         try {
             ContainerDocument document = getDocumentForReference(reference, content);
-            DataHash referenceHash = reference.getHash();
-            if (document.getDataHash(referenceHash.getAlgorithm()).equals(referenceHash)) {
-                return RuleResult.OK;
+            DataHash expectedHash = reference.getHash();
+            DataHash realHash = document.getDataHash(expectedHash.getAlgorithm());
+            if (realHash.equals(expectedHash)) {
+                result = RuleResult.OK;
             }
         } catch (NullPointerException | IOException | DataHashException e) {
             LOGGER.debug("Verifying data file failed!", e);
         }
-        return getFailureResult();
+        return Pair.of(reference, new GenericVerificationResult(result, this));
     }
 
     private ContainerDocument getDocumentForReference(FileReference reference, SignatureContent content) {
+        // TODO: Improve SignatureContent as to provide easier access to elements based on passed in FileReference or URI from FileReference
         for (ContainerDocument document : content.getDocuments()) {
             if (reference.getUri().equals(document.getFileName())) {
                 if (document.isWritable()) {

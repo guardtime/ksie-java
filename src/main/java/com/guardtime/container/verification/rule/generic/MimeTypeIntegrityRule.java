@@ -4,7 +4,6 @@ import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.context.VerificationContext;
-import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleResult;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.TerminatingVerificationResult;
@@ -13,7 +12,6 @@ import com.guardtime.ksi.util.Util;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 public class MimeTypeIntegrityRule extends GenericRule {
@@ -32,17 +30,15 @@ public class MimeTypeIntegrityRule extends GenericRule {
     @Override
     public List<Pair<? extends Object, ? extends RuleVerificationResult>> verify(VerificationContext context) {
         MimeType mimetype = context.getContainer().getMimeType();
-        Pair<? extends Object, ? extends RuleVerificationResult> result = Pair.of(mimetype, new TerminatingVerificationResult(getFailureResult(), this));
+        RuleResult result = getFailureResult();
         try {
             byte[] realContent = Util.toByteArray(mimetype.getInputStream());
             if (Arrays.equals(expectedContent, realContent)) {
-                result = Pair.of(mimetype, new GenericVerificationResult(RuleResult.OK, this));
+                result = RuleResult.OK;
             }
         } catch (IOException e) {
             LOGGER.debug("Verifying MIME type failed!", e);
         }
-        List<Pair<? extends Object, ? extends RuleVerificationResult>> returnable = new LinkedList<>();
-        returnable.add(result);
-        return returnable;
+        return asReturnablePairList(mimetype, new TerminatingVerificationResult(result, this));
     }
 }

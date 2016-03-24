@@ -12,11 +12,11 @@ import com.guardtime.container.verification.rule.generic.SignatureContentRule;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.unisignature.KSISignature;
+import com.guardtime.ksi.unisignature.verifier.VerificationResult;
 import com.guardtime.ksi.unisignature.verifier.policies.Policy;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 
 public class KsiPolicyBasedSignatureIntegrityRule extends SignatureContentRule {
@@ -42,15 +42,13 @@ public class KsiPolicyBasedSignatureIntegrityRule extends SignatureContentRule {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             contentSignature.writeTo(bos);
             KSISignature signature = ksi.read(bos.toByteArray());
-            com.guardtime.ksi.unisignature.verifier.VerificationResult results = ksi.verify(signature, verificationPolicy);
+            VerificationResult results = ksi.verify(signature, verificationPolicy);
             if (results.isOk()) {
                 ruleResult = RuleResult.OK;
             }
         } catch (KSIException | IOException e) {
             LOGGER.debug("Verifying signature failed!", e);
         }
-        List<Pair<? extends Object, ? extends RuleVerificationResult>> returnable = new LinkedList<>();
-        returnable.add(Pair.of(contentSignature, new GenericVerificationResult(ruleResult, this)));
-        return returnable;
+        return asReturnablePairList(contentSignature, new GenericVerificationResult(ruleResult, this));
     }
 }

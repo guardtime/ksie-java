@@ -39,17 +39,31 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule {
         AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
         for (FileReference reference : annotationsManifest.getAnnotationManifestReferences()) {
             AnnotationInfoManifest annotationInfoManifest = getAnnotationInfoManifestForReference(reference, content);
-            if (shouldIgnoreReference(annotationInfoManifest, context)) continue;
+            if (shouldIgnoreAnnotation(annotationInfoManifest, context)) continue;
             results.add(verifyAnnotationData(reference, annotationInfoManifest, content));
         }
         return results;
     }
 
-    private boolean shouldIgnoreReference(AnnotationInfoManifest annotationInfoManifest, VerificationContext context) {
+    private boolean shouldIgnoreContent(SignatureContent content, VerificationContext context) {
+        SignatureManifest signatureManifest = content.getSignatureManifest().getRight();
+        FileReference annotationsManifestReference = signatureManifest.getAnnotationsManifestReference();
+        List<RuleVerificationResult> resultsForAnnotationsManifestReference = context.getResultsFor(annotationsManifestReference);
+        if (resultsForAnnotationsManifestReference == null) return true;
+        for (RuleVerificationResult result : resultsForAnnotationsManifestReference) {
+            if (!RuleResult.OK.equals(result.getResult())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean shouldIgnoreAnnotation(AnnotationInfoManifest annotationInfoManifest, VerificationContext context) {
         if (annotationInfoManifest == null) return true;
         List<RuleVerificationResult> resultsForAnnotationManifest = context.getResultsFor(annotationInfoManifest);
-        if (resultsForAnnotationManifest == null)
+        if (resultsForAnnotationManifest == null) {
             return true; // Shouldn't verify annotation data if we don't know if the manifests are even valid
+        }
         for (RuleVerificationResult result : resultsForAnnotationManifest) {
             if (!RuleResult.OK.equals(result.getResult())) {
                 return true;
@@ -58,18 +72,8 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule {
         return false;
     }
 
-    private boolean shouldIgnoreContent(SignatureContent content, VerificationContext context) {
-        SignatureManifest signatureManifest = content.getSignatureManifest().getRight();
-        FileReference annotationsManifestReference = signatureManifest.getAnnotationsManifestReference();
-        for (RuleVerificationResult result : context.getResultsFor(annotationsManifestReference)) {
-            if (!RuleResult.OK.equals(result.getResult())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private AnnotationInfoManifest getAnnotationInfoManifestForReference(FileReference reference, SignatureContent content) {
+        // TODO: Improve SignatureContent as to provide easier access to elements based on passed in FileReference or URI from FileReference
         for (Pair<String, AnnotationInfoManifest> manifest : content.getAnnotationManifests()) {
             if (manifest.getLeft().equals(reference.getUri())) {
                 return manifest.getRight();
@@ -78,7 +82,7 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule {
         return null;
     }
 
-    private Pair<? extends Object, ? extends RuleVerificationResult> verifyAnnotationData(FileReference reference, AnnotationInfoManifest annotationInfoManifest, SignatureContent content) {
+    private Pair<FileReference, GenericVerificationResult> verifyAnnotationData(FileReference reference, AnnotationInfoManifest annotationInfoManifest, SignatureContent content) {
         RuleResult result = getFailureResult();
         try {
             ContainerAnnotation annotation = getAnnotationForManifest(annotationInfoManifest, content);
@@ -95,6 +99,7 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule {
     }
 
     private ContainerAnnotation getAnnotationForManifest(AnnotationInfoManifest annotationInfoManifest, SignatureContent content) {
+        // TODO: Improve SignatureContent as to provide easier access to elements based on passed in FileReference or URI from FileReference
         String annotationUri = annotationInfoManifest.getAnnotationReference().getUri();
         for (Pair<String, ContainerAnnotation> annotation : content.getAnnotations()) {
             if (annotationUri.equals(annotation.getLeft())) {

@@ -1,7 +1,6 @@
 package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.manifest.SignatureManifest;
-import com.guardtime.container.packaging.BlockChainContainer;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
@@ -28,10 +27,9 @@ public class ManifestConsecutivityRule extends GenericRule {
 
     @Override
     public List<Pair<? extends Object, ? extends RuleVerificationResult>> verify(VerificationContext context) {
-        BlockChainContainer container = context.getContainer();
         List<Pair<? extends Object, ? extends RuleVerificationResult>> results = new LinkedList<>();
         int expectedIndex = 1;
-        for (SignatureContent content : container.getSignatureContents()) {
+        for (SignatureContent content : context.getContainer().getSignatureContents()) {
             RuleResult result = getFailureResult();
             Pair<String, SignatureManifest> manifest = content.getSignatureManifest();
             int index = Util.extractIntegerFrom(manifest.getLeft());

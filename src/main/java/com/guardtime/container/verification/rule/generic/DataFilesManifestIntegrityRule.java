@@ -14,7 +14,6 @@ import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 
 public class DataFilesManifestIntegrityRule extends SignatureContentRule {
@@ -31,21 +30,20 @@ public class DataFilesManifestIntegrityRule extends SignatureContentRule {
 
     @Override
     protected List<Pair<? extends Object, ? extends RuleVerificationResult>> verifySignatureContent(SignatureContent content, VerificationContext context) {
-        List<Pair<? extends Object, ? extends RuleVerificationResult>> results = new LinkedList<>();
         RuleResult result = getFailureResult();
         FileReference dataFilesManifestReference = content.getSignatureManifest().getRight().getDataFilesManifestReference();
         try {
             DataFilesManifest dataFilesManifest = content.getDataManifest().getRight();
             DataHash expectedHash = getDataHashFromSignatureManifest(content);
+            // TODO: review dataFilesManifest and add getDataHash if possible
             DataHash realHash = Util.hash(dataFilesManifest.getInputStream(), expectedHash.getAlgorithm());
-            if (expectedHash.equals(realHash)) {
+            if (realHash.equals(expectedHash)) {
                 result = RuleResult.OK;
             }
         } catch (NullPointerException | IOException e) {
             LOGGER.debug("Verifying datamanifest failed!", e);
         }
-        results.add(Pair.of(dataFilesManifestReference, new GenericVerificationResult(result, this)));
-        return results;
+        return asReturnablePairList(dataFilesManifestReference, new GenericVerificationResult(result, this));
     }
 
 

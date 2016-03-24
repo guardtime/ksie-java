@@ -6,14 +6,14 @@ public enum RuleResult {
     NOK("RESULT_NOK", 2);
 
     private final String name;
-    private final int value;
+    private final int weight;
 
-    RuleResult(String name, int value) {
+    RuleResult(String name, int weight) {
         this.name = name;
-        this.value = value;
+        this.weight = weight;
     }
 
     public boolean isMoreImportant(RuleResult that) {
-        return this.value > that.value;
+        return this.weight > that.weight;
     }
 }

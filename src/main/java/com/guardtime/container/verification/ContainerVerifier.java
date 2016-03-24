@@ -3,11 +3,10 @@ package com.guardtime.container.verification;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.policy.VerificationPolicy;
+import com.guardtime.container.verification.result.RuleResult;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerifierResult;
 import com.guardtime.container.verification.rule.Rule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -38,11 +37,14 @@ public class ContainerVerifier {
 
     private boolean terminateVerification(List<Pair<? extends Object, ? extends RuleVerificationResult>> verificationResults) {
         for (Pair<? extends Object, ? extends RuleVerificationResult> result : verificationResults) {
-            if (result.getRight().terminatesVerification()) {
-                return true;
-            }
+            if (resultTerminates(result.getRight())) return true;
         }
         return false;
+    }
+
+    private boolean resultTerminates(RuleVerificationResult result) {
+        if (!result.terminatesVerification()) return false;
+        return !RuleResult.OK.equals(result.getResult());
     }
 
 }
