@@ -42,12 +42,12 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
     protected static final byte[] DATA_FILES_MANIFEST_MAGIC = "KSIEDAMF".getBytes();
     protected static final byte[] SIGNATURE_MANIFEST_MAGIC = "KSIEMFST".getBytes();
 
-    protected static final String ANNOTATION_MANIFEST_TYPE = "ksie10/annotmanifest";
+    protected static final String ANNOTATIONS_MANIFEST_TYPE = "ksie10/annotmanifest";
     protected static final String DATA_MANIFEST_TYPE = "ksie10/datamanifest";
     protected static final String SIGNATURE_TYPE = "application/ksi-signature";
     protected static final String MOCK_URI = "/mock/mock";
     protected static final String SIGNATURE_URI = "/META-INF/signature4.ksig";
-    protected static final String ANNOTATION_MANIFEST_URI = "/META-INF/annotation1.tlv";
+    protected static final String ANNOTATION_INFO_MANIFEST_URI = "/META-INF/annotation1.tlv";
 
     @Mock
     protected TlvDataFilesManifest mockDataManifest;

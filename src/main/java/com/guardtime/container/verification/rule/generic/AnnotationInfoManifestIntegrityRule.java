@@ -21,14 +21,14 @@ import java.util.List;
 
 public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule {
 
-    private static final String KSIE_VERIFY_ANNOTATION_MANIFEST = "KSIE_VERIFY_ANNOTATION_MANIFEST";
+    private static final String KSIE_VERIFY_ANNOTATION_INFO_MANIFEST = "KSIE_VERIFY_ANNOTATION_INFO_MANIFEST";
 
     public AnnotationInfoManifestIntegrityRule() {
-        super(KSIE_VERIFY_ANNOTATION_MANIFEST);
+        super(KSIE_VERIFY_ANNOTATION_INFO_MANIFEST);
     }
 
     public AnnotationInfoManifestIntegrityRule(RuleState state) {
-        super(state, KSIE_VERIFY_ANNOTATION_MANIFEST);
+        super(state, KSIE_VERIFY_ANNOTATION_INFO_MANIFEST);
     }
 
     @Override
@@ -37,9 +37,9 @@ public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule {
         if (shouldIgnoreContent(content, context)) return results;
 
         AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
-        for (FileReference reference : annotationsManifest.getAnnotationManifestReferences()) {
+        for (FileReference reference : annotationsManifest.getAnnotationInfoManifestReferences()) {
             AnnotationInfoManifest annotationInfoManifest = getAnnotationInfoManifestForReference(reference, content);
-            results.add(getAnnotationManifestResult(reference, annotationInfoManifest));
+            results.add(getAnnotationInfoManifestResult(reference, annotationInfoManifest));
             results.add(getDataFilesManifestReferenceResult(reference, content, annotationInfoManifest));
         }
         return results;
@@ -58,7 +58,7 @@ public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule {
         return false;
     }
 
-    private Pair<FileReference, GenericVerificationResult> getAnnotationManifestResult(FileReference reference, AnnotationInfoManifest annotationInfoManifest) {
+    private Pair<FileReference, GenericVerificationResult> getAnnotationInfoManifestResult(FileReference reference, AnnotationInfoManifest annotationInfoManifest) {
         RuleResult result = getFailureResult();
         try {
             DataHash expectedHash = reference.getHash();
@@ -87,7 +87,7 @@ public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule {
 
     private AnnotationInfoManifest getAnnotationInfoManifestForReference(FileReference reference, SignatureContent content) {
         // TODO: Improve SignatureContent as to provide easier access to elements based on passed in FileReference or URI from FileReference
-        for (Pair<String, AnnotationInfoManifest> manifest : content.getAnnotationManifests()) {
+        for (Pair<String, AnnotationInfoManifest> manifest : content.getAnnotationInfoManifests()) {
             if (manifest.getLeft().equals(reference.getUri())) {
                 return manifest.getRight();
             }

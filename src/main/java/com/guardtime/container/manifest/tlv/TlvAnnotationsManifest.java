@@ -62,7 +62,7 @@ class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements Ann
     }
 
     @Override
-    public List<? extends FileReference> getAnnotationManifestReferences() {
+    public List<? extends FileReference> getAnnotationInfoManifestReferences() {
         return annotationReferences;
     }
 }

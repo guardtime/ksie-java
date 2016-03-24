@@ -25,8 +25,8 @@ public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
         annotationManifest.put(MOCK_URI, Pair.of(mockAnnotation, mockAnnotationInfoManifest));
         TlvAnnotationsManifest manifest = new TlvAnnotationsManifest(annotationManifest);
         assertArrayEquals(ANNOTATIONS_MANIFEST_MAGIC, manifest.getMagic());
-        assertNotNull(manifest.getAnnotationManifestReferences());
-        assertNotNull(manifest.getAnnotationManifestReferences().get(0));
+        assertNotNull(manifest.getAnnotationInfoManifestReferences());
+        assertNotNull(manifest.getAnnotationInfoManifestReferences().get(0));
     }
 
     @Test
@@ -36,9 +36,9 @@ public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
 
         TlvAnnotationsManifest manifest = new TlvAnnotationsManifest(new ByteArrayInputStream(bytes));
         assertArrayEquals(ANNOTATIONS_MANIFEST_MAGIC, manifest.getMagic());
-        assertNotNull(manifest.getAnnotationManifestReferences());
-        assertEquals(1, manifest.getAnnotationManifestReferences().size());
-        FileReference annotationsReference = manifest.getAnnotationManifestReferences().get(0);
+        assertNotNull(manifest.getAnnotationInfoManifestReferences());
+        assertEquals(1, manifest.getAnnotationInfoManifestReferences().size());
+        FileReference annotationsReference = manifest.getAnnotationInfoManifestReferences().get(0);
         assertEquals(MOCK_URI, annotationsReference.getUri());
         assertEquals(MIME_TYPE_APPLICATION_TXT, annotationsReference.getMimeType());
         assertEquals(dataHash, annotationsReference.getHash());
@@ -55,8 +55,8 @@ public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
     public void testReadAnnotationsManifestWithoutAnnotationReferences() throws Exception {
         TlvAnnotationsManifest manifest = new TlvAnnotationsManifest(new ByteArrayInputStream(ANNOTATIONS_MANIFEST_MAGIC));
         assertArrayEquals(ANNOTATIONS_MANIFEST_MAGIC, manifest.getMagic());
-        assertNotNull(manifest.getAnnotationManifestReferences());
-        assertTrue(manifest.getAnnotationManifestReferences().isEmpty());
+        assertNotNull(manifest.getAnnotationInfoManifestReferences());
+        assertTrue(manifest.getAnnotationInfoManifestReferences().isEmpty());
     }
 
 }
