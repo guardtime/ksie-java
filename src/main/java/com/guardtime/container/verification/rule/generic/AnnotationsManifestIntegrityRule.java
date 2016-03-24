@@ -36,8 +36,7 @@ public class AnnotationsManifestIntegrityRule extends SignatureContentRule {
         try {
             AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
             DataHash expectedDataHash = annotationsManifestReference.getHash();
-            // TODO: review annotationsManifest and add getDataHash if possible
-            DataHash realHash = Util.hash(annotationsManifest.getInputStream(), expectedDataHash.getAlgorithm());
+            DataHash realHash = annotationsManifest.getDataHash(expectedDataHash.getAlgorithm());
             if (expectedDataHash.equals(realHash)) {
                 result = RuleResult.OK;
             }

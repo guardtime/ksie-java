@@ -4,6 +4,9 @@ import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.DataFilesManifest;
 import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.util.DataHashException;
+import com.guardtime.container.util.Util;
+import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVInputStream;
 import com.guardtime.ksi.tlv.TLVParserException;
@@ -59,6 +62,11 @@ class TlvDataFilesManifest extends AbstractTlvManifestStructure implements DataF
             //TODO unknown elements must be handled correctly
             documents.add(new TlvDataFileReference(element));
         }
+    }
+
+    @Override
+    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
+        return Util.hash(getInputStream(), algorithm);
     }
 
 }
