@@ -40,6 +40,7 @@ public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule {
         for (FileReference reference : annotationsManifest.getAnnotationManifestReferences()) {
             AnnotationInfoManifest annotationInfoManifest = getAnnotationInfoManifestForReference(reference, content);
             results.add(getAnnotationManifestResult(reference, annotationInfoManifest));
+            results.add(getDataFilesManifestReferenceResult(reference, content, annotationInfoManifest));
         }
         return results;
     }
@@ -60,15 +61,26 @@ public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule {
     private Pair<FileReference, GenericVerificationResult> getAnnotationManifestResult(FileReference reference, AnnotationInfoManifest annotationInfoManifest) {
         RuleResult result = getFailureResult();
         try {
-            DataHash expectedDataHash = reference.getHash();
+            DataHash expectedHash = reference.getHash();
             // TODO: review annotationInfoManifest and add getDataHash if possible
-            DataHash realDataHash = Util.hash(annotationInfoManifest.getInputStream(), expectedDataHash.getAlgorithm());
-            if (realDataHash.equals(expectedDataHash)) {
+            DataHash realHash = Util.hash(annotationInfoManifest.getInputStream(), expectedHash.getAlgorithm());
+            if (realHash.equals(expectedHash)) {
                 result = RuleResult.OK;
             }
         } catch (IOException e) {
             LOGGER.debug("Verifying annotation manifest failed!", e);
             result = getMissingManifestResult(reference);
+        }
+        return Pair.of(reference, new GenericVerificationResult(result, this));
+    }
+
+    private Pair<FileReference, GenericVerificationResult> getDataFilesManifestReferenceResult(FileReference reference, SignatureContent content, AnnotationInfoManifest annotationInfoManifest) {
+        RuleResult result = getFailureResult();
+        SignatureManifest signatureManifest = content.getSignatureManifest().getRight();
+        FileReference expectedReference = signatureManifest.getDataFilesManifestReference();
+        FileReference realReference = annotationInfoManifest.getDataManifestReference();
+        if (realReference.equals(expectedReference)) {
+            result = RuleResult.OK;
         }
         return Pair.of(reference, new GenericVerificationResult(result, this));
     }
