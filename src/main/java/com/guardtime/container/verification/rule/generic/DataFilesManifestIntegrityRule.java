@@ -4,6 +4,7 @@ import com.guardtime.container.manifest.DataFilesManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.SignatureManifest;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.result.GenericVerificationResult;
@@ -21,16 +22,16 @@ public class DataFilesManifestIntegrityRule extends SignatureContentRule {
     private static final String KSIE_VERIFY_DATA_FILES_MANIFEST = "KSIE_VERIFY_DATA_FILES_MANIFEST";
 
     public DataFilesManifestIntegrityRule() {
-        this(RuleState.FAIL);
+        super(KSIE_VERIFY_DATA_FILES_MANIFEST);
     }
 
     public DataFilesManifestIntegrityRule(RuleState state) {
-        super(state);
+        super(state, KSIE_VERIFY_DATA_FILES_MANIFEST);
     }
 
     @Override
-    protected List<RuleVerificationResult> verifySignatureContent(SignatureContent content, VerificationContext context) {
-        List<RuleVerificationResult> results = new LinkedList<>();
+    protected List<Pair<? extends Object, ? extends RuleVerificationResult>> verifySignatureContent(SignatureContent content, VerificationContext context) {
+        List<Pair<? extends Object, ? extends RuleVerificationResult>> results = new LinkedList<>();
         RuleResult result = getFailureResult();
         FileReference dataFilesManifestReference = content.getSignatureManifest().getRight().getDataFilesManifestReference();
         try {
@@ -43,7 +44,7 @@ public class DataFilesManifestIntegrityRule extends SignatureContentRule {
         } catch (NullPointerException | IOException e) {
             // TODO: log exception?
         }
-        results.add(new GenericVerificationResult(result, KSIE_VERIFY_DATA_FILES_MANIFEST, dataFilesManifestReference));
+        results.add(Pair.of(dataFilesManifestReference, new GenericVerificationResult(result, this)));
         return results;
     }
 

@@ -1,29 +1,11 @@
 package com.guardtime.container.verification.result;
 
-public class TerminatingVerificationResult implements RuleVerificationResult {
-    private final RuleResult result;
-    private final String rule;
-    private final Object tested;
+import com.guardtime.container.verification.rule.Rule;
 
-    public TerminatingVerificationResult(RuleResult result, String rule, Object tested) {
-        this.result = result;
-        this.rule = rule;
-        this.tested = tested;
-    }
+public class TerminatingVerificationResult extends GenericVerificationResult {
 
-    @Override
-    public Object getTested() {
-        return tested;
-    }
-
-    @Override
-    public RuleResult getResult() {
-        return result;
-    }
-
-    @Override
-    public String getRuleName() {
-        return rule;
+    public TerminatingVerificationResult(RuleResult result, Rule rule) {
+        super(result, rule);
     }
 
     @Override

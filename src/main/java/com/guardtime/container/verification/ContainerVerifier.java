@@ -1,5 +1,6 @@
 package com.guardtime.container.verification;
 
+import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.policy.VerificationPolicy;
 import com.guardtime.container.verification.result.RuleVerificationResult;
@@ -29,19 +30,17 @@ public class ContainerVerifier {
      * @return RuleVerificationResult based on the updated VerificationContext
      */
     public VerifierResult verify(VerificationContext context) {
-        List<RuleVerificationResult> results = context.getResults();
         for (Rule rule : policy.getRules()) {
-            if (rule.shouldBeIgnored(results)) continue;
-            List<RuleVerificationResult> verificationResults = rule.verify(context);
-            results.addAll(verificationResults);
+            List<Pair<? extends Object, ? extends RuleVerificationResult>> verificationResults = rule.verify(context);
+            context.addResults(verificationResults);
             if (terminateVerification(verificationResults)) break;
         }
         return new VerifierResult(context);
     }
 
-    private boolean terminateVerification(List<? extends RuleVerificationResult> verificationResults) {
-        for (RuleVerificationResult result : verificationResults) {
-            if (result.terminatesVerification()) {
+    private boolean terminateVerification(List<Pair<? extends Object, ? extends RuleVerificationResult>> verificationResults) {
+        for (Pair<? extends Object, ? extends RuleVerificationResult> result : verificationResults) {
+            if (result.getRight().terminatesVerification()) {
                 return true;
             }
         }

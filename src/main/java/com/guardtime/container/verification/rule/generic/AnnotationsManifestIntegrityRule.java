@@ -3,6 +3,7 @@ package com.guardtime.container.verification.rule.generic;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.result.GenericVerificationResult;
@@ -12,7 +13,7 @@ import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class AnnotationsManifestIntegrityRule extends SignatureContentRule {
@@ -20,15 +21,16 @@ public class AnnotationsManifestIntegrityRule extends SignatureContentRule {
     private static final String KSIE_VERIFY_ANNOTATIONS_MANIFEST = "KSIE_VERIFY_ANNOTATIONS_MANIFEST";
 
     public AnnotationsManifestIntegrityRule() {
-        this(RuleState.FAIL);
+        super(KSIE_VERIFY_ANNOTATIONS_MANIFEST);
     }
 
     public AnnotationsManifestIntegrityRule(RuleState state) {
-        super(state);
+        super(state, KSIE_VERIFY_ANNOTATIONS_MANIFEST);
     }
 
     @Override
-    protected List<RuleVerificationResult> verifySignatureContent(SignatureContent content, VerificationContext context) {
+    protected List<Pair<? extends Object, ? extends RuleVerificationResult>> verifySignatureContent(SignatureContent content, VerificationContext context) {
+        List<Pair<? extends Object, ? extends RuleVerificationResult>> results = new LinkedList<>();
         RuleResult result = getFailureResult();
         FileReference annotationsManifestReference = content.getSignatureManifest().getRight().getAnnotationsManifestReference();
         try {
@@ -41,7 +43,8 @@ public class AnnotationsManifestIntegrityRule extends SignatureContentRule {
         } catch (NullPointerException | IOException e) {
             // TODO: log exception?
         }
-        return Arrays.asList((RuleVerificationResult) new GenericVerificationResult(result, KSIE_VERIFY_ANNOTATIONS_MANIFEST, annotationsManifestReference));
+        results.add(Pair.of(annotationsManifestReference, new GenericVerificationResult(result, this)));
+        return results;
     }
 
 }

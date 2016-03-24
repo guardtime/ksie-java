@@ -3,24 +3,43 @@ package com.guardtime.container.verification.policy;
 import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.generic.*;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class DefaultVerificationPolicy implements VerificationPolicy {
-    private List<Rule> rules = new LinkedList<>(); // TODO: Make into map of string(rule name) and rule. This will allow overriding same rules with rules that have different parameters
+    private Map<String, Rule> rules = new HashMap<>();
 
     public DefaultVerificationPolicy(List<Rule> extraRules) {
-        rules.add(new ManifestConsecutivityRule());
-        rules.add(new DataFilesManifestIntegrityRule());
-        rules.add(new DataFileIntegrityRule());
-        rules.add(new AnnotationsManifestIntegrityRule());
-        rules.add(new AnnotationIntegrityRule());
-        rules.addAll(extraRules);
+        addDefaultRules();
+        addAdditionalAndReplaceMatchingRules(extraRules);
+    }
+
+    private void addAdditionalAndReplaceMatchingRules(List<Rule> extraRules) {
+        for (Rule rule : extraRules) {
+            rules.put(rule.getName(), rule);
+        }
+    }
+
+    private void addDefaultRules() {
+        ManifestConsecutivityRule manifestConsecutivityRule = new ManifestConsecutivityRule();
+        rules.put(manifestConsecutivityRule.getName(), manifestConsecutivityRule);
+        DataFilesManifestIntegrityRule dataFilesManifestIntegrityRule = new DataFilesManifestIntegrityRule();
+        rules.put(dataFilesManifestIntegrityRule.getName(), dataFilesManifestIntegrityRule);
+        DataFileIntegrityRule dataFileIntegrityRule = new DataFileIntegrityRule();
+        rules.put(dataFileIntegrityRule.getName(), dataFileIntegrityRule);
+        AnnotationsManifestIntegrityRule annotationsManifestIntegrityRule = new AnnotationsManifestIntegrityRule();
+        rules.put(annotationsManifestIntegrityRule.getName(), annotationsManifestIntegrityRule);
+        AnnotationInfoManifestIntegrityRule annotationInfoManifestIntegrityRule = new AnnotationInfoManifestIntegrityRule();
+        rules.put(annotationInfoManifestIntegrityRule.getName(), annotationInfoManifestIntegrityRule);
+        AnnotationDataIntegrityRule annotationDataIntegrityRule = new AnnotationDataIntegrityRule();
+        rules.put(annotationDataIntegrityRule.getName(), annotationDataIntegrityRule);
     }
 
     @Override
     public List<Rule> getRules() {
-        return rules;
+        return new LinkedList<>(rules.values());
     }
 
 }

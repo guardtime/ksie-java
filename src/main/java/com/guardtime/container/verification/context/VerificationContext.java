@@ -1,6 +1,7 @@
 package com.guardtime.container.verification.context;
 
 import com.guardtime.container.packaging.BlockChainContainer;
+import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 
 import java.util.List;
@@ -17,7 +18,18 @@ public interface VerificationContext {
 
     /**
      * Provides access to the list of results from rules performed on the context.
+     *
      * @return
      */
     List<RuleVerificationResult> getResults();
+
+    /**
+     * Provides access to a sublist of results that were performed on obj.
+     *
+     * @param obj
+     * @return
+     */
+    List<RuleVerificationResult> getResultsFor(Object obj);
+
+    void addResults(List<Pair<? extends Object, ? extends RuleVerificationResult>> verificationResults);
 }

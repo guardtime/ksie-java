@@ -19,17 +19,17 @@ public class ManifestConsecutivityRule extends GenericRule {
     private static final String KSIE_VERIFY_MANIFEST_INDEX = "KSIE_VERIFY_MANIFEST_INDEX";
 
     public ManifestConsecutivityRule() {
-        this(RuleState.FAIL);
+        super(KSIE_VERIFY_MANIFEST_INDEX);
     }
 
     public ManifestConsecutivityRule(RuleState state) {
-        super(state);
+        super(state, KSIE_VERIFY_MANIFEST_INDEX);
     }
 
     @Override
-    public List<RuleVerificationResult> verify(VerificationContext context) {
+    public List<Pair<? extends Object, ? extends RuleVerificationResult>> verify(VerificationContext context) {
         BlockChainContainer container = context.getContainer();
-        List<RuleVerificationResult> results = new LinkedList<>();
+        List<Pair<? extends Object, ? extends RuleVerificationResult>> results = new LinkedList<>();
         int expectedIndex = 1;
         for (SignatureContent content : container.getSignatureContents()) {
             RuleResult result = getFailureResult();
@@ -39,7 +39,7 @@ public class ManifestConsecutivityRule extends GenericRule {
                 result = RuleResult.OK;
             }
             expectedIndex = index + 1;
-            results.add(new GenericVerificationResult(result, KSIE_VERIFY_MANIFEST_INDEX, manifest));
+            results.add(Pair.of(manifest.getRight(), new GenericVerificationResult(result, this)));
         }
         return results;
     }

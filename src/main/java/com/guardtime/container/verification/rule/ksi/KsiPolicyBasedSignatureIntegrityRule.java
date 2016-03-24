@@ -2,6 +2,7 @@ package com.guardtime.container.verification.rule.ksi;
 
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleResult;
@@ -15,11 +16,11 @@ import com.guardtime.ksi.unisignature.verifier.policies.Policy;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class KsiPolicyBasedSignatureIntegrityRule extends SignatureContentRule {
-    private final String name;
+    private static final String KSIE_VERIFY_MANIFEST_SIGNATURE = "KSIE_VERIFY_MANIFEST_SIGNATURE";
     private final KSI ksi;
     private Policy verificationPolicy;
 
@@ -28,14 +29,13 @@ public class KsiPolicyBasedSignatureIntegrityRule extends SignatureContentRule {
     }
 
     public KsiPolicyBasedSignatureIntegrityRule(KSI ksi, Policy policy, RuleState state) {
-        super(state);
+        super(state, KSIE_VERIFY_MANIFEST_SIGNATURE);
         this.ksi = ksi;
         this.verificationPolicy = policy;
-        this.name = "KSIE_VERIFY_MANIFEST_SIGNATURE";
     }
 
     @Override
-    protected List<RuleVerificationResult> verifySignatureContent(SignatureContent content, VerificationContext context) {
+    protected List<Pair<? extends Object, ? extends RuleVerificationResult>> verifySignatureContent(SignatureContent content, VerificationContext context) {
         RuleResult ruleResult = getFailureResult();
         ContainerSignature contentSignature = content.getSignature();
         try {
@@ -49,6 +49,8 @@ public class KsiPolicyBasedSignatureIntegrityRule extends SignatureContentRule {
         } catch (KSIException | IOException e) {
             // TODO: log exception ?
         }
-        return Arrays.asList((RuleVerificationResult) new GenericVerificationResult(ruleResult, name, contentSignature));
+        List<Pair<? extends Object, ? extends RuleVerificationResult>> returnable = new LinkedList<>();
+        returnable.add(Pair.of(contentSignature, new GenericVerificationResult(ruleResult, this)));
+        return returnable;
     }
 }

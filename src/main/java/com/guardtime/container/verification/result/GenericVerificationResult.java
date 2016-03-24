@@ -1,19 +1,14 @@
 package com.guardtime.container.verification.result;
 
+import com.guardtime.container.verification.rule.Rule;
+
 public class GenericVerificationResult implements RuleVerificationResult {
     private final RuleResult result;
-    private final String rule;
-    private final Object tested;
+    private final String ruleName;
 
-    public GenericVerificationResult(RuleResult result, String rule, Object tested) {
+    public GenericVerificationResult(RuleResult result, Rule rule) {
         this.result = result;
-        this.rule = rule;
-        this.tested = tested;
-    }
-
-    @Override
-    public Object getTested() { // TODO: Improve as Object is too dangerous and ambiguous
-        return tested;
+        this.ruleName = rule.getName();
     }
 
     @Override
@@ -23,7 +18,7 @@ public class GenericVerificationResult implements RuleVerificationResult {
 
     @Override
     public String getRuleName() {
-        return rule;
+        return ruleName;
     }
 
     @Override
