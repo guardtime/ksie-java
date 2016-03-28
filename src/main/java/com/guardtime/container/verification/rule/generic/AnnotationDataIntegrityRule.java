@@ -2,10 +2,7 @@ package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
-import com.guardtime.container.manifest.AnnotationInfoManifest;
-import com.guardtime.container.manifest.AnnotationsManifest;
-import com.guardtime.container.manifest.FileReference;
-import com.guardtime.container.manifest.SignatureManifest;
+import com.guardtime.container.manifest.*;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.context.VerificationContext;
@@ -38,9 +35,11 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule {
 
         AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
         for (FileReference reference : annotationsManifest.getAnnotationManifestReferences()) {
-            AnnotationInfoManifest annotationInfoManifest = getAnnotationInfoManifestForReference(reference, content);
+            AnnotationInfoManifest annotationInfoManifest = content.getAnnotationManifests().get(reference.getUri());
             if (shouldIgnoreAnnotation(annotationInfoManifest, context)) continue;
-            results.add(verifyAnnotationData(reference, annotationInfoManifest, content));
+            AnnotationReference annotationReference = annotationInfoManifest.getAnnotationReference();
+            ContainerAnnotation annotation = content.getAnnotations().get(annotationReference.getUri());
+            results.add(verifyAnnotationData(reference, annotationReference, annotation));
         }
         return results;
     }
@@ -72,21 +71,10 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule {
         return false;
     }
 
-    private AnnotationInfoManifest getAnnotationInfoManifestForReference(FileReference reference, SignatureContent content) {
-        // TODO: Improve SignatureContent as to provide easier access to elements based on passed in FileReference or URI from FileReference
-        for (Pair<String, AnnotationInfoManifest> manifest : content.getAnnotationManifests()) {
-            if (manifest.getLeft().equals(reference.getUri())) {
-                return manifest.getRight();
-            }
-        }
-        return null;
-    }
-
-    private Pair<FileReference, GenericVerificationResult> verifyAnnotationData(FileReference reference, AnnotationInfoManifest annotationInfoManifest, SignatureContent content) {
+    private Pair<FileReference, GenericVerificationResult> verifyAnnotationData(FileReference reference, AnnotationReference annotationReference, ContainerAnnotation annotation) {
         RuleResult result = getFailureResult();
         try {
-            ContainerAnnotation annotation = getAnnotationForManifest(annotationInfoManifest, content);
-            DataHash expectedDataHash = annotationInfoManifest.getAnnotationReference().getHash();
+            DataHash expectedDataHash = annotationReference.getHash();
             DataHash realDataHash = annotation.getDataHash(expectedDataHash.getAlgorithm());
             if (realDataHash.equals(expectedDataHash)) {
                 result = RuleResult.OK;
@@ -96,17 +84,6 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule {
             result = getMissingAnnotationResult(reference);
         }
         return Pair.of(reference, new GenericVerificationResult(result, this));
-    }
-
-    private ContainerAnnotation getAnnotationForManifest(AnnotationInfoManifest annotationInfoManifest, SignatureContent content) {
-        // TODO: Improve SignatureContent as to provide easier access to elements based on passed in FileReference or URI from FileReference
-        String annotationUri = annotationInfoManifest.getAnnotationReference().getUri();
-        for (Pair<String, ContainerAnnotation> annotation : content.getAnnotations()) {
-            if (annotationUri.equals(annotation.getLeft())) {
-                return annotation.getRight();
-            }
-        }
-        return null;
     }
 
     private RuleResult getMissingAnnotationResult(FileReference reference) {

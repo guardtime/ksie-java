@@ -97,7 +97,7 @@ public class ZipContainerReaderTest {
         assertNotNull(result);
         assertFalse(result.getSignatureContents().isEmpty());
         for (SignatureContent content : result.getSignatureContents()) {
-            for (ContainerDocument document : content.getDocuments()) {
+            for (ContainerDocument document : content.getDocuments().values()) {
                 assertTrue(document instanceof EmptyContainerDocument);
             }
         }
