@@ -26,19 +26,19 @@ class SignatureContentHandler {
     private final ManifestHandler manifestHandler;
     private final DataManifestHandler dataManifestHandler;
     private final AnnotationsManifestHandler annotationsManifestHandler;
-    private final AnnotationManifestHandler annotationManifestHandler;
+    private final AnnotationInfoManifestHandler annotationInfoManifestHandler;
     private final SignatureHandler signatureHandler;
 
     public SignatureContentHandler(DataFileContentHandler documentHandler, AnnotationContentHandler annotationContentHandler,
                                    ManifestHandler manifestHandler, DataManifestHandler dataManifestHandler,
-                                   AnnotationsManifestHandler annotationsManifestHandler, AnnotationManifestHandler annotationManifestHandler,
+                                   AnnotationsManifestHandler annotationsManifestHandler, AnnotationInfoManifestHandler annotationInfoManifestHandler,
                                    SignatureHandler signatureHandler) {
         this.documentHandler = documentHandler;
         this.annotationContentHandler = annotationContentHandler;
         this.manifestHandler = manifestHandler;
         this.dataManifestHandler = dataManifestHandler;
         this.annotationsManifestHandler = annotationsManifestHandler;
-        this.annotationManifestHandler = annotationManifestHandler;
+        this.annotationInfoManifestHandler = annotationInfoManifestHandler;
         this.signatureHandler = signatureHandler;
     }
 
@@ -48,7 +48,7 @@ class SignatureContentHandler {
                 .withManifest(group.manifest)
                 .withDataManifest(group.dataManifest)
                 .withAnnotationsManifest(group.annotationsManifest)
-                .withAnnotationManifests(group.annotationManifests)
+                .withAnnotationInfoManifests(group.annotationInfoManifests)
                 .withDocuments(group.documents)
                 .withAnnotations(group.annotations)
                 .build();
@@ -62,7 +62,7 @@ class SignatureContentHandler {
         Pair<String, SignatureManifest> manifest;
         Pair<String, DataFilesManifest> dataManifest;
         Pair<String, AnnotationsManifest> annotationsManifest;
-        List<Pair<String, AnnotationInfoManifest>> annotationManifests = new LinkedList<>();
+        List<Pair<String, AnnotationInfoManifest>> annotationInfoManifests = new LinkedList<>();
         List<Pair<String, ContainerAnnotation>> annotations = new LinkedList<>();
         List<ContainerDocument> documents = new LinkedList<>();
         ContainerSignature signature;
@@ -129,10 +129,10 @@ class SignatureContentHandler {
 
         private void populateAnnotationsWithManifests() {
             if (annotationsManifest == null) return;
-            for (FileReference manifestReference : annotationsManifest.getRight().getAnnotationManifestReferences()) {
+            for (FileReference manifestReference : annotationsManifest.getRight().getAnnotationInfoManifestReferences()) {
                 Pair<String, AnnotationInfoManifest> annotationInfoManifest = getAnnotationInfoManifest(manifestReference);
                 if (annotationInfoManifest != null) {
-                    annotationManifests.add(annotationInfoManifest);
+                    annotationInfoManifests.add(annotationInfoManifest);
                     Pair<String, ContainerAnnotation> annotation = getContainerAnnotation(manifestReference, annotationInfoManifest.getRight());
                     if (annotation != null) annotations.add(annotation);
                 }
@@ -142,7 +142,7 @@ class SignatureContentHandler {
         private Pair<String, AnnotationInfoManifest> getAnnotationInfoManifest(FileReference manifestReference) {
             try {
                 String manifestReferenceUri = manifestReference.getUri();
-                AnnotationInfoManifest annotationInfoManifest = annotationManifestHandler.get(manifestReferenceUri);
+                AnnotationInfoManifest annotationInfoManifest = annotationInfoManifestHandler.get(manifestReferenceUri);
                 return Pair.of(manifestReferenceUri, annotationInfoManifest);
             } catch (ContentParsingException e) {
                 LOGGER.info("Failed to parse annotation manifest for '{}'. Reason: '{}'", manifestReference.getUri(), e.getMessage());

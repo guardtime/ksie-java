@@ -37,7 +37,7 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule {
         if (shouldIgnoreContent(content, context)) return results;
 
         AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
-        for (FileReference reference : annotationsManifest.getAnnotationManifestReferences()) {
+        for (FileReference reference : annotationsManifest.getAnnotationInfoManifestReferences()) {
             AnnotationInfoManifest annotationInfoManifest = getAnnotationInfoManifestForReference(reference, content);
             if (shouldIgnoreAnnotation(annotationInfoManifest, context)) continue;
             results.add(verifyAnnotationData(reference, annotationInfoManifest, content));
@@ -74,7 +74,7 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule {
 
     private AnnotationInfoManifest getAnnotationInfoManifestForReference(FileReference reference, SignatureContent content) {
         // TODO: Improve SignatureContent as to provide easier access to elements based on passed in FileReference or URI from FileReference
-        for (Pair<String, AnnotationInfoManifest> manifest : content.getAnnotationManifests()) {
+        for (Pair<String, AnnotationInfoManifest> manifest : content.getAnnotationInfoManifests()) {
             if (manifest.getLeft().equals(reference.getUri())) {
                 return manifest.getRight();
             }
