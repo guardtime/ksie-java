@@ -67,14 +67,9 @@ public class DataFileIntegrityRule extends SignatureContentRule {
     }
 
     private ContainerDocument getDocumentForReference(FileReference reference, SignatureContent content) {
-        // TODO: Improve SignatureContent as to provide easier access to elements based on passed in FileReference or URI from FileReference
-        for (ContainerDocument document : content.getDocuments()) {
-            if (reference.getUri().equals(document.getFileName())) {
-                if (document.isWritable()) {
-                    return document;
-                }
-                break;
-            }
+        ContainerDocument document = content.getDocuments().get(reference.getUri());
+        if(document != null && document.isWritable()) {
+            return document;
         }
         return null;
     }

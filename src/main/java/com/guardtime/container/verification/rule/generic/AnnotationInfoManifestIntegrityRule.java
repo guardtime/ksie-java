@@ -37,7 +37,7 @@ public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule {
 
         AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
         for (FileReference reference : annotationsManifest.getAnnotationInfoManifestReferences()) {
-            AnnotationInfoManifest annotationInfoManifest = getAnnotationInfoManifestForReference(reference, content);
+            AnnotationInfoManifest annotationInfoManifest = content.getAnnotationInfoManifests().get(reference.getUri());
             results.add(getAnnotationInfoManifestResult(reference, annotationInfoManifest));
             results.add(getDataFilesManifestReferenceResult(reference, content, annotationInfoManifest));
         }
@@ -82,17 +82,6 @@ public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule {
         }
         return Pair.of(reference, new GenericVerificationResult(result, this));
     }
-
-    private AnnotationInfoManifest getAnnotationInfoManifestForReference(FileReference reference, SignatureContent content) {
-        // TODO: Improve SignatureContent as to provide easier access to elements based on passed in FileReference or URI from FileReference
-        for (Pair<String, AnnotationInfoManifest> manifest : content.getAnnotationInfoManifests()) {
-            if (manifest.getLeft().equals(reference.getUri())) {
-                return manifest.getRight();
-            }
-        }
-        return null;
-    }
-
 
     private RuleResult getMissingManifestResult(FileReference reference) {
         ContainerAnnotationType type = ContainerAnnotationType.fromContent(reference.getMimeType());

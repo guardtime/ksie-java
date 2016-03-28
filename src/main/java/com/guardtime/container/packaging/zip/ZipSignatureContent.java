@@ -15,37 +15,63 @@ import com.guardtime.ksi.util.Util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 class ZipSignatureContent implements SignatureContent {
 
-    private final List<ContainerDocument> documents;
+    private final Map<String, ContainerDocument> documents;
     private final Pair<String, DataFilesManifest> dataManifest;
     private final Pair<String, SignatureManifest> manifest;
     private final Pair<String, AnnotationsManifest> annotationsManifest;
-    private final List<Pair<String, AnnotationInfoManifest>> annotationInfoManifests;
+    private final Map<String, AnnotationInfoManifest> annotationInfoManifests;
     private ContainerSignature signature;
-    private List<Pair<String, ContainerAnnotation>> annotations;
+    private Map<String, ContainerAnnotation> annotations;
 
     private ZipSignatureContent(List<ContainerDocument> documents,
                                 List<Pair<String, ContainerAnnotation>> annotations, Pair<String, DataFilesManifest> dataManifest,
                                 Pair<String, AnnotationsManifest> annotationsManifest, Pair<String, SignatureManifest> manifest,
                                 List<Pair<String, AnnotationInfoManifest>> annotationInfoManifests) {
-        this.documents = documents;
-        this.annotations = annotations;
+        this.documents = formatDocumentsListToMap(documents);
+        this.annotations = formatAnnotationsListToMap(annotations);
+        this.annotationInfoManifests = formatAnnotationInfoManifestsListToMap(annotationInfoManifests);
         this.dataManifest = dataManifest;
         this.annotationsManifest = annotationsManifest;
         this.manifest = manifest;
-        this.annotationInfoManifests = annotationInfoManifests;
     }
 
-    public List<ContainerDocument> getDocuments() {
+    private Map<String, AnnotationInfoManifest> formatAnnotationInfoManifestsListToMap(List<Pair<String, AnnotationInfoManifest>> annotationManifests) {
+        Map<String, AnnotationInfoManifest> returnable = new HashMap<>();
+        for (Pair<String, AnnotationInfoManifest> manifestPair : annotationManifests) {
+            returnable.put(manifestPair.getLeft(), manifestPair.getRight());
+        }
+        return returnable;
+    }
+
+    private Map<String, ContainerAnnotation> formatAnnotationsListToMap(List<Pair<String, ContainerAnnotation>> annotations) {
+        Map<String, ContainerAnnotation> returnable = new HashMap<>();
+        for (Pair<String, ContainerAnnotation> annotation : annotations) {
+            returnable.put(annotation.getLeft(), annotation.getRight());
+        }
+        return returnable;
+    }
+
+    private Map<String, ContainerDocument> formatDocumentsListToMap(List<ContainerDocument> documents) {
+        Map<String, ContainerDocument> returnable = new HashMap<>();
+        for (ContainerDocument document : documents) {
+            returnable.put(document.getFileName(), document);
+        }
+        return returnable;
+    }
+
+    public Map<String, ContainerDocument> getDocuments() {
         return documents;
     }
 
-    public List<Pair<String, ContainerAnnotation>> getAnnotations() {
+    public Map<String, ContainerAnnotation> getAnnotations() {
         return annotations;
     }
 
@@ -61,7 +87,7 @@ class ZipSignatureContent implements SignatureContent {
         return manifest;
     }
 
-    public List<Pair<String, AnnotationInfoManifest>> getAnnotationInfoManifests() {
+    public Map<String, AnnotationInfoManifest> getAnnotationInfoManifests() {
         return annotationInfoManifests;
     }
 
@@ -88,14 +114,16 @@ class ZipSignatureContent implements SignatureContent {
     }
 
     private void writeAnnotationInfoManifests(ZipOutputStream output) throws IOException {
-        for (Pair<String, AnnotationInfoManifest> manifest : annotationInfoManifests) {
-            writeEntry(new ZipEntry(manifest.getLeft()), manifest.getRight().getInputStream(), output);
+        for (String uri : annotationInfoManifests.keySet()) {
+            AnnotationInfoManifest manifest = annotationInfoManifests.get(uri);
+            writeEntry(new ZipEntry(uri), manifest.getInputStream(), output);
         }
     }
 
     private void writeAnnotations(ZipOutputStream output) throws IOException {
-        for (Pair<String, ContainerAnnotation> annotation : annotations) {
-            writeEntry(new ZipEntry(annotation.getLeft()), annotation.getRight().getInputStream(), output);
+        for (String uri : annotations.keySet()) {
+            ContainerAnnotation annotation = annotations.get(uri);
+            writeEntry(new ZipEntry(uri), annotation.getInputStream(), output);
         }
     }
 
@@ -108,9 +136,10 @@ class ZipSignatureContent implements SignatureContent {
     }
 
     private void writeDocuments(ZipOutputStream zipOutputStream) throws IOException {
-        for (ContainerDocument dataFile : documents) {
+        for (String uri : documents.keySet()) {
+            ContainerDocument dataFile = documents.get(uri);
             if (dataFile.isWritable()) {
-                writeEntry(new ZipEntry(dataFile.getFileName()), dataFile.getInputStream(), zipOutputStream);
+                writeEntry(new ZipEntry(uri), dataFile.getInputStream(), zipOutputStream);
             }
         }
     }
