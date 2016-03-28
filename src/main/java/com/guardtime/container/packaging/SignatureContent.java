@@ -25,5 +25,5 @@ public interface SignatureContent {
 
     Pair<String, SignatureManifest> getSignatureManifest();
 
-    Map<String, AnnotationInfoManifest> getAnnotationManifests();
+    Map<String, AnnotationInfoManifest> getAnnotationInfoManifests();
 }

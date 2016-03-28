@@ -34,8 +34,8 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule {
         if (shouldIgnoreContent(content, context)) return results;
 
         AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
-        for (FileReference reference : annotationsManifest.getAnnotationManifestReferences()) {
-            AnnotationInfoManifest annotationInfoManifest = content.getAnnotationManifests().get(reference.getUri());
+        for (FileReference reference : annotationsManifest.getAnnotationInfoManifestReferences()) {
+            AnnotationInfoManifest annotationInfoManifest = content.getAnnotationInfoManifests().get(reference.getUri());
             if (shouldIgnoreAnnotation(annotationInfoManifest, context)) continue;
             AnnotationReference annotationReference = annotationInfoManifest.getAnnotationReference();
             ContainerAnnotation annotation = content.getAnnotations().get(annotationReference.getUri());

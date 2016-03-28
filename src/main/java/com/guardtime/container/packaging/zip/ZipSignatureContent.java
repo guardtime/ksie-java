@@ -27,17 +27,17 @@ class ZipSignatureContent implements SignatureContent {
     private final Pair<String, DataFilesManifest> dataManifest;
     private final Pair<String, SignatureManifest> manifest;
     private final Pair<String, AnnotationsManifest> annotationsManifest;
-    private final Map<String, AnnotationInfoManifest> annotationManifests;
+    private final Map<String, AnnotationInfoManifest> annotationInfoManifests;
     private ContainerSignature signature;
     private Map<String, ContainerAnnotation> annotations;
 
     private ZipSignatureContent(List<ContainerDocument> documents,
                                 List<Pair<String, ContainerAnnotation>> annotations, Pair<String, DataFilesManifest> dataManifest,
                                 Pair<String, AnnotationsManifest> annotationsManifest, Pair<String, SignatureManifest> manifest,
-                                List<Pair<String, AnnotationInfoManifest>> annotationManifests) {
+                                List<Pair<String, AnnotationInfoManifest>> annotationInfoManifests) {
         this.documents = formatDocumentsListToMap(documents);
         this.annotations = formatAnnotationsListToMap(annotations);
-        this.annotationManifests = formatAnnotationInfoManifestsListToMap(annotationManifests);
+        this.annotationInfoManifests = formatAnnotationInfoManifestsListToMap(annotationInfoManifests);
         this.dataManifest = dataManifest;
         this.annotationsManifest = annotationsManifest;
         this.manifest = manifest;
@@ -87,8 +87,8 @@ class ZipSignatureContent implements SignatureContent {
         return manifest;
     }
 
-    public Map<String, AnnotationInfoManifest> getAnnotationManifests() {
-        return annotationManifests;
+    public Map<String, AnnotationInfoManifest> getAnnotationInfoManifests() {
+        return annotationInfoManifests;
     }
 
     public ContainerSignature getSignature() {
@@ -114,8 +114,8 @@ class ZipSignatureContent implements SignatureContent {
     }
 
     private void writeAnnotationInfoManifests(ZipOutputStream output) throws IOException {
-        for (String uri : annotationManifests.keySet()) {
-            AnnotationInfoManifest manifest = annotationManifests.get(uri);
+        for (String uri : annotationInfoManifests.keySet()) {
+            AnnotationInfoManifest manifest = annotationInfoManifests.get(uri);
             writeEntry(new ZipEntry(uri), manifest.getInputStream(), output);
         }
     }
@@ -157,7 +157,7 @@ class ZipSignatureContent implements SignatureContent {
         private Pair<String, DataFilesManifest> dataManifest;
         private Pair<String, AnnotationsManifest> annotationsManifest;
         private Pair<String, SignatureManifest> manifest;
-        private List<Pair<String, AnnotationInfoManifest>> annotationManifests;
+        private List<Pair<String, AnnotationInfoManifest>> annotationInfoManifests;
 
         public Builder withDocuments(List<ContainerDocument> documents) {
             this.documents = documents;
@@ -184,13 +184,13 @@ class ZipSignatureContent implements SignatureContent {
             return this;
         }
 
-        public Builder withAnnotationManifests(List<Pair<String, AnnotationInfoManifest>> annotationManifests) {
-            this.annotationManifests = annotationManifests;
+        public Builder withAnnotationInfoManifests(List<Pair<String, AnnotationInfoManifest>> annotationManifests) {
+            this.annotationInfoManifests = annotationManifests;
             return this;
         }
 
         public ZipSignatureContent build() {
-            return new ZipSignatureContent(documents, annotations, dataManifest, annotationsManifest, manifest, annotationManifests);
+            return new ZipSignatureContent(documents, annotations, dataManifest, annotationsManifest, manifest, annotationInfoManifests);
         }
     }
 

@@ -25,12 +25,12 @@ public class TlvAnnotationInfoManifestTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateAnnotationInfoManifest() throws Exception {
-        TlvAnnotationInfoManifest annotationManifest = new TlvAnnotationInfoManifest(Pair.of(ANNOTATION_MANIFEST_URI, mockAnnotation), Pair.of(MOCK_URI, mockDataManifest));
+        TlvAnnotationInfoManifest annotationManifest = new TlvAnnotationInfoManifest(Pair.of(ANNOTATION_INFO_MANIFEST_URI, mockAnnotation), Pair.of(MOCK_URI, mockDataManifest));
 
         assertNotNull(annotationManifest.getAnnotationReference());
         assertNotNull(annotationManifest.getDataManifestReference());
         assertEquals(ANNOTATION_DOMAIN_COM_GUARDTIME, annotationManifest.getAnnotationReference().getDomain());
-        assertEquals(ANNOTATION_MANIFEST_URI, annotationManifest.getAnnotationReference().getUri());
+        assertEquals(ANNOTATION_INFO_MANIFEST_URI, annotationManifest.getAnnotationReference().getUri());
         assertEquals(dataHash, annotationManifest.getAnnotationReference().getHash());
         assertEquals(MOCK_URI, annotationManifest.getDataManifestReference().getUri());
         assertEquals(DATA_MANIFEST_TYPE, annotationManifest.getDataManifestReference().getMimeType());

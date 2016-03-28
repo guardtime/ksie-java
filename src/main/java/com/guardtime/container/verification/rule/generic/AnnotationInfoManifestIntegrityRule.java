@@ -21,14 +21,14 @@ import java.util.List;
 
 public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule {
 
-    private static final String KSIE_VERIFY_ANNOTATION_MANIFEST = "KSIE_VERIFY_ANNOTATION_MANIFEST";
+    private static final String KSIE_VERIFY_ANNOTATION_INFO_MANIFEST = "KSIE_VERIFY_ANNOTATION_INFO_MANIFEST";
 
     public AnnotationInfoManifestIntegrityRule() {
-        super(KSIE_VERIFY_ANNOTATION_MANIFEST);
+        super(KSIE_VERIFY_ANNOTATION_INFO_MANIFEST);
     }
 
     public AnnotationInfoManifestIntegrityRule(RuleState state) {
-        super(state, KSIE_VERIFY_ANNOTATION_MANIFEST);
+        super(state, KSIE_VERIFY_ANNOTATION_INFO_MANIFEST);
     }
 
     @Override
@@ -37,9 +37,9 @@ public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule {
         if (shouldIgnoreContent(content, context)) return results;
 
         AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
-        for (FileReference reference : annotationsManifest.getAnnotationManifestReferences()) {
-            AnnotationInfoManifest annotationInfoManifest = content.getAnnotationManifests().get(reference.getUri());
-            results.add(getAnnotationManifestResult(reference, annotationInfoManifest));
+        for (FileReference reference : annotationsManifest.getAnnotationInfoManifestReferences()) {
+            AnnotationInfoManifest annotationInfoManifest = content.getAnnotationInfoManifests().get(reference.getUri());
+            results.add(getAnnotationInfoManifestResult(reference, annotationInfoManifest));
             results.add(getDataFilesManifestReferenceResult(reference, content, annotationInfoManifest));
         }
         return results;
@@ -58,7 +58,7 @@ public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule {
         return false;
     }
 
-    private Pair<FileReference, GenericVerificationResult> getAnnotationManifestResult(FileReference reference, AnnotationInfoManifest annotationInfoManifest) {
+    private Pair<FileReference, GenericVerificationResult> getAnnotationInfoManifestResult(FileReference reference, AnnotationInfoManifest annotationInfoManifest) {
         RuleResult result = getFailureResult();
         try {
             DataHash expectedHash = reference.getHash();
