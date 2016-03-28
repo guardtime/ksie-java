@@ -23,7 +23,7 @@ public class TlvSignatureManifestTest extends AbstractTlvManifestTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        this.annotationsManifestReference = createReference(ANNOTATIONS_MANIFEST_REFERENCE_TYPE, ANNOTATIONS_MANIFEST_URI, ANNOTATION_MANIFEST_TYPE, dataHash);
+        this.annotationsManifestReference = createReference(ANNOTATIONS_MANIFEST_REFERENCE_TYPE, ANNOTATIONS_MANIFEST_URI, ANNOTATIONS_MANIFEST_TYPE, dataHash);
         this.dataFilesReference = createReference(DATA_MANIFEST_REFERENCE_TYPE, DATAFILES_MANIFEST_URI, MIME_TYPE_APPLICATION_TXT, dataHash);
         this.signatureReference = createReference(SIGNATURE_REFERENCE_TYPE, SIGNATURE_URI, SIGNATURE_TYPE, null);
     }
@@ -56,13 +56,13 @@ public class TlvSignatureManifestTest extends AbstractTlvManifestTest {
         assertEquals(DATAFILES_MANIFEST_URI, manifest.getDataFilesManifestReference().getUri());
         assertEquals(MIME_TYPE_APPLICATION_TXT, manifest.getDataFilesManifestReference().getMimeType());
         assertEquals(ANNOTATIONS_MANIFEST_URI, manifest.getAnnotationsManifestReference().getUri());
-        assertEquals(ANNOTATION_MANIFEST_TYPE, manifest.getAnnotationsManifestReference().getMimeType());
+        assertEquals(ANNOTATIONS_MANIFEST_TYPE, manifest.getAnnotationsManifestReference().getMimeType());
         assertEquals(SIGNATURE_URI, manifest.getSignatureReference().getUri());
         assertEquals(SIGNATURE_TYPE, manifest.getSignatureReference().getType());
     }
 
     @Test
-    public void testReadManifestWithoutAnnotationManifestReference() throws Exception {
+    public void testReadManifestWithoutAnnotationInfoManifestReference() throws Exception {
         expectedException.expect(InvalidManifestException.class);
         expectedException.expectMessage("Annotations manifest reference is mandatory");
         byte[] manifestBytes = join(SIGNATURE_MANIFEST_MAGIC, dataFilesReference.getEncoded(), signatureReference.getEncoded());

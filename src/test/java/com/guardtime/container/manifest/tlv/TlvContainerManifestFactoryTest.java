@@ -31,19 +31,19 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
     public void testCreateAnnotationInfoManifestWithoutDataManifest_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Document manifest");
-        factory.createAnnotationManifest(null, mockedAnnotationPair);
+        factory.createAnnotationInfoManifest(null, mockedAnnotationPair);
     }
 
     @Test
     public void testCreateAnnotationInfoManifestWithoutAnnotation_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Annotation");
-        factory.createAnnotationManifest(mockedDataManifestPair, null);
+        factory.createAnnotationInfoManifest(mockedDataManifestPair, null);
     }
 
     @Test
     public void testCreateAnnotationInfoManifest() throws Exception {
-        TlvAnnotationInfoManifest manifest = factory.createAnnotationManifest(mockedDataManifestPair, mockedAnnotationPair);
+        TlvAnnotationInfoManifest manifest = factory.createAnnotationInfoManifest(mockedDataManifestPair, mockedAnnotationPair);
         assertNotNull(manifest);
         assertNotNull(manifest.getAnnotationReference());
         assertNotNull(manifest.getDataManifestReference());
