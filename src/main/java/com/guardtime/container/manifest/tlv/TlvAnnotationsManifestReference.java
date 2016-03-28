@@ -1,7 +1,6 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.manifest.AnnotationsManifest;
-import com.guardtime.container.util.Util;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 
@@ -17,7 +16,7 @@ class TlvAnnotationsManifestReference extends TlvFileReference {
     }
 
     public TlvAnnotationsManifestReference(String uri, AnnotationsManifest manifest) throws TLVParserException, IOException {
-        super(uri, Util.hash(manifest.getInputStream(), DEFAULT_HASH_ALGORITHM), ANNOTATIONS_MANIFEST_TYPE);
+        super(uri, manifest.getDataHash(DEFAULT_HASH_ALGORITHM), ANNOTATIONS_MANIFEST_TYPE);
     }
 
     @Override

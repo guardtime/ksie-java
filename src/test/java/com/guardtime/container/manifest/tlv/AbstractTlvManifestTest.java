@@ -11,7 +11,6 @@ import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 import com.guardtime.ksi.tlv.TLVStructure;
 import com.guardtime.ksi.util.Util;
-
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -71,14 +70,18 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
     public void setUp() throws Exception {
         super.setUp();
         this.dataHash = hash(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), HashAlgorithm.SHA2_256);
+        DataHash dataHashForEmptyData = hash(EMPTY_INPUT_STREAM, HashAlgorithm.SHA2_256);
         when(mockDataManifest.getInputStream()).thenReturn(EMPTY_INPUT_STREAM);
+        when(mockDataManifest.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHashForEmptyData);
         when(mockAnnotationsManifest.getInputStream()).thenReturn(EMPTY_INPUT_STREAM);
+        when(mockAnnotationsManifest.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHashForEmptyData);
 
         when(mockAnnotation.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHash);
         when(mockAnnotation.getAnnotationType()).thenReturn(ContainerAnnotationType.NON_REMOVABLE);
         when(mockAnnotation.getDomain()).thenReturn(ANNOTATION_DOMAIN_COM_GUARDTIME);
 
         when(mockAnnotationInfoManifest.getInputStream()).thenReturn(EMPTY_INPUT_STREAM);
+        when(mockAnnotationInfoManifest.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHashForEmptyData);
         when(mockAnnotationInfoManifest.getAnnotationReference()).thenReturn(mockAnnotationReference);
 
         when(mockAnnotationReference.getDomain()).thenReturn(ANNOTATION_DOMAIN_COM_GUARDTIME);

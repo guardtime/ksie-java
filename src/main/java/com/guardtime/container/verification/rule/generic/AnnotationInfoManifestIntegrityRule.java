@@ -7,7 +7,6 @@ import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.SignatureManifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
-import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleResult;
@@ -61,10 +60,9 @@ public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule {
     private Pair<FileReference, GenericVerificationResult> getAnnotationInfoManifestResult(FileReference reference, AnnotationInfoManifest annotationInfoManifest) {
         RuleResult result = getFailureResult();
         try {
-            DataHash expectedHash = reference.getHash();
-            // TODO: review annotationInfoManifest and add getDataHash if possible
-            DataHash realHash = Util.hash(annotationInfoManifest.getInputStream(), expectedHash.getAlgorithm());
-            if (realHash.equals(expectedHash)) {
+            DataHash expectedDataHash = reference.getHash();
+            DataHash realDataHash = annotationInfoManifest.getDataHash(expectedDataHash.getAlgorithm());
+            if (realDataHash.equals(expectedDataHash)) {
                 result = RuleResult.OK;
             }
         } catch (IOException e) {

@@ -5,7 +5,6 @@ import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.SignatureManifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
-import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleResult;
@@ -35,8 +34,7 @@ public class DataFilesManifestIntegrityRule extends SignatureContentRule {
         try {
             DataFilesManifest dataFilesManifest = content.getDataManifest().getRight();
             DataHash expectedHash = getDataHashFromSignatureManifest(content);
-            // TODO: review dataFilesManifest and add getDataHash if possible
-            DataHash realHash = Util.hash(dataFilesManifest.getInputStream(), expectedHash.getAlgorithm());
+            DataHash realHash = dataFilesManifest.getDataHash(expectedHash.getAlgorithm());
             if (realHash.equals(expectedHash)) {
                 result = RuleResult.OK;
             }
