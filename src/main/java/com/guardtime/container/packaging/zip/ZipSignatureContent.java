@@ -9,7 +9,7 @@ import com.guardtime.container.manifest.SignatureManifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureException;
-import com.guardtime.container.signature.SignatureFactory;
+import com.guardtime.container.extending.SignatureExtender;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -68,9 +68,9 @@ class ZipSignatureContent implements SignatureContent {
     }
 
     @Override
-    public boolean extendSignature(SignatureFactory signatureFactory) {
+    public boolean extendSignature(SignatureExtender signatureExtender) {
         try {
-            ContainerSignature extendedSignature = signatureFactory.extend(this.signature);
+            ContainerSignature extendedSignature = signatureExtender.extend(this.signature);
             this.signature = extendedSignature;
             return true;
         } catch (SignatureException e) {
