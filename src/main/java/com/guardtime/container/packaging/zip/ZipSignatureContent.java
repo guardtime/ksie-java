@@ -67,23 +67,22 @@ class ZipSignatureContent implements SignatureContent {
         return annotationManifests;
     }
 
-    @Override
-    public boolean extendSignature(SignatureExtender signatureExtender) {
-        try {
-            ContainerSignature extendedSignature = signatureExtender.extend(this.signature);
-            this.signature = extendedSignature;
-            return true;
-        } catch (SignatureException e) {
-            return false;
-        }
-    }
-
     public ContainerSignature getSignature() {
         return signature;
     }
 
     public void setSignature(ContainerSignature signature) {
         this.signature = signature;
+    }
+
+    @Override
+    public boolean extendSignature(SignatureExtender signatureExtender) {
+        try {
+            this.signature = signatureExtender.extend(this.signature);
+            return true;
+        } catch (SignatureException e) {
+            return false;
+        }
     }
 
     public DataHash getSignatureInputHash() throws IOException {
