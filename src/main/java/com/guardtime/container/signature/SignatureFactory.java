@@ -10,6 +10,7 @@ public interface SignatureFactory {
 
     ContainerSignature read(InputStream input) throws SignatureException;
 
-    SignatureFactoryType getSignatureFactoryType();
+    ContainerSignature extend(ContainerSignature signature) throws SignatureException;
 
+    SignatureFactoryType getSignatureFactoryType();
 }

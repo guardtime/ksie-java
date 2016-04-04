@@ -7,6 +7,7 @@ import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.DataFilesManifest;
 import com.guardtime.container.manifest.SignatureManifest;
 import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.util.Pair;
 
 import java.util.List;
@@ -26,4 +27,11 @@ public interface SignatureContent {
     Pair<String, SignatureManifest> getSignatureManifest();
 
     List<Pair<String, AnnotationInfoManifest>> getAnnotationManifests();
+
+    /**
+     * Updates the existing ContainerSignature maintained by the SignatureContent to extend it to a trust anchor
+     * @param signatureFactory
+     * @return true when signature is extended
+     */
+    boolean extendSignature(SignatureFactory signatureFactory);
 }

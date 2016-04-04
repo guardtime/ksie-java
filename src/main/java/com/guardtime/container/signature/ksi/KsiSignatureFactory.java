@@ -1,5 +1,6 @@
 package com.guardtime.container.signature.ksi;
 
+import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureException;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.SignatureFactoryType;
@@ -47,6 +48,16 @@ public class KsiSignatureFactory implements SignatureFactory {
     @Override
     public SignatureFactoryType getSignatureFactoryType() {
         return SIGNATURE_FACTORY_TYPE;
+    }
+
+    @Override
+    public KsiContainerSignature extend(ContainerSignature signature) throws SignatureException {
+        try {
+            KSISignature extendableSignature = ((KsiContainerSignature) signature).getSignature();
+            return new KsiContainerSignature(ksi.extend(extendableSignature));
+        } catch (ClassCastException | KSIException e) {
+            throw new SignatureException(e);
+        }
     }
 
 }

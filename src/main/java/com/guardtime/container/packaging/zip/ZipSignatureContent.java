@@ -8,6 +8,8 @@ import com.guardtime.container.manifest.DataFilesManifest;
 import com.guardtime.container.manifest.SignatureManifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.signature.SignatureException;
+import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -63,6 +65,17 @@ class ZipSignatureContent implements SignatureContent {
 
     public List<Pair<String, AnnotationInfoManifest>> getAnnotationManifests() {
         return annotationManifests;
+    }
+
+    @Override
+    public boolean extendSignature(SignatureFactory signatureFactory) {
+        try {
+            ContainerSignature extendedSignature = signatureFactory.extend(this.signature);
+            this.signature = extendedSignature;
+            return true;
+        } catch (SignatureException e) {
+            return false;
+        }
     }
 
     public ContainerSignature getSignature() {
