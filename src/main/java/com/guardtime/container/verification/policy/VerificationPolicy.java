@@ -10,7 +10,7 @@ public interface VerificationPolicy {
      * Contains rules to be performed on container to prove validity.
      * As an example should contain rules for:
      * <ol>
-     *   <li>verifying mimetype</li>
+     *   <li>verifying MIME-type</li>
      *   <li>verifying manifest indexes are consecutive</li>
      *   <li>verifying signature</li>
      *   <li>verifying data manifest</li>
@@ -19,7 +19,7 @@ public interface VerificationPolicy {
      *   <li>verifying annotations (including annotation manifests)</li>
      * </ol>
      * May contain extra rules to add specialized verification requirements to the policy.
-     * @return List of all rules to be performed when verifying with the policy.
+     * @return List of all {@link Rule} to be performed when verifying with the policy.
      */
     List<Rule> getRules();
 }

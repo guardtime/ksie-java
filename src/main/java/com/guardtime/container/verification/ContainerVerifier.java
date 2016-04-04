@@ -19,12 +19,12 @@ public class ContainerVerifier {
     }
 
     /**
-     * Verifies the VerificationContext based on the rules provided by the VerificationPolicy. Appends results from
+     * Verifies the {@link VerificationContext} based on the rules provided by the {@link VerificationPolicy}. Appends results from
      * rules to the pre-existing list of results contained in the context
      *
      * @param context
      *         containing verifiable container and a list of results from performed rules
-     * @return RuleVerificationResult based on the updated VerificationContext
+     * @return {@link VerifierResult} based on all {@link RuleVerificationResult} gathered during verification.
      */
     public VerifierResult verify(VerificationContext context) {
         for (Rule rule : policy.getRules()) {

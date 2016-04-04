@@ -1,4 +1,4 @@
-package com.guardtime.container.integration;
+package com.guardtime.container.verification;
 
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.BlockChainContainer;
@@ -19,8 +19,8 @@ import com.guardtime.container.verification.rule.generic.ksi.KsiPolicyBasedSigna
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.verifier.VerificationResult;
-import com.guardtime.ksi.unisignature.verifier.policies.CalendarBasedVerificationPolicy;
 import com.guardtime.ksi.unisignature.verifier.policies.KeyBasedVerificationPolicy;
+import com.guardtime.ksi.unisignature.verifier.policies.Policy;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -38,7 +38,7 @@ import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-public class VerifierIT {
+public class VerificationTest {
 
     private static final String CONTAINER_WITH_MULTIPLE_SIGNATURES = "containers/container-multiple-signatures.ksie";
     private ZipContainerPackagingFactory factory;
@@ -70,7 +70,7 @@ public class VerifierIT {
         when(mockSignatureFactory.getSignatureFactoryType()).thenReturn(new KsiSignatureFactoryType());
         when(mockSignatureFactory.read(Mockito.any(InputStream.class))).thenReturn(mockedSignature);
         when(mockKSI.read(Mockito.any(byte[].class))).thenReturn(Mockito.mock(KSISignature.class));
-        when(mockKSI.verify(Mockito.any(KSISignature.class), Mockito.any(CalendarBasedVerificationPolicy.class))).thenReturn(mockResult);
+        when(mockKSI.verify(Mockito.any(KSISignature.class), Mockito.any(Policy.class))).thenReturn(mockResult);
         TlvContainerManifestFactory manifestFactory = new TlvContainerManifestFactory();
         factory = new ZipContainerPackagingFactory(mockSignatureFactory, manifestFactory);
     }
@@ -81,7 +81,7 @@ public class VerifierIT {
         return new SimpleVerificationContext(container);
     }
 
-    private DefaultVerificationPolicy getRecommendedVerificationPolicy() {
+    private DefaultVerificationPolicy getDefaultVerificationPolicy() {
         return new DefaultVerificationPolicy(Arrays.asList((Rule)
                 new MimeTypeIntegrityRule(factory),
                 new KsiPolicyBasedSignatureIntegrityRule(mockKSI, new KeyBasedVerificationPolicy())
@@ -90,14 +90,18 @@ public class VerifierIT {
 
     private VerifierResult getGenericVerifierResult() throws IOException, URISyntaxException, InvalidPackageException {
         VerificationContext context = getVerificationContext(CONTAINER_WITH_MULTIPLE_SIGNATURES);
-        DefaultVerificationPolicy policy = getRecommendedVerificationPolicy();
+        DefaultVerificationPolicy policy = getDefaultVerificationPolicy();
         ContainerVerifier verifier = new ContainerVerifier(policy);
         return verifier.verify(context);
     }
 
+    private void setSignatureVerificationResult(boolean result) {
+        when(mockResult.isOk()).thenReturn(result);
+    }
+
     @Test
     public void testGenericVerificationWithValidContainer() throws Exception {
-        when(mockResult.isOk()).thenReturn(true);
+        setSignatureVerificationResult(true);
         VerifierResult result = getGenericVerifierResult();
 
         assertEquals(RuleResult.OK, result.getVerificationResult());
@@ -105,7 +109,7 @@ public class VerifierIT {
 
     @Test
     public void testGenericVerificationWithBrokenContainer() throws Exception {
-        when(mockResult.isOk()).thenReturn(false); // Make it seem like the container is broken
+        setSignatureVerificationResult(false);
         VerifierResult result = getGenericVerifierResult();
 
         assertEquals(RuleResult.NOK, result.getVerificationResult());

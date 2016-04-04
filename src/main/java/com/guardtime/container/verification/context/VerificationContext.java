@@ -9,7 +9,7 @@ import java.util.List;
 public interface VerificationContext {
 
     /**
-     * Provides the container to be verified as well as containing a list of results from any verification done on the
+     * Provides the {@link BlockChainContainer} to be verified as well as containing a list of results from any verification done on the
      * container.
      *
      * @return
@@ -24,7 +24,7 @@ public interface VerificationContext {
     List<RuleVerificationResult> getResults();
 
     /**
-     * Provides access to a sublist of results that were performed on obj.
+     * Provides access to a sub list of results that were performed on obj.
      *
      * @param obj
      * @return
