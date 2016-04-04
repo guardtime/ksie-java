@@ -1,5 +1,7 @@
 package com.guardtime.container.verification.result;
 
+import com.guardtime.container.ContainerFileElement;
+
 public interface RuleVerificationResult {
 
     RuleResult getResult();
@@ -7,4 +9,6 @@ public interface RuleVerificationResult {
     String getRuleName();
 
     boolean terminatesVerification();
+
+    ContainerFileElement getTestedElement();
 }

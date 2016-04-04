@@ -1,5 +1,6 @@
 package com.guardtime.container.verification.context;
 
+import com.guardtime.container.ContainerFileElement;
 import com.guardtime.container.packaging.BlockChainContainer;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.RuleVerificationResult;
@@ -11,7 +12,7 @@ import java.util.Map;
 
 public class SimpleVerificationContext implements VerificationContext {
     private final BlockChainContainer container;
-    private Map<Object, List<RuleVerificationResult>> resultsMap = new HashMap<>();
+    private Map<ContainerFileElement, List<RuleVerificationResult>> resultsMap = new HashMap<>();
 
     public SimpleVerificationContext(BlockChainContainer container) {
         this.container = container;
@@ -32,21 +33,21 @@ public class SimpleVerificationContext implements VerificationContext {
     }
 
     @Override
-    public List<RuleVerificationResult> getResultsFor(Object obj) {
-        List<RuleVerificationResult> results = resultsMap.get(obj);
+    public List<RuleVerificationResult> getResultsFor(ContainerFileElement element) {
+        List<RuleVerificationResult> results = resultsMap.get(element);
         return results == null ? null : new LinkedList<>(results);
     }
 
     @Override
-    public void addResults(List<Pair<? extends Object, ? extends RuleVerificationResult>> verificationResults) {
-        for (Pair<? extends Object, ? extends RuleVerificationResult> result : verificationResults) {
-            Object testedObject = result.getLeft();
-            List<RuleVerificationResult> priorResults = resultsMap.get(testedObject);
+    public void addResults(List<RuleVerificationResult> verificationResults) {
+        for (RuleVerificationResult result : verificationResults) {
+            ContainerFileElement testedElement = result.getTestedElement();
+            List<RuleVerificationResult> priorResults = resultsMap.get(testedElement);
             if (priorResults == null) {
-                resultsMap.put(testedObject, new LinkedList<RuleVerificationResult>());
-                priorResults = resultsMap.get(testedObject);
+                resultsMap.put(testedElement, new LinkedList<RuleVerificationResult>());
+                priorResults = resultsMap.get(testedElement);
             }
-            priorResults.add(result.getRight());
+            priorResults.add(result);
         }
     }
 }

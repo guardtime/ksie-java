@@ -1,5 +1,6 @@
 package com.guardtime.container.verification.result;
 
+import com.guardtime.container.ContainerFileElement;
 import com.guardtime.container.verification.rule.Rule;
 
 /**
@@ -8,8 +9,8 @@ import com.guardtime.container.verification.rule.Rule;
  */
 public class TerminatingVerificationResult extends GenericVerificationResult {
 
-    public TerminatingVerificationResult(RuleResult result, Rule rule) {
-        super(result, rule);
+    public TerminatingVerificationResult(RuleResult result, Rule rule, ContainerFileElement testedElement) {
+        super(result, rule, testedElement);
     }
 
     @Override
