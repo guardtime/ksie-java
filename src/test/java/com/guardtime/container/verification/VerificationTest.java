@@ -11,6 +11,8 @@ import com.guardtime.container.verification.ContainerVerifier;
 import com.guardtime.container.verification.context.SimpleVerificationContext;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.policy.DefaultVerificationPolicy;
+import com.guardtime.container.verification.report.ContainerVerificationReport;
+import com.guardtime.container.verification.report.generic.GenericContainerVerificationReportFactory;
 import com.guardtime.container.verification.result.RuleResult;
 import com.guardtime.container.verification.result.VerifierResult;
 import com.guardtime.container.verification.rule.Rule;
@@ -36,6 +38,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 public class VerificationTest {
@@ -113,5 +117,15 @@ public class VerificationTest {
         VerifierResult result = getGenericVerifierResult();
 
         assertEquals(RuleResult.NOK, result.getVerificationResult());
+    }
+
+    @Test
+    public void testGenericContainerVerificationReportWithValidContainer() throws Exception {
+        when(mockResult.isOk()).thenReturn(true);
+        ContainerVerificationReport report = new GenericContainerVerificationReportFactory().create(getGenericVerifierResult());
+        assertNotNull(report);
+        assertEquals(RuleResult.OK, report.getResult());
+        assertTrue(report.getUsedRules().size() > 0);
+        assertTrue(report.getAffectedFiles().size() > 0);
     }
 }

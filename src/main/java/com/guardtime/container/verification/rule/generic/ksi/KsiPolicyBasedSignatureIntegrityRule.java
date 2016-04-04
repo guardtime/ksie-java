@@ -2,7 +2,6 @@ package com.guardtime.container.verification.rule.generic.ksi;
 
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
-import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleResult;
@@ -17,9 +16,10 @@ import com.guardtime.ksi.unisignature.verifier.policies.Policy;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
-public class KsiPolicyBasedSignatureIntegrityRule extends SignatureContentRule {
+public class KsiPolicyBasedSignatureIntegrityRule extends SignatureContentRule<GenericVerificationResult> {
     private static final String KSIE_VERIFY_MANIFEST_SIGNATURE = "KSIE_VERIFY_MANIFEST_SIGNATURE";
     private final KSI ksi;
     private Policy verificationPolicy;
@@ -35,7 +35,7 @@ public class KsiPolicyBasedSignatureIntegrityRule extends SignatureContentRule {
     }
 
     @Override
-    protected List<Pair<? extends Object, ? extends RuleVerificationResult>> verifySignatureContent(SignatureContent content, VerificationContext context) {
+    protected List<GenericVerificationResult> verifySignatureContent(SignatureContent content, VerificationContext context) {
         RuleResult ruleResult = getFailureResult();
         ContainerSignature contentSignature = content.getSignature();
         try {
@@ -49,6 +49,6 @@ public class KsiPolicyBasedSignatureIntegrityRule extends SignatureContentRule {
         } catch (KSIException | IOException e) {
             LOGGER.debug("Verifying signature failed!", e);
         }
-        return asReturnablePairList(contentSignature, new GenericVerificationResult(ruleResult, this));
+        return Arrays.asList(new GenericVerificationResult(ruleResult, this, contentSignature));
     }
 }

@@ -1,5 +1,6 @@
 package com.guardtime.container.verification.context;
 
+import com.guardtime.container.ContainerFileElement;
 import com.guardtime.container.packaging.BlockChainContainer;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.RuleVerificationResult;
@@ -26,10 +27,10 @@ public interface VerificationContext {
     /**
      * Provides access to a sub list of results that were performed on obj.
      *
-     * @param obj
+     * @param element
      * @return
      */
-    List<RuleVerificationResult> getResultsFor(Object obj);
+    List<RuleVerificationResult> getResultsFor(ContainerFileElement element);
 
-    void addResults(List<Pair<? extends Object, ? extends RuleVerificationResult>> verificationResults);
+    void addResults(List<RuleVerificationResult> verificationResults);
 }

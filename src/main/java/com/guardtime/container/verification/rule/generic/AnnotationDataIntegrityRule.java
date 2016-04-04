@@ -2,9 +2,11 @@ package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
-import com.guardtime.container.manifest.*;
+import com.guardtime.container.manifest.AnnotationInfoManifest;
+import com.guardtime.container.manifest.AnnotationReference;
+import com.guardtime.container.manifest.AnnotationsManifest;
+import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleResult;
@@ -16,7 +18,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class AnnotationDataIntegrityRule extends SignatureContentRule {
+public class AnnotationDataIntegrityRule extends SignatureContentRule<GenericVerificationResult> {
 
     private static final String KSIE_VERIFY_ANNOTATION_DATA = "KSIE_VERIFY_ANNOTATION_DATA";
 
@@ -29,8 +31,8 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule {
     }
 
     @Override
-    protected List<Pair<? extends Object, ? extends RuleVerificationResult>> verifySignatureContent(SignatureContent content, VerificationContext context) {
-        List<Pair<? extends Object, ? extends RuleVerificationResult>> results = new LinkedList<>();
+    protected List<GenericVerificationResult> verifySignatureContent(SignatureContent content, VerificationContext context) {
+        List<GenericVerificationResult> results = new LinkedList<>();
         if (shouldIgnoreContent(content, context)) return results;
 
         AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
@@ -45,11 +47,10 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule {
     }
 
     private boolean shouldIgnoreContent(SignatureContent content, VerificationContext context) {
-        SignatureManifest signatureManifest = content.getSignatureManifest().getRight();
-        FileReference annotationsManifestReference = signatureManifest.getAnnotationsManifestReference();
-        List<RuleVerificationResult> resultsForAnnotationsManifestReference = context.getResultsFor(annotationsManifestReference);
-        if (resultsForAnnotationsManifestReference == null) return true;
-        for (RuleVerificationResult result : resultsForAnnotationsManifestReference) {
+        AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
+        List<RuleVerificationResult> resultsForAnnotationsManifest = context.getResultsFor(annotationsManifest);
+        if (resultsForAnnotationsManifest == null) return true;
+        for (RuleVerificationResult result : resultsForAnnotationsManifest) {
             if (!RuleResult.OK.equals(result.getResult())) {
                 return true;
             }
@@ -71,7 +72,7 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule {
         return false;
     }
 
-    private Pair<FileReference, GenericVerificationResult> verifyAnnotationData(FileReference reference, AnnotationReference annotationReference, ContainerAnnotation annotation) {
+    private GenericVerificationResult verifyAnnotationData(FileReference reference, AnnotationReference annotationReference, ContainerAnnotation annotation) {
         RuleResult result = getFailureResult();
         try {
             DataHash expectedDataHash = annotationReference.getHash();
@@ -83,7 +84,7 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule {
             LOGGER.debug("Verifying annotation data failed!", e);
             result = getMissingAnnotationResult(reference);
         }
-        return Pair.of(reference, new GenericVerificationResult(result, this));
+        return new GenericVerificationResult(result, this, annotation);
     }
 
     private RuleResult getMissingAnnotationResult(FileReference reference) {
