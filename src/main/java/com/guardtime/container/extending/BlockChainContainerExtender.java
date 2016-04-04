@@ -2,6 +2,7 @@ package com.guardtime.container.extending;
 
 import com.guardtime.container.packaging.BlockChainContainer;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +12,7 @@ public class BlockChainContainerExtender {
     private final SignatureExtender extender;
 
     public BlockChainContainerExtender(SignatureExtender extender) {
+        Util.notNull(extender, "Signature extender");
         this.extender = extender;
     }
 
