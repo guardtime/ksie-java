@@ -35,7 +35,7 @@ public class TlvContainerManifestFactory implements ContainerManifestFactory<Tlv
     }
 
     @Override
-    public TlvAnnotationInfoManifest createAnnotationManifest(Pair<String, TlvDataFilesManifest> dataManifest, Pair<String, ContainerAnnotation> annotation) throws InvalidManifestException {
+    public TlvAnnotationInfoManifest createAnnotationInfoManifest(Pair<String, TlvDataFilesManifest> dataManifest, Pair<String, ContainerAnnotation> annotation) throws InvalidManifestException {
         Util.notNull(dataManifest, "Document manifest");
         Util.notNull(annotation, "Annotation");
         return new TlvAnnotationInfoManifest(annotation, dataManifest);
@@ -60,7 +60,7 @@ public class TlvContainerManifestFactory implements ContainerManifestFactory<Tlv
     }
 
     @Override
-    public TlvAnnotationInfoManifest readAnnotationManifest(InputStream input) throws InvalidManifestException {
+    public TlvAnnotationInfoManifest readAnnotationInfoManifest(InputStream input) throws InvalidManifestException {
         Util.notNull(input, "Input stream");
         return new TlvAnnotationInfoManifest(input);
     }

@@ -9,6 +9,10 @@ import java.util.List;
 
 public interface BlockChainContainer {
 
+    /**
+     *
+     * @return Ordered list of SignatureContent where the order is ascending based on the index of manifest
+     */
     List<? extends SignatureContent> getSignatureContents();
 
     void writeTo(OutputStream output) throws IOException;

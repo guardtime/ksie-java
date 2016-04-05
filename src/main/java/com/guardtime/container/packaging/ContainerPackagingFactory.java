@@ -14,4 +14,5 @@ public interface ContainerPackagingFactory<C extends BlockChainContainer> {
 
     C create(C existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException;
 
+    byte[] getMimeTypeContent();
 }

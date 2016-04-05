@@ -16,7 +16,7 @@ public interface ContainerManifestFactory<S extends SignatureManifest, D extends
 
     A createAnnotationsManifest(Map<String, Pair<ContainerAnnotation, AI>> annotationManifests) throws InvalidManifestException;
 
-    AI createAnnotationManifest(Pair<String, D> dataManifest, Pair<String, ContainerAnnotation> annotation) throws InvalidManifestException;
+    AI createAnnotationInfoManifest(Pair<String, D> dataManifest, Pair<String, ContainerAnnotation> annotation) throws InvalidManifestException;
 
     S readSignatureManifest(InputStream input) throws InvalidManifestException;
 
@@ -24,7 +24,7 @@ public interface ContainerManifestFactory<S extends SignatureManifest, D extends
 
     A readAnnotationsManifest(InputStream input) throws InvalidManifestException;
 
-    AI readAnnotationManifest(InputStream input) throws InvalidManifestException;
+    AI readAnnotationInfoManifest(InputStream input) throws InvalidManifestException;
 
     ManifestFactoryType getManifestFactoryType();
 

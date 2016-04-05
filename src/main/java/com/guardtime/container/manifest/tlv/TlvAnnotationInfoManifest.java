@@ -6,6 +6,9 @@ import com.guardtime.container.manifest.AnnotationReference;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.util.Pair;
+import com.guardtime.container.util.Util;
+import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVInputStream;
 import com.guardtime.ksi.tlv.TLVParserException;
@@ -78,6 +81,11 @@ class TlvAnnotationInfoManifest extends AbstractTlvManifestStructure implements 
     @Override
     public FileReference getDataManifestReference() {
         return dataManifestReference;
+    }
+
+    @Override
+    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
+        return Util.hash(getInputStream(), algorithm);
     }
 
 }

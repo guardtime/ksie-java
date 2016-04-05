@@ -31,7 +31,7 @@ class ZipContainerReader {
     private final ManifestHandler manifestHandler;
     private final DataManifestHandler dataManifestHandler;
     private final AnnotationsManifestHandler annotationsManifestHandler;
-    private final AnnotationManifestHandler annotationManifestHandler;
+    private final AnnotationInfoManifestHandler annotationInfoManifestHandler;
     private final SignatureHandler signatureHandler;
     private final SignatureContentHandler signatureContentHandler;
 
@@ -44,16 +44,16 @@ class ZipContainerReader {
         this.manifestHandler = new ManifestHandler(manifestFactory);
         this.dataManifestHandler = new DataManifestHandler(manifestFactory);
         this.annotationsManifestHandler = new AnnotationsManifestHandler(manifestFactory);
-        this.annotationManifestHandler = new AnnotationManifestHandler(manifestFactory);
+        this.annotationInfoManifestHandler = new AnnotationInfoManifestHandler(manifestFactory);
         this.signatureHandler = new SignatureHandler(signatureFactory);
         this.handlers = new ContentHandler[]{mimeTypeHandler, documentHandler, annotationContentHandler, dataManifestHandler,
-                manifestHandler, annotationsManifestHandler, signatureHandler, annotationManifestHandler};
+                manifestHandler, annotationsManifestHandler, signatureHandler, annotationInfoManifestHandler};
 
         this.manifestSuffix = manifestFactory.getManifestFactoryType().getManifestFileExtension();
         this.signatureSuffix = signatureFactory.getSignatureFactoryType().getSignatureFileExtension();
 
         this.signatureContentHandler = new SignatureContentHandler(documentHandler, annotationContentHandler, manifestHandler,
-                dataManifestHandler, annotationsManifestHandler, annotationManifestHandler, signatureHandler);
+                dataManifestHandler, annotationsManifestHandler, annotationInfoManifestHandler, signatureHandler);
     }
 
     ZipBlockChainContainer read(InputStream input) throws IOException {
@@ -83,8 +83,8 @@ class ZipContainerReader {
         ));
         int maxAnnotationIndex = Collections.max(Arrays.asList(
                 annotationContentHandler.getMaxIndex(),
-                annotationManifestHandler.getMaxIndex(),
-                annotationsManifestHandler.getMaxAnnotationManifestIndex()
+                annotationInfoManifestHandler.getMaxIndex(),
+                annotationsManifestHandler.getMaxAnnotationInfoManifestIndex()
         ));
         return new ZipEntryNameProvider(
                 manifestSuffix,

@@ -1,6 +1,7 @@
 package com.guardtime.container.datafile;
 
 
+import com.guardtime.container.ContainerFileElement;
 import com.guardtime.container.util.DataHashException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -8,7 +9,7 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import java.io.IOException;
 import java.io.InputStream;
 
-public interface ContainerDocument {
+public interface ContainerDocument extends ContainerFileElement {
 
     String getFileName();
 
