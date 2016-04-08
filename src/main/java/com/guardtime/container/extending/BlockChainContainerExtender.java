@@ -1,5 +1,6 @@
 package com.guardtime.container.extending;
 
+import com.guardtime.container.manifest.SignatureManifest;
 import com.guardtime.container.packaging.BlockChainContainer;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Util;
@@ -19,7 +20,8 @@ public class BlockChainContainerExtender {
     public BlockChainContainer extend(BlockChainContainer container) {
         for (SignatureContent content : container.getSignatureContents()) {
             if (!content.extendSignature(extender)) {
-                String signatureUri = content.getSignatureManifest().getRight().getSignatureReference().getUri();
+                SignatureManifest signatureManifest = content.getSignatureManifest().getRight();
+                String signatureUri = signatureManifest.getSignatureReference().getUri();
                 LOGGER.info("Failed to extend signature '{}'", signatureUri);
             }
         }
