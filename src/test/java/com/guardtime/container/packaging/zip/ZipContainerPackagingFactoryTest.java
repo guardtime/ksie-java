@@ -69,7 +69,6 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
 //
 //    }
 
-    //TODO add tests: create container without data file(s)
     //TODO add tests: create container without annotations
     //TODO add tests: create container with multiple annotations
 

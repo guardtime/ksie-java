@@ -10,13 +10,13 @@ import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.extending.SignatureExtender;
 import com.guardtime.container.util.Pair;
 
-import java.util.List;
+import java.util.Map;
 
 public interface SignatureContent {
 
-    List<ContainerDocument> getDocuments();
+    Map<String, ContainerDocument> getDocuments();
 
-    List<Pair<String, ContainerAnnotation>> getAnnotations();
+    Map<String, ContainerAnnotation> getAnnotations();
 
     ContainerSignature getSignature();
 
@@ -26,12 +26,12 @@ public interface SignatureContent {
 
     Pair<String, SignatureManifest> getSignatureManifest();
 
-    List<Pair<String, AnnotationInfoManifest>> getAnnotationManifests();
-
     /**
      * Updates the existing ContainerSignature maintained by the SignatureContent to extend it to a trust anchor
      * @param signatureExtender
      * @return true when signature is extended
      */
     boolean extendSignature(SignatureExtender signatureExtender);
+
+    Map<String, AnnotationInfoManifest> getAnnotationInfoManifests();
 }

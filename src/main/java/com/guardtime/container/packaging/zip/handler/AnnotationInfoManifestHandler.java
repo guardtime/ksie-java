@@ -9,11 +9,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class AnnotationManifestHandler extends IndexedContentHandler<AnnotationInfoManifest> {
+public class AnnotationInfoManifestHandler extends IndexedContentHandler<AnnotationInfoManifest> {
 
     private final ContainerManifestFactory manifestFactory;
 
-    public AnnotationManifestHandler(ContainerManifestFactory manifestFactory) {
+    public AnnotationInfoManifestHandler(ContainerManifestFactory manifestFactory) {
         this.manifestFactory = manifestFactory;
     }
 
@@ -27,7 +27,7 @@ public class AnnotationManifestHandler extends IndexedContentHandler<AnnotationI
     protected AnnotationInfoManifest getEntry(String name) throws ContentParsingException {
         File file = fetchFileFromEntries(name);
         try (FileInputStream input = new FileInputStream(file)) {
-            return manifestFactory.readAnnotationManifest(input);
+            return manifestFactory.readAnnotationInfoManifest(input);
         } catch (InvalidManifestException e) {
             throw new ContentParsingException("Failed to parse content of annotation manifest file", e);
         } catch (FileNotFoundException e) {

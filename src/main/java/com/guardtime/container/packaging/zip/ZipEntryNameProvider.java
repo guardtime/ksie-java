@@ -12,7 +12,7 @@ class ZipEntryNameProvider {
     int manifestIndex = 0;
     int signatureIndex = 0;
     int annotationsManifestIndex = 0;
-    int annotationManifestIndex = 0;
+    int annotationInfoManifestIndex = 0;
     int annotationIndex = 0;
 
     ZipEntryNameProvider(String manifestSuffix, String signatureSuffix) {
@@ -26,7 +26,7 @@ class ZipEntryNameProvider {
         this.manifestIndex = parsedManifestIndex;
         this.signatureIndex = parsedManifestIndex;
         this.annotationsManifestIndex = parsedManifestIndex;
-        this.annotationManifestIndex = parsedAnnotationIndex;
+        this.annotationInfoManifestIndex = parsedAnnotationIndex;
         this.annotationIndex = parsedAnnotationIndex;
     }
 
@@ -46,8 +46,8 @@ class ZipEntryNameProvider {
         return String.format("/META-INF/signature%d.%s", ++signatureIndex, signatureSuffix);
     }
 
-    public String nextAnnotationManifestName() {
-        return String.format("/META-INF/annotation%d.%s", ++annotationManifestIndex, manifestSuffix);
+    public String nextAnnotationInfoManifestName() {
+        return String.format("/META-INF/annotation%d.%s", ++annotationInfoManifestIndex, manifestSuffix);
     }
 
     public String nextAnnotationDataFileName() {
