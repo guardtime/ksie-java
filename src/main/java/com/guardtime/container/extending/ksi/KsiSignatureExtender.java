@@ -9,6 +9,10 @@ import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.unisignature.KSISignature;
 
+/**
+ * SignatureExtender for {@link KSISignature} based ContainerSignatures. Uses logic for extending to closest publication
+ * to signature.
+ */
 public class KsiSignatureExtender implements SignatureExtender {
     protected final KSI ksi;
 

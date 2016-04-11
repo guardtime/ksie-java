@@ -32,7 +32,6 @@ public class ExtendingTest {
     @Mock
     private KSI mockKSI;
 
-
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -49,6 +48,7 @@ public class ExtendingTest {
         BlockChainContainer container = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
         BlockChainContainerExtender extender = new BlockChainContainerExtender(new KsiSignatureExtender(mockKSI));
         BlockChainContainer extendedContainer = extender.extend(container);
+
         assertNotNull(extendedContainer);
         verify(mockKSI, atLeast(2)).extend(Mockito.any(KSISignature.class));
         for (SignatureContent content : extendedContainer.getSignatureContents()) {

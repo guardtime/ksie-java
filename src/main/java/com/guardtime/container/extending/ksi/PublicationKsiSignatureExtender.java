@@ -7,6 +7,10 @@ import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.publication.PublicationRecord;
 import com.guardtime.ksi.unisignature.KSISignature;
 
+/**
+ * SignatureExtender for {@link KSISignature} based ContainerSignatures. Uses logic for extending to given {@link
+ * PublicationRecord}.
+ */
 public class PublicationKsiSignatureExtender extends KsiSignatureExtender {
     private final PublicationRecord publicationRecord;
 
