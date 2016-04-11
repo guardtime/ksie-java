@@ -19,7 +19,7 @@ public class StringAnnotation implements ContainerAnnotation {
     private DataHash dataHash;
 
     public StringAnnotation(ContainerAnnotationType type, String content, String domain) {
-        notNull(content, "Type");
+        notNull(type, "Type");
         notNull(content, "Content");
         this.type = type;
         this.content = content;
