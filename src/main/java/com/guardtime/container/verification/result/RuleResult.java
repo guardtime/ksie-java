@@ -13,7 +13,12 @@ public enum RuleResult {
         this.weight = weight;
     }
 
-    public boolean isMoreImportant(RuleResult that) {
+    /**
+     * Compares this with that to determine which hash higher priority.
+     * @param that
+     * @return true when this has higher priority than that.
+     */
+    public boolean isMoreImportantThan(RuleResult that) {
         return this.weight > that.weight;
     }
 }

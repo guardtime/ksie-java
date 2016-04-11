@@ -7,6 +7,9 @@ import com.guardtime.ksi.unisignature.KSISignature;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * {@link ContainerSignature} implementation with {@link KSISignature} as the underlying signature.
+ */
 public class KsiContainerSignature implements ContainerSignature {
 
     private final KSISignature signature;

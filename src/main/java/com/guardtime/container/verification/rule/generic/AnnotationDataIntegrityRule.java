@@ -18,6 +18,10 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Rule that verifies the type and hash integrity of {@link ContainerAnnotation} as noted by its {@link
+ * AnnotationInfoManifest}.
+ */
 public class AnnotationDataIntegrityRule extends SignatureContentRule<GenericVerificationResult> {
 
     private static final String KSIE_VERIFY_ANNOTATION_DATA = "KSIE_VERIFY_ANNOTATION_DATA";

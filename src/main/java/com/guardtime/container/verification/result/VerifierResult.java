@@ -25,7 +25,7 @@ public class VerifierResult {
         RuleResult returnable = RuleResult.OK;
         for (RuleVerificationResult result : getResults()) {
             RuleResult ruleResult = result.getResult();
-            if (ruleResult.isMoreImportant(returnable)) {
+            if (ruleResult.isMoreImportantThan(returnable)) {
                 returnable = ruleResult;
                 if (RuleResult.NOK.equals(returnable)) break; // No need to check once max failure level reached
             }

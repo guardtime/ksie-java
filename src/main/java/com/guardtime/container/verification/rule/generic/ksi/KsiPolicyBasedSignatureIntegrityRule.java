@@ -5,7 +5,6 @@ import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleResult;
-import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.container.verification.rule.generic.SignatureContentRule;
 import com.guardtime.ksi.KSI;
@@ -19,6 +18,11 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Rule that verifies the {@link ContainerSignature} of a {@link SignatureContent} by using KSI {@link Policy} to verify
+ * the underlying signature.<br>Does not assume the underlying signature to be of type {@link KSISignature} but will
+ * produce failure result for any other type of underlying signature.
+ */
 public class KsiPolicyBasedSignatureIntegrityRule extends SignatureContentRule<GenericVerificationResult> {
     private static final String KSIE_VERIFY_MANIFEST_SIGNATURE = "KSIE_VERIFY_MANIFEST_SIGNATURE";
     private final KSI ksi;

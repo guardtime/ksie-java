@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Rule that verifies the hash integrity of {@link AnnotationsManifest} as noted by {@link SignatureManifest}.
+ */
 public class AnnotationsManifestIntegrityRule extends SignatureContentRule<GenericVerificationResult> {
 
     private static final String KSIE_VERIFY_ANNOTATIONS_MANIFEST = "KSIE_VERIFY_ANNOTATIONS_MANIFEST";
