@@ -8,6 +8,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+/**
+ * This content holders is used for signatures inside the container.
+ */
 public class SignatureHandler extends IndexedContentHandler<ContainerSignature> {
 
     private final SignatureFactory signatureFactory;

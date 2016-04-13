@@ -13,15 +13,30 @@ import com.guardtime.container.util.Pair;
 import java.util.Map;
 
 /**
- * Structure that groups together all KSIE container internal structure elements(manifests), documents and annotations
- * that are directly connected to a signature, which is also included in the structure.
+ * Structure that groups together all container internal structure elements(manifests), documents, annotations and
+ * signature that are directly connected to the signature.
  */
 public interface SignatureContent {
 
+    /**
+     * Provides access to all {@link ContainerDocument} contained by the structure.
+     *
+     * @return Map containing the name and the document.
+     */
     Map<String, ContainerDocument> getDocuments();
 
+    /**
+     * Provides access to all {@link ContainerAnnotation} contained by the structure.
+     *
+     * @return Map containing path and annotation where path is used for container management.
+     */
     Map<String, ContainerAnnotation> getAnnotations();
 
+    /**
+     * Provides access to the {@link ContainerSignature} which signs the structure and its content.
+     *
+     * @return
+     */
     ContainerSignature getSignature();
 
     Pair<String, DataFilesManifest> getDataManifest();
@@ -32,8 +47,10 @@ public interface SignatureContent {
 
     /**
      * Updates the existing ContainerSignature maintained by the SignatureContent to extend it to a trust anchor
+     *
      * @param signatureExtender
-     * @return true when signature is extended
+     *         Provides the signature specific logic for extending the signature.
+     * @return true when signature is extended.
      */
     boolean extendSignature(SignatureExtender signatureExtender);
 

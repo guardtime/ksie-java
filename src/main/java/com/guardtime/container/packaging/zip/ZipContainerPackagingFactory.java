@@ -23,6 +23,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Generates {@link com.guardtime.container.packaging.BlockChainContainer} instances that use ZIP archiving for
+ * storing.
+ */
 public class ZipContainerPackagingFactory implements ContainerPackagingFactory<ZipBlockChainContainer> {
 
     private static final Logger logger = LoggerFactory.getLogger(ZipContainerPackagingFactory.class);

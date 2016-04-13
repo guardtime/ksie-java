@@ -9,6 +9,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+/**
+ * This content holders is used for data files manifests inside the container.
+ */
 public class DataManifestHandler extends IndexedContentHandler<DataFilesManifest> {
 
     private final ContainerManifestFactory manifestFactory;

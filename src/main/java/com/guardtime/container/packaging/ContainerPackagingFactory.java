@@ -6,6 +6,10 @@ import com.guardtime.container.datafile.ContainerDocument;
 import java.io.InputStream;
 import java.util.List;
 
+/**
+ * Creates or parses {@link BlockChainContainer} instances.
+ * @param <C>
+ */
 public interface ContainerPackagingFactory<C extends BlockChainContainer> {
     /**
      * Parses an {@link InputStream} to produce a {@link BlockChainContainer}.
@@ -50,5 +54,9 @@ public interface ContainerPackagingFactory<C extends BlockChainContainer> {
      */
     C create(C existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException;
 
+    /**
+     * Provides the MIMETYPE file content for container.
+     * @return
+     */
     byte[] getMimeTypeContent();
 }

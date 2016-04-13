@@ -4,6 +4,9 @@ import com.guardtime.container.verification.rule.Rule;
 
 import java.util.List;
 
+/**
+ * Access interface for providing {@link Rule} to be used for verifying {@link com.guardtime.container.packaging.BlockChainContainer}
+ */
 public interface VerificationPolicy {
 
     /**

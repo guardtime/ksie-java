@@ -9,6 +9,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+/**
+ * This content holders is used for manifests inside the container.
+ */
 public class ManifestHandler extends IndexedContentHandler<SignatureManifest> {
 
     private final ContainerManifestFactory manifestFactory;

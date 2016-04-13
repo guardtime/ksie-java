@@ -9,6 +9,9 @@ import com.guardtime.container.verification.rule.Rule;
 
 import java.util.List;
 
+/**
+ * Helper class to verify {@link VerificationContext} based on a {@link VerificationPolicy}
+ */
 public class ContainerVerifier {
 
     private VerificationPolicy policy;

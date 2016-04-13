@@ -2,6 +2,9 @@ package com.guardtime.container.packaging.zip.handler;
 
 import java.io.File;
 
+/**
+ * This content holders is used for annotations inside the container.
+ */
 public class AnnotationContentHandler extends IndexedContentHandler<File> {
 
     @Override

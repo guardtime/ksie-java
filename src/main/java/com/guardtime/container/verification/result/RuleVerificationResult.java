@@ -6,6 +6,11 @@ public interface RuleVerificationResult {
 
     RuleResult getResult();
 
+    /**
+     * Indicates which rule was used to produce this result by referring to the rules unique name string.
+     *
+     * @return
+     */
     String getRuleName();
 
     /**

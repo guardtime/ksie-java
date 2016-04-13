@@ -11,6 +11,9 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Creates and parses manifests with TLV (Type Length Value) structure.
+ */
 public class TlvContainerManifestFactory implements ContainerManifestFactory<TlvSignatureManifest, TlvDataFilesManifest, TlvAnnotationsManifest, TlvAnnotationInfoManifest> {
 
     private static final TlvManifestFactoryType TLV_MANIFEST_FACTORY_TYPE = new TlvManifestFactoryType("TLV manifest factory", "tlv");
