@@ -1,6 +1,6 @@
 package com.guardtime.container.packaging.zip;
 
-import com.guardtime.container.packaging.BlockChainContainer;
+import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.util.Util;
@@ -13,20 +13,20 @@ import java.util.zip.Checksum;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-class ZipBlockChainContainer implements BlockChainContainer {
+class ZipContainer implements Container {
 
     private List<ZipSignatureContent> signatureContents = new LinkedList<>();
     private MimeType mimeType;
     private List<Pair<String, File>> unknownFiles = new LinkedList<>();
     private ZipEntryNameProvider nameProvider;
 
-    public ZipBlockChainContainer(ZipSignatureContent signatureContent, MimeType mimeType, ZipEntryNameProvider nameProvider) {
+    public ZipContainer(ZipSignatureContent signatureContent, MimeType mimeType, ZipEntryNameProvider nameProvider) {
         this.signatureContents.add(signatureContent);
         this.mimeType = mimeType;
         this.nameProvider = nameProvider;
     }
 
-    public ZipBlockChainContainer(List<ZipSignatureContent> signatureContents, List<Pair<String, File>> unknownFiles, MimeType mimeType, ZipEntryNameProvider nameProvider) {
+    public ZipContainer(List<ZipSignatureContent> signatureContents, List<Pair<String, File>> unknownFiles, MimeType mimeType, ZipEntryNameProvider nameProvider) {
         this.signatureContents = signatureContents;
         this.unknownFiles = unknownFiles;
         this.mimeType = mimeType;

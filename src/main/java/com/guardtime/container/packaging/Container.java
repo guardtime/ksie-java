@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
-public interface BlockChainContainer {
+public interface Container {
 
     /**
      *

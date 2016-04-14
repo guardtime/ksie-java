@@ -4,49 +4,47 @@ import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.datafile.FileContainerDocument;
 import com.guardtime.container.datafile.StreamContainerDocument;
-import com.guardtime.container.packaging.BlockChainContainer;
+import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
-import com.guardtime.container.packaging.InvalidPackageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
 import static com.guardtime.container.util.Util.notNull;
 
-public class BlockChainContainerBuilder {
+public class ContainerBuilder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BlockChainContainerBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContainerBuilder.class);
 
     private final List<ContainerDocument> documents = new LinkedList<>();
     private final List<ContainerAnnotation> annotations = new LinkedList<>();
 
     private final ContainerPackagingFactory packagingFactory;
-    private BlockChainContainer existingContainer;
+    private Container existingContainer;
 
-    public BlockChainContainerBuilder(ContainerPackagingFactory packagingFactory) {
+    public ContainerBuilder(ContainerPackagingFactory packagingFactory) {
         notNull(packagingFactory, "Packaging factory");
         this.packagingFactory = packagingFactory;
     }
 
-    public BlockChainContainerBuilder withExistingContainer(BlockChainContainer existingContainer) {
+    public ContainerBuilder withExistingContainer(Container existingContainer) {
         this.existingContainer = existingContainer;
         return this;
     }
 
-    public BlockChainContainerBuilder withDataFile(InputStream input, String name, String mimeType) {
+    public ContainerBuilder withDataFile(InputStream input, String name, String mimeType) {
         return withDataFile(new StreamContainerDocument(input, mimeType, name));
     }
 
-    public BlockChainContainerBuilder withDataFile(File file, String mimeType) {
+    public ContainerBuilder withDataFile(File file, String mimeType) {
         return withDataFile(new FileContainerDocument(file, mimeType));
     }
 
-    public BlockChainContainerBuilder withDataFile(ContainerDocument document) {
+    public ContainerBuilder withDataFile(ContainerDocument document) {
         notNull(document, "Data file ");
         documents.add(document);
         if (LOGGER.isDebugEnabled()) {
@@ -55,7 +53,7 @@ public class BlockChainContainerBuilder {
         return this;
     }
 
-    public BlockChainContainerBuilder withAnnotation(ContainerAnnotation annotation) {
+    public ContainerBuilder withAnnotation(ContainerAnnotation annotation) {
         notNull(annotations, "Annotation");
         annotations.add(annotation);
         if (LOGGER.isDebugEnabled()) {
@@ -64,7 +62,7 @@ public class BlockChainContainerBuilder {
         return this;
     }
 
-    public BlockChainContainer build() throws BlockChainContainerException {
+    public Container build() throws ContainerException {
         if (existingContainer == null) {
             return packagingFactory.create(documents, annotations);
         } else {

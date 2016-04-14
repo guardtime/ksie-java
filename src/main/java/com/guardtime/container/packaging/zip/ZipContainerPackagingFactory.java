@@ -23,7 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class ZipContainerPackagingFactory implements ContainerPackagingFactory<ZipBlockChainContainer> {
+public class ZipContainerPackagingFactory implements ContainerPackagingFactory<ZipContainer> {
 
     private static final Logger logger = LoggerFactory.getLogger(ZipContainerPackagingFactory.class);
 
@@ -42,7 +42,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     }
 
     @Override
-    public ZipBlockChainContainer read(InputStream input) throws InvalidPackageException {
+    public ZipContainer read(InputStream input) throws InvalidPackageException {
         Util.notNull(input, "Input stream");
         try {
             ZipContainerReader reader = new ZipContainerReader(manifestFactory, signatureFactory);
@@ -53,17 +53,17 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     }
 
     @Override
-    public ZipBlockChainContainer create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
+    public ZipContainer create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
         Util.notEmpty(files, "Data files");
         try {
             ContentSigner signer = new ContentSigner(files, annotations);
             ZipSignatureContent signatureContent = signer.sign();
             MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
-            return new ZipBlockChainContainer(signatureContent, mimeType, signer.getNameProvider());
+            return new ZipContainer(signatureContent, mimeType, signer.getNameProvider());
         } catch (IOException | InvalidManifestException e) {
-            throw new InvalidPackageException("Failed to create ZipBlockChainContainer internal structure!", e);
+            throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
         } catch (SignatureException e) {
-            throw new InvalidPackageException("Failed to sign ZipBlockChainContainer!", e);
+            throw new InvalidPackageException("Failed to sign ZipContainer!", e);
         }
     }
 
@@ -73,8 +73,8 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     }
 
     @Override
-    public ZipBlockChainContainer create(ZipBlockChainContainer existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
-        Util.notNull(existingSignature, "BlockChainContainer");
+    public ZipContainer create(ZipContainer existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
+        Util.notNull(existingSignature, "Container");
         // TODO: Possibility to add signature without adding data files.
         Util.notEmpty(files, "Data files");
         try {
@@ -83,9 +83,9 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             existingSignature.getSignatureContents().add(signatureContent);
             return existingSignature;
         } catch (IOException | InvalidManifestException e) {
-            throw new InvalidPackageException("Failed to create ZipBlockChainContainer internal structure!", e);
+            throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
         } catch (SignatureException e) {
-            throw new InvalidPackageException("Failed to sign ZipBlockChainContainer!", e);
+            throw new InvalidPackageException("Failed to sign ZipContainer!", e);
         }
     }
 

@@ -6,7 +6,7 @@ import com.guardtime.container.datafile.ContainerDocument;
 import java.io.InputStream;
 import java.util.List;
 
-public interface ContainerPackagingFactory<C extends BlockChainContainer> {
+public interface ContainerPackagingFactory<C extends Container> {
 
     C read(InputStream input) throws InvalidPackageException;
 

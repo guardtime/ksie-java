@@ -1,10 +1,10 @@
 //package com.guardtime.container.integration;
 //
 //
-//import com.guardtime.container.BlockChainContainerBuilder;
+//import com.guardtime.container.ContainerBuilder;
 //import com.guardtime.container.manifest.ContainerManifestFactory;
 //import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
-//import com.guardtime.container.packaging.BlockChainContainer;
+//import com.guardtime.container.packaging.Container;
 //import com.guardtime.container.packaging.SignatureContent;
 //import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 //import com.guardtime.container.signature.SignatureFactory;
@@ -51,7 +51,7 @@
 //
 //    @Test
 //    public void testCreateContainer() throws Exception {
-//        BlockChainContainer container = new BlockChainContainerBuilder(packagingFactory)
+//        Container container = new ContainerBuilder(packagingFactory)
 //                .withDataFile(new ByteArrayInputStream("Test_Data".getBytes()), "test.txt", "application/txt")
 //                .build();
 //
@@ -62,7 +62,7 @@
 //
 //    @Test
 //    public void testReadContainer() throws Exception {
-//        BlockChainContainer container = packagingFactory.read(Files.newInputStream(Paths.get(ClassLoader.getSystemResource("containers/container-one-file.ksie").toURI())));
+//        Container container = packagingFactory.read(Files.newInputStream(Paths.get(ClassLoader.getSystemResource("containers/container-one-file.ksie").toURI())));
 //        List<SignatureContent> contents = container.getSignatureContents();
 //        assertNotNull(contents);
 //        assertEquals(1, contents.size());

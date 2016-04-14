@@ -64,7 +64,7 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
 //    @Test
 //    public void testCreateContainerWithDataFile() throws Exception {
 //        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory);
-//        ZipBlockChainContainer container = packagingFactory.create(asList(TEST_DOCUMENT_HELLO_TEXT), null);
+//        ZipContainer container = packagingFactory.create(asList(TEST_DOCUMENT_HELLO_TEXT), null);
 //        assertNotNull(container);
 //
 //    }
