@@ -49,7 +49,7 @@ public class VerificationTest {
     private KSI mockKSI;
 
     @Mock
-    private VerificationResult mockResult;
+    private VerificationResult mockUnisignatureVerificationResult;
 
     private ContainerSignature mockedSignature = new ContainerSignature() {
 
@@ -69,7 +69,7 @@ public class VerificationTest {
         when(mockSignatureFactory.getSignatureFactoryType()).thenReturn(new KsiSignatureFactoryType());
         when(mockSignatureFactory.read(Mockito.any(InputStream.class))).thenReturn(mockedSignature);
         when(mockKSI.read(Mockito.any(byte[].class))).thenReturn(Mockito.mock(KSISignature.class));
-        when(mockKSI.verify(Mockito.any(KSISignature.class), Mockito.any(Policy.class))).thenReturn(mockResult);
+        when(mockKSI.verify(Mockito.any(KSISignature.class), Mockito.any(Policy.class))).thenReturn(mockUnisignatureVerificationResult);
         TlvContainerManifestFactory manifestFactory = new TlvContainerManifestFactory();
         factory = new ZipContainerPackagingFactory(mockSignatureFactory, manifestFactory);
     }
@@ -95,7 +95,7 @@ public class VerificationTest {
     }
 
     private void setSignatureVerificationResult(boolean result) {
-        when(mockResult.isOk()).thenReturn(result);
+        when(mockUnisignatureVerificationResult.isOk()).thenReturn(result);
     }
 
     @Test
