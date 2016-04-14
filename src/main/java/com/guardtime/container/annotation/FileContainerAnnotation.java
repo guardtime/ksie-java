@@ -9,14 +9,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class FileAnnotation implements ContainerAnnotation {
+public class FileContainerAnnotation implements ContainerAnnotation {
 
     private final File file;
     private final String domain;
     private final ContainerAnnotationType type;
     private DataHash dataHash;
 
-    public FileAnnotation(File file, String domain, ContainerAnnotationType type) {
+    public FileContainerAnnotation(File file, String domain, ContainerAnnotationType type) {
         Util.notNull(file, "File");
         Util.notNull(domain, "Domain");
         Util.notNull(type, "Container type");

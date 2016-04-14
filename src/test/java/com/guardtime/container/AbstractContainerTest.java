@@ -2,7 +2,7 @@ package com.guardtime.container;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
-import com.guardtime.container.annotation.StringAnnotation;
+import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.datafile.StreamContainerDocument;
 import com.guardtime.container.manifest.*;
@@ -45,7 +45,7 @@ public class AbstractContainerTest {
     protected static final String ANNOTATIONS_MANIFEST_URI = "/META-INF/annotmanifest1.tlv";
     protected static final ContainerDocument TEST_DOCUMENT_HELLO_TEXT = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
     protected static final ContainerDocument TEST_DOCUMENT_HELLO_PDF = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_PDF_CONTENT), MIME_TYPE_APPLICATION_PDF, TEST_FILE_NAME_TEST_PDF);
-    protected static final ContainerAnnotation MOCKED_ANNOTATION = new StringAnnotation(ContainerAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME);
+    protected static final ContainerAnnotation MOCKED_ANNOTATION = new StringContainerAnnotation(ContainerAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME);
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();

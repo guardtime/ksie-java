@@ -3,7 +3,7 @@ package com.guardtime.container.packaging.zip;
 import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
-import com.guardtime.container.annotation.StringAnnotation;
+import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 
 import org.junit.Before;
@@ -18,7 +18,6 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
 
@@ -33,7 +32,7 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        annotations.add(new StringAnnotation(ContainerAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME));
+        annotations.add(new StringContainerAnnotation(ContainerAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME));
     }
 
     @Test
