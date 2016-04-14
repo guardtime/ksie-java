@@ -3,6 +3,7 @@ package com.guardtime.container.packaging.zip;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.*;
+import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.signature.ContainerSignature;
@@ -73,19 +74,22 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     }
 
     @Override
-    public ZipContainer create(ZipContainer existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
+    public ZipContainer create(Container existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
         Util.notNull(existingSignature, "Container");
         // TODO: Possibility to add signature without adding data files.
         Util.notEmpty(files, "Data files");
         try {
-            ContentSigner signer = new ContentSigner(files, annotations, existingSignature.getNameProvider());
+            ZipContainer existingContainer = (ZipContainer) existingSignature;
+            ContentSigner signer = new ContentSigner(files, annotations, existingContainer.getNameProvider());
             ZipSignatureContent signatureContent = signer.sign();
-            existingSignature.getSignatureContents().add(signatureContent);
-            return existingSignature;
+            existingContainer.getSignatureContents().add(signatureContent);
+            return existingContainer;
         } catch (IOException | InvalidManifestException e) {
             throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
         } catch (SignatureException e) {
             throw new InvalidPackageException("Failed to sign ZipContainer!", e);
+        } catch (ClassCastException e) {
+            throw new InvalidPackageException("Incorrect Container subclass instance provided!", e);
         }
     }
 
