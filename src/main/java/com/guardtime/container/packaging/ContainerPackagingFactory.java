@@ -6,13 +6,13 @@ import com.guardtime.container.datafile.ContainerDocument;
 import java.io.InputStream;
 import java.util.List;
 
-public interface ContainerPackagingFactory<C extends BlockChainContainer> {
+public interface ContainerPackagingFactory<C extends Container> {
 
     C read(InputStream input) throws InvalidPackageException;
 
     C create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException;
 
-    C create(C existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException;
+    C create(Container existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException;
 
     byte[] getMimeTypeContent();
 }

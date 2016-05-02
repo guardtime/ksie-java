@@ -1,11 +1,11 @@
 package com.guardtime.container.integration;
 
 
-import com.guardtime.container.BlockChainContainerBuilder;
+import com.guardtime.container.ContainerBuilder;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
-import com.guardtime.container.packaging.BlockChainContainer;
+import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 import com.guardtime.container.signature.SignatureFactory;
@@ -72,7 +72,7 @@ public class ZipContainerIT {
 
     @Test
     public void testCreateContainer() throws Exception {
-        BlockChainContainer container = new BlockChainContainerBuilder(packagingFactory)
+        Container container = new ContainerBuilder(packagingFactory)
                 .withDataFile(new ByteArrayInputStream("Test_Data".getBytes()), TEST_FILE_NAME, "application/txt")
                 .build();
         assertSingleContentsWithSingleDocumentWithName(container, TEST_FILE_NAME);
@@ -81,13 +81,13 @@ public class ZipContainerIT {
 
     @Test
     public void testReadContainer() throws Exception {
-        BlockChainContainer container = packagingFactory.read(Files.newInputStream(Paths.get(ClassLoader.getSystemResource(CONTAINER_WITH_ONE_FILE).toURI())));
+        Container container = packagingFactory.read(Files.newInputStream(Paths.get(ClassLoader.getSystemResource(CONTAINER_WITH_ONE_FILE).toURI())));
         assertSingleContentsWithSingleDocument(container);
         assertContainerVerifiesWithResult(container, RuleResult.OK);
     }
 
 
-    private void assertContainerVerifiesWithResult(BlockChainContainer container, RuleResult expected) {
+    private void assertContainerVerifiesWithResult(Container container, RuleResult expected) {
         ContainerVerifier verifier = new ContainerVerifier(new DefaultVerificationPolicy(getExtraRules()));
         VerifierResult result = verifier.verify(new SimpleVerificationContext(container));
         assertEquals(expected, result.getVerificationResult());
@@ -100,7 +100,7 @@ public class ZipContainerIT {
         return extraRules;
     }
 
-    private void assertSingleContentsWithSingleDocumentWithName(BlockChainContainer container, String testFileName) {
+    private void assertSingleContentsWithSingleDocumentWithName(Container container, String testFileName) {
         List<? extends SignatureContent> contents = container.getSignatureContents();
         assertNotNull(contents);
         assertEquals(1, contents.size());
@@ -114,7 +114,7 @@ public class ZipContainerIT {
         }
     }
 
-    private void assertSingleContentsWithSingleDocument(BlockChainContainer container) {
+    private void assertSingleContentsWithSingleDocument(Container container) {
         assertSingleContentsWithSingleDocumentWithName(container, null);
     }
 
