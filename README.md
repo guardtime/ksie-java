@@ -8,26 +8,16 @@ The aim of this project is to implement a container format for associating data 
 * Maven 3.x 
 * KSI Java SDK 4.2.32
 
-# Installation
-
-The latest stable binary releases are available at [http://search.maven.org](http://search.maven.org). Just include the
-dependencies in your pom.xml:
-
-```xml
-<dependency>
-    <groupId>com.guardtime</groupId>
-    <artifactId>container</artifactId>
-    <version>1.0-SNAPSHOT</version>
-</dependency>
-```
-
 # Usage
 
-For all activities you need to have composed a ContainerPackagingFactory which in most/all cases requires a ManifestFactory and a SignatureFactory.
-
+For many activities you need to have composed a ContainerPackagingFactory which in most/all cases requires a ManifestFactory and a SignatureFactory.
 Here is an example of creating a packaging factory for ZIP based containers with TLV manifest structures and KSI based signatures, which will be the basis for the rest of the code examples:
 
 ```java
+KSI ksi;
+/* Initialize KSI
+...
+*/
 ContainerManifestFactory manifestFactory = new TlvContainerManifestFactory();
 SignatureFactory signatureFactory = new KsiSignatureFactory(ksi);
 ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(signatureFactory, manifestFactory);
@@ -56,11 +46,45 @@ Container signedContainer = packagingFactory.create(documents, annotations);
 
 It is important to note that creating a container also signs its contents so you always get a signed container from both the ContainerBuilder and the ContainerPackagingFactory.
 
+When trying to parse an existing container only the packagingFactory can be used as shown below:
+
+```java
+Container parsedContainer = packagingFactory.read(inputStream);
+```
+
+It is suggested to always verify the parsed container before adding new documents/annotations to it.
+
+## Adding new documents/annotations to existing container
+
+Both the ContainerBuilder and ContainerPackagingFactory allow for adding new documents and annotations to an existing container.
+The existing container will be expanded with the new documents/annotation and a signature covering them.
+
+ContainerBuilder:
+
+```java
+ContainerBuilder builder = new ContainerBuilder(packagingFactory);
+builder.withExistingContainer(parsedContainer);
+builder.withDataFile(...);      //can be used multiple times before calling build()
+builder.withAnnotation(...);    //can be used multiple times before calling build()
+Container signedContainer = builder.build();
+```
+
+ContainerPackagingFactory:
+
+```java
+List<ContainerDocument> documents;
+List<ContainerAnnotation> annotations;
+/* initialize and fill documents and annotations lists
+...
+*/
+Container signedContainer = packagingFactory.create(parsedContainer, documents, annotations);
+```
+
 ## Extending signatures in a container
 
 For extending it is necessary to specify the SignatureExtender implementation that applies to the given container.
 
-The following example extends all signatures in the container.
+The following example shows extending of all signatures in a container.
 
 ```java
 SignatureExtender signatureExtender = new KsiSignatureExtender(ksi)
@@ -70,7 +94,7 @@ Container extendedContainer = extender.extend(container);
 
 ## Verifying a container
 
-The following example shows a simple verification for container.
+The following example shows a simple verification for a container.
 
 ```java
 VerificationContext context = new SimpleVerificationContext(container);
