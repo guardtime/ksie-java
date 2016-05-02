@@ -59,14 +59,14 @@ public class ZipContainerReaderTest {
         this.reader = new ZipContainerReader(new TlvContainerManifestFactory(), signatureFactory);
     }
 
-    private ZipBlockChainContainer getContainer(String containerPath) throws IOException, URISyntaxException {
+    private ZipContainer getContainer(String containerPath) throws IOException, URISyntaxException {
         InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource(containerPath).toURI()));
         return reader.read(input);
     }
 
     @Test
     public void testReadContainerFileWithDocument() throws Exception {
-        ZipBlockChainContainer result = getContainer(CONTAINER_WITH_ONE_DOCUMENT);
+        ZipContainer result = getContainer(CONTAINER_WITH_ONE_DOCUMENT);
         assertNotNull(result);
         assertFalse(result.getSignatureContents().isEmpty());
         for (SignatureContent content : result.getSignatureContents()) {
@@ -76,7 +76,7 @@ public class ZipContainerReaderTest {
 
     @Test
     public void testReadEmptyContainerFile() throws Exception {
-        ZipBlockChainContainer result = getContainer(EMPTY_CONTAINER);
+        ZipContainer result = getContainer(EMPTY_CONTAINER);
         // TODO: What is the actual expected behaviour for this? Exception or container with no signatureContent and no mimetype?
         assertNotNull(result);
         assertNull(result.getMimeType());
@@ -85,7 +85,7 @@ public class ZipContainerReaderTest {
 
     @Test
     public void testReadContainerFileWithExtraFiles() throws Exception {
-        ZipBlockChainContainer result = getContainer(CONTAINER_WITH_EXTRA_FILES);
+        ZipContainer result = getContainer(CONTAINER_WITH_EXTRA_FILES);
         assertNotNull(result);
         assertFalse(result.getSignatureContents().isEmpty());
         assertFalse(result.getUnknownFiles().isEmpty());
@@ -93,7 +93,7 @@ public class ZipContainerReaderTest {
 
     @Test
     public void testReadContainerFileWithoutDocuments() throws Exception {
-        ZipBlockChainContainer result = getContainer(CONTAINER_WITH_NO_DOCUMENTS);
+        ZipContainer result = getContainer(CONTAINER_WITH_NO_DOCUMENTS);
         assertNotNull(result);
         assertFalse(result.getSignatureContents().isEmpty());
         for (SignatureContent content : result.getSignatureContents()) {
@@ -105,7 +105,7 @@ public class ZipContainerReaderTest {
 
     @Test
     public void testReadContainerFileWithMultipleAnnotations() throws Exception {
-        ZipBlockChainContainer result = getContainer(CONTAINER_WITH_MULTIPLE_ANNOTATIONS);
+        ZipContainer result = getContainer(CONTAINER_WITH_MULTIPLE_ANNOTATIONS);
         assertNotNull(result);
         assertFalse(result.getSignatureContents().isEmpty());
         for (SignatureContent content : result.getSignatureContents()) {
@@ -115,14 +115,14 @@ public class ZipContainerReaderTest {
 
     @Test
     public void testReadContainerFileWithMultipleSignatures() throws Exception {
-        ZipBlockChainContainer result = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
+        ZipContainer result = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
         assertNotNull(result);
         assertTrue(result.getSignatureContents().size() > 1);
     }
 
     @Test
     public void testReadContainerFileWithBrokenSignatures() throws Exception {
-        ZipBlockChainContainer result = getContainer(CONTAINER_WITH_BROKEN_SIGNATURE);
+        ZipContainer result = getContainer(CONTAINER_WITH_BROKEN_SIGNATURE);
         assertNotNull(result);
         assertFalse(result.getSignatureContents().isEmpty());
         assertFalse(result.getUnknownFiles().isEmpty());

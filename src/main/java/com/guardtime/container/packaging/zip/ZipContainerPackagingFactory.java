@@ -3,6 +3,7 @@ package com.guardtime.container.packaging.zip;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.manifest.*;
+import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.signature.ContainerSignature;
@@ -24,10 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Generates {@link com.guardtime.container.packaging.BlockChainContainer} instances that use ZIP archiving for
- * storing.
+ * Generates {@link Container} instances that use ZIP archiving for storing.
  */
-public class ZipContainerPackagingFactory implements ContainerPackagingFactory<ZipBlockChainContainer> {
+public class ZipContainerPackagingFactory implements ContainerPackagingFactory<ZipContainer> {
 
     private static final Logger logger = LoggerFactory.getLogger(ZipContainerPackagingFactory.class);
 
@@ -46,7 +46,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     }
 
     @Override
-    public ZipBlockChainContainer read(InputStream input) throws InvalidPackageException {
+    public ZipContainer read(InputStream input) throws InvalidPackageException {
         Util.notNull(input, "Input stream");
         try {
             ZipContainerReader reader = new ZipContainerReader(manifestFactory, signatureFactory);
@@ -57,17 +57,17 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     }
 
     @Override
-    public ZipBlockChainContainer create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
+    public ZipContainer create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
         Util.notEmpty(files, "Data files");
         try {
             ContentSigner signer = new ContentSigner(files, annotations);
             ZipSignatureContent signatureContent = signer.sign();
             MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
-            return new ZipBlockChainContainer(signatureContent, mimeType, signer.getNameProvider());
+            return new ZipContainer(signatureContent, mimeType, signer.getNameProvider());
         } catch (IOException | InvalidManifestException e) {
-            throw new InvalidPackageException("Failed to create ZipBlockChainContainer internal structure!", e);
+            throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
         } catch (SignatureException e) {
-            throw new InvalidPackageException("Failed to sign ZipBlockChainContainer!", e);
+            throw new InvalidPackageException("Failed to sign ZipContainer!", e);
         }
     }
 
@@ -77,19 +77,22 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     }
 
     @Override
-    public ZipBlockChainContainer create(ZipBlockChainContainer existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
-        Util.notNull(existingSignature, "BlockChainContainer");
+    public ZipContainer create(Container existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
+        Util.notNull(existingSignature, "Container");
         // TODO: Possibility to add signature without adding data files.
         Util.notEmpty(files, "Data files");
         try {
-            ContentSigner signer = new ContentSigner(files, annotations, existingSignature.getNameProvider());
+            ZipContainer existingContainer = (ZipContainer) existingSignature;
+            ContentSigner signer = new ContentSigner(files, annotations, existingContainer.getNameProvider());
             ZipSignatureContent signatureContent = signer.sign();
-            existingSignature.getSignatureContents().add(signatureContent);
-            return existingSignature;
+            existingContainer.getSignatureContents().add(signatureContent);
+            return existingContainer;
         } catch (IOException | InvalidManifestException e) {
-            throw new InvalidPackageException("Failed to create ZipBlockChainContainer internal structure!", e);
+            throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
         } catch (SignatureException e) {
-            throw new InvalidPackageException("Failed to sign ZipBlockChainContainer!", e);
+            throw new InvalidPackageException("Failed to sign ZipContainer!", e);
+        } catch (ClassCastException e) {
+            throw new InvalidPackageException("Incorrect Container subclass instance provided!", e);
         }
     }
 

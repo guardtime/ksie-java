@@ -4,7 +4,7 @@ import com.guardtime.container.verification.result.VerifierResult;
 
 import java.util.List;
 
-public interface BlockChainContainerVerificationReport {
+public interface ContainerVerificationReport {
     VerifierResult getResult();
 
     List<String> getUsedRules();

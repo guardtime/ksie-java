@@ -56,7 +56,7 @@ class ZipContainerReader {
                 dataManifestHandler, annotationsManifestHandler, annotationInfoManifestHandler, signatureHandler);
     }
 
-    ZipBlockChainContainer read(InputStream input) throws IOException {
+    ZipContainer read(InputStream input) throws IOException {
         try (ZipInputStream zipInput = new ZipInputStream(input)) {
             ZipEntry entry;
             while ((entry = zipInput.getNextEntry()) != null) {
@@ -71,7 +71,7 @@ class ZipContainerReader {
         MimeType mimeType = getMimeType();
         List<Pair<String, File>> unknownFiles = getUnknownFiles();
         ZipEntryNameProvider nameProvider = getNameProvider();
-        return new ZipBlockChainContainer(contents, unknownFiles, mimeType, nameProvider);
+        return new ZipContainer(contents, unknownFiles, mimeType, nameProvider);
     }
 
     private ZipEntryNameProvider getNameProvider() {

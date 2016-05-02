@@ -11,15 +11,15 @@ import java.nio.charset.Charset;
 import static com.guardtime.container.util.Util.hash;
 import static com.guardtime.container.util.Util.notNull;
 
-public class StringAnnotation implements ContainerAnnotation {
+public class StringContainerAnnotation implements ContainerAnnotation {
 
     private final String content;
     private final String domain;
     private final ContainerAnnotationType type;
     private DataHash dataHash;
 
-    public StringAnnotation(ContainerAnnotationType type, String content, String domain) {
-        notNull(content, "Type");
+    public StringContainerAnnotation(ContainerAnnotationType type, String content, String domain) {
+        notNull(type, "Type");
         notNull(content, "Content");
         this.type = type;
         this.content = content;
@@ -51,7 +51,7 @@ public class StringAnnotation implements ContainerAnnotation {
 
     @Override
     public String toString() {
-        return "StringAnnotation {" +
+        return "StringContainerAnnotation {" +
                 ", domain='" + domain + "\'}";
     }
 

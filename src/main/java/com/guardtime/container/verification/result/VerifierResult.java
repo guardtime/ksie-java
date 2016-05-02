@@ -1,13 +1,12 @@
 package com.guardtime.container.verification.result;
 
-import com.guardtime.container.packaging.BlockChainContainer;
+import com.guardtime.container.packaging.Container;
 import com.guardtime.container.verification.context.VerificationContext;
 
 import java.util.List;
 
 /**
- * Encompasses all results from verifying a {@link BlockChainContainer} Provides easier access to overall result of
- * verification.
+ * Encompasses all results from verifying a {@link Container} Provides easier access to overall result of verification.
  */
 public class VerifierResult {
     private final VerificationContext context;
@@ -37,11 +36,11 @@ public class VerifierResult {
     }
 
     /**
-     * Provides access to the {@link BlockChainContainer} which was verified.
+     * Provides access to the {@link Container} which was verified.
      *
      * @return
      */
-    public BlockChainContainer getBlockChainContainer() {
+    public Container getContainer() {
         return context.getContainer();
     }
 

@@ -1,8 +1,8 @@
 package com.guardtime.container.packaging.zip.handler;
 
-import com.guardtime.container.BlockChainContainerException;
+import com.guardtime.container.ContainerException;
 
-public class ContentParsingException extends BlockChainContainerException {
+public class ContentParsingException extends ContainerException {
 
     public ContentParsingException(String message, Throwable cause) {
         super(message, cause);

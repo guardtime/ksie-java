@@ -1,7 +1,7 @@
 package com.guardtime.container.verification;
 
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
-import com.guardtime.container.packaging.BlockChainContainer;
+import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 import com.guardtime.container.signature.ContainerSignature;
@@ -49,7 +49,7 @@ public class VerificationTest {
     private KSI mockKSI;
 
     @Mock
-    private VerificationResult mockResult;
+    private VerificationResult mockUnisignatureVerificationResult;
 
     private ContainerSignature mockedSignature = new ContainerSignature() {
 
@@ -69,14 +69,14 @@ public class VerificationTest {
         when(mockSignatureFactory.getSignatureFactoryType()).thenReturn(new KsiSignatureFactoryType());
         when(mockSignatureFactory.read(Mockito.any(InputStream.class))).thenReturn(mockedSignature);
         when(mockKSI.read(Mockito.any(byte[].class))).thenReturn(Mockito.mock(KSISignature.class));
-        when(mockKSI.verify(Mockito.any(KSISignature.class), Mockito.any(Policy.class))).thenReturn(mockResult);
+        when(mockKSI.verify(Mockito.any(KSISignature.class), Mockito.any(Policy.class))).thenReturn(mockUnisignatureVerificationResult);
         TlvContainerManifestFactory manifestFactory = new TlvContainerManifestFactory();
         factory = new ZipContainerPackagingFactory(mockSignatureFactory, manifestFactory);
     }
 
     private VerificationContext getVerificationContext(String containerPath) throws IOException, URISyntaxException, InvalidPackageException {
         InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource(containerPath).toURI()));
-        BlockChainContainer container = factory.read(input);
+        Container container = factory.read(input);
         return new SimpleVerificationContext(container);
     }
 
@@ -95,7 +95,7 @@ public class VerificationTest {
     }
 
     private void setSignatureVerificationResult(boolean result) {
-        when(mockResult.isOk()).thenReturn(result);
+        when(mockUnisignatureVerificationResult.isOk()).thenReturn(result);
     }
 
     @Test

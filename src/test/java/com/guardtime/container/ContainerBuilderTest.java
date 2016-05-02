@@ -3,7 +3,7 @@ package com.guardtime.container;
 import com.guardtime.container.datafile.StreamContainerDocument;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
-import com.guardtime.container.packaging.BlockChainContainer;
+import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureFactoryType;
@@ -25,10 +25,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-public class BlockChainContainerBuilderTest extends AbstractContainerTest {
+public class ContainerBuilderTest extends AbstractContainerTest {
 
     @Mock
-    private BlockChainContainer mockedContainer;
+    private Container mockedContainer;
 
     @Mock
     private SignatureFactoryType mockedSignatureFactoryType;
@@ -61,7 +61,7 @@ public class BlockChainContainerBuilderTest extends AbstractContainerTest {
 
     @Test
     public void testCreateBuilder() throws Exception {
-        BlockChainContainerBuilder builder = new BlockChainContainerBuilder(mockedPackagingFactory);
+        ContainerBuilder builder = new ContainerBuilder(mockedPackagingFactory);
         assertNotNull(builder);
     }
 
@@ -69,12 +69,12 @@ public class BlockChainContainerBuilderTest extends AbstractContainerTest {
     public void testCreateBuilderWithoutPackagingFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Packaging factory must be present");
-        new BlockChainContainerBuilder(null);
+        new ContainerBuilder(null);
     }
 
     @Test
     public void testAddDocumentToContainer() throws Exception {
-        BlockChainContainerBuilder builder = new BlockChainContainerBuilder(mockedPackagingFactory);
+        ContainerBuilder builder = new ContainerBuilder(mockedPackagingFactory);
         StreamContainerDocument content = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
         builder.withDataFile(content);
         assertEquals(1, builder.getDocuments().size());
@@ -82,19 +82,19 @@ public class BlockChainContainerBuilderTest extends AbstractContainerTest {
 
     @Test
     public void testAddAnnotationToContainer() throws Exception {
-        BlockChainContainerBuilder builder = new BlockChainContainerBuilder(mockedPackagingFactory);
+        ContainerBuilder builder = new ContainerBuilder(mockedPackagingFactory);
         builder.withAnnotation(MOCKED_ANNOTATION);
         assertEquals(1, builder.getAnnotations().size());
     }
 
     @Test
     public void testCreateSignature() throws Exception {
-        BlockChainContainerBuilder builder = new BlockChainContainerBuilder(packagingFactory);
+        ContainerBuilder builder = new ContainerBuilder(packagingFactory);
         builder.withDataFile(TEST_DOCUMENT_HELLO_TEXT);
         builder.withDataFile(TEST_DOCUMENT_HELLO_PDF);
 
         builder.withAnnotation(MOCKED_ANNOTATION);
-        BlockChainContainer container = builder.build();
+        Container container = builder.build();
         assertNotNull(container);
         assertNotNull(container.getSignatureContents());
         assertFalse(container.getSignatureContents().isEmpty());

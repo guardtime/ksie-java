@@ -1,8 +1,8 @@
 package com.guardtime.container.signature;
 
-import com.guardtime.container.BlockChainContainerException;
+import com.guardtime.container.ContainerException;
 
-public class SignatureException extends BlockChainContainerException {
+public class SignatureException extends ContainerException {
 
     public SignatureException(Exception e) {
         super(e);

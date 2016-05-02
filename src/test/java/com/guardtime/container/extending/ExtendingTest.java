@@ -2,7 +2,7 @@ package com.guardtime.container.extending;
 
 import com.guardtime.container.extending.ksi.KsiSignatureExtender;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
-import com.guardtime.container.packaging.BlockChainContainer;
+import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
@@ -45,9 +45,9 @@ public class ExtendingTest {
 
     @Test
     public void testExtending() throws Exception {
-        BlockChainContainer container = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
-        BlockChainContainerExtender extender = new BlockChainContainerExtender(new KsiSignatureExtender(mockKSI));
-        BlockChainContainer extendedContainer = extender.extend(container);
+        Container container = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
+        ContainerExtender extender = new ContainerExtender(new KsiSignatureExtender(mockKSI));
+        Container extendedContainer = extender.extend(container);
 
         assertNotNull(extendedContainer);
         verify(mockKSI, atLeast(2)).extend(Mockito.any(KSISignature.class));
@@ -57,7 +57,7 @@ public class ExtendingTest {
         }
     }
 
-    private BlockChainContainer getContainer(String path) throws IOException, URISyntaxException, InvalidPackageException {
+    private Container getContainer(String path) throws IOException, URISyntaxException, InvalidPackageException {
         InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource(path).toURI()));
         return factory.read(input);
     }

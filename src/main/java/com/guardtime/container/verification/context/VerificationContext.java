@@ -1,24 +1,24 @@
 package com.guardtime.container.verification.context;
 
 import com.guardtime.container.ContainerFileElement;
-import com.guardtime.container.packaging.BlockChainContainer;
+import com.guardtime.container.packaging.Container;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 
 import java.util.List;
 
 /**
- * Helper class providing access to {@link BlockChainContainer} for verification and to keep track of {@link
+ * Helper class providing access to {@link Container} for verification and to keep track of {@link
  * RuleVerificationResult} that are produced as a result of the verification.
  */
 public interface VerificationContext {
 
     /**
-     * Provides the {@link BlockChainContainer} to be verified as well as containing a list of results from any
-     * verification done on the container.
+     * Provides the {@link Container} to be verified as well as containing a list of results from any verification done
+     * on the container.
      *
      * @return
      */
-    BlockChainContainer getContainer();
+    Container getContainer();
 
     /**
      * Provides access to the list of results from rules performed on the context.

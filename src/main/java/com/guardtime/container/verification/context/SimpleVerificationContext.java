@@ -1,8 +1,7 @@
 package com.guardtime.container.verification.context;
 
 import com.guardtime.container.ContainerFileElement;
-import com.guardtime.container.packaging.BlockChainContainer;
-import com.guardtime.container.util.Pair;
+import com.guardtime.container.packaging.Container;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 
 import java.util.HashMap;
@@ -11,15 +10,15 @@ import java.util.List;
 import java.util.Map;
 
 public class SimpleVerificationContext implements VerificationContext {
-    private final BlockChainContainer container;
+    private final Container container;
     private Map<ContainerFileElement, List<RuleVerificationResult>> resultsMap = new HashMap<>();
 
-    public SimpleVerificationContext(BlockChainContainer container) {
+    public SimpleVerificationContext(Container container) {
         this.container = container;
     }
 
     @Override
-    public BlockChainContainer getContainer() {
+    public Container getContainer() {
         return container;
     }
 

@@ -2,7 +2,7 @@ package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
-import com.guardtime.container.annotation.FileAnnotation;
+import com.guardtime.container.annotation.FileContainerAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.datafile.EmptyContainerDocument;
 import com.guardtime.container.datafile.FileContainerDocument;
@@ -155,7 +155,7 @@ class SignatureContentHandler {
                 AnnotationReference annotationReference = annotationInfoManifest.getAnnotationReference();
                 ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getMimeType());
                 File annotationFile = annotationContentHandler.get(annotationReference.getUri());
-                ContainerAnnotation annotation = new FileAnnotation(annotationFile, annotationReference.getDomain(), type);
+                ContainerAnnotation annotation = new FileContainerAnnotation(annotationFile, annotationReference.getDomain(), type);
                 return Pair.of(annotationReference.getUri(), annotation);
             } catch (ContentParsingException e) {
                 LOGGER.info("Failed to parse annotation for '{}'. Reason: '{}'", manifestReference.getUri(), e.getMessage());
