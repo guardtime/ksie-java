@@ -104,5 +104,16 @@ List<Rule> implicitRules;
 */
 DefaultVerificationPolicy policy = new DefaultVerificationPolicy(implicitRules);
 ContainerVerifier verifier = new ContainerVerifier(policy);
-VerificationResult result = verifier.verify(context);
+VerifierResult result = verifier.verify(context);
+RuleResult verificationStatus = result.getVerificationResult(); // OK/NOK/WARN
+```
+
+Since there currently are no reports for verification then you'd have to loop through the raw results to get a more detailed overview of what failed verification.
+
+```java
+for(RuleVerificationResult ruleResult : result.getResults()) {
+    ruleResult.getResult();         // OK/NOK/WARN
+    ruleResult.getRuleName();       // What rule produced the result
+    ruleResult.getTestedElement();  // What element was tested for the result.
+}
 ```
