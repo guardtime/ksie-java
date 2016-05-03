@@ -17,6 +17,10 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Rule that verifies the type and hash integrity of {@link AnnotationInfoManifest} as noted by its {@link
+ * AnnotationsManifest}.
+ */
 public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule<GenericVerificationResult> {
 
     private static final String KSIE_VERIFY_ANNOTATION_INFO_MANIFEST = "KSIE_VERIFY_ANNOTATION_INFO_MANIFEST";

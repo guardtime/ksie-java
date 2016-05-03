@@ -3,13 +3,25 @@ package com.guardtime.container.verification.policy;
 import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.generic.*;
 
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * Default implementation of {@link VerificationPolicy}
+ * Contains rules for:
+ * <ol>
+ *   <li>verifying manifest indexes are consecutive</li>
+ *   <li>verifying {@link com.guardtime.container.manifest.DataFilesManifest}</li>
+ *   <li>verifying {@link com.guardtime.container.datafile.ContainerDocument}s</li>
+ *   <li>verifying {@link com.guardtime.container.manifest.AnnotationsManifest}</li>
+ *   <li>verifying {@link com.guardtime.container.manifest.AnnotationInfoManifest}s</li>
+ *   <li>verifying {@link com.guardtime.container.annotation.ContainerAnnotation}s</li>
+ * </ol>
+ * May contain extra rules to add specialized verification requirements to the policy or to overwrite some of the
+ * pre-existing rules.
+ */
 public class DefaultVerificationPolicy implements VerificationPolicy {
-    private Map<String, Rule> rules = new HashMap<>();
+    private ArrayList<Rule> rules = new ArrayList<>();
 
     public DefaultVerificationPolicy(List<Rule> extraRules) {
         addDefaultRules();
@@ -17,29 +29,38 @@ public class DefaultVerificationPolicy implements VerificationPolicy {
     }
 
     private void addAdditionalAndReplaceMatchingRules(List<Rule> extraRules) {
-        for (Rule rule : extraRules) {
-            rules.put(rule.getName(), rule);
+        for (Rule newRule : extraRules) {
+            Integer index = getExistingRuleIndex(newRule);
+            if(index != null) {
+                rules.set(index, newRule);
+            } else {
+                rules.add(newRule);
+            }
         }
     }
 
+    private Integer getExistingRuleIndex(Rule newRule) {
+        for (int i = 0; i < rules.size(); i++) {
+            String ruleName = rules.get(i).getName();
+            if (ruleName.equals(newRule.getName())) {
+                return i;
+            }
+        }
+        return null;
+    }
+
     private void addDefaultRules() {
-        ManifestConsecutivityRule manifestConsecutivityRule = new ManifestConsecutivityRule();
-        rules.put(manifestConsecutivityRule.getName(), manifestConsecutivityRule);
-        DataFilesManifestIntegrityRule dataFilesManifestIntegrityRule = new DataFilesManifestIntegrityRule();
-        rules.put(dataFilesManifestIntegrityRule.getName(), dataFilesManifestIntegrityRule);
-        DataFileIntegrityRule dataFileIntegrityRule = new DataFileIntegrityRule();
-        rules.put(dataFileIntegrityRule.getName(), dataFileIntegrityRule);
-        AnnotationsManifestIntegrityRule annotationsManifestIntegrityRule = new AnnotationsManifestIntegrityRule();
-        rules.put(annotationsManifestIntegrityRule.getName(), annotationsManifestIntegrityRule);
-        AnnotationInfoManifestIntegrityRule annotationInfoManifestIntegrityRule = new AnnotationInfoManifestIntegrityRule();
-        rules.put(annotationInfoManifestIntegrityRule.getName(), annotationInfoManifestIntegrityRule);
-        AnnotationDataIntegrityRule annotationDataIntegrityRule = new AnnotationDataIntegrityRule();
-        rules.put(annotationDataIntegrityRule.getName(), annotationDataIntegrityRule);
+        rules.add(new ManifestConsecutivityRule());
+        rules.add(new DataFilesManifestIntegrityRule());
+        rules.add(new DataFileIntegrityRule());
+        rules.add(new AnnotationsManifestIntegrityRule());
+        rules.add(new AnnotationInfoManifestIntegrityRule());
+        rules.add(new AnnotationDataIntegrityRule());
     }
 
     @Override
     public List<Rule> getRules() {
-        return new LinkedList<>(rules.values());
+        return rules;
     }
 
 }

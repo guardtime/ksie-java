@@ -16,6 +16,10 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Rule that verifies the hash integrity of each {@link ContainerDocument} in {@link SignatureContent} as noted by
+ * {@link DataFilesManifest}.
+ */
 public class DataFileIntegrityRule extends SignatureContentRule<GenericVerificationResult> {
 
     private static final String KSIE_VERIFY_DATA_FILE = "KSIE_VERIFY_DATA_FILE";

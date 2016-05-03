@@ -12,6 +12,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Rule that verifies the existence and content of a MIMETYPE file in the container. The expected content is given by
+ * {@link ContainerPackagingFactory}.
+ */
 public class MimeTypeIntegrityRule extends GenericRule<TerminatingVerificationResult> {
     private static final String KSIE_VERIFY_MIME_TYPE = "KSIE_VERIFY_MIME_TYPE";
     private final byte[] expectedContent;

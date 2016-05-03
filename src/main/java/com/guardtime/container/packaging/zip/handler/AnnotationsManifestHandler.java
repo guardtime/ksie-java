@@ -11,6 +11,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+/**
+ * This content holders is used for annotations manifests inside the container.
+ */
 public class AnnotationsManifestHandler extends IndexedContentHandler<AnnotationsManifest> {
 
     private final ContainerManifestFactory manifestFactory;

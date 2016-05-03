@@ -13,5 +13,9 @@ public interface Rule<O extends RuleVerificationResult> {
      */
     List<O> verify(VerificationContext context);
 
+    /**
+     *
+     * @return Unique string which can be used to identify the type of the rule.
+     */
     String getName();
 }

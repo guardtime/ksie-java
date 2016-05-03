@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Rule that verifies the hash integrity of {@link DataFilesManifest} as noted in {@link SignatureManifest}.
+ */
 public class DataFilesManifestIntegrityRule extends SignatureContentRule<GenericVerificationResult> {
 
     private static final String KSIE_VERIFY_DATA_FILES_MANIFEST = "KSIE_VERIFY_DATA_FILES_MANIFEST";

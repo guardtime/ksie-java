@@ -8,6 +8,9 @@ import com.guardtime.container.verification.rule.RuleState;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Type of {@link GenericRule} which verifies each {@link SignatureContent} separately from each other.
+ */
 public abstract class SignatureContentRule<O extends RuleVerificationResult> extends GenericRule<O> {
     public SignatureContentRule(String name) {
         super(name);

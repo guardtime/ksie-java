@@ -12,6 +12,10 @@ import com.guardtime.container.verification.rule.RuleState;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Rule that verifies that each next {@link SignatureManifest} and its linked manifests have an ascending set of indexes
+ * compared to the previous set.
+ */
 public class ManifestConsecutivityRule extends GenericRule<GenericVerificationResult> {
 
     private static final String KSIE_VERIFY_MANIFEST_INDEX = "KSIE_VERIFY_MANIFEST_INDEX";

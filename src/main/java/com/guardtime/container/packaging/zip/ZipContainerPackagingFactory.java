@@ -24,6 +24,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Generates {@link Container} instances that use ZIP archiving for storing.
+ */
 public class ZipContainerPackagingFactory implements ContainerPackagingFactory<ZipContainer> {
 
     private static final Logger logger = LoggerFactory.getLogger(ZipContainerPackagingFactory.class);

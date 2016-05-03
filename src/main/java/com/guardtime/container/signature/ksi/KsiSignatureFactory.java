@@ -11,6 +11,9 @@ import com.guardtime.ksi.unisignature.KSISignature;
 
 import java.io.InputStream;
 
+/**
+ * Uses {@link KSI} for the underlying signature logic.
+ */
 public class KsiSignatureFactory implements SignatureFactory {
 
     private static final KsiSignatureFactoryType SIGNATURE_FACTORY_TYPE = new KsiSignatureFactoryType();

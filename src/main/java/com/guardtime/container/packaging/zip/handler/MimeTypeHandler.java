@@ -8,6 +8,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+/**
+ * This content holders is used for MIMETYPE file inside the container.
+ */
 public class MimeTypeHandler extends ContentHandler<byte[]> {
 
     @Override

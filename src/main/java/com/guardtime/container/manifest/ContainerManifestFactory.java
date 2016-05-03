@@ -8,6 +8,13 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Creates or parses manifests used for container internal structure.
+ * @param <S>     Signature manifest implementation.
+ * @param <D>     Data files manifest implementation.
+ * @param <A>     Annotations manifest implementation.
+ * @param <AI>    Annotation info manifest implementation.
+ */
 public interface ContainerManifestFactory<S extends SignatureManifest, D extends DataFilesManifest, A extends AnnotationsManifest, AI extends AnnotationInfoManifest> {
 
     S createSignatureManifest(Pair<String, D> dataFilesManifest, Pair<String, A> annotationManifest, Pair<String, String> signatureReference) throws InvalidManifestException;
