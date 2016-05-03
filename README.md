@@ -29,15 +29,15 @@ In order to create a new container you have a choice of using the ContainerBuild
 ```java
 ContainerBuilder builder = new ContainerBuilder(packagingFactory);
 builder.withDataFile(...);      //can be used multiple times before calling build()
-builder.withAnnotation(...);    //can be used multiple times before calling build()
+builder.withAnnotation(...);    //can be used multiple times before calling build()  or can be omitted
 Container signedContainer = builder.build();
 ```
 
-Or you can use the packaging factory directly as shown below:
+Or you can use the ContainerPackagingFactory directly as shown below:
 
 ```java
 List<ContainerDocument> documents;
-List<ContainerAnnotation> annotations;
+List<ContainerAnnotation> annotations;  // Can be empty list
 /* initialize and fill documents and annotations lists
 ...
 */
@@ -59,21 +59,21 @@ It is suggested to always verify the parsed container before adding new document
 Both the ContainerBuilder and ContainerPackagingFactory allow for adding new documents and annotations to an existing container.
 The existing container will be expanded with the new documents/annotation and a signature covering them.
 
-ContainerBuilder:
+With ContainerBuilder:
 
 ```java
 ContainerBuilder builder = new ContainerBuilder(packagingFactory);
 builder.withExistingContainer(parsedContainer);
 builder.withDataFile(...);      //can be used multiple times before calling build()
-builder.withAnnotation(...);    //can be used multiple times before calling build()
+builder.withAnnotation(...);    //can be used multiple times before calling build()  or can be omitted
 Container signedContainer = builder.build();
 ```
 
-ContainerPackagingFactory:
+With ContainerPackagingFactory:
 
 ```java
 List<ContainerDocument> documents;
-List<ContainerAnnotation> annotations;
+List<ContainerAnnotation> annotations;  // Can be empty list
 /* initialize and fill documents and annotations lists
 ...
 */
