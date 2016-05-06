@@ -8,17 +8,19 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 
 import static org.junit.Assert.*;
 
 public class EmptyContainerDocumentTest extends AbstractContainerTest {
 
     private static final String DOCUMENT_NAME = "Not_added_document_doc";
+    private DataHash hash;
     private EmptyContainerDocument document;
 
     @Before
     public void setUp() {
-        DataHash hash = Util.hash(new ByteArrayInputStream("".getBytes()), HashAlgorithm.SHA2_256);
+        hash = Util.hash(new ByteArrayInputStream("".getBytes()), HashAlgorithm.SHA2_256);
         document = new EmptyContainerDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, hash);
     }
 
@@ -45,5 +47,28 @@ public class EmptyContainerDocumentTest extends AbstractContainerTest {
     @Test
     public void testIsWritable() throws Exception {
         assertFalse(document.isWritable());
+    }
+
+
+    @Test
+    public void testCreateEmptyDocumentWithoutFileName_ThrowsIllegalArgumentException() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("File name must be present");
+        new EmptyContainerDocument(null, MIME_TYPE_APPLICATION_TXT, hash);
+    }
+
+    @Test
+    public void testCreateEmptyDocumentWithoutMimeType_ThrowsIllegalArgumentException() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("MIME type must be present");
+        new EmptyContainerDocument(DOCUMENT_NAME, null, hash);
+    }
+
+
+    @Test
+    public void testCreateEmptyDocumentWithoutDataHash_ThrowsIllegalArgumentException() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Data hash must be present");
+        new EmptyContainerDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, null);
     }
 }

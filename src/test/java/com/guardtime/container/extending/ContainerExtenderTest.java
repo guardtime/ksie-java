@@ -9,8 +9,8 @@ import static org.junit.Assert.assertNotNull;
 public class ContainerExtenderTest extends AbstractContainerTest {
 
     @Test
-    public void testCreateContainerExtender_ThrowsNullPointerException() throws Exception {
-        expectedException.expect(NullPointerException.class);
+    public void testCreateContainerExtender_ThrowsIllegalArgumentException() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Signature extender must be present");
         ContainerExtender extender = new ContainerExtender(null);
     }

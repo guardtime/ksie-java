@@ -66,8 +66,8 @@ public class ContainerBuilderTest extends AbstractContainerTest {
     }
 
     @Test
-    public void testCreateBuilderWithoutPackagingFactory_ThrowsNullPointerException() throws Exception {
-        expectedException.expect(NullPointerException.class);
+    public void testCreateBuilderWithoutPackagingFactory_ThrowsIllegalArgumentException() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Packaging factory must be present");
         new ContainerBuilder(null);
     }

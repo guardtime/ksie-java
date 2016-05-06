@@ -34,8 +34,8 @@ public class KsiSignatureFactoryTest extends AbstractContainerTest{
     }
 
     @Test
-    public void testCreateFactory_ThrowsNullPointerException() throws Exception {
-        expectedException.expect(NullPointerException.class);
+    public void testCreateFactory_ThrowsIllegalArgumentException() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("KSI must be present");
         SignatureFactory signatureFactory = new KsiSignatureFactory(null);
     }

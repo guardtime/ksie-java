@@ -102,7 +102,7 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
     protected TLVElement createReference(int referenceType, String referenceUri, String referenceMime, DataHash dataHash) throws Exception {
         TLVElement reference = new TLVElement(false, false, referenceType);
         if (referenceUri != null) {
-            TLVElement uri = new TLVElement(false, false, TLV_ELEMENT_URI_TYPE); //TODO move to constants
+            TLVElement uri = new TLVElement(false, false, TLV_ELEMENT_URI_TYPE);
             uri.setStringContent(referenceUri);
             reference.addChildElement(uri);
         }
