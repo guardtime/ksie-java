@@ -6,7 +6,6 @@ import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.datafile.StreamContainerDocument;
 import com.guardtime.container.manifest.*;
-import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.SignatureFactoryType;
 import com.guardtime.container.util.Pair;
@@ -55,9 +54,6 @@ public class AbstractContainerTest {
 
     @Mock
     protected ContainerManifestFactory mockedManifestFactory;
-
-    @Mock
-    protected ContainerPackagingFactory mockedPackagingFactory;
 
     @Mock
     protected ManifestFactoryType mockedManifestFactoryType;

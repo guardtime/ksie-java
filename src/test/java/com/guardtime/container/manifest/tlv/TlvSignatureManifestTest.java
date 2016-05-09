@@ -25,14 +25,14 @@ public class TlvSignatureManifestTest extends AbstractTlvManifestTest {
         super.setUp();
         this.annotationsManifestReference = createReference(ANNOTATIONS_MANIFEST_REFERENCE_TYPE, ANNOTATIONS_MANIFEST_URI, ANNOTATIONS_MANIFEST_TYPE, dataHash);
         this.dataFilesReference = createReference(DATA_MANIFEST_REFERENCE_TYPE, DATAFILES_MANIFEST_URI, MIME_TYPE_APPLICATION_TXT, dataHash);
-        this.signatureReference = createReference(SIGNATURE_REFERENCE_TYPE, SIGNATURE_URI, SIGNATURE_TYPE, null);
+        this.signatureReference = createReference(SIGNATURE_REFERENCE_TYPE, SIGNATURE_URI, SIGNATURE_MIME_TYPE, null);
     }
 
     @Test
     public void testCreateManifest() throws Exception {
         Pair<String, TlvDataFilesManifest> dataManifest = Pair.of(DATAFILES_MANIFEST_URI, mockDataManifest);
         Pair<String, TlvAnnotationsManifest> annotationsManifest = Pair.of(ANNOTATIONS_MANIFEST_URI, mockAnnotationsManifest);
-        Pair<String, String> signatureReference = Pair.of(SIGNATURE_URI, SIGNATURE_TYPE);
+        Pair<String, String> signatureReference = Pair.of(SIGNATURE_URI, SIGNATURE_MIME_TYPE);
         TlvSignatureManifest manifest = new TlvSignatureManifest(dataManifest, annotationsManifest, signatureReference);
 
         assertArrayEquals(SIGNATURE_MANIFEST_MAGIC, manifest.getMagic());
@@ -58,7 +58,7 @@ public class TlvSignatureManifestTest extends AbstractTlvManifestTest {
         assertEquals(ANNOTATIONS_MANIFEST_URI, manifest.getAnnotationsManifestReference().getUri());
         assertEquals(ANNOTATIONS_MANIFEST_TYPE, manifest.getAnnotationsManifestReference().getMimeType());
         assertEquals(SIGNATURE_URI, manifest.getSignatureReference().getUri());
-        assertEquals(SIGNATURE_TYPE, manifest.getSignatureReference().getType());
+        assertEquals(SIGNATURE_MIME_TYPE, manifest.getSignatureReference().getType());
     }
 
     @Test

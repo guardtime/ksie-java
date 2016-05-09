@@ -43,7 +43,6 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
 
     protected static final String ANNOTATIONS_MANIFEST_TYPE = "ksie10/annotmanifest";
     protected static final String DATA_MANIFEST_TYPE = "ksie10/datamanifest";
-    protected static final String SIGNATURE_TYPE = "application/ksi-signature";
     protected static final String MOCK_URI = "/mock/mock";
     protected static final String SIGNATURE_URI = "/META-INF/signature4.ksig";
     protected static final String ANNOTATION_INFO_MANIFEST_URI = "/META-INF/annotation1.tlv";
@@ -62,9 +61,11 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
 
     @Mock
     protected ContainerDocument mockDocument;
-    protected DataHash dataHash;
+
     @Mock
     private AnnotationReference mockAnnotationReference;
+
+    protected DataHash dataHash;
 
     @Before
     public void setUp() throws Exception {

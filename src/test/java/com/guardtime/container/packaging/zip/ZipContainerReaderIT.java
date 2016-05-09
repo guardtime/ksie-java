@@ -1,41 +1,34 @@
 package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.AbstractCommonIntegrationTest;
+import com.guardtime.container.AbstractCommonServiceIntegrationTest;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.datafile.EmptyContainerDocument;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.signature.ContainerSignature;
-import com.guardtime.container.signature.SignatureFactory;
-import com.guardtime.container.signature.ksi.KsiSignatureFactoryType;
-import com.guardtime.ksi.hashing.DataHash;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
 
 public class ZipContainerReaderIT extends AbstractCommonIntegrationTest {
     private ZipContainerReader reader;
 
     @Before
     public void setUpReader() throws Exception {
-        this.reader = new ZipContainerReader(new TlvContainerManifestFactory(), signatureFactory);
+        this.reader = new ZipContainerReader(manifestFactory, signatureFactory);
     }
 
-    private ZipContainer getContainer(String containerPath) throws IOException, URISyntaxException {
-        InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource(containerPath).toURI()));
+    private ZipContainer getContainer(String containerPath) throws Exception {
+        InputStream input = new FileInputStream(loadFile(containerPath));
         return reader.read(input);
     }
 
