@@ -7,7 +7,7 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import java.io.IOException;
 import java.io.InputStream;
 
-public interface SignatureManifest extends ContainerFileElement {
+public interface Manifest extends ContainerFileElement {
 
     DataHash getDataHash(HashAlgorithm algorithm) throws IOException;
 

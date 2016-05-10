@@ -14,15 +14,15 @@ import java.util.Map;
 /**
  * Creates and parses manifests with TLV (Type Length Value) structure.
  */
-public class TlvContainerManifestFactory implements ContainerManifestFactory<TlvSignatureManifest, TlvDataFilesManifest, TlvAnnotationsManifest, TlvSingleAnnotationManifest> {
+public class TlvContainerManifestFactory implements ContainerManifestFactory<TlvManifest, TlvDataFilesManifest, TlvAnnotationsManifest, TlvSingleAnnotationManifest> {
 
     private static final TlvManifestFactoryType TLV_MANIFEST_FACTORY_TYPE = new TlvManifestFactoryType("TLV manifest factory", "tlv");
 
     @Override
-    public TlvSignatureManifest createSignatureManifest(Pair<String, TlvDataFilesManifest> dataFilesManifest, Pair<String, TlvAnnotationsManifest> annotationManifest, Pair<String, String> signatureReference) throws InvalidManifestException {
+    public TlvManifest createManifest(Pair<String, TlvDataFilesManifest> dataFilesManifest, Pair<String, TlvAnnotationsManifest> annotationManifest, Pair<String, String> signatureReference) throws InvalidManifestException {
         Util.notNull(dataFilesManifest, "Document manifest");
         Util.notNull(annotationManifest, "Annotations manifest");
-        return new TlvSignatureManifest(dataFilesManifest, annotationManifest, signatureReference);
+        return new TlvManifest(dataFilesManifest, annotationManifest, signatureReference);
     }
 
     @Override
@@ -45,9 +45,9 @@ public class TlvContainerManifestFactory implements ContainerManifestFactory<Tlv
     }
 
     @Override
-    public TlvSignatureManifest readSignatureManifest(InputStream input) throws InvalidManifestException {
+    public TlvManifest readManifest(InputStream input) throws InvalidManifestException {
         Util.notNull(input, "Input stream");
-        return new TlvSignatureManifest(input);
+        return new TlvManifest(input);
     }
 
     @Override

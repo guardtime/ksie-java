@@ -10,14 +10,14 @@ import java.util.Map;
 
 /**
  * Creates or parses manifests used for container internal structure.
- * @param <S>     Signature manifest implementation.
+ * @param <M>     Signature manifest implementation.
  * @param <D>     Data files manifest implementation.
  * @param <A>     Annotations manifest implementation.
  * @param <SA>    Annotation info manifest implementation.
  */
-public interface ContainerManifestFactory<S extends SignatureManifest, D extends DataFilesManifest, A extends AnnotationsManifest, SA extends SingleAnnotationManifest> {
+public interface ContainerManifestFactory<M extends Manifest, D extends DataFilesManifest, A extends AnnotationsManifest, SA extends SingleAnnotationManifest> {
 
-    S createSignatureManifest(Pair<String, D> dataFilesManifest, Pair<String, A> annotationManifest, Pair<String, String> signatureReference) throws InvalidManifestException;
+    M createManifest(Pair<String, D> dataFilesManifest, Pair<String, A> annotationManifest, Pair<String, String> signatureReference) throws InvalidManifestException;
 
     D createDataFilesManifest(List<ContainerDocument> files) throws InvalidManifestException;
 
@@ -25,7 +25,7 @@ public interface ContainerManifestFactory<S extends SignatureManifest, D extends
 
     SA createSingleAnnotationManifest(Pair<String, D> dataManifest, Pair<String, ContainerAnnotation> annotation) throws InvalidManifestException;
 
-    S readSignatureManifest(InputStream input) throws InvalidManifestException;
+    M readManifest(InputStream input) throws InvalidManifestException;
 
     D readDataFilesManifest(InputStream input) throws InvalidManifestException;
 

@@ -1,10 +1,10 @@
 package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.annotation.ContainerAnnotationType;
+import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.FileReference;
-import com.guardtime.container.manifest.SignatureManifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.result.GenericVerificationResult;
@@ -76,8 +76,8 @@ public class SingleAnnotationManifestIntegrityRule extends SignatureContentRule<
 
     private GenericVerificationResult getDataFilesManifestReferenceResult(SignatureContent content, SingleAnnotationManifest singleAnnotationManifest) {
         RuleResult result = getFailureResult();
-        SignatureManifest signatureManifest = content.getSignatureManifest().getRight();
-        FileReference expectedReference = signatureManifest.getDataFilesManifestReference();
+        Manifest manifest = content.getManifest().getRight();
+        FileReference expectedReference = manifest.getDataFilesManifestReference();
         FileReference realReference = singleAnnotationManifest.getDataManifestReference();
         if (realReference.equals(expectedReference)) {
             result = RuleResult.OK;

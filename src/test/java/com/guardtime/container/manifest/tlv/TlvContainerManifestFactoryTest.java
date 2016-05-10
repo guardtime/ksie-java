@@ -87,21 +87,21 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
     }
 
 //    @Test
-//    public void testCreateSignatureManifestWithoutDataManifest_ThrowsNullPointerException() throws Exception {
+//    public void testCreateManifestWithoutDataManifest_ThrowsNullPointerException() throws Exception {
 //        expectedException.expect(NullPointerException.class);
 //        expectedException.expectMessage("kala");
-//        factory.createSignatureManifest(null, mockAnnotationsManifest, "Non-important-for-test", "signature.ksig");
+//        factory.createManifest(null, mockAnnotationsManifest, "Non-important-for-test", "signature.ksig");
 //    }
 
 //    @Test
-//    public void testCreateSignatureManifestWithoutAnnotationsManifest_ThrowsNullPointerException() throws Exception {
+//    public void testCreateManifestWithoutAnnotationsManifest_ThrowsNullPointerException() throws Exception {
 //        expectedException.expect(NullPointerException.class);
-//        factory.createSignatureManifest(mockDataManifest, null, "Non-important-for-test", "signature.ksig");
+//        factory.createManifest(mockDataManifest, null, "Non-important-for-test", "signature.ksig");
 //    }
 //
 //    @Test
-//    public void testCreateSignatureManifestOK() throws Exception {
-//        TlvSignatureManifest signatureManifest = factory.createSignatureManifest(mockDataManifest, mockAnnotationsManifest, "Non-important-for-test", "signature.ksig");
+//    public void testCreateManifestOK() throws Exception {
+//        TlvManifest manifest = factory.createManifest(mockDataManifest, mockAnnotationsManifest, "Non-important-for-test", "signature.ksig");
 //
 //        assertNotNull("Manifest was not created", manifest);
 //    }

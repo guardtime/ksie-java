@@ -131,7 +131,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             AnnotationsManifest annotationsManifest = manifestFactory.createAnnotationsManifest(annotationsManifestContent);
             Pair<String, AnnotationsManifest> annotationsManifestPair = Pair.of(nameProvider.nextAnnotationsManifestName(), annotationsManifest);
 
-            SignatureManifest signatureManifest = manifestFactory.createSignatureManifest(dataFilesManifest, annotationsManifestPair,
+            Manifest manifest = manifestFactory.createManifest(dataFilesManifest, annotationsManifestPair,
                     Pair.of(nameProvider.nextSignatureName(), signatureFactoryType.getSignatureMimeType()));
 
             ZipSignatureContent signatureContent = new ZipSignatureContent.Builder()
@@ -140,7 +140,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
                     .withAnnotations(annotationPairs)
                     .withSingleAnnotationManifests(singleAnnotationManifestPairs)
                     .withAnnotationsManifest(annotationsManifestPair)
-                    .withManifest(Pair.of(nameProvider.nextManifestName(), signatureManifest))
+                    .withManifest(Pair.of(nameProvider.nextManifestName(), manifest))
                     .build();
 
             DataHash hash = signatureContent.getSignatureInputHash();

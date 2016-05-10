@@ -1,7 +1,7 @@
 package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.manifest.DataFilesManifest;
-import com.guardtime.container.manifest.SignatureManifest;
+import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.result.GenericVerificationResult;
@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Rule that verifies the hash integrity of {@link DataFilesManifest} as noted in {@link SignatureManifest}.
+ * Rule that verifies the hash integrity of {@link DataFilesManifest} as noted in {@link Manifest}.
  */
 public class DataFilesManifestIntegrityRule extends SignatureContentRule<GenericVerificationResult> {
 
@@ -33,7 +33,7 @@ public class DataFilesManifestIntegrityRule extends SignatureContentRule<Generic
         RuleResult result = getFailureResult();
         DataFilesManifest dataFilesManifest = content.getDataManifest().getRight();
         try {
-            DataHash expectedHash = getDataHashFromSignatureManifest(content);
+            DataHash expectedHash = getDataHashFromManifest(content);
             DataHash realHash = dataFilesManifest.getDataHash(expectedHash.getAlgorithm());
             if (realHash.equals(expectedHash)) {
                 result = RuleResult.OK;
@@ -45,8 +45,8 @@ public class DataFilesManifestIntegrityRule extends SignatureContentRule<Generic
     }
 
 
-    private DataHash getDataHashFromSignatureManifest(SignatureContent content) {
-        SignatureManifest signatureManifest = content.getSignatureManifest().getRight();
-        return signatureManifest.getDataFilesManifestReference().getHash();
+    private DataHash getDataHashFromManifest(SignatureContent content) {
+        Manifest manifest = content.getManifest().getRight();
+        return manifest.getDataFilesManifestReference().getHash();
     }
 }

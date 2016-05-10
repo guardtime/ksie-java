@@ -2,7 +2,7 @@ package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.InvalidManifestException;
-import com.guardtime.container.manifest.SignatureManifest;
+import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
@@ -19,7 +19,7 @@ import java.util.List;
 import static java.util.Arrays.asList;
 
 //TODO fix reference object
-class TlvSignatureManifest extends AbstractTlvManifestStructure implements SignatureManifest {
+class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
 
     private static final byte[] MAGIC = "KSIEMFST".getBytes();
 
@@ -27,7 +27,7 @@ class TlvSignatureManifest extends AbstractTlvManifestStructure implements Signa
     private TlvSignatureReference signatureReference;
     private TlvAnnotationsManifestReference annotationsManifestReference;
 
-    public TlvSignatureManifest(Pair<String, TlvDataFilesManifest> dataFilesManifest, Pair<String, TlvAnnotationsManifest> annotationsManifest, Pair<String, String> signatureReference) throws InvalidManifestException {
+    public TlvManifest(Pair<String, TlvDataFilesManifest> dataFilesManifest, Pair<String, TlvAnnotationsManifest> annotationsManifest, Pair<String, String> signatureReference) throws InvalidManifestException {
         super(MAGIC);
         try {
             this.dataFilesManifestReference = new TlvDataFilesManifestReference(dataFilesManifest.getRight(), dataFilesManifest.getLeft());
@@ -38,7 +38,7 @@ class TlvSignatureManifest extends AbstractTlvManifestStructure implements Signa
         }
     }
 
-    public TlvSignatureManifest(InputStream stream) throws InvalidManifestException {
+    public TlvManifest(InputStream stream) throws InvalidManifestException {
         super(MAGIC, stream);
         try {
             TLVInputStream inputStream = toTlvInputStream(stream);

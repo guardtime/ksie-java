@@ -75,7 +75,7 @@ public class AbstractContainerTest {
     private SingleAnnotationManifest mockedSingleAnnotationManifest;
 
     @Mock
-    private SignatureManifest mockedSignatureManifest;
+    private Manifest mockedManifest;
 
     @Before
     public void setUp() throws Exception {
@@ -84,7 +84,7 @@ public class AbstractContainerTest {
         when(mockedManifestFactory.createDataFilesManifest(anyListOf(ContainerDocument.class))).thenReturn(mockedDataFilesManifest);
         when(mockedManifestFactory.createAnnotationsManifest(anyMap())).thenReturn(mockedAnnotationsManifest);
         when(mockedManifestFactory.createSingleAnnotationManifest(Mockito.any(Pair.class), Mockito.any(Pair.class))).thenReturn(mockedSingleAnnotationManifest);
-        when(mockedManifestFactory.createSignatureManifest(Mockito.any(Pair.class), Mockito.any(Pair.class), Mockito.any(Pair.class))).thenReturn(mockedSignatureManifest);
+        when(mockedManifestFactory.createManifest(Mockito.any(Pair.class), Mockito.any(Pair.class), Mockito.any(Pair.class))).thenReturn(mockedManifest);
         when(mockedSignatureFactory.getSignatureFactoryType()).thenReturn(mockedSignatureFactoryType);
         when(mockedSignatureFactoryType.getSignatureMimeType()).thenReturn(SIGNATURE_MIME_TYPE);
     }

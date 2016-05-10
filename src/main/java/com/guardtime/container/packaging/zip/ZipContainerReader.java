@@ -131,11 +131,11 @@ class ZipContainerReader {
     private List<ZipSignatureContent> buildSignatures() {
         Set<String> parsedManifestUriSet = manifestHandler.getNames();
         List<ZipSignatureContent> signatures = new LinkedList<>();
-        for (String signatureManifestUri : parsedManifestUriSet) {
+        for (String manifestUri : parsedManifestUriSet) {
             try {
-                signatures.add(signatureContentHandler.get(signatureManifestUri));
+                signatures.add(signatureContentHandler.get(manifestUri));
             } catch (ContentParsingException e) {
-                LOGGER.info("Parsing SignatureContent failed for '{}'. Reason: '{}'", signatureManifestUri, e.getMessage());
+                LOGGER.info("Parsing SignatureContent failed for '{}'. Reason: '{}'", manifestUri, e.getMessage());
             }
         }
         return signatures;

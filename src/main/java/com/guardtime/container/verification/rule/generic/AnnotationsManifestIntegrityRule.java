@@ -2,7 +2,7 @@ package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.FileReference;
-import com.guardtime.container.manifest.SignatureManifest;
+import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.result.GenericVerificationResult;
@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Rule that verifies the hash integrity of {@link AnnotationsManifest} as noted by {@link SignatureManifest}.
+ * Rule that verifies the hash integrity of {@link AnnotationsManifest} as noted by {@link Manifest}.
  */
 public class AnnotationsManifestIntegrityRule extends SignatureContentRule<GenericVerificationResult> {
 
@@ -32,8 +32,8 @@ public class AnnotationsManifestIntegrityRule extends SignatureContentRule<Gener
     @Override
     protected List<GenericVerificationResult> verifySignatureContent(SignatureContent content, VerificationContext context) {
         RuleResult result = getFailureResult();
-        SignatureManifest signatureManifest = content.getSignatureManifest().getRight();
-        FileReference annotationsManifestReference = signatureManifest.getAnnotationsManifestReference();
+        Manifest manifest = content.getManifest().getRight();
+        FileReference annotationsManifestReference = manifest.getAnnotationsManifestReference();
         AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
         try {
             DataHash expectedDataHash = annotationsManifestReference.getHash();

@@ -6,7 +6,7 @@ import com.guardtime.container.extending.SignatureExtender;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.DataFilesManifest;
-import com.guardtime.container.manifest.SignatureManifest;
+import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
 
@@ -43,7 +43,7 @@ public interface SignatureContent {
 
     Pair<String, AnnotationsManifest> getAnnotationsManifest();
 
-    Pair<String, SignatureManifest> getSignatureManifest();
+    Pair<String, Manifest> getManifest();
 
     /**
      * Updates the existing ContainerSignature maintained by the SignatureContent to extend it to a trust anchor
