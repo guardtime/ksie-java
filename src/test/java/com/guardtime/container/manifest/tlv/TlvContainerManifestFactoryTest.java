@@ -28,29 +28,29 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
     }
 
     @Test
-    public void testCreateAnnotationInfoManifestWithoutDataManifest_ThrowsNullPointerException() throws Exception {
+    public void testCreateSingleAnnotationManifestWithoutDataManifest_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Document manifest");
-        factory.createAnnotationInfoManifest(null, mockedAnnotationPair);
+        factory.createSingleAnnotationManifest(null, mockedAnnotationPair);
     }
 
     @Test
-    public void testCreateAnnotationInfoManifestWithoutAnnotation_ThrowsNullPointerException() throws Exception {
+    public void testCreateSingleAnnotationManifestWithoutAnnotation_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Annotation");
-        factory.createAnnotationInfoManifest(mockedDataManifestPair, null);
+        factory.createSingleAnnotationManifest(mockedDataManifestPair, null);
     }
 
     @Test
-    public void testCreateAnnotationInfoManifest() throws Exception {
-        TlvAnnotationInfoManifest manifest = factory.createAnnotationInfoManifest(mockedDataManifestPair, mockedAnnotationPair);
+    public void testCreateSingleAnnotationManifest() throws Exception {
+        TlvSingleAnnotationManifest manifest = factory.createSingleAnnotationManifest(mockedDataManifestPair, mockedAnnotationPair);
         assertNotNull(manifest);
         assertNotNull(manifest.getAnnotationReference());
         assertNotNull(manifest.getDataManifestReference());
     }
 
 //    @Test
-//    public void testCreateAnnotationsManifestWithoutAnnotationInfoManifests_ThrowsIllegalArgumentException() throws Exception {
+//    public void testCreateAnnotationsManifestWithoutSingleAnnotationManifests_ThrowsIllegalArgumentException() throws Exception {
 //        expectedException.expect(NullPointerException.class);
 //        expectedException.expectMessage("Annotation");
 //        factory.createAnnotationsManifest();
@@ -58,8 +58,8 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
 //
 //    @Test
 //    public void testCreateAnnotationsManifestOK() throws Exception {
-//        Map<ContainerAnnotation, TlvAnnotationInfoManifest> annotationManifests = new HashMap();
-//        annotationManifests.put(mockAnnotation, mockAnnotationInfoManifest);
+//        Map<ContainerAnnotation, TlvSingleAnnotationManifest> annotationManifests = new HashMap();
+//        annotationManifests.put(mockAnnotation, mockSingleAnnotationManifest);
 //        TlvAnnotationsManifest manifest = factory.createAnnotationsManifest(annotationManifests, "Non-important-for-test");
 //
 //        assertNotNull("Manifest was not created", manifest);

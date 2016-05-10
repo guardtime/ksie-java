@@ -103,8 +103,8 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
         private ZipEntryNameProvider nameProvider;
 
         private List<Pair<String, ContainerAnnotation>> annotationPairs = new LinkedList<>();
-        private List<Pair<String, AnnotationInfoManifest>> annotationInfoManifestPairs = new LinkedList<>();
-        private Map<String, Pair<ContainerAnnotation, AnnotationInfoManifest>> annotationsManifestContent = new HashMap<>();
+        private List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifestPairs = new LinkedList<>();
+        private Map<String, Pair<ContainerAnnotation, SingleAnnotationManifest>> annotationsManifestContent = new HashMap<>();
 
         public ContentSigner(List<ContainerDocument> documents, List<ContainerAnnotation> annotations) {
             this.documents = documents;
@@ -138,7 +138,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
                     .withDocuments(documents)
                     .withDataManifest(dataFilesManifest)
                     .withAnnotations(annotationPairs)
-                    .withAnnotationInfoManifests(annotationInfoManifestPairs)
+                    .withSingleAnnotationManifests(singleAnnotationManifestPairs)
                     .withAnnotationsManifest(annotationsManifestPair)
                     .withManifest(Pair.of(nameProvider.nextManifestName(), signatureManifest))
                     .build();
@@ -160,10 +160,10 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             for (ContainerAnnotation annotation : annotations) {
                 Pair<String, ContainerAnnotation> annotationPair = Pair.of(nameProvider.nextAnnotationDataFileName(), annotation);
                 annotationPairs.add(annotationPair);
-                AnnotationInfoManifest annotationManifest = manifestFactory.createAnnotationInfoManifest(dataFilesManifest, annotationPair);
-                String annotationManifestName = nameProvider.nextAnnotationInfoManifestName();
-                annotationInfoManifestPairs.add(Pair.of(annotationManifestName, annotationManifest));
-                annotationsManifestContent.put(annotationManifestName, Pair.of(annotation, annotationManifest));
+                SingleAnnotationManifest singleAnnotationManifest = manifestFactory.createSingleAnnotationManifest(dataFilesManifest, annotationPair);
+                String annotationManifestName = nameProvider.nextSingleAnnotationManifestName();
+                singleAnnotationManifestPairs.add(Pair.of(annotationManifestName, singleAnnotationManifest));
+                annotationsManifestContent.put(annotationManifestName, Pair.of(annotation, singleAnnotationManifest));
             }
         }
 

@@ -1,6 +1,6 @@
 package com.guardtime.container.packaging.zip.handler;
 
-import com.guardtime.container.manifest.AnnotationInfoManifest;
+import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.InvalidManifestException;
 
@@ -12,11 +12,11 @@ import java.io.IOException;
 /**
  * This content holders is used for annotation manifests inside the container.
  */
-public class AnnotationInfoManifestHandler extends IndexedContentHandler<AnnotationInfoManifest> {
+public class SingleAnnotationManifestHandler extends IndexedContentHandler<SingleAnnotationManifest> {
 
     private final ContainerManifestFactory manifestFactory;
 
-    public AnnotationInfoManifestHandler(ContainerManifestFactory manifestFactory) {
+    public SingleAnnotationManifestHandler(ContainerManifestFactory manifestFactory) {
         this.manifestFactory = manifestFactory;
     }
 
@@ -27,10 +27,10 @@ public class AnnotationInfoManifestHandler extends IndexedContentHandler<Annotat
     }
 
     @Override
-    protected AnnotationInfoManifest getEntry(String name) throws ContentParsingException {
+    protected SingleAnnotationManifest getEntry(String name) throws ContentParsingException {
         File file = fetchFileFromEntries(name);
         try (FileInputStream input = new FileInputStream(file)) {
-            return manifestFactory.readAnnotationInfoManifest(input);
+            return manifestFactory.readSingleAnnotationManifest(input);
         } catch (InvalidManifestException e) {
             throw new ContentParsingException("Failed to parse content of annotation manifest file", e);
         } catch (FileNotFoundException e) {

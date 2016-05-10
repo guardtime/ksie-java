@@ -1,7 +1,7 @@
 package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.annotation.ContainerAnnotationType;
-import com.guardtime.container.manifest.AnnotationInfoManifest;
+import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.SignatureManifest;
@@ -18,19 +18,19 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Rule that verifies the type and hash integrity of {@link AnnotationInfoManifest} as noted by its {@link
+ * Rule that verifies the type and hash integrity of {@link SingleAnnotationManifest} as noted by its {@link
  * AnnotationsManifest}.
  */
-public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule<GenericVerificationResult> {
+public class SingleAnnotationManifestIntegrityRule extends SignatureContentRule<GenericVerificationResult> {
 
-    private static final String KSIE_VERIFY_ANNOTATION_INFO_MANIFEST = "KSIE_VERIFY_ANNOTATION_INFO_MANIFEST";
+    private static final String KSIE_VERIFY_SINGLE_ANNOTATION_MANIFEST = "KSIE_VERIFY_SINGLE_ANNOTATION_MANIFEST";
 
-    public AnnotationInfoManifestIntegrityRule() {
-        super(KSIE_VERIFY_ANNOTATION_INFO_MANIFEST);
+    public SingleAnnotationManifestIntegrityRule() {
+        super(KSIE_VERIFY_SINGLE_ANNOTATION_MANIFEST);
     }
 
-    public AnnotationInfoManifestIntegrityRule(RuleState state) {
-        super(state, KSIE_VERIFY_ANNOTATION_INFO_MANIFEST);
+    public SingleAnnotationManifestIntegrityRule(RuleState state) {
+        super(state, KSIE_VERIFY_SINGLE_ANNOTATION_MANIFEST);
     }
 
     @Override
@@ -39,10 +39,10 @@ public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule<Ge
         if (shouldIgnoreContent(content, context)) return results;
 
         AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
-        for (FileReference reference : annotationsManifest.getAnnotationInfoManifestReferences()) {
-            AnnotationInfoManifest annotationInfoManifest = content.getAnnotationInfoManifests().get(reference.getUri());
-            results.add(getAnnotationInfoManifestResult(reference, annotationInfoManifest));
-            results.add(getDataFilesManifestReferenceResult(content, annotationInfoManifest));
+        for (FileReference reference : annotationsManifest.getSingleAnnotationManifestReferences()) {
+            SingleAnnotationManifest singleAnnotationManifest = content.getSingleAnnotationManifests().get(reference.getUri());
+            results.add(getSingleAnnotationManifestResult(reference, singleAnnotationManifest));
+            results.add(getDataFilesManifestReferenceResult(content, singleAnnotationManifest));
         }
         return results;
     }
@@ -59,11 +59,11 @@ public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule<Ge
         return false;
     }
 
-    private GenericVerificationResult getAnnotationInfoManifestResult(FileReference reference, AnnotationInfoManifest annotationInfoManifest) {
+    private GenericVerificationResult getSingleAnnotationManifestResult(FileReference reference, SingleAnnotationManifest singleAnnotationManifest) {
         RuleResult result = getFailureResult();
         try {
             DataHash expectedDataHash = reference.getHash();
-            DataHash realDataHash = annotationInfoManifest.getDataHash(expectedDataHash.getAlgorithm());
+            DataHash realDataHash = singleAnnotationManifest.getDataHash(expectedDataHash.getAlgorithm());
             if (realDataHash.equals(expectedDataHash)) {
                 result = RuleResult.OK;
             }
@@ -71,18 +71,18 @@ public class AnnotationInfoManifestIntegrityRule extends SignatureContentRule<Ge
             LOGGER.debug("Verifying annotation manifest failed!", e);
             result = getMissingManifestResult(reference);
         }
-        return new GenericVerificationResult(result, this, annotationInfoManifest);
+        return new GenericVerificationResult(result, this, singleAnnotationManifest);
     }
 
-    private GenericVerificationResult getDataFilesManifestReferenceResult(SignatureContent content, AnnotationInfoManifest annotationInfoManifest) {
+    private GenericVerificationResult getDataFilesManifestReferenceResult(SignatureContent content, SingleAnnotationManifest singleAnnotationManifest) {
         RuleResult result = getFailureResult();
         SignatureManifest signatureManifest = content.getSignatureManifest().getRight();
         FileReference expectedReference = signatureManifest.getDataFilesManifestReference();
-        FileReference realReference = annotationInfoManifest.getDataManifestReference();
+        FileReference realReference = singleAnnotationManifest.getDataManifestReference();
         if (realReference.equals(expectedReference)) {
             result = RuleResult.OK;
         }
-        return new GenericVerificationResult(result, this, annotationInfoManifest);
+        return new GenericVerificationResult(result, this, singleAnnotationManifest);
     }
 
     private RuleResult getMissingManifestResult(FileReference reference) {

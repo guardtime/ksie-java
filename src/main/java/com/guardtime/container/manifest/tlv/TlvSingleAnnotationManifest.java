@@ -1,8 +1,8 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.manifest.AnnotationInfoManifest;
-import com.guardtime.container.manifest.AnnotationReference;
+import com.guardtime.container.manifest.SingleAnnotationManifest;
+import com.guardtime.container.manifest.AnnotationDataReference;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.util.Pair;
@@ -20,29 +20,29 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 
-class TlvAnnotationInfoManifest extends AbstractTlvManifestStructure implements AnnotationInfoManifest {
+class TlvSingleAnnotationManifest extends AbstractTlvManifestStructure implements SingleAnnotationManifest {
 
     private static final byte[] MAGIC = "KSIEANNT".getBytes();
 
-    private TlvAnnotationReference annotationReference;
+    private TlvAnnotationDataReference annotationReference;
     private TlvDataFilesManifestReference dataManifestReference;
 
-    public TlvAnnotationInfoManifest(Pair<String, ContainerAnnotation> annotation, Pair<String, TlvDataFilesManifest> dataManifest) throws InvalidManifestException {
+    public TlvSingleAnnotationManifest(Pair<String, ContainerAnnotation> annotation, Pair<String, TlvDataFilesManifest> dataManifest) throws InvalidManifestException {
         super(MAGIC);
         try {
-            this.annotationReference = new TlvAnnotationReference(annotation);
+            this.annotationReference = new TlvAnnotationDataReference(annotation);
             this.dataManifestReference = new TlvDataFilesManifestReference(dataManifest.getRight(), dataManifest.getLeft());
         } catch (TLVParserException | IOException e) {
             throw new InvalidManifestException("Failed to generate file reference TLVElement", e);
         }
     }
 
-    public TlvAnnotationInfoManifest(InputStream stream) throws InvalidManifestException {
+    public TlvSingleAnnotationManifest(InputStream stream) throws InvalidManifestException {
         super(MAGIC, stream);
         try {
             read(stream);
         } catch (TLVParserException e) {
-            throw new InvalidManifestException("Failed to parse TlvAnnotationInfoManifest from InputStream", e);
+            throw new InvalidManifestException("Failed to parse TlvSingleAnnotationManifest from InputStream", e);
         } catch (IOException e) {
             throw new InvalidManifestException("Failed to read InputStream", e);
         }
@@ -59,8 +59,8 @@ class TlvAnnotationInfoManifest extends AbstractTlvManifestStructure implements 
                 case TlvDataFilesManifestReference.DATA_FILES_MANIFEST_REFERENCE:
                     dataManifestReference = new TlvDataFilesManifestReference(readOnce(element));
                     break;
-                case TlvAnnotationReference.ANNOTATION_REFERENCE:
-                    annotationReference = new TlvAnnotationReference(readOnce(element));
+                case TlvAnnotationDataReference.ANNOTATION_REFERENCE:
+                    annotationReference = new TlvAnnotationDataReference(readOnce(element));
                     break;
                 default:
                     verifyCriticalFlag(element);
@@ -74,7 +74,7 @@ class TlvAnnotationInfoManifest extends AbstractTlvManifestStructure implements 
     }
 
     @Override
-    public AnnotationReference getAnnotationReference() {
+    public AnnotationDataReference getAnnotationReference() {
         return annotationReference;
     }
 

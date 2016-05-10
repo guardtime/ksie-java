@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface AnnotationsManifest extends ContainerFileElement {
 
-    List<? extends FileReference> getAnnotationInfoManifestReferences();
+    List<? extends FileReference> getSingleAnnotationManifestReferences();
 
     InputStream getInputStream() throws IOException;
 

@@ -26,19 +26,19 @@ class SignatureContentHandler {
     private final ManifestHandler manifestHandler;
     private final DataManifestHandler dataManifestHandler;
     private final AnnotationsManifestHandler annotationsManifestHandler;
-    private final AnnotationInfoManifestHandler annotationInfoManifestHandler;
+    private final SingleAnnotationManifestHandler singleAnnotationManifestHandler;
     private final SignatureHandler signatureHandler;
 
     public SignatureContentHandler(DataFileContentHandler documentHandler, AnnotationContentHandler annotationContentHandler,
                                    ManifestHandler manifestHandler, DataManifestHandler dataManifestHandler,
-                                   AnnotationsManifestHandler annotationsManifestHandler, AnnotationInfoManifestHandler annotationInfoManifestHandler,
+                                   AnnotationsManifestHandler annotationsManifestHandler, SingleAnnotationManifestHandler singleAnnotationManifestHandler,
                                    SignatureHandler signatureHandler) {
         this.documentHandler = documentHandler;
         this.annotationContentHandler = annotationContentHandler;
         this.manifestHandler = manifestHandler;
         this.dataManifestHandler = dataManifestHandler;
         this.annotationsManifestHandler = annotationsManifestHandler;
-        this.annotationInfoManifestHandler = annotationInfoManifestHandler;
+        this.singleAnnotationManifestHandler = singleAnnotationManifestHandler;
         this.signatureHandler = signatureHandler;
     }
 
@@ -48,7 +48,7 @@ class SignatureContentHandler {
                 .withManifest(group.manifest)
                 .withDataManifest(group.dataManifest)
                 .withAnnotationsManifest(group.annotationsManifest)
-                .withAnnotationInfoManifests(group.annotationInfoManifests)
+                .withSingleAnnotationManifests(group.singleAnnotationManifests)
                 .withDocuments(group.documents)
                 .withAnnotations(group.annotations)
                 .build();
@@ -62,7 +62,7 @@ class SignatureContentHandler {
         Pair<String, SignatureManifest> manifest;
         Pair<String, DataFilesManifest> dataManifest;
         Pair<String, AnnotationsManifest> annotationsManifest;
-        List<Pair<String, AnnotationInfoManifest>> annotationInfoManifests = new LinkedList<>();
+        List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifests = new LinkedList<>();
         List<Pair<String, ContainerAnnotation>> annotations = new LinkedList<>();
         List<ContainerDocument> documents = new LinkedList<>();
         ContainerSignature signature;
@@ -129,34 +129,34 @@ class SignatureContentHandler {
 
         private void populateAnnotationsWithManifests() {
             if (annotationsManifest == null) return;
-            for (FileReference manifestReference : annotationsManifest.getRight().getAnnotationInfoManifestReferences()) {
-                Pair<String, AnnotationInfoManifest> annotationInfoManifest = getAnnotationInfoManifest(manifestReference);
-                if (annotationInfoManifest != null) {
-                    annotationInfoManifests.add(annotationInfoManifest);
-                    Pair<String, ContainerAnnotation> annotation = getContainerAnnotation(manifestReference, annotationInfoManifest.getRight());
+            for (FileReference manifestReference : annotationsManifest.getRight().getSingleAnnotationManifestReferences()) {
+                Pair<String, SingleAnnotationManifest> singleAnnotationManifest = getSingleAnnotationManifest(manifestReference);
+                if (singleAnnotationManifest != null) {
+                    singleAnnotationManifests.add(singleAnnotationManifest);
+                    Pair<String, ContainerAnnotation> annotation = getContainerAnnotation(manifestReference, singleAnnotationManifest.getRight());
                     if (annotation != null) annotations.add(annotation);
                 }
             }
         }
 
-        private Pair<String, AnnotationInfoManifest> getAnnotationInfoManifest(FileReference manifestReference) {
+        private Pair<String, SingleAnnotationManifest> getSingleAnnotationManifest(FileReference manifestReference) {
             try {
                 String manifestReferenceUri = manifestReference.getUri();
-                AnnotationInfoManifest annotationInfoManifest = annotationInfoManifestHandler.get(manifestReferenceUri);
-                return Pair.of(manifestReferenceUri, annotationInfoManifest);
+                SingleAnnotationManifest singleAnnotationManifest = singleAnnotationManifestHandler.get(manifestReferenceUri);
+                return Pair.of(manifestReferenceUri, singleAnnotationManifest);
             } catch (ContentParsingException e) {
                 LOGGER.info("Failed to parse annotation manifest for '{}'. Reason: '{}'", manifestReference.getUri(), e.getMessage());
                 return null;
             }
         }
 
-        private Pair<String, ContainerAnnotation> getContainerAnnotation(FileReference manifestReference, AnnotationInfoManifest annotationInfoManifest) {
+        private Pair<String, ContainerAnnotation> getContainerAnnotation(FileReference manifestReference, SingleAnnotationManifest singleAnnotationManifest) {
             try {
-                AnnotationReference annotationReference = annotationInfoManifest.getAnnotationReference();
+                AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
                 ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getMimeType());
-                File annotationFile = annotationContentHandler.get(annotationReference.getUri());
-                ContainerAnnotation annotation = new FileContainerAnnotation(annotationFile, annotationReference.getDomain(), type);
-                return Pair.of(annotationReference.getUri(), annotation);
+                File annotationFile = annotationContentHandler.get(annotationDataReference.getUri());
+                ContainerAnnotation annotation = new FileContainerAnnotation(annotationFile, annotationDataReference.getDomain(), type);
+                return Pair.of(annotationDataReference.getUri(), annotation);
             } catch (ContentParsingException e) {
                 LOGGER.info("Failed to parse annotation for '{}'. Reason: '{}'", manifestReference.getUri(), e.getMessage());
                 return null;

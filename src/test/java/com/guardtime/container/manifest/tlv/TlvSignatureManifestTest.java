@@ -62,7 +62,7 @@ public class TlvSignatureManifestTest extends AbstractTlvManifestTest {
     }
 
     @Test
-    public void testReadManifestWithoutAnnotationInfoManifestReference() throws Exception {
+    public void testReadManifestWithoutSingleAnnotationManifestReference() throws Exception {
         expectedException.expect(InvalidManifestException.class);
         expectedException.expectMessage("Annotations manifest reference is mandatory");
         byte[] manifestBytes = join(SIGNATURE_MANIFEST_MAGIC, dataFilesReference.getEncoded(), signatureReference.getEncoded());

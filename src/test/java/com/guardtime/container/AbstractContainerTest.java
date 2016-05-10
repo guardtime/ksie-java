@@ -72,7 +72,7 @@ public class AbstractContainerTest {
     protected AnnotationsManifest mockedAnnotationsManifest;
 
     @Mock
-    private AnnotationInfoManifest mockedAnnotationInfoManifest;
+    private SingleAnnotationManifest mockedSingleAnnotationManifest;
 
     @Mock
     private SignatureManifest mockedSignatureManifest;
@@ -83,7 +83,7 @@ public class AbstractContainerTest {
         when(mockedManifestFactory.getManifestFactoryType()).thenReturn(mockedManifestFactoryType);
         when(mockedManifestFactory.createDataFilesManifest(anyListOf(ContainerDocument.class))).thenReturn(mockedDataFilesManifest);
         when(mockedManifestFactory.createAnnotationsManifest(anyMap())).thenReturn(mockedAnnotationsManifest);
-        when(mockedManifestFactory.createAnnotationInfoManifest(Mockito.any(Pair.class), Mockito.any(Pair.class))).thenReturn(mockedAnnotationInfoManifest);
+        when(mockedManifestFactory.createSingleAnnotationManifest(Mockito.any(Pair.class), Mockito.any(Pair.class))).thenReturn(mockedSingleAnnotationManifest);
         when(mockedManifestFactory.createSignatureManifest(Mockito.any(Pair.class), Mockito.any(Pair.class), Mockito.any(Pair.class))).thenReturn(mockedSignatureManifest);
         when(mockedSignatureFactory.getSignatureFactoryType()).thenReturn(mockedSignatureFactoryType);
         when(mockedSignatureFactoryType.getSignatureMimeType()).thenReturn(SIGNATURE_MIME_TYPE);

@@ -7,9 +7,9 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import java.io.IOException;
 import java.io.InputStream;
 
-public interface AnnotationInfoManifest extends ContainerFileElement {
+public interface SingleAnnotationManifest extends ContainerFileElement {
 
-    AnnotationReference getAnnotationReference();
+    AnnotationDataReference getAnnotationReference();
 
     FileReference getDataManifestReference();
 

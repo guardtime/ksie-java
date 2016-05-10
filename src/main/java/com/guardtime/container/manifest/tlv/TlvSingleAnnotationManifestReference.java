@@ -6,15 +6,15 @@ import com.guardtime.ksi.tlv.TLVParserException;
 
 import java.io.IOException;
 
-class TlvAnnotationInfoManifestReference extends TlvFileReference {
+class TlvSingleAnnotationManifestReference extends TlvFileReference {
 
     private static final int ANNOTATION_INFO_REFERENCE = 0xb04;
 
-    public TlvAnnotationInfoManifestReference(TLVElement rootElement) throws TLVParserException {
+    public TlvSingleAnnotationManifestReference(TLVElement rootElement) throws TLVParserException {
         super(rootElement);
     }
 
-    public TlvAnnotationInfoManifestReference(String uri, TlvAnnotationInfoManifest manifest, ContainerAnnotationType annotationType) throws TLVParserException, IOException {
+    public TlvSingleAnnotationManifestReference(String uri, TlvSingleAnnotationManifest manifest, ContainerAnnotationType annotationType) throws TLVParserException, IOException {
         super(uri, manifest.getDataHash(DEFAULT_HASH_ALGORITHM), annotationType.getContent());
     }
 

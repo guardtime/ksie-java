@@ -10,7 +10,7 @@ import java.io.ByteArrayInputStream;
 
 import static org.junit.Assert.*;
 
-public class TlvAnnotationInfoManifestTest extends AbstractTlvManifestTest {
+public class TlvSingleAnnotationManifestTest extends AbstractTlvManifestTest {
 
     private TLVElement annotationReference;
     private TLVElement dataFilesReference;
@@ -24,13 +24,13 @@ public class TlvAnnotationInfoManifestTest extends AbstractTlvManifestTest {
     }
 
     @Test
-    public void testCreateAnnotationInfoManifest() throws Exception {
-        TlvAnnotationInfoManifest annotationManifest = new TlvAnnotationInfoManifest(Pair.of(ANNOTATION_INFO_MANIFEST_URI, mockAnnotation), Pair.of(MOCK_URI, mockDataManifest));
+    public void testCreateSingleAnnotationManifest() throws Exception {
+        TlvSingleAnnotationManifest annotationManifest = new TlvSingleAnnotationManifest(Pair.of(SINGLE_ANNOTATION_MANIFEST_URI, mockAnnotation), Pair.of(MOCK_URI, mockDataManifest));
 
         assertNotNull(annotationManifest.getAnnotationReference());
         assertNotNull(annotationManifest.getDataManifestReference());
         assertEquals(ANNOTATION_DOMAIN_COM_GUARDTIME, annotationManifest.getAnnotationReference().getDomain());
-        assertEquals(ANNOTATION_INFO_MANIFEST_URI, annotationManifest.getAnnotationReference().getUri());
+        assertEquals(SINGLE_ANNOTATION_MANIFEST_URI, annotationManifest.getAnnotationReference().getUri());
         assertEquals(dataHash, annotationManifest.getAnnotationReference().getHash());
         assertEquals(MOCK_URI, annotationManifest.getDataManifestReference().getUri());
         assertEquals(DATA_MANIFEST_TYPE, annotationManifest.getDataManifestReference().getMimeType());
@@ -38,29 +38,29 @@ public class TlvAnnotationInfoManifestTest extends AbstractTlvManifestTest {
     }
 
     @Test
-    public void testReadAnnotationInfoManifest() throws Exception {
-        byte[] bytes = join(ANNOTATION_INFO_MANIFEST_MAGIC, annotationReference.getEncoded(), dataFilesReference.getEncoded());
-        TlvAnnotationInfoManifest annotationInfoManifest = new TlvAnnotationInfoManifest(new ByteArrayInputStream(bytes));
+    public void testReadSingleAnnotationManifest() throws Exception {
+        byte[] bytes = join(SINGLE_ANNOTATION_MANIFEST_MAGIC, annotationReference.getEncoded(), dataFilesReference.getEncoded());
+        TlvSingleAnnotationManifest annotationInfoManifest = new TlvSingleAnnotationManifest(new ByteArrayInputStream(bytes));
 
-        assertArrayEquals(ANNOTATION_INFO_MANIFEST_MAGIC, annotationInfoManifest.getMagic());
+        assertArrayEquals(SINGLE_ANNOTATION_MANIFEST_MAGIC, annotationInfoManifest.getMagic());
         assertNotNull(annotationInfoManifest.getDataManifestReference());
         assertNotNull(annotationInfoManifest.getAnnotationReference());
     }
 
     @Test
-    public void testReadAnnotationInfoManifestWithoutDataReference() throws Exception {
+    public void testReadSingleAnnotationManifestWithoutDataReference() throws Exception {
         expectedException.expect(InvalidManifestException.class);
         expectedException.expectMessage("Data manifest reference is mandatory manifest element");
-        byte[] bytes = join(ANNOTATION_INFO_MANIFEST_MAGIC, annotationReference.getEncoded());
-        new TlvAnnotationInfoManifest(new ByteArrayInputStream(bytes));
+        byte[] bytes = join(SINGLE_ANNOTATION_MANIFEST_MAGIC, annotationReference.getEncoded());
+        new TlvSingleAnnotationManifest(new ByteArrayInputStream(bytes));
     }
 
     @Test
-    public void testReadAnnotationInfoManifestWithoutAnnotationReference() throws Exception {
+    public void testReadSingleAnnotationManifestWithoutAnnotationReference() throws Exception {
         expectedException.expect(InvalidManifestException.class);
         expectedException.expectMessage("Annotation reference is mandatory manifest element");
-        byte[] bytes = join(ANNOTATION_INFO_MANIFEST_MAGIC, dataFilesReference.getEncoded());
-        new TlvAnnotationInfoManifest(new ByteArrayInputStream(bytes));
+        byte[] bytes = join(SINGLE_ANNOTATION_MANIFEST_MAGIC, dataFilesReference.getEncoded());
+        new TlvSingleAnnotationManifest(new ByteArrayInputStream(bytes));
     }
 
 }

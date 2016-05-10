@@ -42,12 +42,12 @@ public class AnnotationsManifestHandler extends IndexedContentHandler<Annotation
         }
     }
 
-    public int getMaxAnnotationInfoManifestIndex() {
+    public int getMaxSingleAnnotationManifestIndex() {
         int max = 0;
         for (File file : entries.values()) {
             try {
                 AnnotationsManifest manifest = manifestFactory.readAnnotationsManifest(new FileInputStream(file));
-                for (FileReference reference : manifest.getAnnotationInfoManifestReferences()) {
+                for (FileReference reference : manifest.getSingleAnnotationManifestReferences()) {
                     int index = Util.extractIntegerFrom(reference.getUri());
                     if (index > max) max = index;
                 }

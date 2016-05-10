@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * Creates and parses manifests with TLV (Type Length Value) structure.
  */
-public class TlvContainerManifestFactory implements ContainerManifestFactory<TlvSignatureManifest, TlvDataFilesManifest, TlvAnnotationsManifest, TlvAnnotationInfoManifest> {
+public class TlvContainerManifestFactory implements ContainerManifestFactory<TlvSignatureManifest, TlvDataFilesManifest, TlvAnnotationsManifest, TlvSingleAnnotationManifest> {
 
     private static final TlvManifestFactoryType TLV_MANIFEST_FACTORY_TYPE = new TlvManifestFactoryType("TLV manifest factory", "tlv");
 
@@ -33,15 +33,15 @@ public class TlvContainerManifestFactory implements ContainerManifestFactory<Tlv
     }
 
     @Override
-    public TlvAnnotationsManifest createAnnotationsManifest(Map<String, Pair<ContainerAnnotation, TlvAnnotationInfoManifest>> annotationManifest) throws InvalidManifestException {
+    public TlvAnnotationsManifest createAnnotationsManifest(Map<String, Pair<ContainerAnnotation, TlvSingleAnnotationManifest>> annotationManifest) throws InvalidManifestException {
         return new TlvAnnotationsManifest(annotationManifest);
     }
 
     @Override
-    public TlvAnnotationInfoManifest createAnnotationInfoManifest(Pair<String, TlvDataFilesManifest> dataManifest, Pair<String, ContainerAnnotation> annotation) throws InvalidManifestException {
+    public TlvSingleAnnotationManifest createSingleAnnotationManifest(Pair<String, TlvDataFilesManifest> dataManifest, Pair<String, ContainerAnnotation> annotation) throws InvalidManifestException {
         Util.notNull(dataManifest, "Document manifest");
         Util.notNull(annotation, "Annotation");
-        return new TlvAnnotationInfoManifest(annotation, dataManifest);
+        return new TlvSingleAnnotationManifest(annotation, dataManifest);
     }
 
     @Override
@@ -63,9 +63,9 @@ public class TlvContainerManifestFactory implements ContainerManifestFactory<Tlv
     }
 
     @Override
-    public TlvAnnotationInfoManifest readAnnotationInfoManifest(InputStream input) throws InvalidManifestException {
+    public TlvSingleAnnotationManifest readSingleAnnotationManifest(InputStream input) throws InvalidManifestException {
         Util.notNull(input, "Input stream");
-        return new TlvAnnotationInfoManifest(input);
+        return new TlvSingleAnnotationManifest(input);
     }
 
     @Override

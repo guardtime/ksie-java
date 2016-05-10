@@ -4,7 +4,7 @@ import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.datafile.ContainerDocument;
-import com.guardtime.container.manifest.AnnotationReference;
+import com.guardtime.container.manifest.AnnotationDataReference;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
@@ -36,7 +36,7 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
     protected static final int ANNOTATION_REFERENCE_TYPE = 0xb05;
     protected static final int SIGNATURE_REFERENCE_TYPE = 0xb06;
 
-    protected static final byte[] ANNOTATION_INFO_MANIFEST_MAGIC = "KSIEANNT".getBytes();
+    protected static final byte[] SINGLE_ANNOTATION_MANIFEST_MAGIC = "KSIEANNT".getBytes();
     protected static final byte[] ANNOTATIONS_MANIFEST_MAGIC = "KSIEANMF".getBytes();
     protected static final byte[] DATA_FILES_MANIFEST_MAGIC = "KSIEDAMF".getBytes();
     protected static final byte[] SIGNATURE_MANIFEST_MAGIC = "KSIEMFST".getBytes();
@@ -46,7 +46,7 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
     protected static final String SIGNATURE_TYPE = "application/ksi-signature";
     protected static final String MOCK_URI = "/mock/mock";
     protected static final String SIGNATURE_URI = "/META-INF/signature4.ksig";
-    protected static final String ANNOTATION_INFO_MANIFEST_URI = "/META-INF/annotation1.tlv";
+    protected static final String SINGLE_ANNOTATION_MANIFEST_URI = "/META-INF/annotation1.tlv";
 
     @Mock
     protected TlvDataFilesManifest mockDataManifest;
@@ -58,13 +58,13 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
     protected ContainerAnnotation mockAnnotation;
 
     @Mock
-    protected TlvAnnotationInfoManifest mockAnnotationInfoManifest;
+    protected TlvSingleAnnotationManifest mockSingleAnnotationManifest;
 
     @Mock
     protected ContainerDocument mockDocument;
     protected DataHash dataHash;
     @Mock
-    private AnnotationReference mockAnnotationReference;
+    private AnnotationDataReference mockAnnotationDataReference;
 
     @Before
     public void setUp() throws Exception {
@@ -80,13 +80,13 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
         when(mockAnnotation.getAnnotationType()).thenReturn(ContainerAnnotationType.NON_REMOVABLE);
         when(mockAnnotation.getDomain()).thenReturn(ANNOTATION_DOMAIN_COM_GUARDTIME);
 
-        when(mockAnnotationInfoManifest.getInputStream()).thenReturn(EMPTY_INPUT_STREAM);
-        when(mockAnnotationInfoManifest.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHashForEmptyData);
-        when(mockAnnotationInfoManifest.getAnnotationReference()).thenReturn(mockAnnotationReference);
+        when(mockSingleAnnotationManifest.getInputStream()).thenReturn(EMPTY_INPUT_STREAM);
+        when(mockSingleAnnotationManifest.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHashForEmptyData);
+        when(mockSingleAnnotationManifest.getAnnotationReference()).thenReturn(mockAnnotationDataReference);
 
-        when(mockAnnotationReference.getDomain()).thenReturn(ANNOTATION_DOMAIN_COM_GUARDTIME);
-        when(mockAnnotationReference.getUri()).thenReturn(MOCK_URI);
-        when(mockAnnotationReference.getHash()).thenReturn(dataHash);
+        when(mockAnnotationDataReference.getDomain()).thenReturn(ANNOTATION_DOMAIN_COM_GUARDTIME);
+        when(mockAnnotationDataReference.getUri()).thenReturn(MOCK_URI);
+        when(mockAnnotationDataReference.getHash()).thenReturn(dataHash);
 
         when(mockDocument.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHash);
         when(mockDocument.getFileName()).thenReturn(TEST_FILE_NAME_TEST_TXT);
@@ -147,7 +147,7 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
         return getFirstChildElement(reference, TLV_ELEMENT_MIME_TYPE).getDecodedString();
     }
 
-    protected String getDomain(TlvAnnotationReference reference) throws TLVParserException {
+    protected String getDomain(TlvAnnotationDataReference reference) throws TLVParserException {
         return getFirstChildElement(reference, TLV_ELEMENT_DOMAIN_TYPE).getDecodedString();
     }
 

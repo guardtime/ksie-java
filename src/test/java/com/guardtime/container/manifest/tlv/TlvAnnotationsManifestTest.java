@@ -21,12 +21,12 @@ public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateAnnotationsManifest() throws Exception {
-        Map<String, Pair<ContainerAnnotation, TlvAnnotationInfoManifest>> annotationManifest = new HashMap<>();
-        annotationManifest.put(MOCK_URI, Pair.of(mockAnnotation, mockAnnotationInfoManifest));
-        TlvAnnotationsManifest manifest = new TlvAnnotationsManifest(annotationManifest);
+        Map<String, Pair<ContainerAnnotation, TlvSingleAnnotationManifest>> singleAnnotationManifests = new HashMap<>();
+        singleAnnotationManifests.put(MOCK_URI, Pair.of(mockAnnotation, mockSingleAnnotationManifest));
+        TlvAnnotationsManifest manifest = new TlvAnnotationsManifest(singleAnnotationManifests);
         assertArrayEquals(ANNOTATIONS_MANIFEST_MAGIC, manifest.getMagic());
-        assertNotNull(manifest.getAnnotationInfoManifestReferences());
-        assertNotNull(manifest.getAnnotationInfoManifestReferences().get(0));
+        assertNotNull(manifest.getSingleAnnotationManifestReferences());
+        assertNotNull(manifest.getSingleAnnotationManifestReferences().get(0));
     }
 
     @Test
@@ -36,9 +36,9 @@ public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
 
         TlvAnnotationsManifest manifest = new TlvAnnotationsManifest(new ByteArrayInputStream(bytes));
         assertArrayEquals(ANNOTATIONS_MANIFEST_MAGIC, manifest.getMagic());
-        assertNotNull(manifest.getAnnotationInfoManifestReferences());
-        assertEquals(1, manifest.getAnnotationInfoManifestReferences().size());
-        FileReference annotationsReference = manifest.getAnnotationInfoManifestReferences().get(0);
+        assertNotNull(manifest.getSingleAnnotationManifestReferences());
+        assertEquals(1, manifest.getSingleAnnotationManifestReferences().size());
+        FileReference annotationsReference = manifest.getSingleAnnotationManifestReferences().get(0);
         assertEquals(MOCK_URI, annotationsReference.getUri());
         assertEquals(MIME_TYPE_APPLICATION_TXT, annotationsReference.getMimeType());
         assertEquals(dataHash, annotationsReference.getHash());
@@ -55,8 +55,8 @@ public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
     public void testReadAnnotationsManifestWithoutAnnotationReferences() throws Exception {
         TlvAnnotationsManifest manifest = new TlvAnnotationsManifest(new ByteArrayInputStream(ANNOTATIONS_MANIFEST_MAGIC));
         assertArrayEquals(ANNOTATIONS_MANIFEST_MAGIC, manifest.getMagic());
-        assertNotNull(manifest.getAnnotationInfoManifestReferences());
-        assertTrue(manifest.getAnnotationInfoManifestReferences().isEmpty());
+        assertNotNull(manifest.getSingleAnnotationManifestReferences());
+        assertTrue(manifest.getSingleAnnotationManifestReferences().isEmpty());
     }
 
 }
