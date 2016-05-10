@@ -49,7 +49,7 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
             throw new InvalidManifestException("Failed to read InputStream", e);
         }
         checkMandatoryElement(dataFilesManifestReference, "Data files manifest reference");
-        checkMandatoryElement(signatureReference, "Signature manifest reference");
+        checkMandatoryElement(signatureReference, "Signature reference");
         checkMandatoryElement(annotationsManifestReference, "Annotations manifest reference");
     }
 
