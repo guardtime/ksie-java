@@ -5,6 +5,7 @@ package com.guardtime.container.packaging.zip;
  */
 class ZipEntryNameProvider {
 
+    private static final String META_INF = "META-INF/";
     private final String manifestSuffix;
     private final String signatureSuffix;
 
@@ -31,26 +32,26 @@ class ZipEntryNameProvider {
     }
 
     public String nextDataManifestName() {
-        return String.format("/META-INF/datamanifest%d.%s", ++dataManifestIndex, manifestSuffix);
+        return String.format(META_INF + "datamanifest%d.%s", ++dataManifestIndex, manifestSuffix);
     }
 
     public String nextManifestName() {
-        return String.format("/META-INF/manifest%d.%s", ++manifestIndex, manifestSuffix);
+        return String.format(META_INF + "manifest%d.%s", ++manifestIndex, manifestSuffix);
     }
 
     public String nextAnnotationsManifestName() {
-        return String.format("/META-INF/annotmanifest%d.%s", ++annotationsManifestIndex, manifestSuffix);
+        return String.format(META_INF + "annotmanifest%d.%s", ++annotationsManifestIndex, manifestSuffix);
     }
 
     public String nextSignatureName() {
-        return String.format("/META-INF/signature%d.%s", ++signatureIndex, signatureSuffix);
+        return String.format(META_INF + "signature%d.%s", ++signatureIndex, signatureSuffix);
     }
 
     public String nextAnnotationInfoManifestName() {
-        return String.format("/META-INF/annotation%d.%s", ++annotationInfoManifestIndex, manifestSuffix);
+        return String.format(META_INF + "annotation%d.%s", ++annotationInfoManifestIndex, manifestSuffix);
     }
 
     public String nextAnnotationDataFileName() {
-        return String.format("/META-INF/annotation%d.dat", ++annotationIndex);
+        return String.format(META_INF + "annotation%d.dat", ++annotationIndex);
     }
 }
