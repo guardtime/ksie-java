@@ -29,17 +29,17 @@ class ZipSignatureContent implements SignatureContent {
     private final Pair<String, DataFilesManifest> dataManifest;
     private final Pair<String, SignatureManifest> manifest;
     private final Pair<String, AnnotationsManifest> annotationsManifest;
-    private final Map<String, SingleAnnotationManifest> singleAnnotationManifests;
+    private final Map<String, SingleAnnotationManifest> singleAnnotationManifestMap;
     private ContainerSignature signature;
     private Map<String, ContainerAnnotation> annotations;
 
     private ZipSignatureContent(List<ContainerDocument> documents,
                                 List<Pair<String, ContainerAnnotation>> annotations, Pair<String, DataFilesManifest> dataManifest,
                                 Pair<String, AnnotationsManifest> annotationsManifest, Pair<String, SignatureManifest> manifest,
-                                List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifests) {
+                                List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifestMap) {
         this.documents = formatDocumentsListToMap(documents);
         this.annotations = formatAnnotationsListToMap(annotations);
-        this.singleAnnotationManifests = formatSingleAnnotationManifestsListToMap(singleAnnotationManifests);
+        this.singleAnnotationManifestMap = formatSingleAnnotationManifestsListToMap(singleAnnotationManifestMap);
         this.dataManifest = dataManifest;
         this.annotationsManifest = annotationsManifest;
         this.manifest = manifest;
@@ -90,7 +90,7 @@ class ZipSignatureContent implements SignatureContent {
     }
 
     public Map<String, SingleAnnotationManifest> getSingleAnnotationManifests() {
-        return singleAnnotationManifests;
+        return singleAnnotationManifestMap;
     }
 
     public ContainerSignature getSignature() {
@@ -126,9 +126,9 @@ class ZipSignatureContent implements SignatureContent {
     }
 
     private void writeSingleAnnotationManifests(ZipOutputStream output) throws IOException {
-        for (String uri : singleAnnotationManifests.keySet()) {
-            SingleAnnotationManifest manifest = singleAnnotationManifests.get(uri);
-            writeEntry(new ZipEntry(uri), manifest.getInputStream(), output);
+        for (String uri : singleAnnotationManifestMap.keySet()) {
+            SingleAnnotationManifest singleAnnotationManifest = singleAnnotationManifestMap.get(uri);
+            writeEntry(new ZipEntry(uri), singleAnnotationManifest.getInputStream(), output);
         }
     }
 

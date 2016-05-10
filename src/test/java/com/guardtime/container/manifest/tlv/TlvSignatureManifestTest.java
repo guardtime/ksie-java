@@ -33,32 +33,32 @@ public class TlvSignatureManifestTest extends AbstractTlvManifestTest {
         Pair<String, TlvDataFilesManifest> dataManifest = Pair.of(DATAFILES_MANIFEST_URI, mockDataManifest);
         Pair<String, TlvAnnotationsManifest> annotationsManifest = Pair.of(ANNOTATIONS_MANIFEST_URI, mockAnnotationsManifest);
         Pair<String, String> signatureReference = Pair.of(SIGNATURE_URI, SIGNATURE_TYPE);
-        TlvSignatureManifest manifest = new TlvSignatureManifest(dataManifest, annotationsManifest, signatureReference);
+        TlvSignatureManifest signatureManifest = new TlvSignatureManifest(dataManifest, annotationsManifest, signatureReference);
 
-        assertArrayEquals(SIGNATURE_MANIFEST_MAGIC, manifest.getMagic());
-        assertNotNull(manifest.getDataFilesManifestReference());
-        assertNotNull(manifest.getAnnotationsManifestReference());
-        assertNotNull(manifest.getSignatureReference());
-        assertEquals(DATAFILES_MANIFEST_URI, manifest.getDataFilesManifestReference().getUri());
-        assertEquals(ANNOTATIONS_MANIFEST_URI, manifest.getAnnotationsManifestReference().getUri());
-        assertEquals(SIGNATURE_URI, manifest.getSignatureReference().getUri());
+        assertArrayEquals(SIGNATURE_MANIFEST_MAGIC, signatureManifest.getMagic());
+        assertNotNull(signatureManifest.getDataFilesManifestReference());
+        assertNotNull(signatureManifest.getAnnotationsManifestReference());
+        assertNotNull(signatureManifest.getSignatureReference());
+        assertEquals(DATAFILES_MANIFEST_URI, signatureManifest.getDataFilesManifestReference().getUri());
+        assertEquals(ANNOTATIONS_MANIFEST_URI, signatureManifest.getAnnotationsManifestReference().getUri());
+        assertEquals(SIGNATURE_URI, signatureManifest.getSignatureReference().getUri());
     }
 
     @Test
     public void testReadManifest() throws Exception {
         byte[] manifestBytes = join(SIGNATURE_MANIFEST_MAGIC, annotationsManifestReference.getEncoded(), dataFilesReference.getEncoded(), signatureReference.getEncoded());
 
-        TlvSignatureManifest manifest = new TlvSignatureManifest(new ByteArrayInputStream(manifestBytes));
-        assertArrayEquals(SIGNATURE_MANIFEST_MAGIC, manifest.getMagic());
-        assertNotNull(manifest.getDataFilesManifestReference());
-        assertNotNull(manifest.getAnnotationsManifestReference());
-        assertNotNull(manifest.getSignatureReference());
-        assertEquals(DATAFILES_MANIFEST_URI, manifest.getDataFilesManifestReference().getUri());
-        assertEquals(MIME_TYPE_APPLICATION_TXT, manifest.getDataFilesManifestReference().getMimeType());
-        assertEquals(ANNOTATIONS_MANIFEST_URI, manifest.getAnnotationsManifestReference().getUri());
-        assertEquals(ANNOTATIONS_MANIFEST_TYPE, manifest.getAnnotationsManifestReference().getMimeType());
-        assertEquals(SIGNATURE_URI, manifest.getSignatureReference().getUri());
-        assertEquals(SIGNATURE_TYPE, manifest.getSignatureReference().getType());
+        TlvSignatureManifest signatureManifest = new TlvSignatureManifest(new ByteArrayInputStream(manifestBytes));
+        assertArrayEquals(SIGNATURE_MANIFEST_MAGIC, signatureManifest.getMagic());
+        assertNotNull(signatureManifest.getDataFilesManifestReference());
+        assertNotNull(signatureManifest.getAnnotationsManifestReference());
+        assertNotNull(signatureManifest.getSignatureReference());
+        assertEquals(DATAFILES_MANIFEST_URI, signatureManifest.getDataFilesManifestReference().getUri());
+        assertEquals(MIME_TYPE_APPLICATION_TXT, signatureManifest.getDataFilesManifestReference().getMimeType());
+        assertEquals(ANNOTATIONS_MANIFEST_URI, signatureManifest.getAnnotationsManifestReference().getUri());
+        assertEquals(ANNOTATIONS_MANIFEST_TYPE, signatureManifest.getAnnotationsManifestReference().getMimeType());
+        assertEquals(SIGNATURE_URI, signatureManifest.getSignatureReference().getUri());
+        assertEquals(SIGNATURE_TYPE, signatureManifest.getSignatureReference().getType());
     }
 
     @Test

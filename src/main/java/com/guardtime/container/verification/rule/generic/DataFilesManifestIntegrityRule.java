@@ -46,7 +46,7 @@ public class DataFilesManifestIntegrityRule extends SignatureContentRule<Generic
 
 
     private DataHash getDataHashFromSignatureManifest(SignatureContent content) {
-        SignatureManifest manifest = content.getSignatureManifest().getRight();
-        return manifest.getDataFilesManifestReference().getHash();
+        SignatureManifest signatureManifest = content.getSignatureManifest().getRight();
+        return signatureManifest.getDataFilesManifestReference().getHash();
     }
 }

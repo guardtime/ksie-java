@@ -34,13 +34,13 @@ public class ManifestConsecutivityRule extends GenericRule<GenericVerificationRe
         int expectedIndex = 1;
         for (SignatureContent content : context.getContainer().getSignatureContents()) {
             RuleResult result = getFailureResult();
-            Pair<String, SignatureManifest> manifest = content.getSignatureManifest();
-            int index = Util.extractIntegerFrom(manifest.getLeft());
+            Pair<String, SignatureManifest> signatureManifest = content.getSignatureManifest();
+            int index = Util.extractIntegerFrom(signatureManifest.getLeft());
             if (index == expectedIndex) {
                 result = RuleResult.OK;
             }
             expectedIndex = index + 1;
-            results.add(new GenericVerificationResult(result, this, manifest.getRight()));
+            results.add(new GenericVerificationResult(result, this, signatureManifest.getRight()));
         }
         return results;
     }

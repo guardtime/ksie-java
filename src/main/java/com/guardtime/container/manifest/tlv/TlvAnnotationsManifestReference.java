@@ -15,8 +15,8 @@ class TlvAnnotationsManifestReference extends TlvFileReference {
         super(rootElement);
     }
 
-    public TlvAnnotationsManifestReference(String uri, AnnotationsManifest manifest) throws TLVParserException, IOException {
-        super(uri, manifest.getDataHash(DEFAULT_HASH_ALGORITHM), ANNOTATIONS_MANIFEST_TYPE);
+    public TlvAnnotationsManifestReference(String uri, AnnotationsManifest annotationsManifest) throws TLVParserException, IOException {
+        super(uri, annotationsManifest.getDataHash(DEFAULT_HASH_ALGORITHM), ANNOTATIONS_MANIFEST_TYPE);
     }
 
     @Override

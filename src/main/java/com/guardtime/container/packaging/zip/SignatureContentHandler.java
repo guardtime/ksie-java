@@ -45,7 +45,7 @@ class SignatureContentHandler {
     public ZipSignatureContent get(String manifestPath) throws ContentParsingException {
         SignatureContentGroup group = new SignatureContentGroup(manifestPath);
         ZipSignatureContent signatureContent = new ZipSignatureContent.Builder()
-                .withManifest(group.manifest)
+                .withManifest(group.signatureManifest)
                 .withDataManifest(group.dataManifest)
                 .withAnnotationsManifest(group.annotationsManifest)
                 .withSingleAnnotationManifests(group.singleAnnotationManifests)
@@ -59,7 +59,7 @@ class SignatureContentHandler {
 
     private class SignatureContentGroup {
 
-        Pair<String, SignatureManifest> manifest;
+        Pair<String, SignatureManifest> signatureManifest;
         Pair<String, DataFilesManifest> dataManifest;
         Pair<String, AnnotationsManifest> annotationsManifest;
         List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifests = new LinkedList<>();
@@ -69,7 +69,7 @@ class SignatureContentHandler {
 
 
         public SignatureContentGroup(String manifestPath) throws ContentParsingException {
-            this.manifest = getManifest(manifestPath);
+            this.signatureManifest = getSignatureManifest(manifestPath);
             this.dataManifest = getDataManifest();
             this.annotationsManifest = getAnnotationsManifest();
 
@@ -78,12 +78,12 @@ class SignatureContentHandler {
             fetchSignature();
         }
 
-        private Pair<String, SignatureManifest> getManifest(String manifestPath) throws ContentParsingException {
+        private Pair<String, SignatureManifest> getSignatureManifest(String manifestPath) throws ContentParsingException {
             return Pair.of(manifestPath, manifestHandler.get(manifestPath));
         }
 
         private Pair<String, AnnotationsManifest> getAnnotationsManifest() {
-            FileReference annotationsManifestReference = manifest.getRight().getAnnotationsManifestReference();
+            FileReference annotationsManifestReference = signatureManifest.getRight().getAnnotationsManifestReference();
             try {
                 return Pair.of(
                         annotationsManifestReference.getUri(),
@@ -96,7 +96,7 @@ class SignatureContentHandler {
         }
 
         private Pair<String, DataFilesManifest> getDataManifest() {
-            FileReference dataManifestReference = manifest.getRight().getDataFilesManifestReference();
+            FileReference dataManifestReference = signatureManifest.getRight().getDataFilesManifestReference();
             try {
                 return Pair.of(dataManifestReference.getUri(), dataManifestHandler.get(dataManifestReference.getUri()));
             } catch (ContentParsingException e) {
@@ -164,7 +164,7 @@ class SignatureContentHandler {
         }
 
         private void fetchSignature() {
-            String signatureUri = manifest.getRight().getSignatureReference().getUri();
+            String signatureUri = signatureManifest.getRight().getSignatureReference().getUri();
             try {
                 signature = signatureHandler.get(signatureUri);
             } catch (ContentParsingException e) {

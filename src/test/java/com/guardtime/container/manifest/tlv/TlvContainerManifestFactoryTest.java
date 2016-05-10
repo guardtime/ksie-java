@@ -43,10 +43,10 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateSingleAnnotationManifest() throws Exception {
-        TlvSingleAnnotationManifest manifest = factory.createSingleAnnotationManifest(mockedDataManifestPair, mockedAnnotationPair);
-        assertNotNull(manifest);
-        assertNotNull(manifest.getAnnotationReference());
-        assertNotNull(manifest.getDataManifestReference());
+        TlvSingleAnnotationManifest singleAnnotationManifest = factory.createSingleAnnotationManifest(mockedDataManifestPair, mockedAnnotationPair);
+        assertNotNull(singleAnnotationManifest);
+        assertNotNull(singleAnnotationManifest.getAnnotationReference());
+        assertNotNull(singleAnnotationManifest.getDataManifestReference());
     }
 
 //    @Test
@@ -60,7 +60,7 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
 //    public void testCreateAnnotationsManifestOK() throws Exception {
 //        Map<ContainerAnnotation, TlvSingleAnnotationManifest> annotationManifests = new HashMap();
 //        annotationManifests.put(mockAnnotation, mockSingleAnnotationManifest);
-//        TlvAnnotationsManifest manifest = factory.createAnnotationsManifest(annotationManifests, "Non-important-for-test");
+//        TlvAnnotationsManifest annotationsManifest = factory.createAnnotationsManifest(annotationManifests, "Non-important-for-test");
 //
 //        assertNotNull("Manifest was not created", manifest);
 //    }
@@ -81,9 +81,9 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateDataFilesManifestOK() throws Exception {
-        TlvDataFilesManifest manifest = factory.createDataFilesManifest(asList(TEST_DOCUMENT_HELLO_TEXT));
-        assertNotNull("Manifest was not created", manifest);
-        assertEquals(1, manifest.getDataFileReferences().size());
+        TlvDataFilesManifest dataFilesManifest = factory.createDataFilesManifest(asList(TEST_DOCUMENT_HELLO_TEXT));
+        assertNotNull("Manifest was not created", dataFilesManifest);
+        assertEquals(1, dataFilesManifest.getDataFileReferences().size());
     }
 
 //    @Test
@@ -101,7 +101,7 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
 //
 //    @Test
 //    public void testCreateSignatureManifestOK() throws Exception {
-//        TlvSignatureManifest manifest = factory.createSignatureManifest(mockDataManifest, mockAnnotationsManifest, "Non-important-for-test", "signature.ksig");
+//        TlvSignatureManifest signatureManifest = factory.createSignatureManifest(mockDataManifest, mockAnnotationsManifest, "Non-important-for-test", "signature.ksig");
 //
 //        assertNotNull("Manifest was not created", manifest);
 //    }
