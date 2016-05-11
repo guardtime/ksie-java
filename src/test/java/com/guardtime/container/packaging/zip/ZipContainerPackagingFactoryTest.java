@@ -31,15 +31,15 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
     }
 
     @Test
-    public void testCreatePackagingFactoryWithoutSignatureFactory_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void testCreatePackagingFactoryWithoutSignatureFactory_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Signature factory must be present");
         new ZipContainerPackagingFactory(null, mockedManifestFactory);
     }
 
     @Test
-    public void testCreatePackagingFactoryWithoutManifestFactory_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void testCreatePackagingFactoryWithoutManifestFactory_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Manifest factory must be present");
         new ZipContainerPackagingFactory(mockedSignatureFactory, null);
     }

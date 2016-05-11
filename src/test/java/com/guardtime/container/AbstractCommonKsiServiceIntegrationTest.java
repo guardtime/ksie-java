@@ -10,7 +10,7 @@ import com.guardtime.ksi.service.http.simple.SimpleHttpClient;
 import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
 import org.junit.Before;
 
-public abstract class AbstractCommonServiceIntegrationTest extends AbstractCommonIntegrationTest {
+public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCommonIntegrationTest {
 
     private static final String TEST_SIGNING_SERVICE = "http://ksigw.test.guardtime.com:3333/gt-signingservice";
     private static final String TEST_EXTENDING_SERVICE = "http://ksigw.test.guardtime.com:8010/gt-extendingservice";

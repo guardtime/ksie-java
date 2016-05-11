@@ -30,15 +30,15 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
     }
 
     @Test
-    public void testCreateAnnotationInfoManifestWithoutDataManifest_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void testCreateAnnotationInfoManifestWithoutDataManifest_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Document manifest");
         factory.createAnnotationInfoManifest(null, mockedAnnotationPair);
     }
 
     @Test
-    public void testCreateAnnotationInfoManifestWithoutAnnotation_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void testCreateAnnotationInfoManifestWithoutAnnotation_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Annotation");
         factory.createAnnotationInfoManifest(mockedDataManifestPair, null);
     }
@@ -74,8 +74,8 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
     }
 
     @Test
-    public void testCreateDataFilesManifestWithoutDataFiles_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void testCreateDataFilesManifestWithoutDataFiles_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Document list must be present");
         factory.createDataFilesManifest(null);
     }
@@ -88,15 +88,15 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
     }
 
     @Test
-    public void testCreateSignatureManifestWithoutDataManifest_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void testCreateSignatureManifestWithoutDataManifest_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Document manifest must be present");
         factory.createSignatureManifest(null, Pair.of("Non-important-for-test", mockAnnotationsManifest), Pair.of("Non-important-for-test", "signature.ksig"));
     }
 
     @Test
-    public void testCreateSignatureManifestWithoutAnnotationsManifest_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void testCreateSignatureManifestWithoutAnnotationsManifest_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Annotations manifest must be present");
         factory.createSignatureManifest(Pair.of("Non-important-for-test", mockDataManifest), null, Pair.of("Non-important-for-test", "signature.ksig"));
     }

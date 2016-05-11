@@ -11,15 +11,15 @@ public class StringContainerAnnotationTest extends AbstractContainerTest {
 
 
     @Test
-    public void testCreateStringAnnotationWithoutInputString_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void testCreateStringAnnotationWithoutInputString_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Content must be present");
         new StringContainerAnnotation(ContainerAnnotationType.NON_REMOVABLE, null, ANNOTATION_DOMAIN_COM_GUARDTIME);
     }
 
     @Test
-    public void testCreateStringAnnotationWithoutAnnotationType_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void testCreateStringAnnotationWithoutAnnotationType_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Type must be present");
         new StringContainerAnnotation(null, "Example Content", ANNOTATION_DOMAIN_COM_GUARDTIME);
     }

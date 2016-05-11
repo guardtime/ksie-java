@@ -10,7 +10,8 @@ import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 
@@ -32,8 +33,8 @@ public class ContainerBuilderTest extends AbstractContainerTest {
     }
 
     @Test
-    public void testCreateBuilderWithoutPackagingFactory_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void testCreateBuilderWithoutPackagingFactory_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Packaging factory must be present");
         new ContainerBuilder(null);
     }

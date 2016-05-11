@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 
 import static org.junit.Assert.*;
 
@@ -51,23 +50,23 @@ public class EmptyContainerDocumentTest extends AbstractContainerTest {
 
 
     @Test
-    public void testCreateEmptyDocumentWithoutFileName_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void testCreateEmptyDocumentWithoutFileName_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("File name must be present");
         new EmptyContainerDocument(null, MIME_TYPE_APPLICATION_TXT, hash);
     }
 
     @Test
-    public void testCreateEmptyDocumentWithoutMimeType_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void testCreateEmptyDocumentWithoutMimeType_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("MIME type must be present");
         new EmptyContainerDocument(DOCUMENT_NAME, null, hash);
     }
 
 
     @Test
-    public void testCreateEmptyDocumentWithoutDataHash_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void testCreateEmptyDocumentWithoutDataHash_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Data hash must be present");
         new EmptyContainerDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, null);
     }

@@ -13,15 +13,15 @@ import static org.junit.Assert.assertNotNull;
 public class FileContainerDocumentTest extends AbstractContainerTest {
 
     @Test
-    public void testCreateFileDocumentWithoutInputFile_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void testCreateFileDocumentWithoutInputFile_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("File must be present");
         new FileContainerDocument(null, MIME_TYPE_APPLICATION_TXT);
     }
 
     @Test
-    public void testCreateFileDocumentWithoutMimeType_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void testCreateFileDocumentWithoutMimeType_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("MIME type must be present");
         new FileContainerDocument(new File(TEST_FILE_PATH_TEST_TXT), null);
     }

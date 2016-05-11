@@ -1,7 +1,7 @@
 package com.guardtime.container.integration;
 
 
-import com.guardtime.container.AbstractCommonServiceIntegrationTest;
+import com.guardtime.container.AbstractCommonKsiServiceIntegrationTest;
 import com.guardtime.container.ContainerBuilder;
 import com.guardtime.container.datafile.ContainerDocument;
 import com.guardtime.container.packaging.Container;
@@ -11,15 +11,13 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class ZipContainerSIT extends AbstractCommonServiceIntegrationTest {
+public class ZipContainerKsiServiceIT extends AbstractCommonKsiServiceIntegrationTest {
 
     @Test
     public void testCreateContainer() throws Exception {

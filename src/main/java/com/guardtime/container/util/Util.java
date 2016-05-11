@@ -14,7 +14,7 @@ public final class Util {
 
     public static void notNull(Object o, String name) {
         if (o == null) {
-            throw new IllegalArgumentException(name + " must be present");
+            throw new NullPointerException(name + " must be present");
         }
     }
 
