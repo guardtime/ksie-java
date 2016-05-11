@@ -12,7 +12,7 @@ public class ContainerExtenderTest extends AbstractContainerTest {
     public void testCreateContainerExtender_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Signature extender must be present");
-        ContainerExtender extender = new ContainerExtender(null);
+        new ContainerExtender(null);
     }
 
     @Test
