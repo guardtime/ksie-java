@@ -39,7 +39,7 @@ public class ZipContainerReaderIT extends AbstractCommonIntegrationTest {
     @Test
     public void testReadEmptyContainerFile_ThrowsInvalidPackageException() throws Exception {
         expectedException.expect(InvalidPackageException.class);
-        expectedException.expectMessage("Container has no valid content");
+        expectedException.expectMessage("Parsed container was not valid");
         ZipContainer container = getContainer(EMPTY_CONTAINER);
     }
 
