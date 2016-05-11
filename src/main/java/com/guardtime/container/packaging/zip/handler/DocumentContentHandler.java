@@ -5,9 +5,9 @@ import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 import java.io.File;
 
 /**
- * This content holders is used for data files inside the container.
+ * This content holders is used for documents inside the container.
  */
-public class DataFileContentHandler extends ContentHandler<File> {
+public class DocumentContentHandler extends ContentHandler<File> {
 
     @Override
     public boolean isSupported(String name) {

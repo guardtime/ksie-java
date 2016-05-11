@@ -1,4 +1,4 @@
-package com.guardtime.container.datafile;
+package com.guardtime.container.document;
 
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;

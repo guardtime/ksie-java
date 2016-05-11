@@ -1,11 +1,11 @@
 package com.guardtime.container.packaging;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.datafile.ContainerDocument;
+import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.extending.SignatureExtender;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.manifest.AnnotationsManifest;
-import com.guardtime.container.manifest.DataFilesManifest;
+import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
@@ -39,7 +39,7 @@ public interface SignatureContent {
      */
     ContainerSignature getSignature();
 
-    Pair<String, DataFilesManifest> getDataManifest();
+    Pair<String, DocumentsManifest> getDocumentsManifest();
 
     Pair<String, AnnotationsManifest> getAnnotationsManifest();
 

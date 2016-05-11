@@ -42,7 +42,7 @@ public class SingleAnnotationManifestIntegrityRule extends SignatureContentRule<
         for (FileReference reference : annotationsManifest.getSingleAnnotationManifestReferences()) {
             SingleAnnotationManifest singleAnnotationManifest = content.getSingleAnnotationManifests().get(reference.getUri());
             results.add(getSingleAnnotationManifestResult(reference, singleAnnotationManifest));
-            results.add(getDataFilesManifestReferenceResult(content, singleAnnotationManifest));
+            results.add(getDocumentsManifestReferenceResult(content, singleAnnotationManifest));
         }
         return results;
     }
@@ -74,11 +74,11 @@ public class SingleAnnotationManifestIntegrityRule extends SignatureContentRule<
         return new GenericVerificationResult(result, this, singleAnnotationManifest);
     }
 
-    private GenericVerificationResult getDataFilesManifestReferenceResult(SignatureContent content, SingleAnnotationManifest singleAnnotationManifest) {
+    private GenericVerificationResult getDocumentsManifestReferenceResult(SignatureContent content, SingleAnnotationManifest singleAnnotationManifest) {
         RuleResult result = getFailureResult();
         Manifest manifest = content.getManifest().getRight();
-        FileReference expectedReference = manifest.getDataFilesManifestReference();
-        FileReference realReference = singleAnnotationManifest.getDataManifestReference();
+        FileReference expectedReference = manifest.getDocumentsManifestReference();
+        FileReference realReference = singleAnnotationManifest.getDocumentsManifestReference();
         if (realReference.equals(expectedReference)) {
             result = RuleResult.OK;
         }

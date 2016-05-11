@@ -1,7 +1,7 @@
 package com.guardtime.container.manifest.tlv;
 
-import com.guardtime.container.datafile.ContainerDocument;
-import com.guardtime.container.manifest.DataFilesManifest;
+import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Util;
@@ -16,41 +16,41 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-class TlvDataFilesManifest extends AbstractTlvManifestStructure implements DataFilesManifest {
+class TlvDocumentsManifest extends AbstractTlvManifestStructure implements DocumentsManifest {
 
     private static final byte[] MAGIC = "KSIEDAMF".getBytes();
 
-    private List<TlvDataFileReference> documents = new LinkedList<>();
+    private List<TlvDocumentReference> documents = new LinkedList<>();
 
-    public TlvDataFilesManifest(List<ContainerDocument> documents) throws InvalidManifestException {
+    public TlvDocumentsManifest(List<ContainerDocument> documents) throws InvalidManifestException {
         super(MAGIC);
         try {
             for (ContainerDocument doc : documents) {
-                this.documents.add(new TlvDataFileReference(doc));
+                this.documents.add(new TlvDocumentReference(doc));
             }
         } catch (DataHashException | TLVParserException | IOException e) {
-            throw new InvalidManifestException("Failed to generate TlvDataFilesManifest", e);
+            throw new InvalidManifestException("Failed to generate TlvDocumentsManifest", e);
         }
     }
 
-    public TlvDataFilesManifest(InputStream stream) throws InvalidManifestException {
+    public TlvDocumentsManifest(InputStream stream) throws InvalidManifestException {
         super(MAGIC, stream);
         try {
             read(stream);
         } catch (TLVParserException e) {
-            throw new InvalidManifestException("Failed to parse TlvDataFilesManifest from InputStream", e);
+            throw new InvalidManifestException("Failed to parse TlvDocumentsManifest from InputStream", e);
         } catch (IOException e) {
             throw new InvalidManifestException("Failed to read InputStream", e);
         }
     }
 
     @Override
-    public List<TlvDataFileReference> getDataFileReferences() {
+    public List<TlvDocumentReference> getDocumentReferences() {
         return documents;
     }
 
     @Override
-    protected List<TlvDataFileReference> getElements() {
+    protected List<TlvDocumentReference> getElements() {
         return documents;
     }
 
@@ -60,7 +60,7 @@ class TlvDataFilesManifest extends AbstractTlvManifestStructure implements DataF
         while (input.hasNextElement()) {
             element = input.readElement();
             //TODO unknown elements must be handled correctly
-            documents.add(new TlvDataFileReference(element));
+            documents.add(new TlvDocumentReference(element));
         }
     }
 

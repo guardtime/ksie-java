@@ -1,7 +1,7 @@
 package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.datafile.ContainerDocument;
+import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.manifest.*;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
@@ -58,7 +58,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
 
     @Override
     public ZipContainer create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
-        Util.notEmpty(files, "Data files");
+        Util.notEmpty(files, "Document files");
         try {
             ContentSigner signer = new ContentSigner(files, annotations);
             ZipSignatureContent signatureContent = signer.sign();
@@ -126,17 +126,17 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             SignatureFactoryType signatureFactoryType = signatureFactory.getSignatureFactoryType();
             logger.info("'{}' is used to create and read container manifests", manifestFactoryType.getName());
             logger.info("'{}' is used to create and read container signatures", signatureFactoryType.getName());
-            Pair<String, DataFilesManifest> dataFilesManifest = Pair.of(nameProvider.nextDataManifestName(), manifestFactory.createDataFilesManifest(documents));
-            processAnnotations(dataFilesManifest);
+            Pair<String, DocumentsManifest> documentsManifest = Pair.of(nameProvider.nextDocumentsManifestName(), manifestFactory.createDocumentsManifest(documents));
+            processAnnotations(documentsManifest);
             AnnotationsManifest annotationsManifest = manifestFactory.createAnnotationsManifest(annotationsManifestContent);
             Pair<String, AnnotationsManifest> annotationsManifestPair = Pair.of(nameProvider.nextAnnotationsManifestName(), annotationsManifest);
 
-            Manifest manifest = manifestFactory.createManifest(dataFilesManifest, annotationsManifestPair,
+            Manifest manifest = manifestFactory.createManifest(documentsManifest, annotationsManifestPair,
                     Pair.of(nameProvider.nextSignatureName(), signatureFactoryType.getSignatureMimeType()));
 
             ZipSignatureContent signatureContent = new ZipSignatureContent.Builder()
                     .withDocuments(documents)
-                    .withDataManifest(dataFilesManifest)
+                    .withDocumentsManifest(documentsManifest)
                     .withAnnotations(annotationPairs)
                     .withSingleAnnotationManifests(singleAnnotationManifestPairs)
                     .withAnnotationsManifest(annotationsManifestPair)
@@ -153,14 +153,14 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             return nameProvider;
         }
 
-        private void processAnnotations(Pair<String, DataFilesManifest> dataFilesManifest) throws InvalidManifestException {
+        private void processAnnotations(Pair<String, DocumentsManifest> documentsManifest) throws InvalidManifestException {
             if (annotations == null) {
                 return;
             }
             for (ContainerAnnotation annotation : annotations) {
                 Pair<String, ContainerAnnotation> annotationPair = Pair.of(nameProvider.nextAnnotationDataFileName(), annotation);
                 annotationPairs.add(annotationPair);
-                SingleAnnotationManifest singleAnnotationManifest = manifestFactory.createSingleAnnotationManifest(dataFilesManifest, annotationPair);
+                SingleAnnotationManifest singleAnnotationManifest = manifestFactory.createSingleAnnotationManifest(documentsManifest, annotationPair);
                 String annotationManifestName = nameProvider.nextSingleAnnotationManifestName();
                 singleAnnotationManifestPairs.add(Pair.of(annotationManifestName, singleAnnotationManifest));
                 annotationsManifestContent.put(annotationManifestName, Pair.of(annotation, singleAnnotationManifest));

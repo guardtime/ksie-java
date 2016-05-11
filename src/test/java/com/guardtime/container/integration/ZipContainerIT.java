@@ -2,7 +2,7 @@ package com.guardtime.container.integration;
 
 
 import com.guardtime.container.ContainerBuilder;
-import com.guardtime.container.datafile.ContainerDocument;
+import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
@@ -73,7 +73,7 @@ public class ZipContainerIT {
     @Test
     public void testCreateContainer() throws Exception {
         Container container = new ContainerBuilder(packagingFactory)
-                .withDataFile(new ByteArrayInputStream("Test_Data".getBytes()), TEST_FILE_NAME, "application/txt")
+                .withDocument(new ByteArrayInputStream("Test_Data".getBytes()), TEST_FILE_NAME, "application/txt")
                 .build();
         assertSingleContentsWithSingleDocumentWithName(container, TEST_FILE_NAME);
         assertContainerVerifiesWithResult(container, RuleResult.OK);

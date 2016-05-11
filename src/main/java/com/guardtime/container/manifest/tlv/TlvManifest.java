@@ -23,14 +23,14 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
 
     private static final byte[] MAGIC = "KSIEMFST".getBytes();
 
-    private TlvDataFilesManifestReference dataFilesManifestReference;
+    private TlvDocumentsManifestReference documentsManifestReference;
     private TlvSignatureReference signatureReference;
     private TlvAnnotationsManifestReference annotationsManifestReference;
 
-    public TlvManifest(Pair<String, TlvDataFilesManifest> dataFilesManifest, Pair<String, TlvAnnotationsManifest> annotationsManifest, Pair<String, String> signatureReference) throws InvalidManifestException {
+    public TlvManifest(Pair<String, TlvDocumentsManifest> documentsManifest, Pair<String, TlvAnnotationsManifest> annotationsManifest, Pair<String, String> signatureReference) throws InvalidManifestException {
         super(MAGIC);
         try {
-            this.dataFilesManifestReference = new TlvDataFilesManifestReference(dataFilesManifest.getRight(), dataFilesManifest.getLeft());
+            this.documentsManifestReference = new TlvDocumentsManifestReference(documentsManifest.getRight(), documentsManifest.getLeft());
             this.signatureReference = new TlvSignatureReference(signatureReference.getLeft(), signatureReference.getRight());
             this.annotationsManifestReference = new TlvAnnotationsManifestReference(annotationsManifest.getLeft(), annotationsManifest.getRight());
         } catch (TLVParserException | IOException e) {
@@ -48,7 +48,7 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
         } catch (IOException e) {
             throw new InvalidManifestException("Failed to read InputStream", e);
         }
-        checkMandatoryElement(dataFilesManifestReference, "Data files manifest reference");
+        checkMandatoryElement(documentsManifestReference, "Documents manifest reference");
         checkMandatoryElement(signatureReference, "Signature reference");
         checkMandatoryElement(annotationsManifestReference, "Annotations manifest reference");
     }
@@ -58,9 +58,8 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
         return Util.hash(getInputStream(), algorithm);
     }
 
-    @Override
-    public FileReference getDataFilesManifestReference() {
-        return dataFilesManifestReference;
+    public FileReference getDocumentsManifestReference() {
+        return documentsManifestReference;
     }
 
     @Override
@@ -75,7 +74,7 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
 
     @Override
     protected List<TLVStructure> getElements() {
-        return asList(dataFilesManifestReference, signatureReference, annotationsManifestReference);
+        return asList(documentsManifestReference, signatureReference, annotationsManifestReference);
     }
 
     //TODO this isn't the best solution
@@ -84,8 +83,8 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
         while (inputStream.hasNextElement()) {
             element = inputStream.readElement();
             switch (element.getType()) {
-                case TlvDataFilesManifestReference.DATA_FILES_MANIFEST_REFERENCE:
-                    dataFilesManifestReference = new TlvDataFilesManifestReference(readOnce(element));
+                case TlvDocumentsManifestReference.DOCUMENTS_MANIFEST_REFERENCE:
+                    documentsManifestReference = new TlvDocumentsManifestReference(readOnce(element));
                     break;
                 case TlvSignatureReference.SIGNATURE_REFERENCE:
                     signatureReference = new TlvSignatureReference(readOnce(element));

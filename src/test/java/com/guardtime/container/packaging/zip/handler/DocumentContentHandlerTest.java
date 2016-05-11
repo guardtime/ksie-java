@@ -5,15 +5,15 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class DataFileContentHandlerTest {
+public class DocumentContentHandlerTest {
 
     private static final String VALID_DOCUMENT_PATH = "important_document_is_important.doc";
     private static final String INVALID_DOCUMENT_PATH = "/META-INF/manifest1.tlv";
-    private DataFileContentHandler handler;
+    private DocumentContentHandler handler;
 
     @Before
     public void setUp() {
-        handler = new DataFileContentHandler();
+        handler = new DocumentContentHandler();
     }
 
     @Test

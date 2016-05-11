@@ -6,21 +6,21 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class TlvDataFileReferenceTest extends AbstractTlvManifestTest {
+public class TlvDocumentReferenceTest extends AbstractTlvManifestTest {
 
     @Test
-    public void testCreateDataFileReference() throws Exception {
-        TlvDataFileReference reference = new TlvDataFileReference(TEST_DOCUMENT_HELLO_TEXT);
-        assertEquals(DATA_FILE_REFERENCE_TYPE, reference.getElementType());
+    public void testCreateDocumentReference() throws Exception {
+        TlvDocumentReference reference = new TlvDocumentReference(TEST_DOCUMENT_HELLO_TEXT);
+        assertEquals(DOCUMENT_REFERENCE_TYPE, reference.getElementType());
         assertEquals(MIME_TYPE_APPLICATION_TXT, getMimeType(reference));
         assertEquals(TEST_FILE_NAME_TEST_TXT, getUri(reference));
         assertEquals(dataHash, getDataHash(reference));
     }
 
     @Test
-    public void testReadDataFileReference() throws Exception {
-        TLVElement element = createReference(DATA_FILE_REFERENCE_TYPE, TEST_FILE_NAME_TEST_TXT, MIME_TYPE_APPLICATION_TXT, dataHash);
-        TlvDataFileReference reference = new TlvDataFileReference(element);
+    public void testReadDocumentReference() throws Exception {
+        TLVElement element = createReference(DOCUMENT_REFERENCE_TYPE, TEST_FILE_NAME_TEST_TXT, MIME_TYPE_APPLICATION_TXT, dataHash);
+        TlvDocumentReference reference = new TlvDocumentReference(element);
         assertEquals(TEST_FILE_NAME_TEST_TXT, reference.getUri());
         assertEquals(MIME_TYPE_APPLICATION_TXT, reference.getMimeType());
         assertEquals(dataHash, reference.getHash());

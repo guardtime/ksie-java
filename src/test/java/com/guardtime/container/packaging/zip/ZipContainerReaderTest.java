@@ -1,7 +1,7 @@
 package com.guardtime.container.packaging.zip;
 
-import com.guardtime.container.datafile.ContainerDocument;
-import com.guardtime.container.datafile.EmptyContainerDocument;
+import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.document.EmptyContainerDocument;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;

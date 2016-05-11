@@ -9,11 +9,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-public interface DataFilesManifest extends ContainerFileElement {
+public interface DocumentsManifest extends ContainerFileElement {
 
     InputStream getInputStream() throws IOException;
 
-    List<? extends FileReference> getDataFileReferences();
+    List<? extends FileReference> getDocumentReferences();
 
     DataHash getDataHash(HashAlgorithm algorithm) throws IOException;
 

@@ -28,7 +28,7 @@ In order to create a new container you have a choice of using the ContainerBuild
 
 ```java
 ContainerBuilder builder = new ContainerBuilder(packagingFactory);
-builder.withDataFile(...);      //can be used multiple times before calling build()
+builder.withDocument(...);      //can be used multiple times before calling build()
 builder.withAnnotation(...);    //can be used multiple times before calling build()  or can be omitted
 Container signedContainer = builder.build();
 ```
@@ -64,7 +64,7 @@ With ContainerBuilder:
 ```java
 ContainerBuilder builder = new ContainerBuilder(packagingFactory);
 builder.withExistingContainer(parsedContainer);
-builder.withDataFile(...);      //can be used multiple times before calling build()
+builder.withDocument(...);      //can be used multiple times before calling build()
 builder.withAnnotation(...);    //can be used multiple times before calling build()  or can be omitted
 Container signedContainer = builder.build();
 ```

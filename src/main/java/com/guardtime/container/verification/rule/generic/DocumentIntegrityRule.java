@@ -1,7 +1,7 @@
 package com.guardtime.container.verification.rule.generic;
 
-import com.guardtime.container.datafile.ContainerDocument;
-import com.guardtime.container.manifest.DataFilesManifest;
+import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.DataHashException;
@@ -18,17 +18,17 @@ import java.util.List;
 
 /**
  * Rule that verifies the hash integrity of each {@link ContainerDocument} in {@link SignatureContent} as noted by
- * {@link DataFilesManifest}.
+ * {@link DocumentsManifest}.
  */
-public class DataFileIntegrityRule extends SignatureContentRule<GenericVerificationResult> {
+public class DocumentIntegrityRule extends SignatureContentRule<GenericVerificationResult> {
 
     private static final String KSIE_VERIFY_DATA_FILE = "KSIE_VERIFY_DATA_FILE";
 
-    public DataFileIntegrityRule() {
+    public DocumentIntegrityRule() {
         super(KSIE_VERIFY_DATA_FILE);
     }
 
-    public DataFileIntegrityRule(RuleState state) {
+    public DocumentIntegrityRule(RuleState state) {
         super(state, KSIE_VERIFY_DATA_FILE);
     }
 
@@ -37,16 +37,16 @@ public class DataFileIntegrityRule extends SignatureContentRule<GenericVerificat
         List<GenericVerificationResult> results = new LinkedList<>();
         if (shouldIgnoreContent(content, context)) return results;
 
-        DataFilesManifest dataFilesManifest = content.getDataManifest().getRight();
-        for (FileReference reference : dataFilesManifest.getDataFileReferences()) {
+        DocumentsManifest documentsManifest = content.getDocumentsManifest().getRight();
+        for (FileReference reference : documentsManifest.getDocumentReferences()) {
             results.add(verifyReference(content, reference));
         }
         return results;
     }
 
     private boolean shouldIgnoreContent(SignatureContent content, VerificationContext context) {
-        DataFilesManifest dataFilesManifest = content.getDataManifest().getRight();
-        for (RuleVerificationResult result : context.getResultsFor(dataFilesManifest)) {
+        DocumentsManifest documentsManifest = content.getDocumentsManifest().getRight();
+        for (RuleVerificationResult result : context.getResultsFor(documentsManifest)) {
             if (!RuleResult.OK.equals(result)) return true;
         }
         return false;

@@ -13,7 +13,7 @@ public interface Manifest extends ContainerFileElement {
 
     InputStream getInputStream() throws IOException;
 
-    FileReference getDataFilesManifestReference();
+    FileReference getDocumentsManifestReference();
 
     FileReference getAnnotationsManifestReference();
 

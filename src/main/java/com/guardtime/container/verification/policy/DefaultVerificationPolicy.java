@@ -1,5 +1,6 @@
 package com.guardtime.container.verification.policy;
 
+import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.generic.*;
 
@@ -11,8 +12,8 @@ import java.util.List;
  * Contains rules for:
  * <ol>
  *   <li>verifying manifest indexes are consecutive</li>
- *   <li>verifying {@link com.guardtime.container.manifest.DataFilesManifest}</li>
- *   <li>verifying {@link com.guardtime.container.datafile.ContainerDocument}s</li>
+ *   <li>verifying {@link DocumentsManifest}</li>
+ *   <li>verifying {@link com.guardtime.container.document.ContainerDocument}s</li>
  *   <li>verifying {@link com.guardtime.container.manifest.AnnotationsManifest}</li>
  *   <li>verifying {@link com.guardtime.container.manifest.SingleAnnotationManifest}s</li>
  *   <li>verifying {@link com.guardtime.container.annotation.ContainerAnnotation}s</li>
@@ -51,8 +52,8 @@ public class DefaultVerificationPolicy implements VerificationPolicy {
 
     private void addDefaultRules() {
         rules.add(new ManifestConsecutivityRule());
-        rules.add(new DataFilesManifestIntegrityRule());
-        rules.add(new DataFileIntegrityRule());
+        rules.add(new DocumentsManifestIntegrityRule());
+        rules.add(new DocumentIntegrityRule());
         rules.add(new AnnotationsManifestIntegrityRule());
         rules.add(new SingleAnnotationManifestIntegrityRule());
         rules.add(new AnnotationDataIntegrityRule());

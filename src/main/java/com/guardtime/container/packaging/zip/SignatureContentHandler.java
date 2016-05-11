@@ -3,9 +3,9 @@ package com.guardtime.container.packaging.zip;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.FileContainerAnnotation;
-import com.guardtime.container.datafile.ContainerDocument;
-import com.guardtime.container.datafile.EmptyContainerDocument;
-import com.guardtime.container.datafile.FileContainerDocument;
+import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.document.EmptyContainerDocument;
+import com.guardtime.container.document.FileContainerDocument;
 import com.guardtime.container.manifest.*;
 import com.guardtime.container.packaging.zip.handler.*;
 import com.guardtime.container.signature.ContainerSignature;
@@ -21,22 +21,22 @@ class SignatureContentHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SignatureContentHandler.class);
 
-    private final DataFileContentHandler documentHandler;
+    private final DocumentContentHandler documentHandler;
     private final AnnotationContentHandler annotationContentHandler;
     private final ManifestHandler manifestHandler;
-    private final DataManifestHandler dataManifestHandler;
+    private final DocumentsManifestHandler documentsManifestHandler;
     private final AnnotationsManifestHandler annotationsManifestHandler;
     private final SingleAnnotationManifestHandler singleAnnotationManifestHandler;
     private final SignatureHandler signatureHandler;
 
-    public SignatureContentHandler(DataFileContentHandler documentHandler, AnnotationContentHandler annotationContentHandler,
-                                   ManifestHandler manifestHandler, DataManifestHandler dataManifestHandler,
+    public SignatureContentHandler(DocumentContentHandler documentHandler, AnnotationContentHandler annotationContentHandler,
+                                   ManifestHandler manifestHandler, DocumentsManifestHandler documentsManifestHandler,
                                    AnnotationsManifestHandler annotationsManifestHandler, SingleAnnotationManifestHandler singleAnnotationManifestHandler,
                                    SignatureHandler signatureHandler) {
         this.documentHandler = documentHandler;
         this.annotationContentHandler = annotationContentHandler;
         this.manifestHandler = manifestHandler;
-        this.dataManifestHandler = dataManifestHandler;
+        this.documentsManifestHandler = documentsManifestHandler;
         this.annotationsManifestHandler = annotationsManifestHandler;
         this.singleAnnotationManifestHandler = singleAnnotationManifestHandler;
         this.signatureHandler = signatureHandler;
@@ -46,7 +46,7 @@ class SignatureContentHandler {
         SignatureContentGroup group = new SignatureContentGroup(manifestPath);
         ZipSignatureContent signatureContent = new ZipSignatureContent.Builder()
                 .withManifest(group.manifest)
-                .withDataManifest(group.dataManifest)
+                .withDocumentsManifest(group.documentsManifest)
                 .withAnnotationsManifest(group.annotationsManifest)
                 .withSingleAnnotationManifests(group.singleAnnotationManifests)
                 .withDocuments(group.documents)
@@ -60,7 +60,7 @@ class SignatureContentHandler {
     private class SignatureContentGroup {
 
         Pair<String, Manifest> manifest;
-        Pair<String, DataFilesManifest> dataManifest;
+        Pair<String, DocumentsManifest> documentsManifest;
         Pair<String, AnnotationsManifest> annotationsManifest;
         List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifests = new LinkedList<>();
         List<Pair<String, ContainerAnnotation>> annotations = new LinkedList<>();
@@ -70,7 +70,7 @@ class SignatureContentHandler {
 
         public SignatureContentGroup(String manifestPath) throws ContentParsingException {
             this.manifest = getManifest(manifestPath);
-            this.dataManifest = getDataManifest();
+            this.documentsManifest = getDocumentsManifest();
             this.annotationsManifest = getAnnotationsManifest();
 
             populateAnnotationsWithManifests();
@@ -95,23 +95,23 @@ class SignatureContentHandler {
             }
         }
 
-        private Pair<String, DataFilesManifest> getDataManifest() {
-            FileReference dataManifestReference = manifest.getRight().getDataFilesManifestReference();
+        private Pair<String, DocumentsManifest> getDocumentsManifest() {
+            FileReference documentsManifestReference = manifest.getRight().getDocumentsManifestReference();
             try {
-                return Pair.of(dataManifestReference.getUri(), dataManifestHandler.get(dataManifestReference.getUri()));
+                return Pair.of(documentsManifestReference.getUri(), documentsManifestHandler.get(documentsManifestReference.getUri()));
             } catch (ContentParsingException e) {
-                LOGGER.info("Manifest '{}' failed to parse. Reason: '{}'", dataManifestReference.getUri(), e.getMessage());
+                LOGGER.info("Manifest '{}' failed to parse. Reason: '{}'", documentsManifestReference.getUri(), e.getMessage());
                 return null;
             }
         }
 
         private void populateDocuments() {
-            if (dataManifest == null) return;
-            for (FileReference reference : dataManifest.getRight().getDataFileReferences()) {
+            if (documentsManifest == null) return;
+            for (FileReference reference : documentsManifest.getRight().getDocumentReferences()) {
                 try {
                     documents.add(fetchDocumentFromHandler(reference));
                 } catch (ContentParsingException e) {
-                    throw new RuntimeException("Programming bug! This should never happen. Investigate why DataFileContentHandler#getEntry() threw exception.", e);
+                    throw new RuntimeException("Programming bug! This should never happen. Investigate why DocumentContentHandler#getEntry() threw exception.", e);
                 }
             }
         }

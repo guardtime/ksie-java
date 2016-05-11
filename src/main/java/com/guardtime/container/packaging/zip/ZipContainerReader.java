@@ -24,12 +24,12 @@ class ZipContainerReader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZipContainerReader.class);
 
-    private final DataFileContentHandler documentHandler = new DataFileContentHandler();
+    private final DocumentContentHandler documentHandler = new DocumentContentHandler();
     private final AnnotationContentHandler annotationContentHandler = new AnnotationContentHandler();
     private final UnknownFileHandler unknownFileHandler = new UnknownFileHandler();
     private final MimeTypeHandler mimeTypeHandler = new MimeTypeHandler();
     private final ManifestHandler manifestHandler;
-    private final DataManifestHandler dataManifestHandler;
+    private final DocumentsManifestHandler documentsManifestHandler;
     private final AnnotationsManifestHandler annotationsManifestHandler;
     private final SingleAnnotationManifestHandler singleAnnotationManifestHandler;
     private final SignatureHandler signatureHandler;
@@ -42,18 +42,18 @@ class ZipContainerReader {
 
     ZipContainerReader(ContainerManifestFactory manifestFactory, SignatureFactory signatureFactory) {
         this.manifestHandler = new ManifestHandler(manifestFactory);
-        this.dataManifestHandler = new DataManifestHandler(manifestFactory);
+        this.documentsManifestHandler = new DocumentsManifestHandler(manifestFactory);
         this.annotationsManifestHandler = new AnnotationsManifestHandler(manifestFactory);
         this.singleAnnotationManifestHandler = new SingleAnnotationManifestHandler(manifestFactory);
         this.signatureHandler = new SignatureHandler(signatureFactory);
-        this.handlers = new ContentHandler[]{mimeTypeHandler, documentHandler, annotationContentHandler, dataManifestHandler,
+        this.handlers = new ContentHandler[]{mimeTypeHandler, documentHandler, annotationContentHandler, documentsManifestHandler,
                 manifestHandler, annotationsManifestHandler, signatureHandler, singleAnnotationManifestHandler};
 
         this.manifestSuffix = manifestFactory.getManifestFactoryType().getManifestFileExtension();
         this.signatureSuffix = signatureFactory.getSignatureFactoryType().getSignatureFileExtension();
 
         this.signatureContentHandler = new SignatureContentHandler(documentHandler, annotationContentHandler, manifestHandler,
-                dataManifestHandler, annotationsManifestHandler, singleAnnotationManifestHandler, signatureHandler);
+                documentsManifestHandler, annotationsManifestHandler, singleAnnotationManifestHandler, signatureHandler);
     }
 
     ZipContainer read(InputStream input) throws IOException {
@@ -78,7 +78,7 @@ class ZipContainerReader {
         int maxManifestIndex = Collections.max(Arrays.asList(
                 manifestHandler.getMaxIndex(),
                 signatureHandler.getMaxIndex(),
-                dataManifestHandler.getMaxIndex(),
+                documentsManifestHandler.getMaxIndex(),
                 annotationsManifestHandler.getMaxIndex()
         ));
         int maxAnnotationIndex = Collections.max(Arrays.asList(

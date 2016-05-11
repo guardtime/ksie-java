@@ -25,13 +25,13 @@ class TlvSingleAnnotationManifest extends AbstractTlvManifestStructure implement
     private static final byte[] MAGIC = "KSIEANNT".getBytes();
 
     private TlvAnnotationDataReference annotationReference;
-    private TlvDataFilesManifestReference dataManifestReference;
+    private TlvDocumentsManifestReference documentsManifestReference;
 
-    public TlvSingleAnnotationManifest(Pair<String, ContainerAnnotation> annotation, Pair<String, TlvDataFilesManifest> dataManifest) throws InvalidManifestException {
+    public TlvSingleAnnotationManifest(Pair<String, ContainerAnnotation> annotation, Pair<String, TlvDocumentsManifest> documentsManifest) throws InvalidManifestException {
         super(MAGIC);
         try {
             this.annotationReference = new TlvAnnotationDataReference(annotation);
-            this.dataManifestReference = new TlvDataFilesManifestReference(dataManifest.getRight(), dataManifest.getLeft());
+            this.documentsManifestReference = new TlvDocumentsManifestReference(documentsManifest.getRight(), documentsManifest.getLeft());
         } catch (TLVParserException | IOException e) {
             throw new InvalidManifestException("Failed to generate file reference TLVElement", e);
         }
@@ -46,7 +46,7 @@ class TlvSingleAnnotationManifest extends AbstractTlvManifestStructure implement
         } catch (IOException e) {
             throw new InvalidManifestException("Failed to read InputStream", e);
         }
-        checkMandatoryElement(dataManifestReference, "Data manifest reference");
+        checkMandatoryElement(documentsManifestReference, "Data manifest reference");
         checkMandatoryElement(annotationReference, "Annotation reference");
     }
 
@@ -56,8 +56,8 @@ class TlvSingleAnnotationManifest extends AbstractTlvManifestStructure implement
         while (input.hasNextElement()) {
             element = input.readElement();
             switch (element.getType()) {
-                case TlvDataFilesManifestReference.DATA_FILES_MANIFEST_REFERENCE:
-                    dataManifestReference = new TlvDataFilesManifestReference(readOnce(element));
+                case TlvDocumentsManifestReference.DOCUMENTS_MANIFEST_REFERENCE:
+                    documentsManifestReference = new TlvDocumentsManifestReference(readOnce(element));
                     break;
                 case TlvAnnotationDataReference.ANNOTATION_REFERENCE:
                     annotationReference = new TlvAnnotationDataReference(readOnce(element));
@@ -70,7 +70,7 @@ class TlvSingleAnnotationManifest extends AbstractTlvManifestStructure implement
 
     @Override
     protected List<TLVStructure> getElements() {
-        return asList(dataManifestReference, annotationReference);
+        return asList(documentsManifestReference, annotationReference);
     }
 
     @Override
@@ -78,9 +78,8 @@ class TlvSingleAnnotationManifest extends AbstractTlvManifestStructure implement
         return annotationReference;
     }
 
-    @Override
-    public FileReference getDataManifestReference() {
-        return dataManifestReference;
+    public FileReference getDocumentsManifestReference() {
+        return documentsManifestReference;
     }
 
     @Override

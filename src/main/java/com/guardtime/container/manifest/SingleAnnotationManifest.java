@@ -11,7 +11,7 @@ public interface SingleAnnotationManifest extends ContainerFileElement {
 
     AnnotationDataReference getAnnotationReference();
 
-    FileReference getDataManifestReference();
+    FileReference getDocumentsManifestReference();
 
     InputStream getInputStream() throws IOException;
 

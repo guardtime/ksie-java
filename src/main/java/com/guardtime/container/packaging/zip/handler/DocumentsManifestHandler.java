@@ -1,7 +1,7 @@
 package com.guardtime.container.packaging.zip.handler;
 
 import com.guardtime.container.manifest.ContainerManifestFactory;
-import com.guardtime.container.manifest.DataFilesManifest;
+import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.manifest.InvalidManifestException;
 
 import java.io.File;
@@ -12,11 +12,11 @@ import java.io.IOException;
 /**
  * This content holders is used for data files manifests inside the container.
  */
-public class DataManifestHandler extends IndexedContentHandler<DataFilesManifest> {
+public class DocumentsManifestHandler extends IndexedContentHandler<DocumentsManifest> {
 
     private final ContainerManifestFactory manifestFactory;
 
-    public DataManifestHandler(ContainerManifestFactory manifestFactory) {
+    public DocumentsManifestHandler(ContainerManifestFactory manifestFactory) {
         this.manifestFactory = manifestFactory;
     }
 
@@ -27,10 +27,10 @@ public class DataManifestHandler extends IndexedContentHandler<DataFilesManifest
     }
 
     @Override
-    protected DataFilesManifest getEntry(String name) throws ContentParsingException {
+    protected DocumentsManifest getEntry(String name) throws ContentParsingException {
         File file = fetchFileFromEntries(name);
         try (FileInputStream input = new FileInputStream(file)) {
-            return manifestFactory.readDataFilesManifest(input);
+            return manifestFactory.readDocumentsManifest(input);
         } catch (InvalidManifestException e) {
             throw new ContentParsingException("Failed to parse content of datamanifest file", e);
         } catch (FileNotFoundException e) {

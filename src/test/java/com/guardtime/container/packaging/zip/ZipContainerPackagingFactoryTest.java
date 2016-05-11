@@ -4,7 +4,7 @@ import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.StringContainerAnnotation;
-import com.guardtime.container.datafile.ContainerDocument;
+import com.guardtime.container.document.ContainerDocument;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.verify;
 public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
 
     @Mock
-    protected ContainerDocument mockedDataFile;
+    protected ContainerDocument mockedDocument;
 
     @Mock
     private ContainerAnnotation mockedAnnotation;
@@ -51,22 +51,22 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
 
 
     @Test
-    public void testCreatePackagingFactoryWithoutDataFiles_ThrowsIllegalArgumentException() throws Exception {
+    public void testCreatePackagingFactoryWithoutDocuments_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Data files must not be empty");
+        expectedException.expectMessage("Document files must not be empty");
         ZipContainerPackagingFactory containerFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory);
         containerFactory.create(new ArrayList<ContainerDocument>(), annotations);
     }
 
     @Test
-    public void testCreateContainerWithDataFile() throws Exception {
+    public void testCreateContainerWithDocument() throws Exception {
         ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory);
         ZipContainer container = packagingFactory.create(asList(TEST_DOCUMENT_HELLO_TEXT), null);
         assertNotNull(container);
     }
 
     @Test
-    public void testCreateContainerWithDataFileAndAnnotations() throws Exception {
+    public void testCreateContainerWithDocumentAndAnnotations() throws Exception {
         ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory);
         annotations.add(mockedAnnotation);
         ZipContainer container = packagingFactory.create(asList(TEST_DOCUMENT_HELLO_TEXT), annotations);
