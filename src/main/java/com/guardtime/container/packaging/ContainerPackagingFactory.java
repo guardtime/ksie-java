@@ -41,7 +41,7 @@ public interface ContainerPackagingFactory<C extends Container> {
      * Updates an existing {@link Container} to include a new set of documents, annotations and a signature
      * for the added elements.
      *
-     * @param existingSignature
+     * @param existingContainer
      *         An instance of {@link Container} which already has {@link com.guardtime.container.signature.ContainerSignature}(s)
      * @param files
      *         List of {@link ContainerDocument} to be added and signed. Can NOT be null.
@@ -52,7 +52,7 @@ public interface ContainerPackagingFactory<C extends Container> {
      * @throws InvalidPackageException
      *         When the input data can not be processed or signing fails.
      */
-    C create(Container existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException;
+    C create(Container existingContainer, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException;
 
     /**
      * Provides the MIMETYPE file content for container.

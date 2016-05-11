@@ -77,16 +77,16 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     }
 
     @Override
-    public ZipContainer create(Container existingSignature, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
-        Util.notNull(existingSignature, "Container");
+    public ZipContainer create(Container existingContainer, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
+        Util.notNull(existingContainer, "Container");
         // TODO: Possibility to add signature without adding data files.
         Util.notEmpty(files, "Data files");
         try {
-            ZipContainer existingContainer = (ZipContainer) existingSignature;
-            ContentSigner signer = new ContentSigner(files, annotations, existingContainer.getNameProvider());
+            ZipContainer existingZipContainer = (ZipContainer) existingContainer;
+            ContentSigner signer = new ContentSigner(files, annotations, existingZipContainer.getNameProvider());
             ZipSignatureContent signatureContent = signer.sign();
-            existingContainer.getSignatureContents().add(signatureContent);
-            return existingContainer;
+            existingZipContainer.getSignatureContents().add(signatureContent);
+            return existingZipContainer;
         } catch (IOException | InvalidManifestException e) {
             throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
         } catch (SignatureException e) {
