@@ -3,8 +3,8 @@ package com.guardtime.container;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.StringContainerAnnotation;
-import com.guardtime.container.datafile.ContainerDocument;
-import com.guardtime.container.datafile.StreamContainerDocument;
+import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.manifest.*;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.SignatureFactoryType;
@@ -39,7 +39,7 @@ public class AbstractContainerTest {
     protected static final String ANNOTATION_DOMAIN_COM_GUARDTIME = "com.guardtime";
 
     protected static final String ANNOTATION_CONTENT = "42";
-    protected static final String DATAFILES_MANIFEST_URI = "/META-INF/datamanifest1.tlv";
+    protected static final String DOCUMENTS_MANIFEST_URI = "/META-INF/datamanifest1.tlv";
 
     protected static final String ANNOTATIONS_MANIFEST_URI = "/META-INF/annotmanifest1.tlv";
     protected static final ContainerDocument TEST_DOCUMENT_HELLO_TEXT = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
@@ -62,25 +62,25 @@ public class AbstractContainerTest {
     protected SignatureFactoryType mockedSignatureFactoryType;
 
     @Mock
-    protected DataFilesManifest mockedDataFilesManifest;
+    protected DocumentsManifest mockedDocumentsManifest;
 
     @Mock
     protected AnnotationsManifest mockedAnnotationsManifest;
 
     @Mock
-    private AnnotationInfoManifest mockedAnnotationInfoManifest;
+    private SingleAnnotationManifest mockedSingleAnnotationManifest;
 
     @Mock
-    private SignatureManifest mockedSignatureManifest;
+    private Manifest mockedManifest;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         when(mockedManifestFactory.getManifestFactoryType()).thenReturn(mockedManifestFactoryType);
-        when(mockedManifestFactory.createDataFilesManifest(anyListOf(ContainerDocument.class))).thenReturn(mockedDataFilesManifest);
+        when(mockedManifestFactory.createDocumentsManifest(anyListOf(ContainerDocument.class))).thenReturn(mockedDocumentsManifest);
         when(mockedManifestFactory.createAnnotationsManifest(anyMap())).thenReturn(mockedAnnotationsManifest);
-        when(mockedManifestFactory.createAnnotationInfoManifest(Mockito.any(Pair.class), Mockito.any(Pair.class))).thenReturn(mockedAnnotationInfoManifest);
-        when(mockedManifestFactory.createSignatureManifest(Mockito.any(Pair.class), Mockito.any(Pair.class), Mockito.any(Pair.class))).thenReturn(mockedSignatureManifest);
+        when(mockedManifestFactory.createSingleAnnotationManifest(Mockito.any(Pair.class), Mockito.any(Pair.class))).thenReturn(mockedSingleAnnotationManifest);
+        when(mockedManifestFactory.createManifest(Mockito.any(Pair.class), Mockito.any(Pair.class), Mockito.any(Pair.class))).thenReturn(mockedManifest);
         when(mockedSignatureFactory.getSignatureFactoryType()).thenReturn(mockedSignatureFactoryType);
         when(mockedSignatureFactoryType.getSignatureMimeType()).thenReturn(SIGNATURE_MIME_TYPE);
     }

@@ -3,7 +3,7 @@ package com.guardtime.container.integration;
 
 import com.guardtime.container.AbstractCommonKsiServiceIntegrationTest;
 import com.guardtime.container.ContainerBuilder;
-import com.guardtime.container.datafile.ContainerDocument;
+import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
 import org.junit.Test;
@@ -22,7 +22,7 @@ public class ZipContainerKsiServiceIT extends AbstractCommonKsiServiceIntegratio
     @Test
     public void testCreateContainer() throws Exception {
         Container container = new ContainerBuilder(packagingFactory)
-                .withDataFile(new ByteArrayInputStream("Test_Data".getBytes()), TEST_FILE_NAME_TEST_TXT, "application/txt")
+                .withDocument(new ByteArrayInputStream("Test_Data".getBytes()), TEST_FILE_NAME_TEST_TXT, "application/txt")
                 .build();
         assertSingleContentsWithSingleDocumentWithName(container, TEST_FILE_NAME_TEST_TXT);
     }

@@ -1,6 +1,6 @@
 package com.guardtime.container.verification.rule.generic;
 
-import com.guardtime.container.manifest.SignatureManifest;
+import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Rule that verifies that each next {@link SignatureManifest} and its linked manifests have an ascending set of indexes
+ * Rule that verifies that each next {@link Manifest} and its linked manifests have an ascending set of indexes
  * compared to the previous set.
  */
 public class ManifestConsecutivityRule extends GenericRule<GenericVerificationResult> {
@@ -34,7 +34,7 @@ public class ManifestConsecutivityRule extends GenericRule<GenericVerificationRe
         int expectedIndex = 1;
         for (SignatureContent content : context.getContainer().getSignatureContents()) {
             RuleResult result = getFailureResult();
-            Pair<String, SignatureManifest> manifest = content.getSignatureManifest();
+            Pair<String, Manifest> manifest = content.getManifest();
             int index = Util.extractIntegerFrom(manifest.getLeft());
             if (index == expectedIndex) {
                 result = RuleResult.OK;

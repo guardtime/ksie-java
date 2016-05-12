@@ -2,8 +2,8 @@ package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
-import com.guardtime.container.manifest.AnnotationInfoManifest;
-import com.guardtime.container.manifest.AnnotationReference;
+import com.guardtime.container.manifest.SingleAnnotationManifest;
+import com.guardtime.container.manifest.AnnotationDataReference;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.packaging.SignatureContent;
@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * Rule that verifies the type and hash integrity of {@link ContainerAnnotation} as noted by its {@link
- * AnnotationInfoManifest}.
+ * SingleAnnotationManifest}.
  */
 public class AnnotationDataIntegrityRule extends SignatureContentRule<GenericVerificationResult> {
 
@@ -40,12 +40,12 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule<GenericVer
         if (shouldIgnoreContent(content, context)) return results;
 
         AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
-        for (FileReference reference : annotationsManifest.getAnnotationInfoManifestReferences()) {
-            AnnotationInfoManifest annotationInfoManifest = content.getAnnotationInfoManifests().get(reference.getUri());
-            if (shouldIgnoreAnnotation(annotationInfoManifest, context)) continue;
-            AnnotationReference annotationReference = annotationInfoManifest.getAnnotationReference();
-            ContainerAnnotation annotation = content.getAnnotations().get(annotationReference.getUri());
-            results.add(verifyAnnotationData(reference, annotationReference, annotation));
+        for (FileReference reference : annotationsManifest.getSingleAnnotationManifestReferences()) {
+            SingleAnnotationManifest singleAnnotationManifest = content.getSingleAnnotationManifests().get(reference.getUri());
+            if (shouldIgnoreAnnotation(singleAnnotationManifest, context)) continue;
+            AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
+            ContainerAnnotation annotation = content.getAnnotations().get(annotationDataReference.getUri());
+            results.add(verifyAnnotationData(reference, annotationDataReference, annotation));
         }
         return results;
     }
@@ -62,9 +62,9 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule<GenericVer
         return false;
     }
 
-    private boolean shouldIgnoreAnnotation(AnnotationInfoManifest annotationInfoManifest, VerificationContext context) {
-        if (annotationInfoManifest == null) return true;
-        List<RuleVerificationResult> resultsForAnnotationManifest = context.getResultsFor(annotationInfoManifest);
+    private boolean shouldIgnoreAnnotation(SingleAnnotationManifest singleAnnotationManifest, VerificationContext context) {
+        if (singleAnnotationManifest == null) return true;
+        List<RuleVerificationResult> resultsForAnnotationManifest = context.getResultsFor(singleAnnotationManifest);
         if (resultsForAnnotationManifest == null) {
             return true; // Shouldn't verify annotation data if we don't know if the manifests are even valid
         }
@@ -76,10 +76,10 @@ public class AnnotationDataIntegrityRule extends SignatureContentRule<GenericVer
         return false;
     }
 
-    private GenericVerificationResult verifyAnnotationData(FileReference reference, AnnotationReference annotationReference, ContainerAnnotation annotation) {
+    private GenericVerificationResult verifyAnnotationData(FileReference reference, AnnotationDataReference annotationDataReference, ContainerAnnotation annotation) {
         RuleResult result = getFailureResult();
         try {
-            DataHash expectedDataHash = annotationReference.getHash();
+            DataHash expectedDataHash = annotationDataReference.getHash();
             DataHash realDataHash = annotation.getDataHash(expectedDataHash.getAlgorithm());
             if (realDataHash.equals(expectedDataHash)) {
                 result = RuleResult.OK;

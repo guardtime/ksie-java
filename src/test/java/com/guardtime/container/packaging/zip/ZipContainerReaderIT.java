@@ -1,8 +1,8 @@
 package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.AbstractCommonIntegrationTest;
-import com.guardtime.container.datafile.ContainerDocument;
-import com.guardtime.container.datafile.EmptyContainerDocument;
+import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.document.EmptyContainerDocument;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
 import org.junit.Before;
@@ -40,7 +40,7 @@ public class ZipContainerReaderIT extends AbstractCommonIntegrationTest {
     public void testReadEmptyContainerFile_ThrowsInvalidPackageException() throws Exception {
         expectedException.expect(InvalidPackageException.class);
         expectedException.expectMessage("Parsed container was not valid");
-        ZipContainer container = getContainer(EMPTY_CONTAINER);
+        getContainer(EMPTY_CONTAINER);
     }
 
     @Test

@@ -26,14 +26,14 @@ class ZipContainerReader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZipContainerReader.class);
 
-    private final DataFileContentHandler documentHandler = new DataFileContentHandler();
+    private final DocumentContentHandler documentHandler = new DocumentContentHandler();
     private final AnnotationContentHandler annotationContentHandler = new AnnotationContentHandler();
     private final UnknownFileHandler unknownFileHandler = new UnknownFileHandler();
     private final MimeTypeHandler mimeTypeHandler = new MimeTypeHandler();
     private final ManifestHandler manifestHandler;
-    private final DataManifestHandler dataManifestHandler;
+    private final DocumentsManifestHandler documentsManifestHandler;
     private final AnnotationsManifestHandler annotationsManifestHandler;
-    private final AnnotationInfoManifestHandler annotationInfoManifestHandler;
+    private final SingleAnnotationManifestHandler singleAnnotationManifestHandler;
     private final SignatureHandler signatureHandler;
     private final SignatureContentHandler signatureContentHandler;
 
@@ -44,18 +44,18 @@ class ZipContainerReader {
 
     ZipContainerReader(ContainerManifestFactory manifestFactory, SignatureFactory signatureFactory) {
         this.manifestHandler = new ManifestHandler(manifestFactory);
-        this.dataManifestHandler = new DataManifestHandler(manifestFactory);
+        this.documentsManifestHandler = new DocumentsManifestHandler(manifestFactory);
         this.annotationsManifestHandler = new AnnotationsManifestHandler(manifestFactory);
-        this.annotationInfoManifestHandler = new AnnotationInfoManifestHandler(manifestFactory);
+        this.singleAnnotationManifestHandler = new SingleAnnotationManifestHandler(manifestFactory);
         this.signatureHandler = new SignatureHandler(signatureFactory);
-        this.handlers = new ContentHandler[]{mimeTypeHandler, documentHandler, annotationContentHandler, dataManifestHandler,
-                manifestHandler, annotationsManifestHandler, signatureHandler, annotationInfoManifestHandler};
+        this.handlers = new ContentHandler[]{mimeTypeHandler, documentHandler, annotationContentHandler, documentsManifestHandler,
+                manifestHandler, annotationsManifestHandler, signatureHandler, singleAnnotationManifestHandler};
 
         this.manifestSuffix = manifestFactory.getManifestFactoryType().getManifestFileExtension();
         this.signatureSuffix = signatureFactory.getSignatureFactoryType().getSignatureFileExtension();
 
         this.signatureContentHandler = new SignatureContentHandler(documentHandler, annotationContentHandler, manifestHandler,
-                dataManifestHandler, annotationsManifestHandler, annotationInfoManifestHandler, signatureHandler);
+                documentsManifestHandler, annotationsManifestHandler, singleAnnotationManifestHandler, signatureHandler);
     }
 
     ZipContainer read(InputStream input) throws IOException, InvalidPackageException {
@@ -95,8 +95,8 @@ class ZipContainerReader {
     }
 
     private boolean containsManifest(SignatureContent content) {
-        return content.getSignatureManifest() != null ||
-                content.getDataManifest() != null ||
+        return content.getManifest() != null ||
+                content.getDocumentsManifest() != null ||
                 content.getAnnotationsManifest() != null;
     }
 
@@ -112,13 +112,13 @@ class ZipContainerReader {
         int maxManifestIndex = Collections.max(Arrays.asList(
                 manifestHandler.getMaxIndex(),
                 signatureHandler.getMaxIndex(),
-                dataManifestHandler.getMaxIndex(),
+                documentsManifestHandler.getMaxIndex(),
                 annotationsManifestHandler.getMaxIndex()
         ));
         int maxAnnotationIndex = Collections.max(Arrays.asList(
                 annotationContentHandler.getMaxIndex(),
-                annotationInfoManifestHandler.getMaxIndex(),
-                annotationsManifestHandler.getMaxAnnotationInfoManifestIndex()
+                singleAnnotationManifestHandler.getMaxIndex(),
+                annotationsManifestHandler.getMaxSingleAnnotationManifestIndex()
         ));
         return new ZipEntryNameProvider(
                 manifestSuffix,
@@ -163,13 +163,13 @@ class ZipContainerReader {
     }
 
     private List<ZipSignatureContent> buildSignatures() {
-        Set<String> signatureManifests = manifestHandler.getNames();
+        Set<String> parsedManifestUriSet = manifestHandler.getNames();
         List<ZipSignatureContent> signatures = new LinkedList<>();
-        for (String manifest : signatureManifests) {
+        for (String manifestUri : parsedManifestUriSet) {
             try {
-                signatures.add(signatureContentHandler.get(manifest));
+                signatures.add(signatureContentHandler.get(manifestUri));
             } catch (ContentParsingException e) {
-                LOGGER.info("Parsing SignatureContent failed for '{}'. Reason: '{}'", manifest, e.getMessage());
+                LOGGER.info("Parsing SignatureContent failed for '{}'. Reason: '{}'", manifestUri, e.getMessage());
             }
         }
         return signatures;

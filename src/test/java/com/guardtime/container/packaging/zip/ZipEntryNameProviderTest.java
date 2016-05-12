@@ -13,10 +13,10 @@ public class ZipEntryNameProviderTest {
     private ZipEntryNameProvider preInitializedNameProvider = new ZipEntryNameProvider("tlv", "ksi", PARSED_MANIFEST_INDEX, PARSED_ANNOTATION_INDEX);
 
     @Test
-    public void testNextDataManifestName() throws Exception {
-        String dataManifestName = nameProvider.nextDataManifestName();
-        assertEquals(META_INF + "datamanifest1.tlv", dataManifestName);
-        assertEquals(nameProvider.dataManifestIndex, 1);
+    public void testNextDocumentsManifestName() throws Exception {
+        String documentsManifestName = nameProvider.nextDocumentsManifestName();
+        assertEquals(META_INF + "datamanifest1.tlv", documentsManifestName);
+        assertEquals(nameProvider.documentsManifestIndex, 1);
     }
 
     @Test

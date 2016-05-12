@@ -1,9 +1,9 @@
 package com.guardtime.container;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.datafile.ContainerDocument;
-import com.guardtime.container.datafile.FileContainerDocument;
-import com.guardtime.container.datafile.StreamContainerDocument;
+import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.document.FileContainerDocument;
+import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import org.slf4j.Logger;
@@ -36,15 +36,15 @@ public class ContainerBuilder {
         return this;
     }
 
-    public ContainerBuilder withDataFile(InputStream input, String name, String mimeType) {
-        return withDataFile(new StreamContainerDocument(input, mimeType, name));
+    public ContainerBuilder withDocument(InputStream input, String name, String mimeType) {
+        return withDocument(new StreamContainerDocument(input, mimeType, name));
     }
 
-    public ContainerBuilder withDataFile(File file, String mimeType) {
-        return withDataFile(new FileContainerDocument(file, mimeType));
+    public ContainerBuilder withDocument(File file, String mimeType) {
+        return withDocument(new FileContainerDocument(file, mimeType));
     }
 
-    public ContainerBuilder withDataFile(ContainerDocument document) {
+    public ContainerBuilder withDocument(ContainerDocument document) {
         notNull(document, "Data file ");
         documents.add(document);
         if (LOGGER.isDebugEnabled()) {

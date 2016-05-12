@@ -23,15 +23,15 @@ class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements Ann
 
     private static final byte[] MAGIC = "KSIEANMF".getBytes();
 
-    private List<TlvAnnotationInfoManifestReference> annotationReferences = new LinkedList<>();
+    private List<TlvSingleAnnotationManifestReference> singleAnnotationManifestReferences = new LinkedList<>();
 
-    public TlvAnnotationsManifest(Map<String, Pair<ContainerAnnotation, TlvAnnotationInfoManifest>> annotationManifests) throws InvalidManifestException {
+    public TlvAnnotationsManifest(Map<String, Pair<ContainerAnnotation, TlvSingleAnnotationManifest>> singleAnnotationManifests) throws InvalidManifestException {
         super(MAGIC);
         try {
-            Set<String> uris = annotationManifests.keySet();
+            Set<String> uris = singleAnnotationManifests.keySet();
             for (String uri : uris) {
-                Pair<ContainerAnnotation, TlvAnnotationInfoManifest> pair = annotationManifests.get(uri);
-                this.annotationReferences.add(new TlvAnnotationInfoManifestReference(uri, pair.getRight(), pair.getLeft().getAnnotationType()));
+                Pair<ContainerAnnotation, TlvSingleAnnotationManifest> pair = singleAnnotationManifests.get(uri);
+                this.singleAnnotationManifestReferences.add(new TlvSingleAnnotationManifestReference(uri, pair.getRight(), pair.getLeft().getAnnotationType()));
             }
         } catch (TLVParserException | IOException e) {
             throw new InvalidManifestException("Failed to generate file reference TLVElement", e);
@@ -55,18 +55,18 @@ class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements Ann
         while (input.hasNextElement()) {
             element = input.readElement();
             //TODO unknown elements
-            this.annotationReferences.add(new TlvAnnotationInfoManifestReference(element));
+            this.singleAnnotationManifestReferences.add(new TlvSingleAnnotationManifestReference(element));
         }
     }
 
     @Override
-    protected List<TlvAnnotationInfoManifestReference> getElements() {
-        return annotationReferences;
+    protected List<TlvSingleAnnotationManifestReference> getElements() {
+        return singleAnnotationManifestReferences;
     }
 
     @Override
-    public List<? extends FileReference> getAnnotationInfoManifestReferences() {
-        return annotationReferences;
+    public List<? extends FileReference> getSingleAnnotationManifestReferences() {
+        return singleAnnotationManifestReferences;
     }
 
     @Override

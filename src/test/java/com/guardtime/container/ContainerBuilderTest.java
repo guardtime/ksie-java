@@ -1,6 +1,6 @@
 package com.guardtime.container;
 
-import com.guardtime.container.datafile.StreamContainerDocument;
+import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import org.junit.Before;
@@ -43,7 +43,7 @@ public class ContainerBuilderTest extends AbstractContainerTest {
     public void testAddDocumentToContainer() throws Exception {
         ContainerBuilder builder = new ContainerBuilder(mockedPackagingFactory);
         StreamContainerDocument content = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
-        builder.withDataFile(content);
+        builder.withDocument(content);
         assertEquals(1, builder.getDocuments().size());
     }
 
@@ -57,8 +57,8 @@ public class ContainerBuilderTest extends AbstractContainerTest {
     @Test
     public void testCreateSignature() throws Exception {
         ContainerBuilder builder = new ContainerBuilder(mockedPackagingFactory);
-        builder.withDataFile(TEST_DOCUMENT_HELLO_TEXT);
-        builder.withDataFile(TEST_DOCUMENT_HELLO_PDF);
+        builder.withDocument(TEST_DOCUMENT_HELLO_TEXT);
+        builder.withDocument(TEST_DOCUMENT_HELLO_PDF);
 
         builder.withAnnotation(MOCKED_ANNOTATION);
         Container container = builder.build();

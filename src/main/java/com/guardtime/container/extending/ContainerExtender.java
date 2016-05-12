@@ -1,6 +1,6 @@
 package com.guardtime.container.extending;
 
-import com.guardtime.container.manifest.SignatureManifest;
+import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Util;
@@ -29,8 +29,8 @@ public class ContainerExtender {
     public Container extend(Container container) {
         for (SignatureContent content : container.getSignatureContents()) {
             if (!content.extendSignature(extender)) {
-                SignatureManifest signatureManifest = content.getSignatureManifest().getRight();
-                String signatureUri = signatureManifest.getSignatureReference().getUri();
+                Manifest manifest = content.getManifest().getRight();
+                String signatureUri = manifest.getSignatureReference().getUri();
                 LOGGER.info("Failed to extend signature '{}'", signatureUri);
             }
         }

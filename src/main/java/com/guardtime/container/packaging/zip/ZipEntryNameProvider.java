@@ -9,11 +9,11 @@ class ZipEntryNameProvider {
     private final String manifestSuffix;
     private final String signatureSuffix;
 
-    int dataManifestIndex = 0;
+    int documentsManifestIndex = 0;
     int manifestIndex = 0;
     int signatureIndex = 0;
     int annotationsManifestIndex = 0;
-    int annotationInfoManifestIndex = 0;
+    int singleAnnotationManifestIndex = 0;
     int annotationIndex = 0;
 
     ZipEntryNameProvider(String manifestSuffix, String signatureSuffix) {
@@ -23,16 +23,16 @@ class ZipEntryNameProvider {
 
     public ZipEntryNameProvider(String manifestSuffix, String signatureSuffix, int parsedManifestIndex, int parsedAnnotationIndex) {
         this(manifestSuffix, signatureSuffix);
-        this.dataManifestIndex = parsedManifestIndex;
+        this.documentsManifestIndex = parsedManifestIndex;
         this.manifestIndex = parsedManifestIndex;
         this.signatureIndex = parsedManifestIndex;
         this.annotationsManifestIndex = parsedManifestIndex;
-        this.annotationInfoManifestIndex = parsedAnnotationIndex;
+        this.singleAnnotationManifestIndex = parsedAnnotationIndex;
         this.annotationIndex = parsedAnnotationIndex;
     }
 
-    public String nextDataManifestName() {
-        return String.format(META_INF + "datamanifest%d.%s", ++dataManifestIndex, manifestSuffix);
+    public String nextDocumentsManifestName() {
+        return String.format(META_INF + "datamanifest%d.%s", ++documentsManifestIndex, manifestSuffix);
     }
 
     public String nextManifestName() {
@@ -47,8 +47,8 @@ class ZipEntryNameProvider {
         return String.format(META_INF + "signature%d.%s", ++signatureIndex, signatureSuffix);
     }
 
-    public String nextAnnotationInfoManifestName() {
-        return String.format(META_INF + "annotation%d.%s", ++annotationInfoManifestIndex, manifestSuffix);
+    public String nextSingleAnnotationManifestName() {
+        return String.format(META_INF + "annotation%d.%s", ++singleAnnotationManifestIndex, manifestSuffix);
     }
 
     public String nextAnnotationDataFileName() {
