@@ -1,12 +1,10 @@
 package com.guardtime.container.verification;
 
-import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
+import com.guardtime.container.AbstractCommonIntegrationTest;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 import com.guardtime.container.signature.ContainerSignature;
-import com.guardtime.container.signature.SignatureFactory;
-import com.guardtime.container.signature.ksi.KsiSignatureFactoryType;
 import com.guardtime.container.verification.context.SimpleVerificationContext;
 import com.guardtime.container.verification.context.VerificationContext;
 import com.guardtime.container.verification.policy.DefaultVerificationPolicy;
@@ -15,7 +13,6 @@ import com.guardtime.container.verification.result.VerifierResult;
 import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.generic.MimeTypeIntegrityRule;
 import com.guardtime.container.verification.rule.generic.ksi.KsiPolicyBasedSignatureIntegrityRule;
-import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.verifier.VerificationResult;
 import com.guardtime.ksi.unisignature.verifier.policies.KeyBasedVerificationPolicy;
@@ -24,8 +21,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,16 +34,7 @@ import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-public class VerificationTest {
-
-    private static final String CONTAINER_WITH_MULTIPLE_SIGNATURES = "containers/container-multiple-signatures.ksie";
-    private ZipContainerPackagingFactory factory;
-
-    @Mock
-    private SignatureFactory mockSignatureFactory;
-
-    @Mock
-    private KSI mockKSI;
+public class VerificationIT extends AbstractCommonIntegrationTest {
 
     @Mock
     private VerificationResult mockUnisignatureVerificationResult;
@@ -65,29 +53,28 @@ public class VerificationTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        when(mockSignatureFactory.getSignatureFactoryType()).thenReturn(new KsiSignatureFactoryType());
-        when(mockSignatureFactory.read(Mockito.any(InputStream.class))).thenReturn(mockedSignature);
-        when(mockKSI.read(Mockito.any(byte[].class))).thenReturn(Mockito.mock(KSISignature.class));
-        when(mockKSI.verify(Mockito.any(KSISignature.class), Mockito.any(Policy.class))).thenReturn(mockUnisignatureVerificationResult);
-        TlvContainerManifestFactory manifestFactory = new TlvContainerManifestFactory();
-        factory = new ZipContainerPackagingFactory(mockSignatureFactory, manifestFactory);
+        super.setUp();
+        when(mockKsi.verify(Mockito.any(KSISignature.class), Mockito.any(Policy.class))).thenReturn(mockUnisignatureVerificationResult);
+
+        when(mockedSignatureFactoryType.getSignatureFileExtension()).thenReturn("ksi");
+        when(mockedSignatureFactory.read(Mockito.any(InputStream.class))).thenReturn(mockedSignature);
+        this.packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, manifestFactory);
     }
 
-    private VerificationContext getVerificationContext(String containerPath) throws IOException, URISyntaxException, InvalidPackageException {
-        InputStream input = Files.newInputStream(Paths.get(ClassLoader.getSystemResource(containerPath).toURI()));
-        Container container = factory.read(input);
+    private VerificationContext getVerificationContext(String containerPath) throws Exception {
+        InputStream input = new FileInputStream(loadFile(containerPath));
+        Container container = packagingFactory.read(input);
         return new SimpleVerificationContext(container);
     }
 
     private DefaultVerificationPolicy getDefaultVerificationPolicy() {
         return new DefaultVerificationPolicy(Arrays.asList((Rule)
-                        new MimeTypeIntegrityRule(factory),
-                new KsiPolicyBasedSignatureIntegrityRule(mockKSI, new KeyBasedVerificationPolicy())
+                        new MimeTypeIntegrityRule(packagingFactory),
+                new KsiPolicyBasedSignatureIntegrityRule(mockKsi, new KeyBasedVerificationPolicy())
         ));
     }
 
-    private VerifierResult getGenericVerifierResult() throws IOException, URISyntaxException, InvalidPackageException {
+    private VerifierResult getGenericVerifierResult() throws Exception {
         VerificationContext context = getVerificationContext(CONTAINER_WITH_MULTIPLE_SIGNATURES);
         DefaultVerificationPolicy policy = getDefaultVerificationPolicy();
         ContainerVerifier verifier = new ContainerVerifier(policy);

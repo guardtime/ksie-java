@@ -8,4 +8,8 @@ public class InvalidPackageException extends ContainerException {
         super(message, cause);
     }
 
+    public InvalidPackageException(String message) {
+        super(message);
+    }
+
 }

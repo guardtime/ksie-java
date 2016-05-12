@@ -48,7 +48,7 @@ public class TlvAnnotationInfoManifestTest extends AbstractTlvManifestTest {
     }
 
     @Test
-    public void testReadAnnotationInfoManifestWithoutDataReference() throws Exception {
+    public void testReadAnnotationInfoManifestWithoutDataReference_ThrowsInvalidManifestException() throws Exception {
         expectedException.expect(InvalidManifestException.class);
         expectedException.expectMessage("Data manifest reference is mandatory manifest element");
         byte[] bytes = join(ANNOTATION_INFO_MANIFEST_MAGIC, annotationReference.getEncoded());
@@ -56,7 +56,7 @@ public class TlvAnnotationInfoManifestTest extends AbstractTlvManifestTest {
     }
 
     @Test
-    public void testReadAnnotationInfoManifestWithoutAnnotationReference() throws Exception {
+    public void testReadAnnotationInfoManifestWithoutAnnotationReference_ThrowsInvalidManifestException() throws Exception {
         expectedException.expect(InvalidManifestException.class);
         expectedException.expectMessage("Annotation reference is mandatory manifest element");
         byte[] bytes = join(ANNOTATION_INFO_MANIFEST_MAGIC, dataFilesReference.getEncoded());
