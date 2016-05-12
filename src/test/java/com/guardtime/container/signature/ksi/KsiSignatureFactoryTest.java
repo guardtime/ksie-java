@@ -12,14 +12,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import java.io.ByteArrayInputStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
-public class KsiSignatureFactoryTest extends AbstractContainerTest{
+public class KsiSignatureFactoryTest extends AbstractContainerTest {
 
     @Mock
     private KSI mockKsi;
@@ -37,7 +36,7 @@ public class KsiSignatureFactoryTest extends AbstractContainerTest{
     public void testCreateFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("KSI must be present");
-        SignatureFactory signatureFactory = new KsiSignatureFactory(null);
+        new KsiSignatureFactory(null);
     }
 
     @Test

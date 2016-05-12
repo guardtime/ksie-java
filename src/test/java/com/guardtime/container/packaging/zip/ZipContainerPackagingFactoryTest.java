@@ -5,10 +5,8 @@ import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -16,18 +14,10 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
-
-    @Mock
-    protected ContainerDocument mockedDocument;
-
-    @Mock
-    private ContainerAnnotation mockedAnnotation;
-
     private List<ContainerAnnotation> annotations = new LinkedList<>();
+    private List<ContainerDocument> documents = asList(TEST_DOCUMENT_HELLO_TEXT);
 
     @Before
     public void setUp() throws Exception {
@@ -61,15 +51,14 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
     @Test
     public void testCreateContainerWithDocument() throws Exception {
         ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory);
-        ZipContainer container = packagingFactory.create(asList(TEST_DOCUMENT_HELLO_TEXT), null);
+        ZipContainer container = packagingFactory.create(documents, null);
         assertNotNull(container);
     }
 
     @Test
     public void testCreateContainerWithDocumentAndAnnotations() throws Exception {
         ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory);
-        annotations.add(mockedAnnotation);
-        ZipContainer container = packagingFactory.create(asList(TEST_DOCUMENT_HELLO_TEXT), annotations);
+        ZipContainer container = packagingFactory.create(documents, annotations);
         assertNotNull(container);
     }
 

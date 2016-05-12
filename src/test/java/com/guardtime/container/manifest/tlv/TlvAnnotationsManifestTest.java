@@ -45,7 +45,7 @@ public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
     }
 
     @Test
-    public void testReadAnnotationsManifestUsingInvalidMagicBytes() throws Exception {
+    public void testReadAnnotationsManifestUsingInvalidMagicBytes_ThrowsInvalidManifestException() throws Exception {
         expectedException.expect(InvalidManifestException.class);
         expectedException.expectMessage("Invalid magic for manifest type");
         new TlvAnnotationsManifest(new ByteArrayInputStream(DOCUMENTS_MANIFEST_MAGIC));

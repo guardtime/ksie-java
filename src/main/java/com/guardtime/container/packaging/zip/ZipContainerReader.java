@@ -1,7 +1,9 @@
 package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.manifest.ContainerManifestFactory;
+import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.MimeType;
+import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.zip.handler.*;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.util.Pair;
@@ -56,7 +58,7 @@ class ZipContainerReader {
                 documentsManifestHandler, annotationsManifestHandler, singleAnnotationManifestHandler, signatureHandler);
     }
 
-    ZipContainer read(InputStream input) throws IOException {
+    ZipContainer read(InputStream input) throws IOException, InvalidPackageException {
         try (ZipInputStream zipInput = new ZipInputStream(input)) {
             ZipEntry entry;
             while ((entry = zipInput.getNextEntry()) != null) {
@@ -71,7 +73,39 @@ class ZipContainerReader {
         MimeType mimeType = getMimeType();
         List<Pair<String, File>> unknownFiles = getUnknownFiles();
         ZipEntryNameProvider nameProvider = getNameProvider();
-        return new ZipContainer(contents, unknownFiles, mimeType, nameProvider);
+
+        if (validMimeType(mimeType) && containsValidContents(contents)) {
+            return new ZipContainer(contents, unknownFiles, mimeType, nameProvider);
+        } else {
+            throw new InvalidPackageException("Parsed container was not valid");
+        }
+    }
+
+    private boolean containsValidContents(List<ZipSignatureContent> signatureContents) {
+        for (SignatureContent content : signatureContents) {
+            if (containsManifest(content) || containsDocumentsOrAnnotations(content)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean containsDocumentsOrAnnotations(SignatureContent content) {
+        return content.getDocuments().size() > 0 || content.getAnnotations().size() > 0;
+    }
+
+    private boolean containsManifest(SignatureContent content) {
+        return content.getManifest() != null ||
+                content.getDocumentsManifest() != null ||
+                content.getAnnotationsManifest() != null;
+    }
+
+    private boolean validMimeType(MimeType mimeType) {
+        try {
+            return mimeType != null && mimeType.getInputStream().available() > 0;
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     private ZipEntryNameProvider getNameProvider() {

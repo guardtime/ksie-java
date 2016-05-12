@@ -58,11 +58,11 @@ public class TlvManifestTest extends AbstractTlvManifestTest {
         assertEquals(ANNOTATIONS_MANIFEST_URI, manifest.getAnnotationsManifestReference().getUri());
         assertEquals(ANNOTATIONS_MANIFEST_TYPE, manifest.getAnnotationsManifestReference().getMimeType());
         assertEquals(SIGNATURE_URI, manifest.getSignatureReference().getUri());
-        assertEquals(SIGNATURE_TYPE, manifest.getSignatureReference().getType());
+        assertEquals(SIGNATURE_MIME_TYPE, manifest.getSignatureReference().getType());
     }
 
     @Test
-    public void testReadManifestWithoutSingleAnnotationManifestReference() throws Exception {
+    public void testReadManifestWithoutSingleAnnotationManifestReference_ThrowsInvalidManifestException() throws Exception {
         expectedException.expect(InvalidManifestException.class);
         expectedException.expectMessage("Annotations manifest reference is mandatory");
         byte[] manifestBytes = join(SIGNATURE_MANIFEST_MAGIC, documentsManifestReference.getEncoded(), signatureReference.getEncoded());
@@ -70,7 +70,7 @@ public class TlvManifestTest extends AbstractTlvManifestTest {
     }
 
     @Test
-    public void testReadManifestWithoutSignatureReference() throws Exception {
+    public void testReadManifestWithoutSignatureManifestReference_ThrowsInvalidManifestException() throws Exception {
         expectedException.expect(InvalidManifestException.class);
         expectedException.expectMessage("Signature reference is mandatory");
         byte[] manifestBytes = join(SIGNATURE_MANIFEST_MAGIC, annotationsManifestReference.getEncoded(), documentsManifestReference.getEncoded());
@@ -78,7 +78,7 @@ public class TlvManifestTest extends AbstractTlvManifestTest {
     }
 
     @Test
-    public void testReadManifestWithoutDocumentsManifestReference() throws Exception {
+    public void testReadManifestWithoutDocumentsManifestReference_ThrowsInvalidManifestException() throws Exception {
         expectedException.expect(InvalidManifestException.class);
         expectedException.expectMessage("Documents manifest reference is mandatory");
         byte[] manifestBytes = join(SIGNATURE_MANIFEST_MAGIC, annotationsManifestReference.getEncoded(), signatureReference.getEncoded());

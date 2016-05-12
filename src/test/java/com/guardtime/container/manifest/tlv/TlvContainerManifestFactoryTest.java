@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
@@ -49,21 +51,20 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
         assertNotNull(singleAnnotationManifest.getDocumentsManifestReference());
     }
 
-//    @Test
-//    public void testCreateAnnotationsManifestWithoutSingleAnnotationManifests_ThrowsIllegalArgumentException() throws Exception {
-//        expectedException.expect(NullPointerException.class);
-//        expectedException.expectMessage("Annotation");
-//        factory.createAnnotationsManifest();
-//    }
-//
-//    @Test
-//    public void testCreateAnnotationsManifestOK() throws Exception {
-//        Map<ContainerAnnotation, TlvSingleAnnotationManifest> annotationManifests = new HashMap();
-//        annotationManifests.put(mockAnnotation, mockSingleAnnotationManifest);
-//        TlvAnnotationsManifest annotationsManifest = factory.createAnnotationsManifest(annotationManifests, "Non-important-for-test");
-//
-//        assertNotNull("Manifest was not created", manifest);
-//    }
+    @Test
+    public void testCreateAnnotationsManifestWithoutSingleAnnotationManifestsOK() throws Exception {
+        TlvAnnotationsManifest manifest = factory.createAnnotationsManifest(new HashMap<String, Pair<ContainerAnnotation, TlvSingleAnnotationManifest>>());
+        assertNotNull(manifest);
+    }
+
+    @Test
+    public void testCreateAnnotationsManifestOK() throws Exception {
+        Map<String, Pair<ContainerAnnotation, TlvSingleAnnotationManifest>> annotationManifests = new HashMap();
+        annotationManifests.put("Non-important-for-test", Pair.of(mockAnnotation, mockSingleAnnotationManifest));
+        TlvAnnotationsManifest manifest = factory.createAnnotationsManifest(annotationManifests);
+
+        assertNotNull("Manifest was not created", manifest);
+    }
 
     @Test
     public void testCreateDocumentsManifestWithEmptyDocumentsList_ThrowsIllegalArgumentException() throws Exception {
@@ -86,26 +87,30 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
         assertEquals(1, documentsManifest.getDocumentReferences().size());
     }
 
-//    @Test
-//    public void testCreateManifestWithoutDocumentsManifest_ThrowsNullPointerException() throws Exception {
-//        expectedException.expect(NullPointerException.class);
-//        expectedException.expectMessage("kala");
-//        factory.createManifest(null, mockAnnotationsManifest, "Non-important-for-test", "signature.ksig");
-//    }
+    @Test
+    public void testCreateManifestWithoutDocumentsManifest_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Documents manifest must be present");
+        factory.createManifest(null, Pair.of("Non-important-for-test", mockAnnotationsManifest), Pair.of("Non-important-for-test", "signature.ksig"));
+    }
 
-//    @Test
-//    public void testCreateManifestWithoutAnnotationsManifest_ThrowsNullPointerException() throws Exception {
-//        expectedException.expect(NullPointerException.class);
-//        factory.createManifest(mockDocumentsManifest, null, "Non-important-for-test", "signature.ksig");
-//    }
-//
-//    @Test
-//    public void testCreateManifestOK() throws Exception {
-//        TlvManifest manifest = factory.createManifest(mockDocumentsManifest, mockAnnotationsManifest, "Non-important-for-test", "signature.ksig");
-//
-//        assertNotNull("Manifest was not created", manifest);
-//    }
+    @Test
+    public void testCreateManifestWithoutAnnotationsManifest_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Annotations manifest must be present");
+        factory.createManifest(Pair.of("Non-important-for-test", mockDocumentsManifest), null, Pair.of("Non-important-for-test", "signature.ksig"));
+    }
 
+    @Test
+    public void testCreateManifestOK() throws Exception {
+        TlvManifest manifest = factory.createManifest(
+                Pair.of("Non-important-for-test", mockDocumentsManifest),
+                Pair.of("Non-important-for-test", mockAnnotationsManifest),
+                Pair.of("Non-important-for-test", "signature.ksig")
+        );
+
+        assertNotNull("Manifest was not created", manifest);
+    }
 
     @Test
     public void testGetManifestFactoryType() throws Exception {
