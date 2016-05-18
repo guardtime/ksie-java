@@ -74,8 +74,8 @@ public class VerificationIT extends AbstractCommonIntegrationTest {
         ));
     }
 
-    private VerifierResult getGenericVerifierResult() throws Exception {
-        VerificationContext context = getVerificationContext(CONTAINER_WITH_MULTIPLE_SIGNATURES);
+    private VerifierResult getGenericVerifierResult(String path) throws Exception {
+        VerificationContext context = getVerificationContext(path);
         DefaultVerificationPolicy policy = getDefaultVerificationPolicy();
         ContainerVerifier verifier = new ContainerVerifier(policy);
         return verifier.verify(context);
@@ -88,7 +88,7 @@ public class VerificationIT extends AbstractCommonIntegrationTest {
     @Test
     public void testGenericVerificationWithValidContainer() throws Exception {
         setSignatureVerificationResult(true);
-        VerifierResult result = getGenericVerifierResult();
+        VerifierResult result = getGenericVerifierResult(CONTAINER_WITH_MULTIPLE_SIGNATURES);
 
         assertEquals(RuleResult.OK, result.getVerificationResult());
     }
@@ -96,8 +96,24 @@ public class VerificationIT extends AbstractCommonIntegrationTest {
     @Test
     public void testGenericVerificationWithBrokenContainer() throws Exception {
         setSignatureVerificationResult(false);
-        VerifierResult result = getGenericVerifierResult();
+        VerifierResult result = getGenericVerifierResult(CONTAINER_WITH_MULTIPLE_SIGNATURES);
 
         assertEquals(RuleResult.NOK, result.getVerificationResult());
+    }
+
+    @Test
+    public void testGenericVerification_ContainerWithMissingAnnotation() throws Exception {
+        setSignatureVerificationResult(true);
+        VerifierResult result = getGenericVerifierResult(CONTAINER_WITH_MISSING_ANNOTATION);
+
+        assertEquals(RuleResult.OK, result.getVerificationResult());
+    }
+
+    @Test
+    public void testGenericVerification_ContainerWithMissingAnnotationData() throws Exception {
+        setSignatureVerificationResult(true);
+        VerifierResult result = getGenericVerifierResult(CONTAINER_WITH_MISSING_ANNOTATION_DATA);
+
+        assertEquals(RuleResult.OK, result.getVerificationResult());
     }
 }

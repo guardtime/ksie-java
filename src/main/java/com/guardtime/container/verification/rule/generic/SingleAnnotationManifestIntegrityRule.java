@@ -42,7 +42,6 @@ public class SingleAnnotationManifestIntegrityRule extends SignatureContentRule<
         for (FileReference reference : annotationsManifest.getSingleAnnotationManifestReferences()) {
             SingleAnnotationManifest singleAnnotationManifest = content.getSingleAnnotationManifests().get(reference.getUri());
             results.add(getSingleAnnotationManifestResult(reference, singleAnnotationManifest));
-            results.add(getDocumentsManifestReferenceResult(content, singleAnnotationManifest));
         }
         return results;
     }
@@ -67,20 +66,9 @@ public class SingleAnnotationManifestIntegrityRule extends SignatureContentRule<
             if (realDataHash.equals(expectedDataHash)) {
                 result = RuleResult.OK;
             }
-        } catch (IOException e) {
+        } catch (NullPointerException | IOException e) {
             LOGGER.debug("Verifying annotation manifest failed!", e);
             result = getMissingManifestResult(reference);
-        }
-        return new GenericVerificationResult(result, this, singleAnnotationManifest);
-    }
-
-    private GenericVerificationResult getDocumentsManifestReferenceResult(SignatureContent content, SingleAnnotationManifest singleAnnotationManifest) {
-        RuleResult result = getFailureResult();
-        Manifest manifest = content.getManifest().getRight();
-        FileReference expectedReference = manifest.getDocumentsManifestReference();
-        FileReference realReference = singleAnnotationManifest.getDocumentsManifestReference();
-        if (realReference.equals(expectedReference)) {
-            result = RuleResult.OK;
         }
         return new GenericVerificationResult(result, this, singleAnnotationManifest);
     }
