@@ -14,8 +14,8 @@ public class AnnotationContentHandler extends IndexedContentHandler<File> {
     }
 
     @Override
-    protected File getEntry(String name) {
-        return entries.get(name);
+    protected File getEntry(String name) throws ContentParsingException {
+        return fetchFileFromEntries(name);
     }
 
 }
