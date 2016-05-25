@@ -37,7 +37,7 @@ public interface SignatureContent {
      *
      * @return
      */
-    ContainerSignature getSignature();
+    ContainerSignature getContainerSignature();
 
     Pair<String, DocumentsManifest> getDocumentsManifest();
 

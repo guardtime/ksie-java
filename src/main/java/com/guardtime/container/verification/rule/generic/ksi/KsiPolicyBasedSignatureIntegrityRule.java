@@ -44,7 +44,7 @@ public class KsiPolicyBasedSignatureIntegrityRule extends SignatureContentRule<G
     protected List<GenericVerificationResult> verifySignatureContent(SignatureContent content, VerificationContext context) {
         RuleResult ruleResult = getFailureResult();
         try {
-            KsiContainerSignature ksiContainerSignature = (KsiContainerSignature) content.getSignature();
+            KsiContainerSignature ksiContainerSignature = (KsiContainerSignature) content.getContainerSignature();
             KSISignature signature = ksiContainerSignature.getSignature();
             HashAlgorithm hashAlgorithm = signature.getInputHash().getAlgorithm();
             DataHash actualHash = content.getManifest().getRight().getDataHash(hashAlgorithm);
@@ -55,6 +55,6 @@ public class KsiPolicyBasedSignatureIntegrityRule extends SignatureContentRule<G
         } catch (ClassCastException | KSIException | IOException e) {
             LOGGER.debug("Verifying signature failed!", e);
         }
-        return Arrays.asList(new GenericVerificationResult(ruleResult, this, content.getSignature()));
+        return Arrays.asList(new GenericVerificationResult(ruleResult, this, content.getContainerSignature()));
     }
 }

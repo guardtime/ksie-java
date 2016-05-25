@@ -93,7 +93,7 @@ class ZipSignatureContent implements SignatureContent {
         return singleAnnotationManifestMap;
     }
 
-    public ContainerSignature getSignature() {
+    public ContainerSignature getContainerSignature() {
         return signature;
     }
 
