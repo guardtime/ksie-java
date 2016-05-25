@@ -88,4 +88,17 @@ public class ZipContainerReaderIT extends AbstractCommonIntegrationTest {
         assertFalse(container.getUnknownFiles().isEmpty());
     }
 
+    @Test
+    public void testReadContainerFileWithMissingAnnotationData() throws Exception {
+        ZipContainer container = getContainer(CONTAINER_WITH_MISSING_ANNOTATION_DATA);
+        assertNotNull(container);
+        assertFalse(container.getSignatureContents().isEmpty());
+    }
+
+    @Test
+    public void testReadContainerFileWithMissingAnnotation() throws Exception {
+        ZipContainer container = getContainer(CONTAINER_WITH_MISSING_ANNOTATION);
+        assertNotNull(container);
+        assertFalse(container.getSignatureContents().isEmpty());
+    }
 }
