@@ -31,16 +31,19 @@ public class VerificationIT extends AbstractCommonIntegrationTest {
     private com.guardtime.ksi.unisignature.verifier.VerificationResult mockUnisignatureVerificationResult;
 
     @Mock
-    private KSISignature mockKsiSignature;
+    private KSISignature mockedKsiSignature;
+
+    private DataHash mockedDataHash;
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
         when(mockKsi.verify(Mockito.any(KSISignature.class), Mockito.any(Policy.class), Mockito.any(DataHash.class))).thenReturn(mockUnisignatureVerificationResult);
         when(mockedSignatureFactoryType.getSignatureFileExtension()).thenReturn("ksi");
-        when(mockedSignatureFactory.read(Mockito.any(InputStream.class))).thenReturn(new KsiContainerSignature(mockKsiSignature));
-        when(mockKsiSignature.getInputHash()).thenReturn(new DataHash(HashAlgorithm.SHA2_256, "12345678901234567890123456789012".getBytes()));
-
+        when(mockedSignatureFactory.read(Mockito.any(InputStream.class))).thenReturn(new KsiContainerSignature(mockedKsiSignature));
+        when(mockedKsiSignature.getInputHash()).thenReturn(new DataHash(HashAlgorithm.SHA2_256, "12345678901234567890123456789012".getBytes()));
+        mockedDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
+        when(mockedKsiSignature.getInputHash()).thenReturn(mockedDataHash);
         this.packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, manifestFactory);
     }
 
