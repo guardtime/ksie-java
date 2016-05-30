@@ -28,8 +28,14 @@ public class AnnotationsIntegrityRule extends AbstractRule<SignatureContent> {
     @Override
     protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
         List<RuleVerificationResult> results = new LinkedList<>();
+
+        //Annotmanifest existence
+        results.addAll(new AnnotationsManifestExistenceRule(state).verify(verifiable));
+        if (terminateVerification(results)) return results;
+        //Annotmanifest integrity
         results.addAll(new AnnotationsManifestIntegrityRule(state).verify(verifiable));
         if (terminateVerification(results)) return results;
+        //Annotations
         AnnotationsManifest annotationsManifest = verifiable.getAnnotationsManifest().getRight();
         List<? extends FileReference> singleAnnotationManifestReferences = annotationsManifest.getSingleAnnotationManifestReferences();
         for (FileReference reference : singleAnnotationManifestReferences) {

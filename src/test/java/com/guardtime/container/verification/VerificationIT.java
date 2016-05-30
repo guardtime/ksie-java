@@ -78,20 +78,4 @@ public class VerificationIT extends AbstractCommonIntegrationTest {
 
         assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
-
-    @Test
-    public void testGenericVerification_ContainerWithMissingAnnotation() throws Exception {
-        setSignatureVerificationResult(true);
-        RawVerifierResult result = getGenericVerifierResult(CONTAINER_WITH_MISSING_ANNOTATION);
-
-        assertEquals(VerificationResult.OK, result.getVerificationResult());
-    }
-
-    @Test
-    public void testGenericVerification_ContainerWithMissingAnnotationData() throws Exception {
-        setSignatureVerificationResult(true);
-        RawVerifierResult result = getGenericVerifierResult(CONTAINER_WITH_MISSING_ANNOTATION_DATA);
-
-        assertEquals(VerificationResult.OK, result.getVerificationResult());
-    }
 }
