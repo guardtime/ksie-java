@@ -1,7 +1,6 @@
 package com.guardtime.container.verification;
 
 import com.guardtime.container.AbstractContainerTest;
-import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
@@ -47,15 +46,6 @@ public class AnnotationsIntegrityRuleTest extends AbstractContainerTest {
 
     @Mock
     private KSISignature mockKsiSignature;
-
-    @Mock
-    private SingleAnnotationManifest mockSingleAnnotationManifest;
-
-    @Mock
-    private SignatureContent mockSignatureContent;
-
-    @Mock
-    private com.guardtime.container.manifest.AnnotationDataReference mockAnnotationReference;
 
     private ContainerPackagingFactory packagingFactory;
     private Rule rule = new AnnotationsIntegrityRule();

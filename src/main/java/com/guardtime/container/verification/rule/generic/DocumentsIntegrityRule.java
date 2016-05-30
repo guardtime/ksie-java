@@ -28,8 +28,13 @@ public class DocumentsIntegrityRule extends AbstractRule<SignatureContent> {
     @Override
     protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
         List<RuleVerificationResult> results = new LinkedList<>();
+        // DocumentsManifest existence
+        results.addAll(new DocumentsManifestExistenceRule(state).verify(verifiable));
+        if (terminateVerification(results)) return results;
+        //DocumentsManifest integrity
         results.addAll(new DocumentsManifestIntegrityRule(state).verify(verifiable));
         if (terminateVerification(results)) return results;
+        //Documents
         DocumentsManifest documentsManifest = verifiable.getDocumentsManifest().getRight();
         List<? extends FileReference> documentsReferences = documentsManifest.getDocumentReferences();
         for (FileReference reference : documentsReferences) {

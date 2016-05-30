@@ -1,6 +1,6 @@
 package com.guardtime.container.verification.rule.generic;
 
-import com.guardtime.container.manifest.AnnotationsManifest;
+import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.SignatureContent;
@@ -13,36 +13,37 @@ import com.guardtime.container.verification.rule.RuleState;
 import java.util.Arrays;
 import java.util.List;
 
-public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureContent>{
+public class DocumentsManifestExistenceRule extends AbstractRule<SignatureContent>{
 
-    public AnnotationsManifestExistenceRule() {
+    public DocumentsManifestExistenceRule() {
         this(RuleState.FAIL);
     }
 
-    public AnnotationsManifestExistenceRule(RuleState state) {
+    public DocumentsManifestExistenceRule(RuleState state) {
         super(state);
     }
 
     @Override
     protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
+
         VerificationResult verificationResult = getFailureVerificationResult();
         Manifest manifest = verifiable.getManifest().getRight();
-        FileReference annotationsManifestReference = manifest.getAnnotationsManifestReference();
-        Pair<String, AnnotationsManifest> annotationsManifest = verifiable.getAnnotationsManifest();
-        if(annotationsManifest != null) {
+        FileReference documentsManifestReference = manifest.getDocumentsManifestReference();
+        Pair<String, DocumentsManifest> documentsManifest = verifiable.getDocumentsManifest();
+        if(documentsManifest!= null) {
             verificationResult = VerificationResult.OK;
         }
-        TerminatingVerificationResult result = new TerminatingVerificationResult(verificationResult, this, annotationsManifestReference.getUri());
+        TerminatingVerificationResult result = new TerminatingVerificationResult(verificationResult, this, documentsManifestReference.getUri());
         return Arrays.asList((RuleVerificationResult) result);
     }
 
     @Override
     public String getName() {
-        return "KSIE_VERIFY_ANNOTATION_MANIFEST";
+        return "KSIE_VERIFY_DATA_MANIFEST";
     }
 
     @Override
     public String getErrorMessage() {
-        return "Annotations manifest is not present in the container.";
+        return "Datamanifest is not present in the container.";
     }
 }
