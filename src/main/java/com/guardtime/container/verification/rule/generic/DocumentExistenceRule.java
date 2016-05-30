@@ -1,27 +1,25 @@
 package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.document.EmptyContainerDocument;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.TerminatingVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.ksi.hashing.DataHash;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, SignatureContent>>{
+public class DocumentExistenceRule extends AbstractRule<Pair<FileReference, SignatureContent>>{
 
-    public DocumentIntegrityRule() {
+    public DocumentExistenceRule() {
         this(RuleState.FAIL);
     }
 
-    public DocumentIntegrityRule(RuleState state) {
+    public DocumentExistenceRule(RuleState state) {
         super(state);
     }
 
@@ -29,15 +27,9 @@ public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, Sign
     public List<RuleVerificationResult> verifyRule(Pair<FileReference, SignatureContent> verifiable) {
         VerificationResult result = getFailureVerificationResult();
         String documentUri = verifiable.getLeft().getUri();
-        try {
-            ContainerDocument document = verifiable.getRight().getDocuments().get(documentUri);
-            DataHash expectedHash = verifiable.getLeft().getHash();
-            DataHash realHash = document.getDataHash(expectedHash.getAlgorithm());
-            if(expectedHash.equals(realHash)) {
-                result = VerificationResult.OK;
-            }
-        } catch (IOException | DataHashException e) {
-            LOGGER.debug("Verifying document failed!", e);
+        ContainerDocument document = verifiable.getRight().getDocuments().get(documentUri);
+        if(document != null && !(document instanceof EmptyContainerDocument)) {
+            result = VerificationResult.OK;
         }
         RuleVerificationResult verificationResult = new TerminatingVerificationResult(result, this, documentUri);
         return Arrays.asList((RuleVerificationResult) verificationResult);
@@ -45,11 +37,11 @@ public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, Sign
 
     @Override
     public String getName() {
-        return "KSIE_VERIFY_DATA_HASH";
+        return "KSIE_VERIFY_DATA_EXISTS";
     }
 
     @Override
     public String getErrorMessage() {
-        return "Data file hash mismatch.";
+        return "Signed file does not exist in the container.";
     }
 }

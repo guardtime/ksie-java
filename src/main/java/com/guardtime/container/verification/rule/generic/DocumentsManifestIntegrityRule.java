@@ -1,11 +1,12 @@
 package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.manifest.DocumentsManifest;
+import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.verification.context.VerificationContext;
-import com.guardtime.container.verification.result.GenericVerificationResult;
-import com.guardtime.container.verification.result.RuleResult;
+import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.result.TerminatingVerificationResult;
+import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 
@@ -13,40 +14,42 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Rule that verifies the hash integrity of {@link DocumentsManifest} as noted in {@link Manifest}.
- */
-public class DocumentsManifestIntegrityRule extends SignatureContentRule<GenericVerificationResult> {
-
-    private static final String KSIE_VERIFY_DATA_FILES_MANIFEST = "KSIE_VERIFY_DATA_FILES_MANIFEST";
+public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureContent> {
 
     public DocumentsManifestIntegrityRule() {
-        super(KSIE_VERIFY_DATA_FILES_MANIFEST);
+        this(RuleState.FAIL);
     }
 
     public DocumentsManifestIntegrityRule(RuleState state) {
-        super(state, KSIE_VERIFY_DATA_FILES_MANIFEST);
+        super(state);
     }
 
     @Override
-    protected List<GenericVerificationResult> verifySignatureContent(SignatureContent content, VerificationContext context) {
-        RuleResult result = getFailureResult();
-        DocumentsManifest documentsManifest = content.getDocumentsManifest().getRight();
+    public List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
+        VerificationResult verificationResult = getFailureVerificationResult();
+        DocumentsManifest documentsManifest = verifiable.getDocumentsManifest().getRight();
+        Manifest manifest = verifiable.getManifest().getRight();
+        FileReference documentsManifestReference = manifest.getDocumentsManifestReference();
         try {
-            DataHash expectedHash = getDataHashFromManifest(content);
-            DataHash realHash = documentsManifest.getDataHash(expectedHash.getAlgorithm());
-            if (realHash.equals(expectedHash)) {
-                result = RuleResult.OK;
+            DataHash expectedHash = documentsManifestReference.getHash();
+            DataHash annotationsManifestHash = documentsManifest.getDataHash(expectedHash.getAlgorithm());
+            if(expectedHash.equals(annotationsManifestHash)) {
+                verificationResult = VerificationResult.OK;
             }
-        } catch (NullPointerException | IOException e) {
-            LOGGER.debug("Verifying datamanifest failed!", e);
+        } catch (IOException e) {
+            LOGGER.debug("Verifying documents manifest failed!", e);
         }
-        return Arrays.asList(new GenericVerificationResult(result, this, documentsManifest));
+        TerminatingVerificationResult result = new TerminatingVerificationResult(verificationResult, this, documentsManifestReference.getUri());
+        return Arrays.asList((RuleVerificationResult) result);
     }
 
+    @Override
+    public String getName() {
+        return "KSIE_VERIFY_DATA_MANIFEST";
+    }
 
-    private DataHash getDataHashFromManifest(SignatureContent content) {
-        Manifest manifest = content.getManifest().getRight();
-        return manifest.getDocumentsManifestReference().getHash();
+    @Override
+    public String getErrorMessage() {
+        return "Datamanifest hash mismatch.";
     }
 }

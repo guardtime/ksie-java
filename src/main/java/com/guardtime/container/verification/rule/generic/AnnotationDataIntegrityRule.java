@@ -1,15 +1,13 @@
 package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.annotation.ContainerAnnotationType;
-import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.manifest.AnnotationDataReference;
-import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.FileReference;
+import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.verification.context.VerificationContext;
+import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.GenericVerificationResult;
-import com.guardtime.container.verification.result.RuleResult;
+import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
@@ -18,82 +16,48 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Rule that verifies the type and hash integrity of {@link ContainerAnnotation} as noted by its {@link
- * SingleAnnotationManifest}.
- */
-public class AnnotationDataIntegrityRule extends SignatureContentRule<GenericVerificationResult> {
-
-    private static final String KSIE_VERIFY_ANNOTATION_DATA = "KSIE_VERIFY_ANNOTATION_DATA";
+public class AnnotationDataIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
     public AnnotationDataIntegrityRule() {
-        super(KSIE_VERIFY_ANNOTATION_DATA);
+        this(RuleState.FAIL);
     }
 
     public AnnotationDataIntegrityRule(RuleState state) {
-        super(state, KSIE_VERIFY_ANNOTATION_DATA);
+        super(state);
     }
 
     @Override
-    protected List<GenericVerificationResult> verifySignatureContent(SignatureContent content, VerificationContext context) {
-        List<GenericVerificationResult> results = new LinkedList<>();
-        if (shouldIgnoreContent(content, context)) return results;
+    public List<RuleVerificationResult> verifyRule(Pair<SignatureContent, FileReference> verifiable) {
+        List<RuleVerificationResult> results = new LinkedList<>();
+        VerificationResult verificationResult = getFailureVerificationResult();
 
-        AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
-        for (FileReference reference : annotationsManifest.getSingleAnnotationManifestReferences()) {
-            SingleAnnotationManifest singleAnnotationManifest = content.getSingleAnnotationManifests().get(reference.getUri());
-            if (shouldIgnoreAnnotation(singleAnnotationManifest, context)) continue;
-            AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
-            ContainerAnnotation annotation = content.getAnnotations().get(annotationDataReference.getUri());
-            results.add(verifyAnnotationData(reference, annotationDataReference, annotation));
+        String manifestUri = verifiable.getRight().getUri();
+        SignatureContent signatureContent = verifiable.getLeft();
+        SingleAnnotationManifest manifest = signatureContent.getSingleAnnotationManifests().get(manifestUri);
+        AnnotationDataReference annotationDataReference = manifest.getAnnotationReference();
+        String annotationDataUri = annotationDataReference.getUri();
+        ContainerAnnotation annotation = signatureContent.getAnnotations().get(annotationDataUri);
+
+        try {
+            DataHash expectedHash = annotationDataReference.getHash();
+            DataHash realHash = annotation.getDataHash(expectedHash.getAlgorithm());
+            if(expectedHash.equals(realHash)) {
+                verificationResult = VerificationResult.OK;
+            }
+        } catch (IOException e) {
+            LOGGER.debug("Verifying annotation data failed!", e);
         }
+        results.add(new GenericVerificationResult(verificationResult, this, annotationDataUri));
         return results;
     }
 
-    private boolean shouldIgnoreContent(SignatureContent content, VerificationContext context) {
-        AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
-        List<RuleVerificationResult> resultsForAnnotationsManifest = context.getResultsFor(annotationsManifest);
-        if (resultsForAnnotationsManifest == null) return true;
-        for (RuleVerificationResult result : resultsForAnnotationsManifest) {
-            if (!RuleResult.OK.equals(result.getResult())) {
-                return true;
-            }
-        }
-        return false;
+    @Override
+    public String getName() {
+        return "KSIE_VERIFY_ANNOTATION_DATA";
     }
 
-    private boolean shouldIgnoreAnnotation(SingleAnnotationManifest singleAnnotationManifest, VerificationContext context) {
-        if (singleAnnotationManifest == null) return true;
-        List<RuleVerificationResult> resultsForAnnotationManifest = context.getResultsFor(singleAnnotationManifest);
-        if (resultsForAnnotationManifest == null) {
-            return true; // Shouldn't verify annotation data if we don't know if the manifests are even valid
-        }
-        for (RuleVerificationResult result : resultsForAnnotationManifest) {
-            if (!RuleResult.OK.equals(result.getResult())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private GenericVerificationResult verifyAnnotationData(FileReference reference, AnnotationDataReference annotationDataReference, ContainerAnnotation annotation) {
-        RuleResult result = getFailureResult();
-        try {
-            DataHash expectedDataHash = annotationDataReference.getHash();
-            DataHash realDataHash = annotation.getDataHash(expectedDataHash.getAlgorithm());
-            if (realDataHash.equals(expectedDataHash)) {
-                result = RuleResult.OK;
-            }
-        } catch (NullPointerException | IOException e) {
-            LOGGER.debug("Verifying annotation data failed!", e);
-            result = getMissingAnnotationResult(reference);
-        }
-        return new GenericVerificationResult(result, this, annotation);
-    }
-
-    private RuleResult getMissingAnnotationResult(FileReference reference) {
-        ContainerAnnotationType type = ContainerAnnotationType.fromContent(reference.getMimeType());
-        if (ContainerAnnotationType.NON_REMOVABLE.equals(type)) return getFailureResult();
-        return RuleResult.OK;
+    @Override
+    public String getErrorMessage() {
+        return "Annotation data hash mismatch.";
     }
 }
