@@ -13,7 +13,11 @@ import com.guardtime.container.verification.rule.RuleState;
 import java.util.Arrays;
 import java.util.List;
 
-public class DocumentExistenceRule extends AbstractRule<Pair<FileReference, SignatureContent>>{
+/**
+ * This rule verifies that the tested {@link ContainerDocument} is indeed present in the {@link
+ * com.guardtime.container.packaging.Container}
+ */
+public class DocumentExistenceRule extends AbstractRule<Pair<FileReference, SignatureContent>> {
 
     public DocumentExistenceRule() {
         this(RuleState.FAIL);
@@ -24,11 +28,11 @@ public class DocumentExistenceRule extends AbstractRule<Pair<FileReference, Sign
     }
 
     @Override
-    public List<RuleVerificationResult> verifyRule(Pair<FileReference, SignatureContent> verifiable) {
+    protected List<RuleVerificationResult> verifyRule(Pair<FileReference, SignatureContent> verifiable) {
         VerificationResult result = getFailureVerificationResult();
         String documentUri = verifiable.getLeft().getUri();
         ContainerDocument document = verifiable.getRight().getDocuments().get(documentUri);
-        if(document != null && !(document instanceof EmptyContainerDocument)) {
+        if (document != null && !(document instanceof EmptyContainerDocument)) {
             result = VerificationResult.OK;
         }
         RuleVerificationResult verificationResult = new TerminatingVerificationResult(result, this, documentUri);

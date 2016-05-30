@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This rule verifies that the annotmanifest has not been corrupted.
+ */
 public class AnnotationsManifestIntegrityRule extends AbstractRule<SignatureContent> {
 
     public AnnotationsManifestIntegrityRule() {
@@ -25,7 +28,7 @@ public class AnnotationsManifestIntegrityRule extends AbstractRule<SignatureCont
     }
 
     @Override
-    public List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
+    protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
         VerificationResult verificationResult = getFailureVerificationResult();
         AnnotationsManifest annotationsManifest = verifiable.getAnnotationsManifest().getRight();
         Manifest manifest = verifiable.getManifest().getRight();
@@ -33,7 +36,7 @@ public class AnnotationsManifestIntegrityRule extends AbstractRule<SignatureCont
         try {
             DataHash expectedHash = annotationsManifestReference.getHash();
             DataHash annotationsManifestHash = annotationsManifest.getDataHash(expectedHash.getAlgorithm());
-            if(expectedHash.equals(annotationsManifestHash)) {
+            if (expectedHash.equals(annotationsManifestHash)) {
                 verificationResult = VerificationResult.OK;
             }
         } catch (IOException e) {

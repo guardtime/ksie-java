@@ -10,22 +10,24 @@ import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.RuleState;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *  This rule verifies the existence of the meta-data file of an annotation.
+ */
 public class SingleAnnotationManifestExistenceRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
     public SingleAnnotationManifestExistenceRule(RuleState ruleState) {
         super(ruleState);
     }
 
     @Override
-    public List<RuleVerificationResult> verifyRule(Pair<SignatureContent, FileReference> verifiable) {
+    protected List<RuleVerificationResult> verifyRule(Pair<SignatureContent, FileReference> verifiable) {
         String manifestUri = verifiable.getRight().getUri();
         Map<String, SingleAnnotationManifest> singleAnnotationManifests = verifiable.getLeft().getSingleAnnotationManifests();
         SingleAnnotationManifest manifest = singleAnnotationManifests.get(manifestUri);
         VerificationResult result = getFailureVerificationResult();
-        if(manifest != null) {
+        if (manifest != null) {
             result = VerificationResult.OK;
         }
         TerminatingVerificationResult verificationResult = new TerminatingVerificationResult(result, this, manifestUri);

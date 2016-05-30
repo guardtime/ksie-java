@@ -7,8 +7,8 @@ import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.GenericVerificationResult;
-import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 
@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This rule verifies that the annotation data has not been corrupted.
+ */
 public class AnnotationDataIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
     public AnnotationDataIntegrityRule() {
@@ -27,7 +30,7 @@ public class AnnotationDataIntegrityRule extends AbstractRule<Pair<SignatureCont
     }
 
     @Override
-    public List<RuleVerificationResult> verifyRule(Pair<SignatureContent, FileReference> verifiable) {
+    protected List<RuleVerificationResult> verifyRule(Pair<SignatureContent, FileReference> verifiable) {
         List<RuleVerificationResult> results = new LinkedList<>();
         VerificationResult verificationResult = getFailureVerificationResult();
 
@@ -41,7 +44,7 @@ public class AnnotationDataIntegrityRule extends AbstractRule<Pair<SignatureCont
         try {
             DataHash expectedHash = annotationDataReference.getHash();
             DataHash realHash = annotation.getDataHash(expectedHash.getAlgorithm());
-            if(expectedHash.equals(realHash)) {
+            if (expectedHash.equals(realHash)) {
                 verificationResult = VerificationResult.OK;
             }
         } catch (IOException e) {

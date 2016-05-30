@@ -14,6 +14,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This rule verifies the validity of the datamanifest which contains records for all {@link
+ * com.guardtime.container.document.ContainerDocument}s associated with a signature.
+ */
 public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureContent> {
 
     public DocumentsManifestIntegrityRule() {
@@ -25,7 +29,7 @@ public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureConten
     }
 
     @Override
-    public List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
+    protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
         VerificationResult verificationResult = getFailureVerificationResult();
         DocumentsManifest documentsManifest = verifiable.getDocumentsManifest().getRight();
         Manifest manifest = verifiable.getManifest().getRight();
@@ -33,7 +37,7 @@ public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureConten
         try {
             DataHash expectedHash = documentsManifestReference.getHash();
             DataHash annotationsManifestHash = documentsManifest.getDataHash(expectedHash.getAlgorithm());
-            if(expectedHash.equals(annotationsManifestHash)) {
+            if (expectedHash.equals(annotationsManifestHash)) {
                 verificationResult = VerificationResult.OK;
             }
         } catch (IOException e) {

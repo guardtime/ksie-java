@@ -14,7 +14,10 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class AnnotationDataExistenceRule extends AbstractRule<Pair<SignatureContent, FileReference>>{
+/**
+ * This rule verifies that the annotation data is actually present in the {@link com.guardtime.container.packaging.Container}
+ */
+public class AnnotationDataExistenceRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
     public AnnotationDataExistenceRule() {
         this(RuleState.FAIL);
@@ -25,15 +28,15 @@ public class AnnotationDataExistenceRule extends AbstractRule<Pair<SignatureCont
     }
 
     @Override
-    public List<RuleVerificationResult> verifyRule(Pair<SignatureContent, FileReference> verifiable) {
-        if(ignoreRule()) return new LinkedList<>();
+    protected List<RuleVerificationResult> verifyRule(Pair<SignatureContent, FileReference> verifiable) {
+        if (ignoreRule()) return new LinkedList<>();
         VerificationResult result = getFailureVerificationResult();
         String manifestUri = verifiable.getRight().getUri();
         SignatureContent signatureContent = verifiable.getLeft();
         SingleAnnotationManifest manifest = signatureContent.getSingleAnnotationManifests().get(manifestUri);
         String dataUri = manifest.getAnnotationReference().getUri();
         ContainerAnnotation annotation = signatureContent.getAnnotations().get(dataUri);
-        if(annotation != null) {
+        if (annotation != null) {
             result = VerificationResult.OK;
         }
         RuleVerificationResult verificationResult = new TerminatingVerificationResult(result, this, dataUri);

@@ -14,7 +14,9 @@ import java.util.List;
  * Default implementation of {@link VerificationPolicy}
  * Contains containerRules for:
  * <ol>
+ *   <li>verifying MIME type</li>
  *   <li>verifying manifest indexes are consecutive</li>
+ *   <li>verifying signature</li>
  *   <li>verifying {@link DocumentsManifest}</li>
  *   <li>verifying {@link com.guardtime.container.document.ContainerDocument}s</li>
  *   <li>verifying {@link com.guardtime.container.manifest.AnnotationsManifest}</li>
@@ -27,6 +29,10 @@ import java.util.List;
 public class DefaultVerificationPolicy implements VerificationPolicy {
     private ArrayList<ContainerRule> containerRules = new ArrayList<>();
 
+    /**
+     * @param signatureRule will be called for verifying each signature.
+     * @param mimetypeRule will be called to verify mimetype file.
+     */
     public DefaultVerificationPolicy(Rule signatureRule, ContainerRule mimetypeRule) {
         this(signatureRule, mimetypeRule, new LinkedList<ContainerRule>());
     }

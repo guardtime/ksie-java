@@ -13,6 +13,9 @@ import com.guardtime.container.verification.rule.RuleState;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This rule verifies that consecutive manifests have appropriate index numbers.
+ */
 public class ManifestIndexConsistencyRule extends AbstractContainerRule {
 
     public ManifestIndexConsistencyRule() {
@@ -24,7 +27,7 @@ public class ManifestIndexConsistencyRule extends AbstractContainerRule {
     }
 
     @Override
-    public List<RuleVerificationResult> verify(Container verifiable) {
+    protected List<RuleVerificationResult> verifyRule(Container verifiable) {
         List<RuleVerificationResult> results = new LinkedList<>();
         int expectedIndex = 1;
         for (SignatureContent content : verifiable.getSignatureContents()) {

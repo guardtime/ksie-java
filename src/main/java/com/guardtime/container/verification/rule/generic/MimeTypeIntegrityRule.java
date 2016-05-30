@@ -30,7 +30,7 @@ public class MimeTypeIntegrityRule extends AbstractContainerRule {
     }
 
     @Override
-    public List<RuleVerificationResult> verify(Container verifiable) {
+    protected List<RuleVerificationResult> verifyRule(Container verifiable) {
         MimeType mimetype = verifiable.getMimeType();
         VerificationResult result = getFailureVerificationResult();
         try {

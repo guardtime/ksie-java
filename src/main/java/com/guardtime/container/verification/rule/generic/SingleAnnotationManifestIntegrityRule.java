@@ -15,7 +15,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>>{
+/**
+ * This rule verifies the validity of the manifest file containing meta-data for an annotation.
+ */
+public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
     public SingleAnnotationManifestIntegrityRule() {
         this(RuleState.FAIL);
@@ -26,7 +29,7 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<Sig
     }
 
     @Override
-    public List<RuleVerificationResult> verifyRule(Pair<SignatureContent, FileReference> verifiable) {
+    protected List<RuleVerificationResult> verifyRule(Pair<SignatureContent, FileReference> verifiable) {
         VerificationResult result = getFailureVerificationResult();
         String manifestUri = verifiable.getRight().getUri();
         try {
@@ -34,7 +37,7 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<Sig
             SingleAnnotationManifest manifest = singleAnnotationManifests.get(manifestUri);
             DataHash expectedHash = verifiable.getRight().getHash();
             DataHash realHash = manifest.getDataHash(expectedHash.getAlgorithm());
-            if(expectedHash.equals(realHash)) {
+            if (expectedHash.equals(realHash)) {
                 result = VerificationResult.OK;
             }
         } catch (IOException e) {

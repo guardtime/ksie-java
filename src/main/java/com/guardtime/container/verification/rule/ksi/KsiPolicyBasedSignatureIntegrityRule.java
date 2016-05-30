@@ -2,7 +2,6 @@ package com.guardtime.container.verification.rule.ksi;
 
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ksi.KsiContainerSignature;
-import com.guardtime.ksi.unisignature.verifier.policies.Policy;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
@@ -13,11 +12,16 @@ import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.KSISignature;
+import com.guardtime.ksi.unisignature.verifier.policies.Policy;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This rule uses a given KSI verification {@link Policy} to verify the validity of the signature for the given {@link
+ * SignatureContent}.
+ */
 public class KsiPolicyBasedSignatureIntegrityRule extends AbstractRule<SignatureContent> {
     private final KSI ksi;
     private final Policy policy;
@@ -33,7 +37,7 @@ public class KsiPolicyBasedSignatureIntegrityRule extends AbstractRule<Signature
     }
 
     @Override
-    public List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
+    protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
         VerificationResult ruleResult = getFailureVerificationResult();
         try {
             KsiContainerSignature ksiContainerSignature = (KsiContainerSignature) verifiable.getSignature();

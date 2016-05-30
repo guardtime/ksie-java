@@ -15,7 +15,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, SignatureContent>>{
+/**
+ * This rule verifies that the {@link ContainerDocument} being tested has not been corrupted.
+ */
+public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, SignatureContent>> {
 
     public DocumentIntegrityRule() {
         this(RuleState.FAIL);
@@ -26,14 +29,14 @@ public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, Sign
     }
 
     @Override
-    public List<RuleVerificationResult> verifyRule(Pair<FileReference, SignatureContent> verifiable) {
+    protected List<RuleVerificationResult> verifyRule(Pair<FileReference, SignatureContent> verifiable) {
         VerificationResult result = getFailureVerificationResult();
         String documentUri = verifiable.getLeft().getUri();
         try {
             ContainerDocument document = verifiable.getRight().getDocuments().get(documentUri);
             DataHash expectedHash = verifiable.getLeft().getHash();
             DataHash realHash = document.getDataHash(expectedHash.getAlgorithm());
-            if(expectedHash.equals(realHash)) {
+            if (expectedHash.equals(realHash)) {
                 result = VerificationResult.OK;
             }
         } catch (IOException | DataHashException e) {
