@@ -70,7 +70,7 @@ public class AnnotationsIntegrityRuleTest extends AbstractContainerTest {
     private RuleVerificationResult selectMostImportantResult(List<RuleVerificationResult> results) {
         RuleVerificationResult returnable = results.get(0);
         for (RuleVerificationResult result : results) {
-            if (result.getResultStatus().isMoreImportantThan(returnable.getResultStatus())) {
+            if (result.getVerificationResult().isMoreImportantThan(returnable.getVerificationResult())) {
                 returnable = result;
             }
         }
@@ -81,125 +81,125 @@ public class AnnotationsIntegrityRuleTest extends AbstractContainerTest {
     public void testFullyRemovableAnnotationPresent_OK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_FULLY_REMOVABLE_ANNOTATION);
 
-        assertEquals(VerificationResult.OK, result.getResultStatus());
+        assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testFullyRemovableAnnotationFullyRemoved_OK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_FULLY_REMOVABLE_MISSING_ANNOTATION);
 
-        assertEquals(VerificationResult.OK, result.getResultStatus());
+        assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testFullyRemovableAnnotationCorrupt_OK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_FULLY_REMOVABLE_CORRUPT_ANNOTATION);
 
-        assertEquals(VerificationResult.OK, result.getResultStatus());
+        assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testFullyRemovableAnnotationDataRemoved_OK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_FULLY_REMOVABLE_MISSING_ANNOTATION_DATA);
 
-        assertEquals(VerificationResult.OK, result.getResultStatus());
+        assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testFullyRemovableAnnotationDataCorrupt_OK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_FULLY_REMOVABLE_CORRUPT_ANNOTATION_DATA);
 
-        assertEquals(VerificationResult.OK, result.getResultStatus());
+        assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testValueRemovableAnnotationDataPresent_OK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_VALUE_REMOVABLE_ANNOTATION);
 
-        assertEquals(VerificationResult.OK, result.getResultStatus());
+        assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testValueRemovableAnnotationDataRemoved_OK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_VALUE_REMOVABLE_MISSING_ANNOTATION_DATA);
 
-        assertEquals(VerificationResult.OK, result.getResultStatus());
+        assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testValueRemovableAnnotationDataCorrupt_OK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_VALUE_REMOVABLE_CORRUPT_ANNOTATION_DATA);
 
-        assertEquals(VerificationResult.OK, result.getResultStatus());
+        assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testValueRemovableAnnotationRemoved_NOK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_VALUE_REMOVABLE_MISSING_ANNOTATION);
 
-        assertEquals(VerificationResult.NOK, result.getResultStatus());
+        assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testValueRemovableAnnotationCorrupt_NOK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_VALUE_REMOVABLE_CORRUPT_ANNOTATION);
 
-        assertEquals(VerificationResult.NOK, result.getResultStatus());
+        assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testNonRemovableAnnotationDataPresent_OK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_NON_REMOVABLE_ANNOTATION);
 
-        assertEquals(VerificationResult.OK, result.getResultStatus());
+        assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testNonRemovableAnnotationDataRemoved_NOK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_NON_REMOVABLE_MISSING_ANNOTATION_DATA);
 
-        assertEquals(VerificationResult.NOK, result.getResultStatus());
+        assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testNonRemovableAnnotationDataCorrupt_NOK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_NON_REMOVABLE_CORRUPT_ANNOTATION_DATA);
 
-        assertEquals(VerificationResult.NOK, result.getResultStatus());
+        assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testNonRemovableAnnotationRemoved_NOK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_NON_REMOVABLE_MISSING_ANNOTATION);
 
-        assertEquals(VerificationResult.NOK, result.getResultStatus());
+        assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testNonRemovableAnnotationCorrupt_NOK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_NON_REMOVABLE_CORRUPT_ANNOTATION);
 
-        assertEquals(VerificationResult.NOK, result.getResultStatus());
+        assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testAnnotationsManifestPresent_OK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_ANNOTATIONS_MANIFEST);
 
-        assertEquals(VerificationResult.OK, result.getResultStatus());
+        assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testAnnotationsManifestRemoved_NOK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_MISSING_ANNOTATIONS_MANIFEST);
 
-        assertEquals(VerificationResult.NOK, result.getResultStatus());
+        assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testAnnotationsManifestCorrupt_NOK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_CORRUPT_ANNOTATIONS_MANIFEST);
 
-        assertEquals(VerificationResult.NOK, result.getResultStatus());
+        assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 }

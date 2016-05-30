@@ -28,7 +28,7 @@ public class DocumentsIntegrityRuleTest extends AbstractContainerTest {
     private static final String CONTAINER_WITH_DOCUMENTS_MANIFEST = "verification/documents/container-with-documents-manifest.ksie";
     private static final String CONTAINER_WITH_MISSING_DOCUMENTS_MANIFEST = "verification/documents/container-with-missing-documents-manifest.ksie";
     private static final String CONTAINER_WITH_CORRUPT_DOCUMENTS_MANIFEST = "verification/documents/container-with-corrupt-documents-manifest.ksie";
-    private static final String CONTAINER_WITH_DOCUMENT= "verification/documents/container-with-document.ksie";
+    private static final String CONTAINER_WITH_DOCUMENT = "verification/documents/container-with-document.ksie";
     private static final String CONTAINER_WITH_MISSING_DOCUMENT = "verification/documents/container-with-missing-document.ksie";
     private static final String CONTAINER_WITH_CORRUPT_DOCUMENT = "verification/documents/container-with-corrupt-document.ksie";
 
@@ -58,7 +58,7 @@ public class DocumentsIntegrityRuleTest extends AbstractContainerTest {
     private RuleVerificationResult selectMostImportantResult(List<RuleVerificationResult> results) {
         RuleVerificationResult returnable = results.get(0);
         for (RuleVerificationResult result : results) {
-            if (result.getResultStatus().isMoreImportantThan(returnable.getResultStatus())) {
+            if (result.getVerificationResult().isMoreImportantThan(returnable.getVerificationResult())) {
                 returnable = result;
             }
         }
@@ -69,41 +69,41 @@ public class DocumentsIntegrityRuleTest extends AbstractContainerTest {
     public void testDocumentsManifestPresent_OK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_DOCUMENTS_MANIFEST);
 
-        assertEquals(VerificationResult.OK, result.getResultStatus());
+        assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testDocumentsManifestMissing_NOK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_MISSING_DOCUMENTS_MANIFEST);
 
-        assertEquals(VerificationResult.NOK, result.getResultStatus());
+        assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testDocumentsManifestCorrupt_NOK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_CORRUPT_DOCUMENTS_MANIFEST);
 
-        assertEquals(VerificationResult.NOK, result.getResultStatus());
+        assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testDocumentPresent_OK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_DOCUMENT);
 
-        assertEquals(VerificationResult.OK, result.getResultStatus());
+        assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testDocumentMissing_NOK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_MISSING_DOCUMENT);
 
-        assertEquals(VerificationResult.NOK, result.getResultStatus());
+        assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testDocumentCorrupt_NOK() throws Exception {
         RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_CORRUPT_DOCUMENT);
 
-        assertEquals(VerificationResult.NOK, result.getResultStatus());
+        assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 }

@@ -13,7 +13,7 @@ import com.guardtime.container.verification.rule.RuleState;
 import java.util.Arrays;
 import java.util.List;
 
-public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureContent>{
+public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureContent> {
 
     public AnnotationsManifestExistenceRule() {
         this(RuleState.FAIL);
@@ -29,7 +29,7 @@ public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureCont
         Manifest manifest = verifiable.getManifest().getRight();
         FileReference annotationsManifestReference = manifest.getAnnotationsManifestReference();
         Pair<String, AnnotationsManifest> annotationsManifest = verifiable.getAnnotationsManifest();
-        if(annotationsManifest != null) {
+        if (annotationsManifest != null) {
             verificationResult = VerificationResult.OK;
         }
         TerminatingVerificationResult result = new TerminatingVerificationResult(verificationResult, this, annotationsManifestReference.getUri());

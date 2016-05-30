@@ -5,7 +5,7 @@ import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 import com.guardtime.container.signature.ksi.KsiContainerSignature;
 import com.guardtime.container.verification.policy.DefaultVerificationPolicy;
-import com.guardtime.container.verification.result.RawVerifierResult;
+import com.guardtime.container.verification.result.ContainerVerifierResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.generic.MimeTypeIntegrityRule;
 import com.guardtime.container.verification.rule.ksi.KsiPolicyBasedSignatureIntegrityRule;
@@ -51,7 +51,7 @@ public class VerificationIT extends AbstractCommonIntegrationTest {
         );
     }
 
-    private RawVerifierResult getGenericVerifierResult(String path) throws Exception {
+    private ContainerVerifierResult getGenericVerifierResult(String path) throws Exception {
         DefaultVerificationPolicy policy = getDefaultVerificationPolicy();
         ContainerVerifier verifier = new ContainerVerifier(policy);
         InputStream input = new FileInputStream(loadFile(path));
@@ -66,7 +66,7 @@ public class VerificationIT extends AbstractCommonIntegrationTest {
     @Test
     public void testGenericVerificationWithValidContainer() throws Exception {
         setSignatureVerificationResult(true);
-        RawVerifierResult result = getGenericVerifierResult(CONTAINER_WITH_MULTIPLE_SIGNATURES);
+        ContainerVerifierResult result = getGenericVerifierResult(CONTAINER_WITH_MULTIPLE_SIGNATURES);
 
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
@@ -74,7 +74,7 @@ public class VerificationIT extends AbstractCommonIntegrationTest {
     @Test
     public void testGenericVerificationWithBrokenContainer() throws Exception {
         setSignatureVerificationResult(false);
-        RawVerifierResult result = getGenericVerifierResult(CONTAINER_WITH_MULTIPLE_SIGNATURES);
+        ContainerVerifierResult result = getGenericVerifierResult(CONTAINER_WITH_MULTIPLE_SIGNATURES);
 
         assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }

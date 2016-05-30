@@ -7,12 +7,12 @@ import java.util.List;
 /**
  * Encompasses all results from verifying a {@link Container} Provides easier access to overall result of verification.
  */
-public class RawVerifierResult {
+public class ContainerVerifierResult {
     private final VerificationResult aggregateResult;
     private final List<RuleVerificationResult> verificationResults;
     private final Container container;
 
-    public RawVerifierResult(Container container, List<RuleVerificationResult> verificationResults) {
+    public ContainerVerifierResult(Container container, List<RuleVerificationResult> verificationResults) {
         this.container = container;
         this.verificationResults = verificationResults;
         this.aggregateResult = findHighestPriorityResult(verificationResults);
@@ -48,7 +48,7 @@ public class RawVerifierResult {
     private VerificationResult findHighestPriorityResult(List<RuleVerificationResult> verificationResults) {
         VerificationResult returnable = VerificationResult.OK;
         for (RuleVerificationResult result : verificationResults) {
-            VerificationResult verificationResult = result.getResultStatus();
+            VerificationResult verificationResult = result.getVerificationResult();
             if (verificationResult.isMoreImportantThan(returnable)) {
                 returnable = verificationResult;
                 if (VerificationResult.NOK.equals(returnable)) break; // No need to check once max failure level reached

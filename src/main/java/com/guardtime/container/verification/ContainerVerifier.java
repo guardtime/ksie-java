@@ -4,7 +4,7 @@ import com.guardtime.container.packaging.Container;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.policy.VerificationPolicy;
 import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.result.RawVerifierResult;
+import com.guardtime.container.verification.result.ContainerVerifierResult;
 import com.guardtime.container.verification.rule.ContainerRule;
 
 import java.util.LinkedList;
@@ -26,21 +26,20 @@ public class ContainerVerifier {
      *
      * @param container
      *         container to be verified
-     * @return {@link RawVerifierResult} based on all {@link RuleVerificationResult} gathered during verification.
+     * @return {@link ContainerVerifierResult} based on all {@link RuleVerificationResult} gathered during verification.
      */
-    public RawVerifierResult verify(Container container) {
+    public ContainerVerifierResult verify(Container container) {
         List<RuleVerificationResult> verificationResults = new LinkedList<>();
         for(ContainerRule rule : policy.getContainerRules()) {
             verificationResults.addAll(rule.verify(container));
-            if(terminateVerification(verificationResults)) break;
+            if(mustTerminateVerification(verificationResults)) break;
         }
-        return new RawVerifierResult(container, verificationResults);
+        return new ContainerVerifierResult(container, verificationResults);
     }
 
-    // TODO: Try to import this method from somewhere shared to lessen duplication
-    private boolean terminateVerification(List<RuleVerificationResult> verificationResults) {
+    private boolean mustTerminateVerification(List<RuleVerificationResult> verificationResults) {
         for (RuleVerificationResult result : verificationResults) {
-            if (result.terminatesVerification() && !VerificationResult.OK.equals(result.getResultStatus())) {
+            if (result.terminatesVerification() && !VerificationResult.OK.equals(result.getVerificationResult())) {
                 return true;
             }
         }

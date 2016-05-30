@@ -30,10 +30,10 @@ abstract class AbstractRuleHelper<O> {
         }
     }
 
-    protected boolean terminateVerification(List<RuleVerificationResult> verificationResults) {
+    protected boolean mustTerminateVerification(List<RuleVerificationResult> verificationResults) {
         if (verificationResults.isEmpty()) return true;
         for (RuleVerificationResult result : verificationResults) {
-            if (result.terminatesVerification() && !VerificationResult.OK.equals(result.getResultStatus())) {
+            if (result.terminatesVerification() && !VerificationResult.OK.equals(result.getVerificationResult())) {
                 return true;
             }
         }

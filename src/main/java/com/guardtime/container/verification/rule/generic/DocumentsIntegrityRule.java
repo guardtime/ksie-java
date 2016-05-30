@@ -30,17 +30,17 @@ public class DocumentsIntegrityRule extends AbstractRule<SignatureContent> {
         List<RuleVerificationResult> results = new LinkedList<>();
         // DocumentsManifest existence
         results.addAll(new DocumentsManifestExistenceRule(state).verify(verifiable));
-        if (terminateVerification(results)) return results;
+        if (mustTerminateVerification(results)) return results;
         //DocumentsManifest integrity
         results.addAll(new DocumentsManifestIntegrityRule(state).verify(verifiable));
-        if (terminateVerification(results)) return results;
+        if (mustTerminateVerification(results)) return results;
         //Documents
         DocumentsManifest documentsManifest = verifiable.getDocumentsManifest().getRight();
         List<? extends FileReference> documentsReferences = documentsManifest.getDocumentReferences();
         for (FileReference reference : documentsReferences) {
             List<RuleVerificationResult> existenceResults = new DocumentExistenceRule(state).verify(Pair.of(reference, verifiable));
             results.addAll(existenceResults);
-            if (terminateVerification(existenceResults)) continue;
+            if (mustTerminateVerification(existenceResults)) continue;
             results.addAll(new DocumentIntegrityRule(state).verify(Pair.of(reference, verifiable)));
         }
 

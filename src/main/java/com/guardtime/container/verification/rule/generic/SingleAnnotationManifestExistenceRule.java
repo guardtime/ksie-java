@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  This rule verifies the existence of the meta-data file of an annotation.
+ * This rule verifies the existence of the meta-data file of an annotation.
  */
 public class SingleAnnotationManifestExistenceRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
     public SingleAnnotationManifestExistenceRule(RuleState ruleState) {

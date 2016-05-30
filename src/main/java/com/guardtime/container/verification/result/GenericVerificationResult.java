@@ -16,7 +16,7 @@ public class GenericVerificationResult implements RuleVerificationResult {
     }
 
     @Override
-    public VerificationResult getResultStatus() {
+    public VerificationResult getVerificationResult() {
         return result;
     }
 

@@ -2,7 +2,7 @@ package com.guardtime.container.verification.result;
 
 public interface RuleVerificationResult {
 
-    VerificationResult getResultStatus();
+    VerificationResult getVerificationResult();
 
     /**
      * Indicates which rule was used to produce this result by referring to the rules unique name string.
@@ -10,6 +10,11 @@ public interface RuleVerificationResult {
      * @return
      */
     String getRuleName();
+
+    /**
+     * Contains the message string provided by the rule which applies for a non OK result.
+     * @return
+     */
     String getRuleErrorMessage();
 
     /**

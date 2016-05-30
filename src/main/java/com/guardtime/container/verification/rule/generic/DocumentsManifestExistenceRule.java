@@ -13,7 +13,7 @@ import com.guardtime.container.verification.rule.RuleState;
 import java.util.Arrays;
 import java.util.List;
 
-public class DocumentsManifestExistenceRule extends AbstractRule<SignatureContent>{
+public class DocumentsManifestExistenceRule extends AbstractRule<SignatureContent> {
 
     public DocumentsManifestExistenceRule() {
         this(RuleState.FAIL);
@@ -30,7 +30,7 @@ public class DocumentsManifestExistenceRule extends AbstractRule<SignatureConten
         Manifest manifest = verifiable.getManifest().getRight();
         FileReference documentsManifestReference = manifest.getDocumentsManifestReference();
         Pair<String, DocumentsManifest> documentsManifest = verifiable.getDocumentsManifest();
-        if(documentsManifest!= null) {
+        if (documentsManifest != null) {
             verificationResult = VerificationResult.OK;
         }
         TerminatingVerificationResult result = new TerminatingVerificationResult(verificationResult, this, documentsManifestReference.getUri());
