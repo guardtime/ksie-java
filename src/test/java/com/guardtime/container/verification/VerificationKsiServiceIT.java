@@ -23,7 +23,7 @@ public class VerificationKsiServiceIT extends AbstractCommonKsiServiceIntegratio
 
     @Test
     public void testContainerWithInvalidSignature_VerificationFails() throws Exception {
-        FileInputStream fis = new FileInputStream(loadFile(CONTAINER_WITH_WRONG_SIGNATURE_FILE_KSIE));
+        FileInputStream fis = new FileInputStream(loadFile(CONTAINER_WITH_WRONG_SIGNATURE_FILE));
         Container container = packagingFactory.read(fis);
         VerificationPolicy defaultPolicy = new DefaultVerificationPolicy(Arrays.<Rule>asList(
                 new KsiPolicyBasedSignatureIntegrityRule(ksi, new CalendarBasedVerificationPolicy()),

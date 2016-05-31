@@ -64,8 +64,38 @@ public class ZipContainerReaderIT extends AbstractCommonIntegrationTest {
     }
 
     @Test
+    public void testReadContainerFileWithMissingDocumentUri() throws Exception {
+        ZipContainer container = getContainer(CONTAINERS_CONTAINER_NO_DOCUMENT_URI_IN_MANIFEST);
+        assertNotNull(container);
+        assertFalse(container.getSignatureContents().isEmpty());
+        for (SignatureContent content : container.getSignatureContents()) {
+            assertTrue(content.getDocuments().isEmpty());
+        }
+    }
+
+    @Test
+    public void testReadContainerFileWithMissingDocumentMIMEType() throws Exception {
+        ZipContainer container = getContainer(CONTAINERS_CONTAINER_DOCUMENT_MISSING_MIMETYPE);
+        assertNotNull(container);
+        assertFalse(container.getSignatureContents().isEmpty());
+        for (SignatureContent content : container.getSignatureContents()) {
+            assertTrue(content.getDocuments().isEmpty());
+        }
+    }
+
+    @Test
     public void testReadContainerFileWithMultipleAnnotations() throws Exception {
         ZipContainer container = getContainer(CONTAINER_WITH_MULTIPLE_ANNOTATIONS);
+        assertNotNull(container);
+        assertFalse(container.getSignatureContents().isEmpty());
+        for (SignatureContent content : container.getSignatureContents()) {
+            assertTrue(content.getAnnotations().size() > 1);
+        }
+    }
+
+    @Test
+    public void testReadContainerFileWithInvalidAnnotationType() throws Exception {
+        ZipContainer container = getContainer(CONTAINERS_CONTAINER_INVALID_ANNOTATION_TYPE);
         assertNotNull(container);
         assertFalse(container.getSignatureContents().isEmpty());
         for (SignatureContent content : container.getSignatureContents()) {

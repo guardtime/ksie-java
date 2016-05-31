@@ -10,6 +10,7 @@ import com.guardtime.container.manifest.*;
 import com.guardtime.container.packaging.zip.handler.*;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
+import com.guardtime.container.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,12 +113,15 @@ class SignatureContentHandler {
                     documents.add(fetchDocumentFromHandler(reference));
                 } catch (ContentParsingException e) {
                     throw new RuntimeException("Programming bug! This should never happen. Investigate why DocumentContentHandler#getEntry() threw exception.", e);
+                } catch (NullPointerException e) {
+                    LOGGER.info("Failed to parse document '{}'. Reason: '{}'", reference.getUri(), e.getMessage());
                 }
             }
         }
 
         private ContainerDocument fetchDocumentFromHandler(FileReference reference) throws ContentParsingException {
             String documentUri = reference.getUri();
+            Util.notNull(documentUri, "Document URI");
             File file = documentHandler.get(documentUri);
             if (file == null) {
                 // either removed or was never present in the first place, verifier will decide
@@ -152,8 +156,12 @@ class SignatureContentHandler {
 
         private Pair<String, ContainerAnnotation> getContainerAnnotation(FileReference manifestReference, SingleAnnotationManifest singleAnnotationManifest) {
             try {
-                AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
                 ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getMimeType());
+                if(type == null) {
+                    LOGGER.info("Failed to parse annotation for '{}'. Reason: Invalid annotation type: '{}'", manifestReference.getUri(), manifestReference.getMimeType());
+                    return null;
+                }
+                AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
                 File annotationFile = annotationContentHandler.get(annotationDataReference.getUri());
                 ContainerAnnotation annotation = new FileContainerAnnotation(annotationFile, annotationDataReference.getDomain(), type);
                 return Pair.of(annotationDataReference.getUri(), annotation);
