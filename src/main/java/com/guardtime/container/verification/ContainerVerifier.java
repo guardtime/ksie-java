@@ -1,16 +1,17 @@
 package com.guardtime.container.verification;
 
-import com.guardtime.container.verification.context.VerificationContext;
+import com.guardtime.container.packaging.Container;
+import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.policy.VerificationPolicy;
-import com.guardtime.container.verification.result.RuleResult;
 import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.result.VerifierResult;
-import com.guardtime.container.verification.rule.Rule;
+import com.guardtime.container.verification.result.ContainerVerifierResult;
+import com.guardtime.container.verification.rule.ContainerRule;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Helper class to verify {@link VerificationContext} based on a {@link VerificationPolicy}
+ * Helper class to verify {@link Container} based on a {@link VerificationPolicy}
  */
 public class ContainerVerifier {
 
@@ -21,30 +22,28 @@ public class ContainerVerifier {
     }
 
     /**
-     * Verifies the {@link VerificationContext} based on the rules provided by the {@link VerificationPolicy}. Appends
-     * results from rules to the pre-existing list of results contained in the context
+     * Verifies the {@link Container} based on the rules provided by the {@link VerificationPolicy}.
      *
-     * @param context
-     *         containing verifiable container and a list of results from performed rules
-     * @return {@link VerifierResult} based on all {@link RuleVerificationResult} gathered during verification.
+     * @param container
+     *         container to be verified
+     * @return {@link ContainerVerifierResult} based on all {@link RuleVerificationResult} gathered during verification.
      */
-    public VerifierResult verify(VerificationContext context) {
-        for (Rule rule : policy.getRules()) {
-            List<RuleVerificationResult> verificationResults = rule.verify(context);
-            context.addResults(verificationResults);
-            if (terminateVerification(verificationResults)) break;
+    public ContainerVerifierResult verify(Container container) {
+        List<RuleVerificationResult> verificationResults = new LinkedList<>();
+        for(ContainerRule rule : policy.getContainerRules()) {
+            verificationResults.addAll(rule.verify(container));
+            if(mustTerminateVerification(verificationResults)) break;
         }
-        return new VerifierResult(context);
+        return new ContainerVerifierResult(container, verificationResults);
     }
 
-    private boolean terminateVerification(List<RuleVerificationResult> verificationResults) {
+    private boolean mustTerminateVerification(List<RuleVerificationResult> verificationResults) {
         for (RuleVerificationResult result : verificationResults) {
-            if (result.terminatesVerification() && !RuleResult.OK.equals(result.getResult())) {
+            if (result.terminatesVerification() && !VerificationResult.OK.equals(result.getVerificationResult())) {
                 return true;
             }
         }
         return false;
     }
-
 
 }

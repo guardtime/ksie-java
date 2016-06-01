@@ -1,21 +1,22 @@
 package com.guardtime.container.verification.result;
 
-import com.guardtime.container.ContainerFileElement;
 import com.guardtime.container.verification.rule.Rule;
 
 public class GenericVerificationResult implements RuleVerificationResult {
-    private final RuleResult result;
+    private final VerificationResult result;
     private final String ruleName;
-    private final ContainerFileElement testedElement;
+    private final String ruleMessage;
+    private final String testedElement;
 
-    public GenericVerificationResult(RuleResult result, Rule rule, ContainerFileElement testedElement) {
+    public GenericVerificationResult(VerificationResult result, Rule rule, String testedElement) {
         this.result = result;
         this.testedElement = testedElement;
         this.ruleName = rule.getName();
+        this.ruleMessage = rule.getErrorMessage();
     }
 
     @Override
-    public RuleResult getResult() {
+    public VerificationResult getVerificationResult() {
         return result;
     }
 
@@ -25,12 +26,18 @@ public class GenericVerificationResult implements RuleVerificationResult {
     }
 
     @Override
-    public boolean terminatesVerification() {
-        return false;
+    public String getRuleErrorMessage() {
+        return ruleMessage;
+    }
+
+
+    @Override
+    public String getTestedElementPath() {
+        return testedElement;
     }
 
     @Override
-    public ContainerFileElement getTestedElement() {
-        return testedElement;
+    public boolean terminatesVerification() {
+        return false;
     }
 }

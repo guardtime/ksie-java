@@ -4,43 +4,33 @@ import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.TerminatingVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.ksi.hashing.DataHash;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * This rule verifies that the annotmanifest has not been corrupted.
- */
-public class AnnotationsManifestIntegrityRule extends AbstractRule<SignatureContent> {
+public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureContent> {
 
-    public AnnotationsManifestIntegrityRule() {
+    public AnnotationsManifestExistenceRule() {
         this(RuleState.FAIL);
     }
 
-    public AnnotationsManifestIntegrityRule(RuleState state) {
+    public AnnotationsManifestExistenceRule(RuleState state) {
         super(state);
     }
 
     @Override
     protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
         VerificationResult verificationResult = getFailureVerificationResult();
-        AnnotationsManifest annotationsManifest = verifiable.getAnnotationsManifest().getRight();
         Manifest manifest = verifiable.getManifest().getRight();
         FileReference annotationsManifestReference = manifest.getAnnotationsManifestReference();
-        try {
-            DataHash expectedHash = annotationsManifestReference.getHash();
-            DataHash annotationsManifestHash = annotationsManifest.getDataHash(expectedHash.getAlgorithm());
-            if (expectedHash.equals(annotationsManifestHash)) {
-                verificationResult = VerificationResult.OK;
-            }
-        } catch (IOException e) {
-            LOGGER.debug("Verifying annotations manifest failed!", e);
+        Pair<String, AnnotationsManifest> annotationsManifest = verifiable.getAnnotationsManifest();
+        if (annotationsManifest != null) {
+            verificationResult = VerificationResult.OK;
         }
         TerminatingVerificationResult result = new TerminatingVerificationResult(verificationResult, this, annotationsManifestReference.getUri());
         return Arrays.asList((RuleVerificationResult) result);
@@ -53,6 +43,6 @@ public class AnnotationsManifestIntegrityRule extends AbstractRule<SignatureCont
 
     @Override
     public String getErrorMessage() {
-        return "Annotation manifest hash mismatch.";
+        return "Annotations manifest is not present in the container.";
     }
 }

@@ -1,6 +1,6 @@
 package com.guardtime.container.verification.result;
 
-public enum RuleResult {
+public enum VerificationResult {
     OK("RESULT_OK", 0),
     WARN("RESULT_WARN", 1),
     NOK("RESULT_NOK", 2);
@@ -8,7 +8,7 @@ public enum RuleResult {
     private final String name;
     private final int weight;
 
-    RuleResult(String name, int weight) {
+    VerificationResult(String name, int weight) {
         this.name = name;
         this.weight = weight;
     }
@@ -18,7 +18,7 @@ public enum RuleResult {
      * @param that
      * @return true when this has higher priority than that.
      */
-    public boolean isMoreImportantThan(RuleResult that) {
+    public boolean isMoreImportantThan(VerificationResult that) {
         return this.weight > that.weight;
     }
 }

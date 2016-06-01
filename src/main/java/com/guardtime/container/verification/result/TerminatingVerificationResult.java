@@ -1,16 +1,15 @@
 package com.guardtime.container.verification.result;
 
-import com.guardtime.container.ContainerFileElement;
 import com.guardtime.container.verification.rule.Rule;
 
 /**
  * A variant of RuleVerificationResult which will indicate the need to stop verification if the result is not {@link
- * RuleResult#OK}
+ * VerificationResult#OK}
  */
 public class TerminatingVerificationResult extends GenericVerificationResult {
 
-    public TerminatingVerificationResult(RuleResult result, Rule rule, ContainerFileElement testedElement) {
-        super(result, rule, testedElement);
+    public TerminatingVerificationResult(VerificationResult result, Rule containerRule, String testedElement) {
+        super(result, containerRule, testedElement);
     }
 
     @Override

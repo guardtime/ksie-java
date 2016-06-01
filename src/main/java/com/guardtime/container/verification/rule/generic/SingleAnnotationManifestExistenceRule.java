@@ -8,40 +8,27 @@ import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.TerminatingVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.ksi.hashing.DataHash;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 /**
- * This rule verifies the validity of the manifest file containing meta-data for an annotation.
+ * This rule verifies the existence of the meta-data file of an annotation.
  */
-public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
-
-    public SingleAnnotationManifestIntegrityRule() {
-        this(RuleState.FAIL);
-    }
-
-    public SingleAnnotationManifestIntegrityRule(RuleState state) {
-        super(state);
+public class SingleAnnotationManifestExistenceRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
+    public SingleAnnotationManifestExistenceRule(RuleState ruleState) {
+        super(ruleState);
     }
 
     @Override
     protected List<RuleVerificationResult> verifyRule(Pair<SignatureContent, FileReference> verifiable) {
-        VerificationResult result = getFailureVerificationResult();
         String manifestUri = verifiable.getRight().getUri();
-        try {
-            Map<String, SingleAnnotationManifest> singleAnnotationManifests = verifiable.getLeft().getSingleAnnotationManifests();
-            SingleAnnotationManifest manifest = singleAnnotationManifests.get(manifestUri);
-            DataHash expectedHash = verifiable.getRight().getHash();
-            DataHash realHash = manifest.getDataHash(expectedHash.getAlgorithm());
-            if (expectedHash.equals(realHash)) {
-                result = VerificationResult.OK;
-            }
-        } catch (IOException e) {
-            LOGGER.debug("Verifying annotation meta-data failed!", e);
+        Map<String, SingleAnnotationManifest> singleAnnotationManifests = verifiable.getLeft().getSingleAnnotationManifests();
+        SingleAnnotationManifest manifest = singleAnnotationManifests.get(manifestUri);
+        VerificationResult result = getFailureVerificationResult();
+        if (manifest != null) {
+            result = VerificationResult.OK;
         }
         TerminatingVerificationResult verificationResult = new TerminatingVerificationResult(result, this, manifestUri);
         return Arrays.asList((RuleVerificationResult) verificationResult);
@@ -54,6 +41,6 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<Sig
 
     @Override
     public String getErrorMessage() {
-        return "Annotation meta-data hash mismatch.";
+        return "Annotation meta-data missing.";
     }
 }
