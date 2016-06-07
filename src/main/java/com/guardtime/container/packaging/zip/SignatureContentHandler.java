@@ -121,7 +121,7 @@ class SignatureContentHandler {
             File file = documentHandler.get(documentUri);
             if (file == null) {
                 // either removed or was never present in the first place, verifier will decide
-                return new EmptyContainerDocument(documentUri, reference.getMimeType(), reference.getHash());
+                return new EmptyContainerDocument(documentUri, reference.getMimeType(), reference.getHashList());
             } else {
                 return new FileContainerDocument(file, reference.getMimeType(), documentUri);
             }

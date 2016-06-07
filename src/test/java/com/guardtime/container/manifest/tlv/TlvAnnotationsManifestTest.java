@@ -41,7 +41,7 @@ public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
         FileReference annotationsReference = annotationsManifest.getSingleAnnotationManifestReferences().get(0);
         assertEquals(MOCK_URI, annotationsReference.getUri());
         assertEquals(MIME_TYPE_APPLICATION_TXT, annotationsReference.getMimeType());
-        assertEquals(dataHash, annotationsReference.getHash());
+        assertEquals(dataHash, annotationsReference.getHashList().get(0));
     }
 
     @Test

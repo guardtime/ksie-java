@@ -7,19 +7,20 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 public class EmptyContainerDocument implements ContainerDocument {
     private final String fileName;
     private final String mimeType;
-    private final DataHash hash;
+    private final List<DataHash> hashList;
 
-    public EmptyContainerDocument(String fileName, String mimeType, DataHash hash) {
+    public EmptyContainerDocument(String fileName, String mimeType, List<DataHash> hashes) {
         Util.notNull(fileName, "File name");
         Util.notNull(mimeType, "MIME type");
-        Util.notNull(hash, "Data hash");
+        Util.notEmpty(hashes, "Data hash list");
         this.fileName = fileName;
         this.mimeType = mimeType;
-        this.hash = hash;
+        this.hashList = hashes;
     }
 
     @Override
@@ -39,10 +40,12 @@ public class EmptyContainerDocument implements ContainerDocument {
 
     @Override
     public DataHash getDataHash(HashAlgorithm algorithm) throws IOException, DataHashException {
-        if(!hash.getAlgorithm().equals(algorithm)) {
-            throw new DataHashException("Unable to convert pre-generated hash to algorithm '" + algorithm.getName() + "'");
+        for(DataHash hash : hashList) {
+            if (hash.getAlgorithm().equals(algorithm)) {
+                return hash;
+            }
         }
-        return hash;
+        throw new DataHashException("Could not find pre-generated hash for algorithm '" + algorithm.getName() + "'");
     }
 
     @Override
