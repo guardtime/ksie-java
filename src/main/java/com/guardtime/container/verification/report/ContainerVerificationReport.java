@@ -1,13 +1,16 @@
 package com.guardtime.container.verification.report;
 
-import com.guardtime.container.verification.result.VerifierResult;
+import com.guardtime.container.verification.result.ContainerVerifierResult;
+import com.guardtime.container.verification.result.RuleVerificationResult;
 
 import java.util.List;
 
 public interface ContainerVerificationReport {
-    VerifierResult getResult();
+    ContainerVerifierResult getResult();
 
-    List<String> getUsedRules();
+    List<String> getProcessedRulesNames();
+
+    List<RuleVerificationResult> getRuleVerficationResults();
 
     String getErrorMessage();
 }
