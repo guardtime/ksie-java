@@ -72,14 +72,13 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     }
 
     public byte[] getMimeTypeContent() {
-        // TODO: Append manifest type?
         return CONTAINER_MIME_TYPE.getBytes(Charset.forName("UTF-8"));
     }
 
     @Override
     public ZipContainer create(Container existingContainer, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
         Util.notNull(existingContainer, "Container");
-        // TODO: Possibility to add signature without adding data files.
+        // TODO: Possibility to add signature without adding data files. Spec needed for this
         Util.notEmpty(files, "Data files");
         try {
             ZipContainer existingZipContainer = (ZipContainer) existingContainer;

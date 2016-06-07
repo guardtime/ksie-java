@@ -9,7 +9,7 @@ import java.io.IOException;
 
 class TlvDocumentReference extends TlvFileReference {
 
-    private static final int DATA_FILE_REFERENCE = 0xb03;
+    public static final int DATA_FILE_REFERENCE = 0xb03;
 
     public TlvDocumentReference(TLVElement root) throws TLVParserException {
         super(root);

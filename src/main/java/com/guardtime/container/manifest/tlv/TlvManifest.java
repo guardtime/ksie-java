@@ -18,7 +18,6 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 
-//TODO fix reference object
 class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
 
     private static final byte[] MAGIC = "KSIEMFST".getBytes();

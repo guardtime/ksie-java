@@ -8,7 +8,7 @@ import java.io.IOException;
 
 class TlvSingleAnnotationManifestReference extends TlvFileReference {
 
-    private static final int ANNOTATION_INFO_REFERENCE = 0xb04;
+    public static final int ANNOTATION_INFO_REFERENCE = 0xb04;
 
     public TlvSingleAnnotationManifestReference(TLVElement rootElement) throws TLVParserException {
         super(rootElement);
