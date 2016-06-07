@@ -25,7 +25,7 @@ public class TlvSingleAnnotationManifestTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateSingleAnnotationManifest() throws Exception {
-        TlvSingleAnnotationManifest annotationManifest = new TlvSingleAnnotationManifest(Pair.of(SINGLE_ANNOTATION_MANIFEST_URI, mockAnnotation), Pair.of(MOCK_URI, mockDocumentsManifest));
+        TlvSingleAnnotationManifest annotationManifest = new TlvSingleAnnotationManifest(Pair.of(SINGLE_ANNOTATION_MANIFEST_URI, mockAnnotation), Pair.of(MOCK_URI, mockDocumentsManifest), DEFAULT_HASH_ALGORITHM);
 
         assertNotNull(annotationManifest.getAnnotationReference());
         assertNotNull(annotationManifest.getDocumentsManifestReference());

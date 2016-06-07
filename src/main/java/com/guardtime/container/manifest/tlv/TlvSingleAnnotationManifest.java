@@ -1,10 +1,10 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.manifest.AnnotationDataReference;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.InvalidManifestException;
+import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
@@ -27,11 +27,11 @@ class TlvSingleAnnotationManifest extends AbstractTlvManifestStructure implement
     private TlvAnnotationDataReference annotationReference;
     private TlvDocumentsManifestReference documentsManifestReference;
 
-    public TlvSingleAnnotationManifest(Pair<String, ContainerAnnotation> annotation, Pair<String, TlvDocumentsManifest> documentsManifest) throws InvalidManifestException {
+    public TlvSingleAnnotationManifest(Pair<String, ContainerAnnotation> annotation, Pair<String, TlvDocumentsManifest> documentsManifest, HashAlgorithm algorithm) throws InvalidManifestException {
         super(MAGIC);
         try {
-            this.annotationReference = new TlvAnnotationDataReference(annotation);
-            this.documentsManifestReference = new TlvDocumentsManifestReference(documentsManifest.getRight(), documentsManifest.getLeft());
+            this.annotationReference = new TlvAnnotationDataReference(annotation, algorithm);
+            this.documentsManifestReference = new TlvDocumentsManifestReference(documentsManifest.getRight(), documentsManifest.getLeft(), algorithm);
         } catch (TLVParserException | IOException e) {
             throw new InvalidManifestException("Failed to generate file reference TLVElement", e);
         }

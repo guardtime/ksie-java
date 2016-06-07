@@ -1,6 +1,7 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.manifest.AnnotationsManifest;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 
@@ -15,8 +16,8 @@ class TlvAnnotationsManifestReference extends TlvFileReference {
         super(rootElement);
     }
 
-    public TlvAnnotationsManifestReference(String uri, AnnotationsManifest annotationsManifest) throws TLVParserException, IOException {
-        super(uri, annotationsManifest.getDataHash(DEFAULT_HASH_ALGORITHM), ANNOTATIONS_MANIFEST_TYPE);
+    public TlvAnnotationsManifestReference(String uri, AnnotationsManifest annotationsManifest, HashAlgorithm algorithm) throws TLVParserException, IOException {
+        super(uri, annotationsManifest.getDataHash(algorithm), ANNOTATIONS_MANIFEST_TYPE);
     }
 
     @Override
