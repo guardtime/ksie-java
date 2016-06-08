@@ -29,7 +29,7 @@ public class FileContainerAnnotationTest extends AbstractContainerTest {
     @Test
     public void testCreateFileAnnotationWithoutAnnotationType_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("Container type must be present");
+        expectedException.expectMessage("Annotation type must be present");
         new FileContainerAnnotation(new File(TEST_FILE_PATH_TEST_TXT), ANNOTATION_DOMAIN_COM_GUARDTIME, null);
     }
 
