@@ -30,6 +30,13 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
     }
 
     @Test
+    public void testCreateTlvContainerManifestFactoryWithoutHashAlgorithm_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Hash algorithm");
+        new TlvContainerManifestFactory(null);
+    }
+
+    @Test
     public void testCreateSingleAnnotationManifestWithoutDocumentsManifest_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Documents manifest");

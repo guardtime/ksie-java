@@ -25,13 +25,13 @@ class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements Ann
 
     private List<TlvSingleAnnotationManifestReference> singleAnnotationManifestReferences = new LinkedList<>();
 
-    public TlvAnnotationsManifest(Map<String, Pair<ContainerAnnotation, TlvSingleAnnotationManifest>> singleAnnotationManifests) throws InvalidManifestException {
+    public TlvAnnotationsManifest(Map<String, Pair<ContainerAnnotation, TlvSingleAnnotationManifest>> singleAnnotationManifests, HashAlgorithm algorithm) throws InvalidManifestException {
         super(MAGIC);
         try {
             Set<String> uris = singleAnnotationManifests.keySet();
             for (String uri : uris) {
                 Pair<ContainerAnnotation, TlvSingleAnnotationManifest> pair = singleAnnotationManifests.get(uri);
-                this.singleAnnotationManifestReferences.add(new TlvSingleAnnotationManifestReference(uri, pair.getRight(), pair.getLeft().getAnnotationType()));
+                this.singleAnnotationManifestReferences.add(new TlvSingleAnnotationManifestReference(uri, pair.getRight(), pair.getLeft().getAnnotationType(), algorithm));
             }
         } catch (TLVParserException | IOException e) {
             throw new InvalidManifestException("Failed to generate file reference TLVElement", e);
