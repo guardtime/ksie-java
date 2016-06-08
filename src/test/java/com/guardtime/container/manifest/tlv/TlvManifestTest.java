@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -25,7 +26,7 @@ public class TlvManifestTest extends AbstractTlvManifestTest {
         super.setUp();
         this.annotationsManifestReference = createReference(ANNOTATIONS_MANIFEST_REFERENCE_TYPE, ANNOTATIONS_MANIFEST_URI, ANNOTATIONS_MANIFEST_TYPE, dataHash);
         this.documentsManifestReference = createReference(DOCUMENTS_MANIFEST_REFERENCE_TYPE, DOCUMENTS_MANIFEST_URI, MIME_TYPE_APPLICATION_TXT, dataHash);
-        this.signatureReference = createReference(SIGNATURE_REFERENCE_TYPE, SIGNATURE_URI, SIGNATURE_TYPE, null);
+        this.signatureReference = createReference(SIGNATURE_REFERENCE_TYPE, SIGNATURE_URI, SIGNATURE_TYPE, (List) null);
     }
 
     @Test

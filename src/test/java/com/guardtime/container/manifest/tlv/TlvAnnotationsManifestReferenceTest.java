@@ -25,7 +25,7 @@ public class TlvAnnotationsManifestReferenceTest extends AbstractTlvManifestTest
         TlvAnnotationsManifestReference reference = new TlvAnnotationsManifestReference(element);
         assertEquals(MOCK_URI, reference.getUri());
         assertEquals(ANNOTATIONS_MANIFEST_TYPE, reference.getMimeType());
-        assertEquals(dataHash, reference.getHash());
+        assertEquals(dataHash, reference.getHashList().get(0));
     }
 
 }

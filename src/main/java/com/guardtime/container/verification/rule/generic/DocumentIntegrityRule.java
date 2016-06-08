@@ -10,6 +10,7 @@ import com.guardtime.container.verification.result.TerminatingVerificationResult
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -34,10 +35,12 @@ public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, Sign
         String documentUri = verifiable.getLeft().getUri();
         try {
             ContainerDocument document = verifiable.getRight().getDocuments().get(documentUri);
-            DataHash expectedHash = verifiable.getLeft().getHash();
-            DataHash realHash = document.getDataHash(expectedHash.getAlgorithm());
-            if (expectedHash.equals(realHash)) {
-                result = VerificationResult.OK;
+            for(DataHash expectedHash : verifiable.getLeft().getHashList()) {
+                if(expectedHash.getAlgorithm().getStatus()!= HashAlgorithm.Status.NORMAL) continue; // Skip not implemented or not trusted
+                DataHash realHash = document.getDataHash(expectedHash.getAlgorithm());
+                if (expectedHash.equals(realHash)) {
+                    result = VerificationResult.OK;
+                }
             }
         } catch (IOException | DataHashException e) {
             LOGGER.debug("Verifying document failed!", e);

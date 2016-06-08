@@ -4,6 +4,8 @@ import com.guardtime.ksi.tlv.TLVElement;
 
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 
 public class TlvSignatureReferenceTest extends AbstractTlvManifestTest {
@@ -18,7 +20,7 @@ public class TlvSignatureReferenceTest extends AbstractTlvManifestTest {
 
     @Test
     public void testReadSignatureReference() throws Exception {
-        TLVElement element = createReference(SIGNATURE_REFERENCE_TYPE, SIGNATURE_URI, SIGNATURE_MIME_TYPE, null);
+        TLVElement element = createReference(SIGNATURE_REFERENCE_TYPE, SIGNATURE_URI, SIGNATURE_MIME_TYPE, (List) null);
         TlvSignatureReference signatureReference = new TlvSignatureReference(element);
         assertEquals(SIGNATURE_URI, signatureReference.getUri());
         assertEquals(SIGNATURE_MIME_TYPE, signatureReference.getType());
