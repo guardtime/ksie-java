@@ -76,7 +76,6 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
         return asList(documentsManifestReference, signatureReference, annotationsManifestReference);
     }
 
-    //TODO this isn't the best solution
     private void read(TLVInputStream inputStream) throws IOException, TLVParserException {
         TLVElement element;
         while (inputStream.hasNextElement()) {
