@@ -5,8 +5,14 @@ import com.guardtime.container.verification.rule.Rule;
 public class GenericVerificationResult implements RuleVerificationResult {
     private final VerificationResult result;
     private final String ruleName;
-    private final String ruleMessage;
     private final String testedElement;
+    private String ruleMessage;
+
+    public GenericVerificationResult(VerificationResult result, Rule rule, String testedElement, Exception exception) {
+        this(result, rule, testedElement);
+        this.ruleMessage = exception.getMessage();
+    }
+
 
     public GenericVerificationResult(VerificationResult result, Rule rule, String testedElement) {
         this.result = result;

@@ -8,6 +8,10 @@ import com.guardtime.container.verification.rule.Rule;
  */
 public class TerminatingVerificationResult extends GenericVerificationResult {
 
+    public TerminatingVerificationResult(VerificationResult result, Rule containerRule, String testedElement, Exception exception) {
+        super(result, containerRule, testedElement, exception);
+    }
+
     public TerminatingVerificationResult(VerificationResult result, Rule containerRule, String testedElement) {
         super(result, containerRule, testedElement);
     }

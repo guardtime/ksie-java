@@ -6,6 +6,8 @@ import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.rule.AbstractRule;
+import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleState;
 
 import java.util.LinkedList;
@@ -15,7 +17,7 @@ import java.util.List;
  * This is a delegating rule, not verifying directly but by calling relevant rules to verify sub-components. This rule
  * focuses on verifying annotmanifest and {@link com.guardtime.container.annotation.ContainerAnnotation}s.
  */
-public class AnnotationsIntegrityRule extends AbstractRule<SignatureContent> {
+public class AnnotationsIntegrityRule extends AbstractRule<SignatureContent> implements Rule<SignatureContent> {
 
     public AnnotationsIntegrityRule() {
         this(RuleState.FAIL);

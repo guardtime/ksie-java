@@ -6,8 +6,9 @@ import com.guardtime.container.signature.ksi.KsiContainerSignature;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.rule.AbstractRule;
+import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.container.verification.rule.generic.AbstractRule;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.hashing.DataHash;
@@ -24,7 +25,7 @@ import java.util.List;
  * the underlying signature.<br>Does not assume the underlying signature to be of type {@link KSISignature} but will
  * produce failure result for any other type of underlying signature.
  */
-public class KsiPolicyBasedSignatureIntegrityRule extends AbstractRule<SignatureContent> {
+public class KsiPolicyBasedSignatureIntegrityRule extends AbstractRule<SignatureContent> implements Rule<SignatureContent> {
     private final KSI ksi;
     private final Policy policy;
 
@@ -40,7 +41,9 @@ public class KsiPolicyBasedSignatureIntegrityRule extends AbstractRule<Signature
 
     @Override
     protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
+        RuleVerificationResult verificationResult;
         VerificationResult ruleResult = getFailureVerificationResult();
+        String signatureUri = verifiable.getManifest().getRight().getSignatureReference().getUri();
         try {
             KsiContainerSignature ksiContainerSignature = (KsiContainerSignature) verifiable.getContainerSignature();
             KSISignature signature = ksiContainerSignature.getSignature();
@@ -50,11 +53,11 @@ public class KsiPolicyBasedSignatureIntegrityRule extends AbstractRule<Signature
             if (ksiVerificationResult.isOk()) {
                 ruleResult = VerificationResult.OK;
             }
+            verificationResult = new GenericVerificationResult(ruleResult, this, signatureUri);
         } catch (ClassCastException | KSIException | IOException e) {
-            LOGGER.debug("Verifying signature failed!", e);
+            LOGGER.info("Verifying signature failed!", e);
+            verificationResult = new GenericVerificationResult(ruleResult, this, signatureUri, e);
         }
-        String signatureUri = verifiable.getManifest().getRight().getSignatureReference().getUri();
-        GenericVerificationResult verificationResult = new GenericVerificationResult(ruleResult, this, signatureUri);
-        return Arrays.asList((RuleVerificationResult) verificationResult);
+        return Arrays.asList(verificationResult);
     }
 }

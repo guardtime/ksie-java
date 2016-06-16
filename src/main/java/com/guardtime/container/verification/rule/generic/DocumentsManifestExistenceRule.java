@@ -8,12 +8,14 @@ import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.TerminatingVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.rule.AbstractRule;
+import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleState;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class DocumentsManifestExistenceRule extends AbstractRule<SignatureContent> {
+public class DocumentsManifestExistenceRule extends AbstractRule<SignatureContent> implements Rule<SignatureContent> {
 
     public DocumentsManifestExistenceRule() {
         this(RuleState.FAIL);
@@ -33,8 +35,8 @@ public class DocumentsManifestExistenceRule extends AbstractRule<SignatureConten
         if (documentsManifest != null) {
             verificationResult = VerificationResult.OK;
         }
-        TerminatingVerificationResult result = new TerminatingVerificationResult(verificationResult, this, documentsManifestReference.getUri());
-        return Arrays.asList((RuleVerificationResult) result);
+        RuleVerificationResult result = new TerminatingVerificationResult(verificationResult, this, documentsManifestReference.getUri());
+        return Arrays.asList(result);
     }
 
     @Override

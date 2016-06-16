@@ -8,6 +8,8 @@ import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.rule.AbstractRule;
+import com.guardtime.container.verification.rule.ContainerRule;
 import com.guardtime.container.verification.rule.RuleState;
 
 import java.util.LinkedList;
@@ -16,7 +18,7 @@ import java.util.List;
 /**
  * This rule verifies that consecutive manifests have appropriate index numbers.
  */
-public class ManifestIndexConsistencyRule extends AbstractContainerRule {
+public class ManifestIndexConsistencyRule extends AbstractRule<Container> implements ContainerRule {
 
     public ManifestIndexConsistencyRule() {
         this(RuleState.FAIL);
