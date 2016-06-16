@@ -8,6 +8,10 @@ public class SignatureException extends ContainerException {
         super(e);
     }
 
+    public SignatureException(String s) {
+        super(s);
+    }
+
     // TODO add type?
 
 }

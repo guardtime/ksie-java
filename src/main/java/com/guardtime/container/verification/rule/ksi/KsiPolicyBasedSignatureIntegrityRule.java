@@ -2,7 +2,6 @@ package com.guardtime.container.verification.rule.ksi;
 
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
-import com.guardtime.container.signature.ksi.KsiContainerSignature;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
@@ -42,22 +41,29 @@ public class KsiPolicyBasedSignatureIntegrityRule extends AbstractRule<Signature
     @Override
     protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
         RuleVerificationResult verificationResult;
-        VerificationResult ruleResult = getFailureVerificationResult();
         String signatureUri = verifiable.getManifest().getRight().getSignatureReference().getUri();
+        ContainerSignature containerSignature = verifiable.getContainerSignature();
+        if (containerSignature.supportsSignatureClass(KSISignature.class)) {
+            verificationResult = getKSISignatureVerificationResult((KSISignature) containerSignature.getSignature(), verifiable, signatureUri);
+        } else {
+            verificationResult = new GenericVerificationResult(getFailureVerificationResult(), this, signatureUri, new Exception("Unsupported "));
+        }
+        return Arrays.asList(verificationResult);
+    }
+
+    private RuleVerificationResult getKSISignatureVerificationResult(KSISignature signature, SignatureContent verifiable, String signatureUri) {
+        VerificationResult ruleResult = getFailureVerificationResult();
         try {
-            KsiContainerSignature ksiContainerSignature = (KsiContainerSignature) verifiable.getContainerSignature();
-            KSISignature signature = ksiContainerSignature.getSignature();
             HashAlgorithm hashAlgorithm = signature.getInputHash().getAlgorithm();
             DataHash realHash = verifiable.getManifest().getRight().getDataHash(hashAlgorithm);
             com.guardtime.ksi.unisignature.verifier.VerificationResult ksiVerificationResult = ksi.verify(signature, policy, realHash);
             if (ksiVerificationResult.isOk()) {
                 ruleResult = VerificationResult.OK;
             }
-            verificationResult = new GenericVerificationResult(ruleResult, this, signatureUri);
-        } catch (ClassCastException | KSIException | IOException e) {
+            return new GenericVerificationResult(ruleResult, this, signatureUri);
+        } catch (KSIException | IOException e) {
             LOGGER.info("Verifying signature failed!", e);
-            verificationResult = new GenericVerificationResult(ruleResult, this, signatureUri, e);
+            return new GenericVerificationResult(ruleResult, this, signatureUri, e);
         }
-        return Arrays.asList(verificationResult);
     }
 }

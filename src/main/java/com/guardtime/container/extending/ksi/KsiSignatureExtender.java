@@ -22,11 +22,14 @@ public class KsiSignatureExtender implements SignatureExtender {
     }
 
     @Override
-    public ContainerSignature extend(ContainerSignature signature) throws SignatureException {
+    public ContainerSignature extend(ContainerSignature containerSignature) throws SignatureException {
+        if(!containerSignature.supportsSignatureClass(KSISignature.class)) {
+            throw new SignatureException("Unsupported ContainerSignature provided for extending.");
+        }
         try {
-            KSISignature extendableSignature = ((KsiContainerSignature) signature).getSignature();
+            KSISignature extendableSignature = (KSISignature) containerSignature.getSignature();
             return getExtendedSignature(extendableSignature);
-        } catch (ClassCastException | KSIException e) {
+        } catch (KSIException e) {
             throw new SignatureException(e);
         }
     }

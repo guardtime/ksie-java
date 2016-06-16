@@ -28,7 +28,7 @@ public class ExtendingIT extends AbstractCommonIntegrationTest {
         verify(mockKsi, atLeast(2)).extend(Mockito.any(KSISignature.class));
         for (SignatureContent content : extendedContainer.getSignatureContents()) {
             assertNotNull(content.getContainerSignature());
-            assertNotNull(((KsiContainerSignature) content.getContainerSignature()).getSignature());
+            assertNotNull(content.getContainerSignature().getSignature());
         }
     }
 
