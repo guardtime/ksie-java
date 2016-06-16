@@ -22,9 +22,12 @@ public class AbstractCommonIntegrationTest extends AbstractContainerTest {
     protected static final String CONTAINER_WITH_MULTIPLE_ANNOTATIONS = "containers/container-multiple-annotations.ksie";
     protected static final String CONTAINER_WITH_MULTIPLE_SIGNATURES = "containers/container-multiple-signatures.ksie";
     protected static final String CONTAINER_WITH_BROKEN_SIGNATURE = "containers/container-broken-signature.ksie";
-    protected static final String CONTAINER_WITH_WRONG_SIGNATURE_FILE_KSIE = "containers/container-wrong-signature-file.ksie";
+    protected static final String CONTAINER_WITH_WRONG_SIGNATURE_FILE = "containers/container-wrong-signature-file.ksie";
     protected static final String CONTAINER_WITH_MISSING_ANNOTATION = "containers/container-missing-annotation.ksie";
     protected static final String CONTAINER_WITH_MISSING_ANNOTATION_DATA = "containers/container-missing-annotation-data.ksie";
+    protected static final String CONTAINERS_CONTAINER_INVALID_ANNOTATION_TYPE = "containers/container-invalid-annotation-type.ksie";
+    protected static final String CONTAINERS_CONTAINER_DOCUMENT_MISSING_MIMETYPE = "containers/container-document-missing-mimetype.ksie";
+    protected static final String CONTAINERS_CONTAINER_NO_DOCUMENT_URI_IN_MANIFEST = "containers/container-no-document-uri-in-manifest.ksie";
 
     protected ContainerManifestFactory manifestFactory = new TlvContainerManifestFactory();
     protected SignatureFactory signatureFactory;

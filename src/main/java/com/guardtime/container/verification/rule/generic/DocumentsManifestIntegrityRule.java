@@ -9,6 +9,7 @@ import com.guardtime.container.verification.result.TerminatingVerificationResult
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -35,10 +36,12 @@ public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureConten
         Manifest manifest = verifiable.getManifest().getRight();
         FileReference documentsManifestReference = manifest.getDocumentsManifestReference();
         try {
-            DataHash expectedHash = documentsManifestReference.getHash();
-            DataHash annotationsManifestHash = documentsManifest.getDataHash(expectedHash.getAlgorithm());
-            if (expectedHash.equals(annotationsManifestHash)) {
-                verificationResult = VerificationResult.OK;
+            for(DataHash expectedHash : documentsManifestReference.getHashList()) {
+                if(expectedHash.getAlgorithm().getStatus()!= HashAlgorithm.Status.NORMAL) continue; // Skip not implemented or not trusted
+                DataHash annotationsManifestHash = documentsManifest.getDataHash(expectedHash.getAlgorithm());
+                if (expectedHash.equals(annotationsManifestHash)) {
+                    verificationResult = VerificationResult.OK;
+                }
             }
         } catch (IOException e) {
             LOGGER.debug("Verifying documents manifest failed!", e);

@@ -27,12 +27,12 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
     private TlvSignatureReference signatureReference;
     private TlvAnnotationsManifestReference annotationsManifestReference;
 
-    public TlvManifest(Pair<String, TlvDocumentsManifest> documentsManifest, Pair<String, TlvAnnotationsManifest> annotationsManifest, Pair<String, String> signatureReference) throws InvalidManifestException {
+    public TlvManifest(Pair<String, TlvDocumentsManifest> documentsManifest, Pair<String, TlvAnnotationsManifest> annotationsManifest, Pair<String, String> signatureReference, HashAlgorithm algorithm) throws InvalidManifestException {
         super(MAGIC);
         try {
-            this.documentsManifestReference = new TlvDocumentsManifestReference(documentsManifest.getRight(), documentsManifest.getLeft());
+            this.documentsManifestReference = new TlvDocumentsManifestReference(documentsManifest.getRight(), documentsManifest.getLeft(), algorithm);
             this.signatureReference = new TlvSignatureReference(signatureReference.getLeft(), signatureReference.getRight());
-            this.annotationsManifestReference = new TlvAnnotationsManifestReference(annotationsManifest.getLeft(), annotationsManifest.getRight());
+            this.annotationsManifestReference = new TlvAnnotationsManifestReference(annotationsManifest.getLeft(), annotationsManifest.getRight(), algorithm);
         } catch (TLVParserException | IOException e) {
             throw new InvalidManifestException("Failed to generate file reference TLVElement", e);
         }

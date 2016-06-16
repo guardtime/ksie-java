@@ -9,6 +9,7 @@ import com.guardtime.container.verification.result.TerminatingVerificationResult
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -35,10 +36,12 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<Sig
         try {
             Map<String, SingleAnnotationManifest> singleAnnotationManifests = verifiable.getLeft().getSingleAnnotationManifests();
             SingleAnnotationManifest manifest = singleAnnotationManifests.get(manifestUri);
-            DataHash expectedHash = verifiable.getRight().getHash();
-            DataHash realHash = manifest.getDataHash(expectedHash.getAlgorithm());
-            if (expectedHash.equals(realHash)) {
-                result = VerificationResult.OK;
+            for(DataHash expectedHash : verifiable.getRight().getHashList()) {
+                if(expectedHash.getAlgorithm().getStatus()!= HashAlgorithm.Status.NORMAL) continue; // Skip not implemented or not trusted
+                DataHash realHash = manifest.getDataHash(expectedHash.getAlgorithm());
+                if (expectedHash.equals(realHash)) {
+                    result = VerificationResult.OK;
+                }
             }
         } catch (IOException e) {
             LOGGER.debug("Verifying annotation meta-data failed!", e);

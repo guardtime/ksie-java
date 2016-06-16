@@ -109,7 +109,8 @@ class SignatureContentHandler {
             if (documentsManifest == null) return;
             for (FileReference reference : documentsManifest.getRight().getDocumentReferences()) {
                 try {
-                    documents.add(fetchDocumentFromHandler(reference));
+                    ContainerDocument containerDocument = fetchDocumentFromHandler(reference);
+                    if (containerDocument != null) documents.add(containerDocument);
                 } catch (ContentParsingException e) {
                     throw new RuntimeException("Programming bug! This should never happen. Investigate why DocumentContentHandler#getEntry() threw exception.", e);
                 }
@@ -117,14 +118,24 @@ class SignatureContentHandler {
         }
 
         private ContainerDocument fetchDocumentFromHandler(FileReference reference) throws ContentParsingException {
+            if (invalidReference(reference)) return null;
             String documentUri = reference.getUri();
             File file = documentHandler.get(documentUri);
             if (file == null) {
                 // either removed or was never present in the first place, verifier will decide
-                return new EmptyContainerDocument(documentUri, reference.getMimeType(), reference.getHash());
+                return new EmptyContainerDocument(documentUri, reference.getMimeType(), reference.getHashList());
             } else {
                 return new FileContainerDocument(file, reference.getMimeType(), documentUri);
             }
+        }
+
+        private boolean invalidReference(FileReference reference) {
+            if (reference.getUri() == null ||
+                    reference.getMimeType() == null ||
+                    reference.getHash() == null) {
+                return true;
+            }
+            return false;
         }
 
         private void populateAnnotationsWithManifests() {
@@ -152,8 +163,12 @@ class SignatureContentHandler {
 
         private Pair<String, ContainerAnnotation> getContainerAnnotation(FileReference manifestReference, SingleAnnotationManifest singleAnnotationManifest) {
             try {
-                AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
                 ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getMimeType());
+                if (type == null) {
+                    LOGGER.info("Failed to parse annotation for '{}'. Reason: Invalid annotation type: '{}'", manifestReference.getUri(), manifestReference.getMimeType());
+                    return null;
+                }
+                AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
                 File annotationFile = annotationContentHandler.get(annotationDataReference.getUri());
                 ContainerAnnotation annotation = new FileContainerAnnotation(annotationFile, annotationDataReference.getDomain(), type);
                 return Pair.of(annotationDataReference.getUri(), annotation);

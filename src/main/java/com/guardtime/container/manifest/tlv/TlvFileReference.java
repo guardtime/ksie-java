@@ -7,12 +7,15 @@ import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 import com.guardtime.ksi.tlv.TLVStructure;
 
+import java.util.LinkedList;
+import java.util.List;
+
 abstract class TlvFileReference extends TLVStructure implements FileReference {
 
     protected static final HashAlgorithm DEFAULT_HASH_ALGORITHM = HashAlgorithm.SHA2_256;
 
     private String uri;
-    private DataHash hash;
+    private List<DataHash> hashList = new LinkedList<>();
     private String mimeType;
 
     public TlvFileReference(TLVElement rootElement) throws TLVParserException {
@@ -23,7 +26,7 @@ abstract class TlvFileReference extends TLVStructure implements FileReference {
                     this.uri = readOnce(element).getDecodedString();
                     break;
                 case TlvReferenceBuilder.HASH_TYPE:
-                    this.hash = readOnce(element).getDecodedDataHash();
+                    this.hashList.add(element.getDecodedDataHash());
                     break;
                 case TlvReferenceBuilder.MIME_TYPE:
                     this.mimeType = readOnce(element).getDecodedString();
@@ -36,7 +39,7 @@ abstract class TlvFileReference extends TLVStructure implements FileReference {
 
     public TlvFileReference(String uri, DataHash dataHash, String mimeType) throws TLVParserException {
         this.uri = uri;
-        this.hash = dataHash;
+        this.hashList.add(dataHash);
         this.mimeType = mimeType;
         this.rootElement = new TlvReferenceBuilder()
                 .withType(getElementType())
@@ -54,7 +57,7 @@ abstract class TlvFileReference extends TLVStructure implements FileReference {
         return mimeType;
     }
 
-    public DataHash getHash() {
-        return hash;
+    public List<DataHash> getHashList() {
+        return hashList;
     }
 }

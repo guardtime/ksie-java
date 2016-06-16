@@ -17,6 +17,8 @@ import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.guardtime.container.util.Util.hash;
 import static org.junit.Assert.assertArrayEquals;
@@ -47,6 +49,7 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
     protected static final String MOCK_URI = "/mock/mock";
     protected static final String SIGNATURE_URI = "/META-INF/signature4.ksig";
     protected static final String SINGLE_ANNOTATION_MANIFEST_URI = "/META-INF/annotation1.tlv";
+    protected static final HashAlgorithm DEFAULT_HASH_ALGORITHM = HashAlgorithm.SHA2_256;
 
     @Mock
     protected TlvDocumentsManifest mockDocumentsManifest;
@@ -102,6 +105,10 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
     }
 
     protected TLVElement createReference(int referenceType, String referenceUri, String referenceMime, DataHash dataHash) throws Exception {
+        return createReference(referenceType, referenceUri, referenceMime, Arrays.asList(dataHash));
+    }
+
+    protected TLVElement createReference(int referenceType, String referenceUri, String referenceMime, List<DataHash> dataHashList) throws Exception {
         TLVElement reference = new TLVElement(false, false, referenceType);
         if (referenceUri != null) {
             TLVElement uri = new TLVElement(false, false, TLV_ELEMENT_URI_TYPE);
@@ -113,10 +120,12 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
             mime.setStringContent(referenceMime);
             reference.addChildElement(mime);
         }
-        if (dataHash != null) {
-            TLVElement hash = new TLVElement(false, false, TLV_ELEMENT_DATA_HASH_TYPE);
-            hash.setDataHashContent(dataHash);
-            reference.addChildElement(hash);
+        if (dataHashList != null) {
+            for(DataHash dataHash : dataHashList) {
+                TLVElement hash = new TLVElement(false, false, TLV_ELEMENT_DATA_HASH_TYPE);
+                hash.setDataHashContent(dataHash);
+                reference.addChildElement(hash);
+            }
         }
         return reference;
     }
