@@ -11,6 +11,9 @@ public interface FileReference {
 
     String getMimeType();
 
+    /**
+     * Returns {@link DataHash} of the referred file.
+     */
     DataHash getHash();
 
 

@@ -9,6 +9,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Annotation that is based on File as the data source.
+ */
 public class FileContainerAnnotation implements ContainerAnnotation {
 
     private final File file;

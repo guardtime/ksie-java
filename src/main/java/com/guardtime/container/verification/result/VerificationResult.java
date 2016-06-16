@@ -1,5 +1,8 @@
 package com.guardtime.container.verification.result;
 
+/**
+ * Possible results for any given rule used to verify a container.
+ */
 public enum VerificationResult {
     OK("RESULT_OK", 0),
     WARN("RESULT_WARN", 1),

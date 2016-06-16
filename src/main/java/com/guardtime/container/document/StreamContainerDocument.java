@@ -11,6 +11,9 @@ import java.io.InputStream;
 import static com.guardtime.container.util.Util.createTempFile;
 import static com.guardtime.container.util.Util.notNull;
 
+/**
+ * Document that is based on a {@link InputStream}.
+ */
 public class StreamContainerDocument implements ContainerDocument {
 
     private static final String TEMP_FILE_PREFIX = "bcc-";

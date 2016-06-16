@@ -8,6 +8,9 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Represents a document in a container which doesn't store the document data in the container.
+ */
 public class EmptyContainerDocument implements ContainerDocument {
     private final String fileName;
     private final String mimeType;
