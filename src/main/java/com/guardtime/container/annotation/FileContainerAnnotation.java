@@ -19,7 +19,7 @@ public class FileContainerAnnotation implements ContainerAnnotation {
     public FileContainerAnnotation(File file, String domain, ContainerAnnotationType type) {
         Util.notNull(file, "File");
         Util.notNull(domain, "Domain");
-        Util.notNull(type, "Container type");
+        Util.notNull(type, "Annotation type");
         this.file = file;
         this.domain = domain;
         this.type = type;

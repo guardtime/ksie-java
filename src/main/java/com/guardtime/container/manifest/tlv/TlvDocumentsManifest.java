@@ -22,11 +22,11 @@ class TlvDocumentsManifest extends AbstractTlvManifestStructure implements Docum
 
     private List<TlvDocumentReference> documents = new LinkedList<>();
 
-    public TlvDocumentsManifest(List<ContainerDocument> documents) throws InvalidManifestException {
+    public TlvDocumentsManifest(List<ContainerDocument> documents, HashAlgorithm algorithm) throws InvalidManifestException {
         super(MAGIC);
         try {
             for (ContainerDocument doc : documents) {
-                this.documents.add(new TlvDocumentReference(doc));
+                this.documents.add(new TlvDocumentReference(doc, algorithm));
             }
         } catch (DataHashException | TLVParserException | IOException e) {
             throw new InvalidManifestException("Failed to generate TlvDocumentsManifest", e);

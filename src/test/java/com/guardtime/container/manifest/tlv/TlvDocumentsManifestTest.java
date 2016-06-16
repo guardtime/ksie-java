@@ -16,7 +16,7 @@ public class TlvDocumentsManifestTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateDocumentsManifest() throws Exception {
-        TlvDocumentsManifest documentsManifest = new TlvDocumentsManifest(asList(TEST_DOCUMENT_HELLO_TEXT));
+        TlvDocumentsManifest documentsManifest = new TlvDocumentsManifest(asList(TEST_DOCUMENT_HELLO_TEXT), DEFAULT_HASH_ALGORITHM);
         InputStream is = documentsManifest.getInputStream();
         testMagic(is, DOCUMENTS_MANIFEST_MAGIC);
         Assert.assertEquals(1, documentsManifest.getDocumentReferences().size());

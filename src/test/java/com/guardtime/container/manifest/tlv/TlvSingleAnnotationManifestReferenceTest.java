@@ -13,7 +13,7 @@ public class TlvSingleAnnotationManifestReferenceTest extends AbstractTlvManifes
 
     @Test
     public void testCreateSingleAnnotationManifestReference() throws Exception {
-        TlvSingleAnnotationManifestReference reference = new TlvSingleAnnotationManifestReference(MOCK_URI, mockSingleAnnotationManifest, ContainerAnnotationType.FULLY_REMOVABLE);
+        TlvSingleAnnotationManifestReference reference = new TlvSingleAnnotationManifestReference(MOCK_URI, mockSingleAnnotationManifest, ContainerAnnotationType.FULLY_REMOVABLE, DEFAULT_HASH_ALGORITHM);
         assertEquals(ANNOTATION_INFO_REFERENCE_TYPE, reference.getElementType());
         assertEquals(ContainerAnnotationType.FULLY_REMOVABLE.getContent(), getMimeType(reference));
         assertEquals(MOCK_URI, getUri(reference));
@@ -26,7 +26,7 @@ public class TlvSingleAnnotationManifestReferenceTest extends AbstractTlvManifes
         TlvSingleAnnotationManifestReference reference = new TlvSingleAnnotationManifestReference(element);
         assertEquals(MOCK_URI, reference.getUri());
         assertEquals(MIME_TYPE_APPLICATION_TXT, reference.getMimeType());
-        assertEquals(dataHash, reference.getHash());
+        assertEquals(dataHash, reference.getHashList().get(0));
     }
 
 }

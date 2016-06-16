@@ -9,6 +9,7 @@ import com.guardtime.container.verification.result.TerminatingVerificationResult
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -34,10 +35,12 @@ public class AnnotationsManifestIntegrityRule extends AbstractRule<SignatureCont
         Manifest manifest = verifiable.getManifest().getRight();
         FileReference annotationsManifestReference = manifest.getAnnotationsManifestReference();
         try {
-            DataHash expectedHash = annotationsManifestReference.getHash();
-            DataHash annotationsManifestHash = annotationsManifest.getDataHash(expectedHash.getAlgorithm());
-            if (expectedHash.equals(annotationsManifestHash)) {
-                verificationResult = VerificationResult.OK;
+            for(DataHash expectedHash : annotationsManifestReference.getHashList()) {
+                if(expectedHash.getAlgorithm().getStatus()!= HashAlgorithm.Status.NORMAL) continue; // Skip not implemented or not trusted
+                DataHash annotationsManifestHash = annotationsManifest.getDataHash(expectedHash.getAlgorithm());
+                if (expectedHash.equals(annotationsManifestHash)) {
+                    verificationResult = VerificationResult.OK;
+                }
             }
         } catch (IOException e) {
             LOGGER.debug("Verifying annotations manifest failed!", e);
