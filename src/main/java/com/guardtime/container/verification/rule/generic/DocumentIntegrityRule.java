@@ -49,7 +49,7 @@ public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, Sign
             }
             verificationResult = new TerminatingVerificationResult(result, this, documentUri);
         } catch (IOException | DataHashException e) {
-            LOGGER.debug("Verifying document failed!", e);
+            LOGGER.info("Verifying document failed!", e);
             verificationResult = new TerminatingVerificationResult(result, this, documentUri, e);
         }
         return Arrays.asList(verificationResult);
