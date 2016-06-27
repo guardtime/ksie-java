@@ -59,8 +59,13 @@ class TlvDocumentsManifest extends AbstractTlvManifestStructure implements Docum
         TLVElement element;
         while (input.hasNextElement()) {
             element = input.readElement();
-            //TODO unknown elements must be handled correctly
-            documents.add(new TlvDocumentReference(element));
+            switch (element.getType()) {
+                case TlvDocumentReference.DATA_FILE_REFERENCE:
+                    documents.add(new TlvDocumentReference(element));
+                    break;
+                default:
+                    verifyCriticalFlag(element);
+            }
         }
     }
 

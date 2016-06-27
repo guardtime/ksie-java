@@ -1,8 +1,6 @@
 package com.guardtime.container.signature;
 
 
-import com.guardtime.container.ContainerFileElement;
-
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -10,7 +8,7 @@ import java.io.OutputStream;
  * General interface for all possible signature implementations.
  * @param <O>   Class of the underlying signature.
  */
-public interface ContainerSignature<O> extends ContainerFileElement {
+public interface ContainerSignature<O> {
 
     void writeTo(OutputStream output) throws IOException;
 

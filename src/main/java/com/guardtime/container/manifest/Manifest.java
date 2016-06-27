@@ -1,13 +1,12 @@
 package com.guardtime.container.manifest;
 
-import com.guardtime.container.ContainerFileElement;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-public interface Manifest extends ContainerFileElement {
+public interface Manifest {
 
     DataHash getDataHash(HashAlgorithm algorithm) throws IOException;
 

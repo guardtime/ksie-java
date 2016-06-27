@@ -12,6 +12,4 @@ public class SignatureException extends ContainerException {
         super(s);
     }
 
-    // TODO add type?
-
 }
