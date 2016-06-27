@@ -15,7 +15,7 @@ public interface ContainerSignature<O> {
     /**
      * Returns true if passed in signatureClass is the same as O.
      */
-    boolean supportsSignatureClass(Class<?> signatureClass);
+    boolean isSupported(Class<?> signatureClass);
 
     /**
      * Returns the underlying signature object.

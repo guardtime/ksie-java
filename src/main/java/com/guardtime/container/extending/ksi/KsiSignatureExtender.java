@@ -23,7 +23,7 @@ public class KsiSignatureExtender implements SignatureExtender {
 
     @Override
     public ContainerSignature extend(ContainerSignature containerSignature) throws SignatureException {
-        if(!containerSignature.supportsSignatureClass(KSISignature.class)) {
+        if(!containerSignature.isSupported(KSISignature.class)) {
             throw new SignatureException("Unsupported ContainerSignature provided for extending.");
         }
         try {

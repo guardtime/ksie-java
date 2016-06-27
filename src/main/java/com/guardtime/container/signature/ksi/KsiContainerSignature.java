@@ -32,7 +32,7 @@ public class KsiContainerSignature implements ContainerSignature<KSISignature> {
     }
 
     @Override
-    public boolean supportsSignatureClass(Class<?> signatureClass) {
+    public boolean isSupported(Class<?> signatureClass) {
         return signatureClass.equals(KSISignature.class);
     }
 }
