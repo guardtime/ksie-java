@@ -44,7 +44,6 @@ abstract class AbstractTlvManifestStructure {
         if (input instanceof TLVInputStream) {
             return (TLVInputStream) input;
         }
-        // TODO remove exception when SDK is fixed.
         return new TLVInputStream(input);
     }
 

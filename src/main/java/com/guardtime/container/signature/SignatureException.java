@@ -8,6 +8,4 @@ public class SignatureException extends ContainerException {
         super(e);
     }
 
-    // TODO add type?
-
 }

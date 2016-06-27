@@ -18,7 +18,6 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 
-//TODO fix reference object
 class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
 
     private static final byte[] MAGIC = "KSIEMFST".getBytes();
@@ -77,7 +76,6 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
         return asList(documentsManifestReference, signatureReference, annotationsManifestReference);
     }
 
-    //TODO this isn't the best solution
     private void read(TLVInputStream inputStream) throws IOException, TLVParserException {
         TLVElement element;
         while (inputStream.hasNextElement()) {
