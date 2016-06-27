@@ -1,6 +1,5 @@
 package com.guardtime.container.manifest;
 
-import com.guardtime.container.ContainerFileElement;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
@@ -12,7 +11,7 @@ import java.io.InputStream;
  * {@link com.guardtime.container.signature.ContainerSignature} contained in the container. This is the root manifest of
  * container structure.
  */
-public interface Manifest extends ContainerFileElement {
+public interface Manifest {
 
     /**
      * Returns {@link DataHash} of the manifest created based on the same data available from {@link #getInputStream()}

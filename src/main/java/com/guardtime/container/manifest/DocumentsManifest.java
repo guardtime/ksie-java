@@ -1,7 +1,6 @@
 package com.guardtime.container.manifest;
 
 
-import com.guardtime.container.ContainerFileElement;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
@@ -12,7 +11,7 @@ import java.util.List;
 /**
  * Container structure manifest containing references to documents contained in the container.
  */
-public interface DocumentsManifest extends ContainerFileElement {
+public interface DocumentsManifest {
 
     /**
      * Returns InputStream containing this manifest.

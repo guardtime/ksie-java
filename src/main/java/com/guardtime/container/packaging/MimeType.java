@@ -1,14 +1,12 @@
 package com.guardtime.container.packaging;
 
-import com.guardtime.container.ContainerFileElement;
-
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
  * MIME type in container.
  */
-public interface MimeType extends ContainerFileElement {
+public interface MimeType {
 
     String getUri();
 

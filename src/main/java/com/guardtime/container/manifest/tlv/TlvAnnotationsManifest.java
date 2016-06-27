@@ -54,8 +54,13 @@ class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements Ann
         TLVElement element;
         while (input.hasNextElement()) {
             element = input.readElement();
-            //TODO unknown elements
-            this.singleAnnotationManifestReferences.add(new TlvSingleAnnotationManifestReference(element));
+            switch (element.getType()) {
+                case TlvSingleAnnotationManifestReference.ANNOTATION_INFO_REFERENCE:
+                    this.singleAnnotationManifestReferences.add(new TlvSingleAnnotationManifestReference(element));
+                    break;
+                default:
+                    verifyCriticalFlag(element);
+            }
         }
     }
 

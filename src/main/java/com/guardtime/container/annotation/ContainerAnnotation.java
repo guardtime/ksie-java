@@ -1,6 +1,5 @@
 package com.guardtime.container.annotation;
 
-import com.guardtime.container.ContainerFileElement;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
@@ -11,7 +10,7 @@ import java.io.InputStream;
  * Represents annotations that can be used in container. Combines into one object both annotation data and annotation
  * meta-data like type and domain.
  */
-public interface ContainerAnnotation extends ContainerFileElement {
+public interface ContainerAnnotation {
 
     ContainerAnnotationType getAnnotationType();
 
