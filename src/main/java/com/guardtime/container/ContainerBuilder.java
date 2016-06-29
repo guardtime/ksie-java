@@ -16,6 +16,9 @@ import java.util.List;
 
 import static com.guardtime.container.util.Util.notNull;
 
+/**
+ * Helper for creating a container with the provided documents and annotations.
+ */
 public class ContainerBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ContainerBuilder.class);
@@ -26,11 +29,17 @@ public class ContainerBuilder {
     private final ContainerPackagingFactory packagingFactory;
     private Container existingContainer;
 
+    /**
+     * Expects as a parameter a {@link ContainerPackagingFactory} to be used for creating the container.
+     */
     public ContainerBuilder(ContainerPackagingFactory packagingFactory) {
         notNull(packagingFactory, "Packaging factory");
         this.packagingFactory = packagingFactory;
     }
 
+    /**
+     * Expects as a parameter a {@link Container} to be expanded by new documents and annotations.
+     */
     public ContainerBuilder withExistingContainer(Container existingContainer) {
         this.existingContainer = existingContainer;
         return this;

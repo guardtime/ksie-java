@@ -11,6 +11,9 @@ import java.io.InputStream;
 
 import static com.guardtime.container.util.Util.notNull;
 
+/**
+ * Document that is based on a {@link File}.
+ */
 public class FileContainerDocument implements ContainerDocument {
 
     private final File file;

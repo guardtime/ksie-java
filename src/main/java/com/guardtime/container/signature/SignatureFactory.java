@@ -4,10 +4,23 @@ import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.InputStream;
 
+/**
+ * Creates and reads signatures used in container.
+ */
 public interface SignatureFactory {
 
+    /**
+     * Returns signature contained in a {@link ContainerSignature} implementation.
+     * @param hash to be signed.
+     * @throws SignatureException when creating the signature for the given hash fails.
+     */
     ContainerSignature create(DataHash hash) throws SignatureException;
 
+    /**
+     * Returns signature contained in a {@link ContainerSignature} implementation.
+     * @param input stream from which the signature is to be read.
+     * @throws SignatureException reading the stream fails or constructing a signature from the read data fails.
+     */
     ContainerSignature read(InputStream input) throws SignatureException;
 
     SignatureFactoryType getSignatureFactoryType();

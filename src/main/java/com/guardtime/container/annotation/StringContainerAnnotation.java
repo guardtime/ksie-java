@@ -11,6 +11,9 @@ import java.nio.charset.Charset;
 import static com.guardtime.container.util.Util.hash;
 import static com.guardtime.container.util.Util.notNull;
 
+/**
+ * Annotation that is based on a String as the data source.
+ */
 public class StringContainerAnnotation implements ContainerAnnotation {
 
     private final String content;

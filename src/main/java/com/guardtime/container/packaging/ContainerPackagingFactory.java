@@ -55,8 +55,7 @@ public interface ContainerPackagingFactory<C extends Container> {
     C create(Container existingContainer, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException;
 
     /**
-     * Provides the MIMETYPE file content for container.
-     * @return
+     * Provides the MIMETYPE content for container.
      */
     byte[] getMimeTypeContent();
 }

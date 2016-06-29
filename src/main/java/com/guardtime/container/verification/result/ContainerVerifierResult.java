@@ -29,8 +29,6 @@ public class ContainerVerifierResult {
 
     /**
      * Provides access to the overall {@link VerificationResult} of the verification.
-     *
-     * @return
      */
     public VerificationResult getVerificationResult() {
         return aggregateResult;
@@ -38,8 +36,6 @@ public class ContainerVerifierResult {
 
     /**
      * Provides access to the {@link Container} which was verified.
-     *
-     * @return
      */
     public Container getContainer() {
         return container;

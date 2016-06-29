@@ -8,11 +8,9 @@ import com.guardtime.container.signature.SignatureException;
  */
 public interface SignatureExtender {
     /**
-     * @param signature
-     *         Input signature to be extended
-     * @return New {@link ContainerSignature} that represents the extended input signature.
-     * @throws SignatureException
-     *         when extending fails for any reason.
+     * Returns New {@link ContainerSignature} that represents the extended input signature.
+     * @param signature Input signature to be extended
+     * @throws SignatureException when extending fails for any reason.
      */
     ContainerSignature extend(ContainerSignature signature) throws SignatureException;
 }

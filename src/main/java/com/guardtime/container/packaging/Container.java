@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface Container {
     /**
-     * @return Ordered list of SignatureContent where the order is ascending based on the index of manifest
+     * Returns Ordered list of SignatureContent where the order is ascending based on the index of manifest
      */
     List<? extends SignatureContent> getSignatureContents();
 
@@ -22,7 +22,7 @@ public interface Container {
     MimeType getMimeType();
 
     /**
-     * @return List of all {@link File} that were not associated with any structure elements or signatures but were
+     * Returns List of all {@link File} that were not associated with any structure elements or signatures but were
      * contained in the {@link Container}
      */
     //TODO: Replace File with InputStream or similar more abstract concept as to not limit the container to be File based
