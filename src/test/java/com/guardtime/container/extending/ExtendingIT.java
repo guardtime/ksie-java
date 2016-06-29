@@ -4,7 +4,6 @@ import com.guardtime.container.AbstractCommonIntegrationTest;
 import com.guardtime.container.extending.ksi.KsiSignatureExtender;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.signature.ksi.KsiContainerSignature;
 import com.guardtime.ksi.unisignature.KSISignature;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -15,6 +14,7 @@ import java.io.InputStream;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ExtendingIT extends AbstractCommonIntegrationTest {
 
@@ -33,6 +33,7 @@ public class ExtendingIT extends AbstractCommonIntegrationTest {
     }
 
     private Container getContainer(String path) throws Exception {
+        when(mockKsi.read(Mockito.any(InputStream.class))).thenReturn(Mockito.mock(KSISignature.class));
         InputStream input = new FileInputStream(loadFile(path));
         return packagingFactory.read(input);
     }

@@ -23,7 +23,7 @@ public class KsiSignatureExtender implements SignatureExtender {
 
     @Override
     public ContainerSignature extend(ContainerSignature containerSignature) throws SignatureException {
-        if(!containerSignature.isSupported(KSISignature.class)) {
+        if(!isSupported(containerSignature)) {
             throw new SignatureException("Unsupported ContainerSignature provided for extending.");
         }
         try {
@@ -36,5 +36,10 @@ public class KsiSignatureExtender implements SignatureExtender {
 
     protected KsiContainerSignature getExtendedSignature(KSISignature extendableSignature) throws KSIException {
         return new KsiContainerSignature(ksi.extend(extendableSignature));
+    }
+
+    @Override
+    public boolean isSupported(ContainerSignature signature) {
+        return signature.getSignature() instanceof KSISignature;
     }
 }

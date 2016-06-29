@@ -43,12 +43,16 @@ public class KsiPolicyBasedSignatureIntegrityRule extends AbstractRule<Signature
         RuleVerificationResult verificationResult;
         String signatureUri = verifiable.getManifest().getRight().getSignatureReference().getUri();
         ContainerSignature containerSignature = verifiable.getContainerSignature();
-        if (containerSignature.isSupported(KSISignature.class)) {
+        if (isSupported(containerSignature)) {
             verificationResult = getKSISignatureVerificationResult((KSISignature) containerSignature.getSignature(), verifiable, signatureUri);
         } else {
             verificationResult = new GenericVerificationResult(getFailureVerificationResult(), this, signatureUri, new Exception("Unsupported "));
         }
         return Arrays.asList(verificationResult);
+    }
+
+    private boolean isSupported(ContainerSignature containerSignature) {
+        return containerSignature.getSignature() instanceof KSISignature;
     }
 
     private RuleVerificationResult getKSISignatureVerificationResult(KSISignature signature, SignatureContent verifiable, String signatureUri) {

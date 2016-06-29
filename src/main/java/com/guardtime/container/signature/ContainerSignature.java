@@ -18,11 +18,6 @@ public interface ContainerSignature<O> {
     void writeTo(OutputStream output) throws IOException;
 
     /**
-     * Returns true if passed in signatureClass is the same as O.
-     */
-    boolean isSupported(Class<?> signatureClass);
-
-    /**
      * Returns the underlying signature object.
      */
     O getSignature();
