@@ -34,8 +34,6 @@ public interface SignatureContent {
 
     /**
      * Provides access to the {@link ContainerSignature} which signs the structure and its content.
-     *
-     * @return
      */
     ContainerSignature getContainerSignature();
 
@@ -48,8 +46,7 @@ public interface SignatureContent {
     /**
      * Updates the existing ContainerSignature maintained by the SignatureContent to extend it to a trust anchor
      *
-     * @param signatureExtender
-     *         Provides the signature specific logic for extending the signature.
+     * @param signatureExtender Provides the signature specific logic for extending the signature.
      * @return true when signature is extended.
      */
     boolean extendSignature(SignatureExtender signatureExtender);

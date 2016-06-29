@@ -3,6 +3,9 @@ package com.guardtime.container.annotation;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Annotation types define annotation persistence.
+ */
 public enum ContainerAnnotationType {
 
     FULLY_REMOVABLE("ksie10/removable-fully"),

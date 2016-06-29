@@ -57,4 +57,12 @@ public class KsiPolicyBasedSignatureIntegrityRule extends AbstractRule<Signature
         GenericVerificationResult verificationResult = new GenericVerificationResult(ruleResult, this, signatureUri);
         return Arrays.asList((RuleVerificationResult) verificationResult);
     }
+
+    public String getName() {
+        return "KSIE_VERIFY_MANIFEST";
+    }
+
+    public String getErrorMessage() {
+        return "Signature mismatch.";
+    }
 }
