@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.guardtime.container</groupId>
-    <artifactId>blockchain-container</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>ksie-java-container</artifactId>
+    <version>1.0.43-SNAPSHOT</version>
 
-    <name>Blockchain Container</name>
+    <name>KSIE Java Container</name>
 
     <properties>
         <junit.version>4.12</junit.version>
@@ -85,18 +85,18 @@
     <repositories>
         <repository>
             <id>gt-public</id>
-            <url>http://192.168.100.24:8081/nexus/content/groups/public/</url>
+            <url>http://maven.ee.guardtime.com:8081/nexus/content/groups/public/</url>
         </repository>
     </repositories>
 
     <distributionManagement>
         <repository>
             <id>gt-release</id>
-            <url>http://192.168.100.24:8081/nexus/content/repositories/releases/</url>
+            <url>http://maven.ee.guardtime.com:8081/nexus/content/repositories/releases/</url>
         </repository>
         <snapshotRepository>
             <id>gt-snapshots</id>
-            <url>http://192.168.100.24:8081/nexus/content/repositories/snapshots/</url>
+            <url>http://maven.ee.guardtime.com:8081/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
