@@ -6,7 +6,6 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleState;
 
 import java.util.LinkedList;
@@ -17,7 +16,7 @@ import java.util.List;
  * handles verifying datamanifest and {@link com.guardtime.container.document.ContainerDocument}s referred to by the
  * datamanifest.
  */
-public class DocumentsIntegrityRule extends AbstractRule<SignatureContent> implements Rule<SignatureContent> {
+public class DocumentsIntegrityRule extends AbstractRule<SignatureContent> {
 
     public DocumentsIntegrityRule() {
         this(RuleState.FAIL);

@@ -9,7 +9,6 @@ import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.TerminatingVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleState;
 
 import java.util.Arrays;
@@ -18,7 +17,7 @@ import java.util.List;
 /**
  * This rule verifies that the annotations manifest is actually present in the {@link com.guardtime.container.packaging.Container}
  */
-public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureContent> implements Rule<SignatureContent> {
+public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureContent> {
 
     public AnnotationsManifestExistenceRule() {
         this(RuleState.FAIL);

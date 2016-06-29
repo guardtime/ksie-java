@@ -9,7 +9,6 @@ import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.TerminatingVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleState;
 
 import java.util.Arrays;
@@ -19,7 +18,7 @@ import java.util.List;
  * This rule verifies that the tested {@link ContainerDocument} is indeed present in the {@link
  * com.guardtime.container.packaging.Container}
  */
-public class DocumentExistenceRule extends AbstractRule<Pair<FileReference, SignatureContent>> implements Rule<Pair<FileReference, SignatureContent>> {
+public class DocumentExistenceRule extends AbstractRule<Pair<FileReference, SignatureContent>> {
 
     public DocumentExistenceRule() {
         this(RuleState.FAIL);

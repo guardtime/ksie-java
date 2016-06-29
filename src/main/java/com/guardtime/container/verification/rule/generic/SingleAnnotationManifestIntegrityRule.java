@@ -8,7 +8,6 @@ import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.TerminatingVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -21,7 +20,7 @@ import java.util.Map;
 /**
  * This rule verifies the validity of the manifest file containing meta-data for an annotation.
  */
-public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> implements Rule<Pair<SignatureContent, FileReference>> {
+public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
     public SingleAnnotationManifestIntegrityRule() {
         this(RuleState.FAIL);

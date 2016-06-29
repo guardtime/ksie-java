@@ -8,7 +8,6 @@ import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.TerminatingVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -21,7 +20,7 @@ import java.util.List;
  * This rule verifies the validity of the datamanifest which contains records for all {@link
  * com.guardtime.container.document.ContainerDocument}s associated with a signature.
  */
-public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureContent> implements Rule<SignatureContent> {
+public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureContent> {
 
     public DocumentsManifestIntegrityRule() {
         this(RuleState.FAIL);

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class AbstractRule<O> {
+public abstract class AbstractRule<O> implements Rule<O> {
     protected static final Logger LOGGER = LoggerFactory.getLogger(Rule.class);
 
     protected final RuleState state;

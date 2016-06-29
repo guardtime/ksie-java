@@ -8,7 +8,6 @@ import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.TerminatingVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleState;
 
 import java.util.Arrays;
@@ -18,7 +17,7 @@ import java.util.Map;
 /**
  * This rule verifies the existence of the meta-data file of an annotation.
  */
-public class SingleAnnotationManifestExistenceRule extends AbstractRule<Pair<SignatureContent, FileReference>> implements Rule<Pair<SignatureContent, FileReference>> {
+public class SingleAnnotationManifestExistenceRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
     public SingleAnnotationManifestExistenceRule(RuleState ruleState) {
         super(ruleState);
     }

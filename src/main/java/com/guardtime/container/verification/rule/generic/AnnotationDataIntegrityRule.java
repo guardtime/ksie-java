@@ -10,7 +10,6 @@ import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 
@@ -21,7 +20,7 @@ import java.util.List;
 /**
  * This rule verifies that the annotation data has not been corrupted.
  */
-public class AnnotationDataIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> implements Rule<Pair<SignatureContent, FileReference>> {
+public class AnnotationDataIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
     public AnnotationDataIntegrityRule() {
         this(RuleState.FAIL);

@@ -6,7 +6,6 @@ import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.exceptions.KSIException;
@@ -24,7 +23,7 @@ import java.util.List;
  * the underlying signature.<br>Does not assume the underlying signature to be of type {@link KSISignature} but will
  * produce failure result for any other type of underlying signature.
  */
-public class KsiPolicyBasedSignatureIntegrityRule extends AbstractRule<SignatureContent> implements Rule<SignatureContent> {
+public class KsiPolicyBasedSignatureIntegrityRule extends AbstractRule<SignatureContent> {
     private final KSI ksi;
     private final Policy policy;
 

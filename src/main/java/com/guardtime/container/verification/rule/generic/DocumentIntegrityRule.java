@@ -9,7 +9,6 @@ import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.TerminatingVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -21,7 +20,7 @@ import java.util.List;
 /**
  * This rule verifies that the {@link ContainerDocument} being tested has not been corrupted.
  */
-public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, SignatureContent>> implements Rule<Pair<FileReference, SignatureContent>> {
+public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, SignatureContent>> {
 
     public DocumentIntegrityRule() {
         this(RuleState.FAIL);
