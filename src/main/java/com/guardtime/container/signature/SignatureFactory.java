@@ -1,5 +1,6 @@
 package com.guardtime.container.signature;
 
+import com.guardtime.container.extending.ExtendingPolicy;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.InputStream;
@@ -22,6 +23,14 @@ public interface SignatureFactory {
      * @throws SignatureException reading the stream fails or constructing a signature from the read data fails.
      */
     ContainerSignature read(InputStream input) throws SignatureException;
+
+    /**
+     * Updates the {@link ContainerSignature} to extend its underlying signature to a trust anchor
+     * @param containerSignature The signature to be extended.
+     * @param extender The extending logic for the underlying signature inside containerSignature.
+     * @throws SignatureException when the extending fails for any reason.
+     */
+    void extend(ContainerSignature containerSignature, ExtendingPolicy extender) throws SignatureException;
 
     SignatureFactoryType getSignatureFactoryType();
 

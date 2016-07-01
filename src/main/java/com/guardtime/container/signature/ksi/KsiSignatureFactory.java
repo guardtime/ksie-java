@@ -1,5 +1,7 @@
 package com.guardtime.container.signature.ksi;
 
+import com.guardtime.container.extending.ExtendingPolicy;
+import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureException;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.SignatureFactoryType;
@@ -45,6 +47,20 @@ public class KsiSignatureFactory implements SignatureFactory {
         } catch (KSIException e) {
             throw new SignatureException(e);
         }
+    }
+
+    @Override
+    public void extend(ContainerSignature containerSignature, ExtendingPolicy extender) throws SignatureException {
+        if (unsupportedContainerSignature(containerSignature)) {
+            throw new SignatureException("Unsupported ContainerSignature provided for extending.");
+        }
+        KsiContainerSignature ksiContainerSignature = (KsiContainerSignature) containerSignature;
+        KSISignature extendedSignature = (KSISignature) extender.getExtendedSignature(ksiContainerSignature.getSignature());
+        ksiContainerSignature.setSignature(extendedSignature);
+    }
+
+    private boolean unsupportedContainerSignature(ContainerSignature containerSignature) {
+        return !(containerSignature instanceof KsiContainerSignature);
     }
 
     @Override

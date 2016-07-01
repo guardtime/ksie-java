@@ -6,7 +6,7 @@ import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
-import com.guardtime.container.signature.ksi.KsiContainerSignature;
+import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.Rule;
@@ -54,7 +54,9 @@ public class AnnotationsIntegrityRuleTest extends AbstractContainerTest {
     public void setUp() throws Exception {
         super.setUp();
         when(mockedSignatureFactoryType.getSignatureFileExtension()).thenReturn("ksi");
-        when(mockedSignatureFactory.read(Mockito.any(InputStream.class))).thenReturn(new KsiContainerSignature(mockKsiSignature));
+        ContainerSignature mockedContainerSignature = Mockito.mock(ContainerSignature.class);
+        when(mockedContainerSignature.getSignature()).thenReturn(mockKsiSignature);
+        when(mockedSignatureFactory.read(Mockito.any(InputStream.class))).thenReturn(mockedContainerSignature);
 
         this.packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory());
     }

@@ -1,6 +1,5 @@
 package com.guardtime.container.signature;
 
-
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -21,4 +20,5 @@ public interface ContainerSignature<O> {
      * Returns the underlying signature object.
      */
     O getSignature();
+
 }

@@ -10,14 +10,15 @@ import java.io.OutputStream;
 /**
  * {@link ContainerSignature} implementation with {@link KSISignature} as the underlying signature.
  */
-public class KsiContainerSignature implements ContainerSignature<KSISignature> {
+class KsiContainerSignature implements ContainerSignature<KSISignature> {
 
-    private final KSISignature signature;
+    private KSISignature signature;
 
     public KsiContainerSignature(KSISignature signature) {
         this.signature = signature;
     }
 
+    @Override
     public KSISignature getSignature() {
         return signature;
     }
@@ -29,6 +30,10 @@ public class KsiContainerSignature implements ContainerSignature<KSISignature> {
         } catch (KSIException e) {
             throw new IOException("Writing signature to output failed", e);
         }
+    }
+
+    public void setSignature(KSISignature signature) {
+        this.signature = signature;
     }
 
 }
