@@ -3,12 +3,14 @@ package com.guardtime.container;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
+import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -45,6 +47,9 @@ public class ContainerBuilderTest extends AbstractContainerTest {
         StreamContainerDocument content = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
         builder.withDocument(content);
         assertEquals(1, builder.getDocuments().size());
+
+        builder.withDocument(Mockito.mock(File.class), "application/binary");
+        assertEquals(2, builder.getDocuments().size());
     }
 
     @Test
@@ -63,6 +68,24 @@ public class ContainerBuilderTest extends AbstractContainerTest {
         builder.withAnnotation(MOCKED_ANNOTATION);
         Container container = builder.build();
         assertNotNull(container);
+    }
+
+    @Test
+    public void testCreateWithExistingContainer() throws Exception {
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory);
+        // build initial container
+        ContainerBuilder builder = new ContainerBuilder(packagingFactory);
+        builder.withDocument(TEST_DOCUMENT_HELLO_PDF);
+        Container container = builder.build();
+
+        // add new documents to existing container
+        ContainerBuilder newBuilder = new ContainerBuilder(packagingFactory);
+        newBuilder.withDocument(TEST_DOCUMENT_HELLO_TEXT);
+        newBuilder.withExistingContainer(container);
+        Container newContainer = newBuilder.build();
+
+        assertNotNull(newContainer);
+        assertEquals(2, newContainer.getSignatureContents().size());
     }
 
 }

@@ -8,9 +8,7 @@ import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +30,18 @@ public class ZipContainerKsiServiceIT extends AbstractCommonKsiServiceIntegratio
         InputStream stream = new FileInputStream(loadFile(CONTAINER_WITH_ONE_DOCUMENT));
         Container container = packagingFactory.read(stream);
         assertSingleContentsWithSingleDocument(container);
+    }
+
+    @Test
+    public void testReadCreatedContainer() throws Exception {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        Container container = new ContainerBuilder(packagingFactory)
+                .withDocument(new ByteArrayInputStream("Test_Data".getBytes()), TEST_FILE_NAME_TEST_TXT, "application/txt")
+                .build();
+        container.writeTo(bos);
+        InputStream stream = new ByteArrayInputStream(bos.toByteArray());
+        Container parsedInContainer = packagingFactory.read(stream);
+        assertSingleContentsWithSingleDocument(parsedInContainer);
     }
 
     private void assertSingleContentsWithSingleDocumentWithName(Container container, String testFileName) {
