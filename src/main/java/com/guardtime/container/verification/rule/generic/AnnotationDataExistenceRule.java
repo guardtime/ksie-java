@@ -8,6 +8,7 @@ import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.TerminatingVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
 
 import java.util.Arrays;
@@ -40,7 +41,7 @@ public class AnnotationDataExistenceRule extends AbstractRule<Pair<SignatureCont
             result = VerificationResult.OK;
         }
         RuleVerificationResult verificationResult = new TerminatingVerificationResult(result, this, dataUri);
-        return Arrays.asList((RuleVerificationResult) verificationResult);
+        return Arrays.asList(verificationResult);
     }
 
     @Override

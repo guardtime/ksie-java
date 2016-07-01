@@ -6,6 +6,8 @@ import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.TerminatingVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.rule.AbstractRule;
+import com.guardtime.container.verification.rule.ContainerRule;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.util.Util;
 
@@ -17,7 +19,7 @@ import java.util.List;
  * Rule that verifies the existence and content of a MIMETYPE file in the container. The expected content is given by
  * {@link ContainerPackagingFactory}.
  */
-public class MimeTypeIntegrityRule extends AbstractContainerRule {
+public class MimeTypeIntegrityRule extends AbstractRule<Container> implements ContainerRule {
     private final byte[] expectedContent;
 
     public MimeTypeIntegrityRule(ContainerPackagingFactory packagingFactory) {
@@ -31,6 +33,7 @@ public class MimeTypeIntegrityRule extends AbstractContainerRule {
 
     @Override
     protected List<RuleVerificationResult> verifyRule(Container verifiable) {
+        RuleVerificationResult verificationResult;
         MimeType mimetype = verifiable.getMimeType();
         VerificationResult result = getFailureVerificationResult();
         try {
@@ -38,11 +41,12 @@ public class MimeTypeIntegrityRule extends AbstractContainerRule {
             if (Arrays.equals(expectedContent, realContent)) {
                 result = VerificationResult.OK;
             }
+            verificationResult = new TerminatingVerificationResult(result, this, mimetype.getUri());
         } catch (IOException e) {
-            LOGGER.debug("Verifying MIME type failed!", e);
+            LOGGER.info("Verifying MIME type failed!", e);
+            verificationResult = new TerminatingVerificationResult(result, this, mimetype.getUri(), e);
         }
-        TerminatingVerificationResult verificationResult = new TerminatingVerificationResult(result, this, mimetype.getUri());
-        return Arrays.asList((RuleVerificationResult) verificationResult);
+        return Arrays.asList(verificationResult);
     }
 
     @Override

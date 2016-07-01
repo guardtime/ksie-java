@@ -132,7 +132,8 @@ class SignatureContentHandler {
         private boolean invalidReference(FileReference reference) {
             if (reference.getUri() == null ||
                     reference.getMimeType() == null ||
-                    reference.getHash() == null) {
+                    reference.getHashList() == null ||
+                    reference.getHashList().isEmpty()) {
                 return true;
             }
             return false;

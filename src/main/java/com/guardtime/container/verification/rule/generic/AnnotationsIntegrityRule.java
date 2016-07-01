@@ -6,6 +6,7 @@ import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
 
 import java.util.LinkedList;

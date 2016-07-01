@@ -13,4 +13,9 @@ public interface SignatureExtender {
      * @throws SignatureException when extending fails for any reason.
      */
     ContainerSignature extend(ContainerSignature signature) throws SignatureException;
+
+    /**
+     * Returns true if passed in {@link ContainerSignature} is supported for extending by the implementation.
+     */
+    boolean isSupported(ContainerSignature signature);
 }

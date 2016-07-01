@@ -10,7 +10,7 @@ import java.io.OutputStream;
 /**
  * {@link ContainerSignature} implementation with {@link KSISignature} as the underlying signature.
  */
-public class KsiContainerSignature implements ContainerSignature {
+public class KsiContainerSignature implements ContainerSignature<KSISignature> {
 
     private final KSISignature signature;
 
@@ -30,4 +30,5 @@ public class KsiContainerSignature implements ContainerSignature {
             throw new IOException("Writing signature to output failed", e);
         }
     }
+
 }

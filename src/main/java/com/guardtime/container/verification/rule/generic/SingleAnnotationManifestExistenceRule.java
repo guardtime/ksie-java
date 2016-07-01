@@ -7,6 +7,7 @@ import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.TerminatingVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
 
 import java.util.Arrays;
@@ -30,8 +31,8 @@ public class SingleAnnotationManifestExistenceRule extends AbstractRule<Pair<Sig
         if (manifest != null) {
             result = VerificationResult.OK;
         }
-        TerminatingVerificationResult verificationResult = new TerminatingVerificationResult(result, this, manifestUri);
-        return Arrays.asList((RuleVerificationResult) verificationResult);
+        RuleVerificationResult verificationResult = new TerminatingVerificationResult(result, this, manifestUri);
+        return Arrays.asList(verificationResult);
     }
 
     @Override

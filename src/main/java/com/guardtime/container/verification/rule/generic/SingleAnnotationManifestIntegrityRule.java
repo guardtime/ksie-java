@@ -7,6 +7,7 @@ import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.TerminatingVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -31,23 +32,27 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<Sig
 
     @Override
     protected List<RuleVerificationResult> verifyRule(Pair<SignatureContent, FileReference> verifiable) {
+        RuleVerificationResult verificationResult;
         VerificationResult result = getFailureVerificationResult();
         String manifestUri = verifiable.getRight().getUri();
         try {
             Map<String, SingleAnnotationManifest> singleAnnotationManifests = verifiable.getLeft().getSingleAnnotationManifests();
             SingleAnnotationManifest manifest = singleAnnotationManifests.get(manifestUri);
-            for(DataHash expectedHash : verifiable.getRight().getHashList()) {
-                if(expectedHash.getAlgorithm().getStatus()!= HashAlgorithm.Status.NORMAL) continue; // Skip not implemented or not trusted
+            for (DataHash expectedHash : verifiable.getRight().getHashList()) {
+                if (expectedHash.getAlgorithm().getStatus() != HashAlgorithm.Status.NORMAL) {
+                    continue; // Skip not implemented or not trusted
+                }
                 DataHash realHash = manifest.getDataHash(expectedHash.getAlgorithm());
                 if (expectedHash.equals(realHash)) {
                     result = VerificationResult.OK;
                 }
             }
+            verificationResult = new TerminatingVerificationResult(result, this, manifestUri);
         } catch (IOException e) {
-            LOGGER.debug("Verifying annotation meta-data failed!", e);
+            LOGGER.info("Verifying annotation meta-data failed!", e);
+            verificationResult = new TerminatingVerificationResult(result, this, manifestUri, e);
         }
-        TerminatingVerificationResult verificationResult = new TerminatingVerificationResult(result, this, manifestUri);
-        return Arrays.asList((RuleVerificationResult) verificationResult);
+        return Arrays.asList(verificationResult);
     }
 
     @Override

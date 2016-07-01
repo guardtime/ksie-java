@@ -7,6 +7,7 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.TerminatingVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -31,23 +32,28 @@ public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureConten
 
     @Override
     protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
+        RuleVerificationResult result;
         VerificationResult verificationResult = getFailureVerificationResult();
         DocumentsManifest documentsManifest = verifiable.getDocumentsManifest().getRight();
         Manifest manifest = verifiable.getManifest().getRight();
         FileReference documentsManifestReference = manifest.getDocumentsManifestReference();
+        String testedElement = documentsManifestReference.getUri();
         try {
-            for(DataHash expectedHash : documentsManifestReference.getHashList()) {
-                if(expectedHash.getAlgorithm().getStatus()!= HashAlgorithm.Status.NORMAL) continue; // Skip not implemented or not trusted
+            for (DataHash expectedHash : documentsManifestReference.getHashList()) {
+                if (expectedHash.getAlgorithm().getStatus() != HashAlgorithm.Status.NORMAL) {
+                    continue; // Skip not implemented or not trusted
+                }
                 DataHash annotationsManifestHash = documentsManifest.getDataHash(expectedHash.getAlgorithm());
                 if (expectedHash.equals(annotationsManifestHash)) {
                     verificationResult = VerificationResult.OK;
                 }
             }
+            result = new TerminatingVerificationResult(verificationResult, this, testedElement);
         } catch (IOException e) {
-            LOGGER.debug("Verifying documents manifest failed!", e);
+            LOGGER.info("Verifying documents manifest failed!", e);
+            result = new TerminatingVerificationResult(verificationResult, this, testedElement, e);
         }
-        TerminatingVerificationResult result = new TerminatingVerificationResult(verificationResult, this, documentsManifestReference.getUri());
-        return Arrays.asList((RuleVerificationResult) result);
+        return Arrays.asList(result);
     }
 
     @Override

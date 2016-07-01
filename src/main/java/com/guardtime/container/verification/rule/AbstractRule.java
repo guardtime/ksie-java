@@ -1,21 +1,19 @@
-package com.guardtime.container.verification.rule.generic;
+package com.guardtime.container.verification.rule;
 
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
-import com.guardtime.container.verification.rule.Rule;
-import com.guardtime.container.verification.rule.RuleState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
 
-abstract class AbstractRuleHelper<O> {
+public abstract class AbstractRule<O> implements Rule<O> {
     protected static final Logger LOGGER = LoggerFactory.getLogger(Rule.class);
 
     protected final RuleState state;
 
-    protected AbstractRuleHelper(RuleState state) {
+    protected AbstractRule(RuleState state) {
         this.state = state;
     }
 

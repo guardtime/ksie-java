@@ -6,8 +6,9 @@ import java.io.OutputStream;
 
 /**
  * General interface for all possible signature implementations.
+ * @param <O>   Class of the underlying signature.
  */
-public interface ContainerSignature {
+public interface ContainerSignature<O> {
 
     /**
      * Write content of signature to output.
@@ -16,4 +17,8 @@ public interface ContainerSignature {
      */
     void writeTo(OutputStream output) throws IOException;
 
+    /**
+     * Returns the underlying signature object.
+     */
+    O getSignature();
 }
