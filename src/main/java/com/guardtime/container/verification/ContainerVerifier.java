@@ -1,6 +1,7 @@
 package com.guardtime.container.verification;
 
 import com.guardtime.container.packaging.Container;
+import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.policy.VerificationPolicy;
 import com.guardtime.container.verification.result.RuleVerificationResult;
@@ -18,6 +19,7 @@ public class ContainerVerifier {
     private VerificationPolicy policy;
 
     public ContainerVerifier(VerificationPolicy policy) {
+        Util.notNull(policy, "Verification policy");
         this.policy = policy;
     }
 

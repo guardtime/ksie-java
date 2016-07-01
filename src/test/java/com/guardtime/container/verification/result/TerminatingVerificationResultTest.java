@@ -1,17 +1,15 @@
 package com.guardtime.container.verification.result;
 
 import com.guardtime.container.verification.rule.Rule;
-import com.guardtime.container.verification.rule.generic.AnnotationDataExistenceRule;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
-public class GenericVerificationResultTest {
+public class TerminatingVerificationResultTest {
     private static final VerificationResult VERIFICATION_RESULT = VerificationResult.OK;
     private static final String RULE_NAME = "RandomRule";
     private static final String RULE_ERROR_MESSAGE = "Error message of the day";
@@ -25,7 +23,7 @@ public class GenericVerificationResultTest {
         MockitoAnnotations.initMocks(this);
         when(mockRule.getName()).thenReturn(RULE_NAME);
         when(mockRule.getErrorMessage()).thenReturn(RULE_ERROR_MESSAGE);
-        result = new GenericVerificationResult(VERIFICATION_RESULT, mockRule, TESTED_ELEMENT);
+        result = new TerminatingVerificationResult(VERIFICATION_RESULT, mockRule, TESTED_ELEMENT);
     }
 
     @Test
@@ -54,14 +52,14 @@ public class GenericVerificationResultTest {
 
     @Test
     public void terminatesVerification() throws Exception {
-        assertFalse(result.terminatesVerification());
+        assertTrue(result.terminatesVerification());
     }
 
     @Test
     public void getRuleErrorMessageWithExceptionInConstructor() throws Exception {
         String exceptionMessage = "The exception occurred!";
         Exception exception = new Exception(exceptionMessage);
-        RuleVerificationResult genericResult = new GenericVerificationResult(VERIFICATION_RESULT, mockRule, TESTED_ELEMENT, exception);
+        RuleVerificationResult genericResult = new TerminatingVerificationResult(VERIFICATION_RESULT, mockRule, TESTED_ELEMENT, exception);
         assertNotNull(genericResult.getRuleErrorMessage());
         assertEquals(exceptionMessage, genericResult.getRuleErrorMessage());
     }
