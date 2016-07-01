@@ -2,11 +2,10 @@ package com.guardtime.container.packaging;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
-import com.guardtime.container.extending.SignatureExtender;
-import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.manifest.Manifest;
+import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
 
@@ -42,14 +41,6 @@ public interface SignatureContent {
     Pair<String, AnnotationsManifest> getAnnotationsManifest();
 
     Pair<String, Manifest> getManifest();
-
-    /**
-     * Updates the existing ContainerSignature maintained by the SignatureContent to extend it to a trust anchor
-     *
-     * @param signatureExtender Provides the signature specific logic for extending the signature.
-     * @return true when signature is extended.
-     */
-    boolean extendSignature(SignatureExtender signatureExtender);
 
     Map<String, SingleAnnotationManifest> getSingleAnnotationManifests();
 }
