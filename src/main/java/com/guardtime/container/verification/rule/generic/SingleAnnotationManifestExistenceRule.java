@@ -37,7 +37,7 @@ public class SingleAnnotationManifestExistenceRule extends AbstractRule<Pair<Sig
 
     @Override
     public String getName() {
-        return "KSIE_VERIFY_ANNOTATION";
+        return "KSIE_VERIFY_ANNOTATION_EXISTS";
     }
 
     @Override

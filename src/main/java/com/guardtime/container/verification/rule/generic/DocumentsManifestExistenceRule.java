@@ -43,7 +43,7 @@ public class DocumentsManifestExistenceRule extends AbstractRule<SignatureConten
 
     @Override
     public String getName() {
-        return "KSIE_VERIFY_DATA_MANIFEST";
+        return "KSIE_VERIFY_DATA_MANIFEST_EXISTS";
     }
 
     @Override
