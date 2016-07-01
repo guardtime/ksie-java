@@ -1,7 +1,6 @@
 package com.guardtime.container.extending.ksi;
 
-import com.guardtime.container.extending.ContainerSignatureExtender;
-import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.extending.ExtendingPolicy;
 import com.guardtime.container.signature.SignatureException;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.KSI;
@@ -13,7 +12,7 @@ import com.guardtime.ksi.unisignature.KSISignature;
  * Extends all {@link KSISignature}s in {@link com.guardtime.container.packaging.Container} to specified publication
  * record. The publication time of the publication record must be after signature aggregation time.
  */
-public class PublicationKsiContainerSignatureExtender extends ContainerSignatureExtender<KSISignature> {
+public class PublicationKsiContainerSignatureExtender implements ExtendingPolicy<KSISignature> {
     private final PublicationRecord publicationRecord;
     protected final KSI ksi;
 
@@ -24,15 +23,8 @@ public class PublicationKsiContainerSignatureExtender extends ContainerSignature
         this.publicationRecord = publicationRecord;
     }
 
-    @Override
-    protected boolean unsupportedContainerSignature(ContainerSignature containerSignature) {
-        return !(containerSignature.getSignature() instanceof KSISignature);
-    }
-
-    @Override
-    protected KSISignature getExtendedSignature(ContainerSignature containerSignature) throws SignatureException {
+    public KSISignature getExtendedSignature(KSISignature ksiSignature) throws SignatureException {
         try {
-            KSISignature ksiSignature = (KSISignature) containerSignature.getSignature();
             return ksi.extend(ksiSignature, publicationRecord);
         } catch (KSIException e) {
             throw new SignatureException(e);

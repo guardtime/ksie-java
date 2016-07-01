@@ -1,7 +1,6 @@
 package com.guardtime.container.signature.ksi;
 
 import com.guardtime.container.signature.ContainerSignature;
-import com.guardtime.container.signature.SignatureException;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.unisignature.KSISignature;
 
@@ -19,29 +18,9 @@ class KsiContainerSignature implements ContainerSignature<KSISignature> {
         this.signature = signature;
     }
 
+    @Override
     public KSISignature getSignature() {
         return signature;
-    }
-
-    @Override
-    public void extend(KSISignature extendedSignature) throws SignatureException {
-        if (extendedSignature != null &&
-                isExtendedOriginal(extendedSignature)) {
-            this.signature = extendedSignature;
-        }
-        throw new SignatureException("Invalid extended signature!");
-    }
-
-    /**
-     * Returns true when the passed in signature is extended and has the same input hash and signing date-time as
-     * this.signature.
-     * @param extendedSignature to be compared with this.signature.
-     */
-    private boolean isExtendedOriginal(KSISignature extendedSignature) {
-        return extendedSignature.getInputHash().equals(signature.getInputHash()) &&
-                extendedSignature.isExtended() &&
-                extendedSignature.getAggregationTime().equals(signature.getAggregationTime()) &&
-                extendedSignature.getIdentity().equals(signature.getIdentity());
     }
 
     @Override
@@ -51,6 +30,10 @@ class KsiContainerSignature implements ContainerSignature<KSISignature> {
         } catch (KSIException e) {
             throw new IOException("Writing signature to output failed", e);
         }
+    }
+
+    public void setSignature(KSISignature signature) {
+        this.signature = signature;
     }
 
 }

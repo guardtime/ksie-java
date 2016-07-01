@@ -21,10 +21,4 @@ public interface ContainerSignature<O> {
      */
     O getSignature();
 
-    /**
-     * Updates the existing ContainerSignature (this) to extend its underlying signature to a trust anchor
-     * @param extendedSignature The extended underlying signature.
-     * @throws SignatureException when the provided extended signature is not an extended version of the original signature
-     */
-    void extend(O extendedSignature) throws SignatureException;
 }
