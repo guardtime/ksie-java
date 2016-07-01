@@ -24,7 +24,7 @@ class TlvManifestFactoryType implements ManifestFactoryType {
 
     @Override
     public String toString() {
-        return "ManifestFactory{" +
+        return "TlvManifestFactoryType {" +
                 "name='" + name + '\'' +
                 ", fileExtension='" + manifestFileExtension + '\'' +
                 '}';

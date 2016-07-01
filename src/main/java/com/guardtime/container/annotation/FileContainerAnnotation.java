@@ -51,4 +51,10 @@ public class FileContainerAnnotation implements ContainerAnnotation {
         return dataHash;
     }
 
+    @Override
+    public String toString() {
+        return "FileContainerAnnotation {" +
+                "type='" + type.getContent() + "\'" +
+                ", domain='" + domain + "\'}";
+    }
 }

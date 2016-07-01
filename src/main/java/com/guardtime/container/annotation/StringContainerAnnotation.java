@@ -55,6 +55,7 @@ public class StringContainerAnnotation implements ContainerAnnotation {
     @Override
     public String toString() {
         return "StringContainerAnnotation {" +
+                "type='" + type.getContent() + "\'" +
                 ", domain='" + domain + "\'}";
     }
 

@@ -56,7 +56,7 @@ public class StreamContainerDocument implements ContainerDocument {
 
     @Override
     public String toString() {
-        return "{type=Stream" +
+        return "StreamContainerDocument {type=Stream" +
                 ", fileName=" + containerDocument.getFileName() +
                 ", mimeType=" + containerDocument.getMimeType() + "}";
     }

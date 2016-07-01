@@ -55,4 +55,11 @@ public class EmptyContainerDocument implements ContainerDocument {
     public boolean isWritable() {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "EmptyContainerDocument {type=Empty" +
+                ", fileName=" + fileName +
+                ", mimeType=" + mimeType+ "}";
+    }
 }

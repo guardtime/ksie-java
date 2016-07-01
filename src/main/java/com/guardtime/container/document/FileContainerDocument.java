@@ -63,7 +63,7 @@ public class FileContainerDocument implements ContainerDocument {
 
     @Override
     public String toString() {
-        return "{type=File" +
+        return "FileContainerDocument {type=File" +
                 ", fileName=" + fileName +
                 ", mimeType=" + mimeType+ "}";
     }

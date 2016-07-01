@@ -23,4 +23,12 @@ class KsiSignatureFactoryType implements SignatureFactoryType {
         return KSI_SIGNATURE_MIME_TYPE;
     }
 
+    @Override
+    public String toString() {
+        return "KsiSignatureFactoryType {" +
+                "name='" + getName() + "\'" +
+                ", fileExtension='" + getSignatureFileExtension() + "\'" +
+                ", mimeType='" + getSignatureMimeType() + "\'" +
+                "}";
+    }
 }
