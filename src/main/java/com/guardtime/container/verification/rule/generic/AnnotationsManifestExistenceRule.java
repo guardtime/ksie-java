@@ -42,7 +42,7 @@ public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureCont
 
     @Override
     public String getName() {
-        return "KSIE_VERIFY_ANNOTATION_MANIFEST";
+        return "KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS";
     }
 
     @Override
