@@ -11,8 +11,10 @@ import java.util.List;
 public interface Rule<O extends Object> {
 
     /**
-     * Returns a list of results gathered during verifying based on the rules internal logic.
-     * @param verifiable object
+     * Verifies {@link O} to produce a list of {@link RuleVerificationResult}. Any number of nested {@link Rule}s are
+     * possible to produce the desired verification.
+     * @param verifiable object to be examined
+     * @return List of results gathered from verifying passed in object
      */
     List<RuleVerificationResult> verify(O verifiable);
 
