@@ -41,11 +41,14 @@ public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureConten
         try {
             for (DataHash expectedHash : documentsManifestReference.getHashList()) {
                 if (expectedHash.getAlgorithm().getStatus() != HashAlgorithm.Status.NORMAL) {
-                    continue; // Skip not implemented or not trusted
+                    LOGGER.info("Will not perform hash verification for '{}' because algorithm status is '{}'", expectedHash, expectedHash.getAlgorithm().getStatus());
+                    continue; // Skip not implemented or not trusted hashes
                 }
                 DataHash annotationsManifestHash = documentsManifest.getDataHash(expectedHash.getAlgorithm());
                 if (expectedHash.equals(annotationsManifestHash)) {
                     verificationResult = VerificationResult.OK;
+                } else {
+                    LOGGER.warn("Generated hash does not match hash in reference. Expecting '{}', got '{}'", expectedHash, annotationsManifestHash);
                 }
             }
             result = new TerminatingVerificationResult(verificationResult, this, testedElement);

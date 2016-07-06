@@ -40,11 +40,14 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<Sig
             SingleAnnotationManifest manifest = singleAnnotationManifests.get(manifestUri);
             for (DataHash expectedHash : verifiable.getRight().getHashList()) {
                 if (expectedHash.getAlgorithm().getStatus() != HashAlgorithm.Status.NORMAL) {
-                    continue; // Skip not implemented or not trusted
+                    LOGGER.info("Will not perform hash verification for '{}' because algorithm status is '{}'", expectedHash, expectedHash.getAlgorithm().getStatus());
+                    continue; // Skip not implemented or not trusted hashes
                 }
                 DataHash realHash = manifest.getDataHash(expectedHash.getAlgorithm());
                 if (expectedHash.equals(realHash)) {
                     result = VerificationResult.OK;
+                } else {
+                    LOGGER.warn("Generated hash does not match hash in reference. Expecting '{}', got '{}'", expectedHash, realHash);
                 }
             }
             verificationResult = new TerminatingVerificationResult(result, this, manifestUri);

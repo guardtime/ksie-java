@@ -39,11 +39,14 @@ public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, Sign
             ContainerDocument document = verifiable.getRight().getDocuments().get(documentUri);
             for (DataHash expectedHash : verifiable.getLeft().getHashList()) {
                 if (expectedHash.getAlgorithm().getStatus() != HashAlgorithm.Status.NORMAL) {
-                    continue; // Skip not implemented or not trusted
+                    LOGGER.info("Will not perform hash verification for '{}' because algorithm status is '{}'", expectedHash, expectedHash.getAlgorithm().getStatus());
+                    continue; // Skip not implemented or not trusted hashes
                 }
                 DataHash realHash = document.getDataHash(expectedHash.getAlgorithm());
                 if (expectedHash.equals(realHash)) {
                     result = VerificationResult.OK;
+                } else {
+                    LOGGER.warn("Generated hash does not match hash in reference. Expecting '{}', got '{}'", expectedHash, realHash);
                 }
             }
             verificationResult = new TerminatingVerificationResult(result, this, documentUri);
