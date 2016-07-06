@@ -11,10 +11,10 @@ import com.guardtime.ksi.unisignature.KSISignature;
  * Extends all {@link KSISignature}s in {@link com.guardtime.container.packaging.Container} to the "closest" publication
  * in publication file available to provided {@link KSI}.
  */
-public class KsiContainerSignatureExtender implements ExtendingPolicy<KSISignature> {
+public class KsiContainerSignatureExtendingPolicy implements ExtendingPolicy<KSISignature> {
     protected final KSI ksi;
 
-    public KsiContainerSignatureExtender(KSI ksi) {
+    public KsiContainerSignatureExtendingPolicy(KSI ksi) {
         Util.notNull(ksi, "KSI");
         this.ksi = ksi;
     }

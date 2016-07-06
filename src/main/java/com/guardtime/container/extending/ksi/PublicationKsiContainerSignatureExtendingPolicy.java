@@ -12,11 +12,11 @@ import com.guardtime.ksi.unisignature.KSISignature;
  * Extends all {@link KSISignature}s in {@link com.guardtime.container.packaging.Container} to specified publication
  * record. The publication time of the publication record must be after signature aggregation time.
  */
-public class PublicationKsiContainerSignatureExtender implements ExtendingPolicy<KSISignature> {
+public class PublicationKsiContainerSignatureExtendingPolicy implements ExtendingPolicy<KSISignature> {
     private final PublicationRecord publicationRecord;
     protected final KSI ksi;
 
-    public PublicationKsiContainerSignatureExtender(KSI ksi, PublicationRecord publicationRecord) {
+    public PublicationKsiContainerSignatureExtendingPolicy(KSI ksi, PublicationRecord publicationRecord) {
         Util.notNull(ksi, "KSI");
         Util.notNull(publicationRecord, "Publication record");
         this.ksi = ksi;

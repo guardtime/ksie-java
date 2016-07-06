@@ -1,8 +1,8 @@
 package com.guardtime.container.extending;
 
 import com.guardtime.container.AbstractCommonKsiServiceIntegrationTest;
-import com.guardtime.container.extending.ksi.KsiContainerSignatureExtender;
-import com.guardtime.container.extending.ksi.PublicationKsiContainerSignatureExtender;
+import com.guardtime.container.extending.ksi.KsiContainerSignatureExtendingPolicy;
+import com.guardtime.container.extending.ksi.PublicationKsiContainerSignatureExtendingPolicy;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.SignatureFactory;
@@ -21,7 +21,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
 
     @Test
     public void testExtendingWithKsiContainerSignatureExtender() throws Exception {
-        ExtendingPolicy policy = new KsiContainerSignatureExtender(ksi);
+        ExtendingPolicy policy = new KsiContainerSignatureExtendingPolicy(ksi);
         doExtendingTest(signatureFactory, policy);
     }
 
@@ -29,7 +29,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
     public void testExtendingWithPublicationKsiContainerSignatureExtender() throws Exception {
         PublicationData publicationData = new PublicationData("AAAAAA-CXMCNI-AAJIV3-RB5OEJ-JBK57H-SJ42PI-IB2RE7-2CA2TM-H5W3EF-TF2BX7-HRNRP5-Q2E754"); // June 2016 publication string
         PublicationsFilePublicationRecord publicationRecord = new PublicationsFilePublicationRecord(publicationData);
-        ExtendingPolicy policy = new PublicationKsiContainerSignatureExtender(ksi, publicationRecord);
+        ExtendingPolicy policy = new PublicationKsiContainerSignatureExtendingPolicy(ksi, publicationRecord);
         doExtendingTest(signatureFactory, policy);
     }
 
@@ -37,7 +37,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
     public void testExtendingWithPublicationKsiContainerSignatureExtender_WithOlderPublicationString() throws Exception {
         PublicationData publicationData = new PublicationData("AAAAAA-CVFWVA-AAPV2S-SN3JLW-YEKPW3-AUSQP6-PF65K5-KVGZZA-7UYTOV-27VX54-VVJQFG-VCK6GR"); // Apr 2015 publication string
         PublicationsFilePublicationRecord publicationRecord = new PublicationsFilePublicationRecord(publicationData);
-        ExtendingPolicy policy = new PublicationKsiContainerSignatureExtender(ksi, publicationRecord);
+        ExtendingPolicy policy = new PublicationKsiContainerSignatureExtendingPolicy(ksi, publicationRecord);
         doExtendingTest(signatureFactory, policy, false);
     }
 

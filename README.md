@@ -82,14 +82,15 @@ Container signedContainer = packagingFactory.create(parsedContainer, documents, 
 
 ## Extending signatures in a container
 
-For extending it is necessary to specify the SignatureExtender implementation that applies to the given container.
+For extending it is necessary to specify the SignatureFactory implementation that applies to the given container. 
+And the ExtendingPolicy to define extension point.
 
 The following example shows extending of all signatures in a container.
 
 ```java
-SignatureExtender signatureExtender = new KsiSignatureExtender(ksi)
-ContainerExtender extender = new ContainerExtender(signatureExtender);
-Container extendedContainer = extender.extend(container);
+ExtendingPolicy extendingPolicy = new KsiContainerSignatureExtendingPolicy(ksi)
+ContainerSignatureExtender signatureExtender = new ContainerSignatureExtender(signatureFactory, extendingPolicy)
+extender.extend(container);
 ```
 
 ## Verifying a container
@@ -97,23 +98,23 @@ Container extendedContainer = extender.extend(container);
 The following example shows a simple verification for a container.
 
 ```java
-VerificationContext context = new SimpleVerificationContext(container);
 List<Rule> implicitRules;
 /* Initialize array and specify any rules deemed missing and necessary from the DefaultVerificationPolicy
 ...
 */
-DefaultVerificationPolicy policy = new DefaultVerificationPolicy(implicitRules);
+Rule signatureRule = new KsiPolicyBasedSignatureIntegrityRule(ksi, KeyBasedVerificationPolicy());
+DefaultVerificationPolicy policy = new DefaultVerificationPolicy(signatureRule, new MimeTypeIntegrityRule(packagingFactory), implicitRules);
 ContainerVerifier verifier = new ContainerVerifier(policy);
-VerifierResult result = verifier.verify(context);
-RuleResult verificationStatus = result.getVerificationResult(); // OK/NOK/WARN
+ContainerVerifierResult result = verifier.verify(container);
+VerificationResult verificationResult = result.getVerificationResult(); // OK/NOK/WARN
 ```
 
 Since there currently are no reports for verification then you'd have to loop through the raw results to get a more detailed overview of what failed verification.
 
 ```java
 for(RuleVerificationResult ruleResult : result.getResults()) {
-    ruleResult.getResult();         // OK/NOK/WARN
-    ruleResult.getRuleName();       // What rule produced the result
-    ruleResult.getTestedElement();  // What element was tested for the result.
+    ruleResult.getVerificationResult();     // OK/NOK/WARN
+    ruleResult.getRuleName();               // What rule produced the result
+    ruleResult.getTestedElementPath();      // What element was tested for the result.
 }
 ```
