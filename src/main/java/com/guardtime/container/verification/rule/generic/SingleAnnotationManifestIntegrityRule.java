@@ -46,6 +46,7 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<Sig
                 DataHash realHash = manifest.getDataHash(expectedHash.getAlgorithm());
                 if (expectedHash.equals(realHash)) {
                     result = VerificationResult.OK;
+                    LOGGER.info("Generated hash matches hash in reference. Hash: '{}'", realHash);
                 } else {
                     LOGGER.warn("Generated hash does not match hash in reference. Expecting '{}', got '{}'", expectedHash, realHash);
                 }

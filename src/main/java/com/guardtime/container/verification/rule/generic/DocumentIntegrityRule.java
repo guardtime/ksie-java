@@ -45,6 +45,7 @@ public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, Sign
                 DataHash realHash = document.getDataHash(expectedHash.getAlgorithm());
                 if (expectedHash.equals(realHash)) {
                     result = VerificationResult.OK;
+                    LOGGER.info("Generated hash matches hash in reference. Hash: '{}'", realHash);
                 } else {
                     LOGGER.warn("Generated hash does not match hash in reference. Expecting '{}', got '{}'", expectedHash, realHash);
                 }
