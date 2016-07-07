@@ -11,10 +11,10 @@ import java.util.List;
 public interface Rule<O extends Object> {
 
     /**
-     * Verifies {@link O} to produce a list of {@link RuleVerificationResult}. Any number of nested {@link Rule}s are
-     * possible to produce the desired verification.
+     * Verifies {@link O} to produce a list of {@link RuleVerificationResult}. Depending on the implementation, there
+     * can be nested Rules used during verification.
      * @param verifiable object to be examined
-     * @return List of results gathered from verifying passed in object
+     * @return List of results gathered from verifying
      */
     List<RuleVerificationResult> verify(O verifiable);
 
