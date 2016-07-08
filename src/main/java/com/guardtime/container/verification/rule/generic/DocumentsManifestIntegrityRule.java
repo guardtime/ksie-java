@@ -5,15 +5,9 @@ import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.result.TerminatingVerificationResult;
-import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.ksi.hashing.DataHash;
-import com.guardtime.ksi.hashing.HashAlgorithm;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,32 +26,10 @@ public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureConten
 
     @Override
     protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
-        RuleVerificationResult result;
-        VerificationResult verificationResult = getFailureVerificationResult();
         DocumentsManifest documentsManifest = verifiable.getDocumentsManifest().getRight();
         Manifest manifest = verifiable.getManifest().getRight();
         FileReference documentsManifestReference = manifest.getDocumentsManifestReference();
-        String testedElement = documentsManifestReference.getUri();
-        try {
-            for (DataHash expectedHash : documentsManifestReference.getHashList()) {
-                if (expectedHash.getAlgorithm().getStatus() != HashAlgorithm.Status.NORMAL) {
-                    LOGGER.info("Will not perform hash verification for '{}' because algorithm status is '{}'", expectedHash, expectedHash.getAlgorithm().getStatus());
-                    continue; // Skip not implemented or not trusted hashes
-                }
-                DataHash realHash = documentsManifest.getDataHash(expectedHash.getAlgorithm());
-                if (expectedHash.equals(realHash)) {
-                    verificationResult = VerificationResult.OK;
-                    LOGGER.info("Generated hash matches hash in reference. Hash: '{}'", realHash);
-                } else {
-                    LOGGER.warn("Generated hash does not match hash in reference. Expecting '{}', got '{}'", expectedHash, realHash);
-                }
-            }
-            result = new TerminatingVerificationResult(verificationResult, this, testedElement);
-        } catch (IOException e) {
-            LOGGER.info("Verifying documents manifest failed!", e);
-            result = new TerminatingVerificationResult(verificationResult, this, testedElement, e);
-        }
-        return Arrays.asList(result);
+        return getFileReferenceHashListVerificationResult(documentsManifest, documentsManifestReference);
     }
 
     @Override

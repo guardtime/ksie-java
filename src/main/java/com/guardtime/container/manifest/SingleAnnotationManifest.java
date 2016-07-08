@@ -9,7 +9,7 @@ import java.io.InputStream;
 /**
  * Container internal structure manifest that contains some meta-data and reference to annotation data.
  */
-public interface SingleAnnotationManifest {
+public interface SingleAnnotationManifest extends MultiHashElement {
 
     /**
      * Returns a reference pointing to annotation data in the container.

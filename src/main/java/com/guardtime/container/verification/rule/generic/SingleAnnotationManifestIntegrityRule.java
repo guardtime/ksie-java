@@ -5,15 +5,10 @@ import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.result.TerminatingVerificationResult;
-import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
-import com.guardtime.ksi.hashing.HashAlgorithm;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -32,31 +27,10 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<Sig
 
     @Override
     protected List<RuleVerificationResult> verifyRule(Pair<SignatureContent, FileReference> verifiable) {
-        RuleVerificationResult verificationResult;
-        VerificationResult result = getFailureVerificationResult();
-        String manifestUri = verifiable.getRight().getUri();
-        try {
-            Map<String, SingleAnnotationManifest> singleAnnotationManifests = verifiable.getLeft().getSingleAnnotationManifests();
-            SingleAnnotationManifest manifest = singleAnnotationManifests.get(manifestUri);
-            for (DataHash expectedHash : verifiable.getRight().getHashList()) {
-                if (expectedHash.getAlgorithm().getStatus() != HashAlgorithm.Status.NORMAL) {
-                    LOGGER.info("Will not perform hash verification for '{}' because algorithm status is '{}'", expectedHash, expectedHash.getAlgorithm().getStatus());
-                    continue; // Skip not implemented or not trusted hashes
-                }
-                DataHash realHash = manifest.getDataHash(expectedHash.getAlgorithm());
-                if (expectedHash.equals(realHash)) {
-                    result = VerificationResult.OK;
-                    LOGGER.info("Generated hash matches hash in reference. Hash: '{}'", realHash);
-                } else {
-                    LOGGER.warn("Generated hash does not match hash in reference. Expecting '{}', got '{}'", expectedHash, realHash);
-                }
-            }
-            verificationResult = new TerminatingVerificationResult(result, this, manifestUri);
-        } catch (IOException e) {
-            LOGGER.info("Verifying annotation meta-data failed!", e);
-            verificationResult = new TerminatingVerificationResult(result, this, manifestUri, e);
-        }
-        return Arrays.asList(verificationResult);
+        FileReference fileReference = verifiable.getRight();
+        Map<String, SingleAnnotationManifest> singleAnnotationManifests = verifiable.getLeft().getSingleAnnotationManifests();
+        SingleAnnotationManifest manifest = singleAnnotationManifests.get(fileReference.getUri());
+        return getFileReferenceHashListVerificationResult(manifest, fileReference);
     }
 
     @Override

@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Container structure manifest containing references to documents contained in the container.
  */
-public interface DocumentsManifest {
+public interface DocumentsManifest extends MultiHashElement {
 
     /**
      * Returns InputStream containing this manifest.

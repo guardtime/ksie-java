@@ -43,7 +43,7 @@ public class EmptyContainerDocument implements ContainerDocument {
 
     @Override
     public DataHash getDataHash(HashAlgorithm algorithm) throws IOException, DataHashException {
-        for(DataHash hash : hashList) {
+        for (DataHash hash : hashList) {
             if (hash.getAlgorithm().equals(algorithm)) {
                 return hash;
             }
