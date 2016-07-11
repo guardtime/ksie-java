@@ -21,7 +21,7 @@ public interface AnnotationsManifest {
     InputStream getInputStream() throws IOException;
 
     /**
-     * Returns Hash of the manifest created based on the same data available from {@link #getInputStream()} for given algorithm.
+     * Returns a {@link DataHash} created based on the same data available from {@link #getInputStream()} for given algorithm.
      * @param algorithm to be used for generating the hash.
      * @throws IOException when the hash input data can't be accessed.
      */

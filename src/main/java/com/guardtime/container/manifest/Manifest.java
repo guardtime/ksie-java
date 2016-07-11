@@ -14,8 +14,7 @@ import java.io.InputStream;
 public interface Manifest {
 
     /**
-     * Returns {@link DataHash} of the manifest created based on the same data available from {@link #getInputStream()}
-     * for given algorithm.
+     * Returns {@link DataHash} created based on the same data available from {@link #getInputStream()} for given algorithm.
      * @param algorithm to be used for generating the hash.
      * @throws IOException when the hash input data can't be accessed.
      */

@@ -3,7 +3,7 @@ package com.guardtime.container.manifest;
 import com.guardtime.ksi.hashing.DataHash;
 
 /**
- * Manifest internal reference used for referring to annotation data in container.
+ * {@link SingleAnnotationManifest} internal reference used for referring to annotation data in container.
  */
 public interface AnnotationDataReference {
 

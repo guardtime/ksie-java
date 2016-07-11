@@ -30,7 +30,7 @@ public class ContainerBuilder {
     private Container existingContainer;
 
     /**
-     * Expects as a parameter a {@link ContainerPackagingFactory} to be used for creating the container.
+     * Expects a {@link ContainerPackagingFactory} as parameter to be used for creating the container.
      */
     public ContainerBuilder(ContainerPackagingFactory packagingFactory) {
         notNull(packagingFactory, "Packaging factory");
@@ -38,7 +38,7 @@ public class ContainerBuilder {
     }
 
     /**
-     * Expects as a parameter a {@link Container} to be expanded by new documents and annotations.
+     * Expects a {@link Container} as parameter to be expanded by new documents and annotations.
      */
     public ContainerBuilder withExistingContainer(Container existingContainer) {
         this.existingContainer = existingContainer;

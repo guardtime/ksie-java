@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Represents annotations that can be used in container. Combines into one object both annotation data and annotation
- * meta-data like type and domain.
+ * Represents annotations that can be used in container. Combines annotation data and annotation
+ * meta-data into one object.
  */
 public interface ContainerAnnotation {
 
