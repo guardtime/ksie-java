@@ -23,7 +23,7 @@ public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
     public void testCreateAnnotationsManifest() throws Exception {
         Map<String, Pair<ContainerAnnotation, TlvSingleAnnotationManifest>> singleAnnotationManifests = new HashMap<>();
         singleAnnotationManifests.put(MOCK_URI, Pair.of(mockAnnotation, mockSingleAnnotationManifest));
-        TlvAnnotationsManifest annotationsManifest = new TlvAnnotationsManifest(singleAnnotationManifests, DEFAULT_HASH_ALGORITHM);
+        TlvAnnotationsManifest annotationsManifest = new TlvAnnotationsManifest(singleAnnotationManifests, DEFAULT_HASH_ALGORITHM_PROVIDER);
         assertArrayEquals(ANNOTATIONS_MANIFEST_MAGIC, annotationsManifest.getMagic());
         assertNotNull(annotationsManifest.getSingleAnnotationManifestReferences());
         assertNotNull(annotationsManifest.getSingleAnnotationManifestReferences().get(0));

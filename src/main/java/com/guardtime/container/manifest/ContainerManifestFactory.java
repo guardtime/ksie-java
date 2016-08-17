@@ -2,6 +2,7 @@ package com.guardtime.container.manifest;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.util.Pair;
 
 import java.io.InputStream;
@@ -16,6 +17,8 @@ import java.util.Map;
  * @param <SA>    Annotation info manifest implementation.
  */
 public interface ContainerManifestFactory<M extends Manifest, D extends DocumentsManifest, A extends AnnotationsManifest, SA extends SingleAnnotationManifest> {
+
+    HashAlgorithmProvider getHashAlgorithmProvider();
 
     M createManifest(Pair<String, D> documentsManifest, Pair<String, A> annotationManifest, Pair<String, String> signatureReference) throws InvalidManifestException;
 

@@ -2,6 +2,7 @@ package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.manifest.*;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
@@ -142,10 +143,16 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
                     .withManifest(Pair.of(nameProvider.nextManifestName(), manifest))
                     .build();
 
-            DataHash hash = signatureContent.getSignatureInputHash();
+            DataHash hash = getSignatureContentSigningHash(signatureContent);
             ContainerSignature signature = signatureFactory.create(hash);
             signatureContent.setSignature(signature);
             return signatureContent;
+        }
+
+        private DataHash getSignatureContentSigningHash(ZipSignatureContent signatureContent) throws IOException {
+            Manifest manifest = signatureContent.getManifest().getRight();
+            HashAlgorithmProvider algorithmProvider = manifestFactory.getHashAlgorithmProvider();
+            return manifest.getDataHash(algorithmProvider.getMainHashAlgorithm());
         }
 
         public ZipEntryNameProvider getNameProvider() {
