@@ -1,6 +1,5 @@
-package com.guardtime.container.verification.rule.generic;
+package com.guardtime.container.verification.rule;
 
-import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.SignatureReference;
 import com.guardtime.container.packaging.SignatureContent;
@@ -10,6 +9,7 @@ import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleState;
+import com.guardtime.container.verification.rule.generic.SignatureExistenceRule;
 import com.guardtime.ksi.unisignature.KSISignature;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +21,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-public class SignatureExistenceRuleTest extends AbstractContainerTest {
+public class SignatureExistenceRuleTest {
 
     @Mock
     private SignatureContent mockSignatureContent;
