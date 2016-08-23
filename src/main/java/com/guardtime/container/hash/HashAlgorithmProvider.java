@@ -9,13 +9,28 @@ import java.util.List;
  * com.guardtime.ksi.hashing.DataHash}es.
  */
 public interface HashAlgorithmProvider {
-    /**
-     * Returns the main {@link HashAlgorithm} of the provider.
-     */
-    HashAlgorithm getMainHashAlgorithm();
 
     /**
-     * Returns a {@link List} of all {@link HashAlgorithm}s of the provider.
+     * Returns a {@link List} of all {@link HashAlgorithm}s to be used for creating {@link
+     * com.guardtime.ksi.hashing.DataHash}es for {@link com.guardtime.container.manifest.FileReference}.
      */
-    List<HashAlgorithm> getHashAlgorithms();
+    List<HashAlgorithm> getFileReferenceHashAlgorithms();
+
+    /**
+     * Returns a {@link List} of all {@link HashAlgorithm}s to be used for creating {@link
+     * com.guardtime.ksi.hashing.DataHash}es for {@link com.guardtime.container.manifest.FileReference} used
+     * specifically for {@link com.guardtime.container.document.ContainerDocument}s.
+     */
+    List<HashAlgorithm> getDocumentReferenceHashAlgorithms();
+
+    /**
+     * Returns a {@link HashAlgorithm} to be used for creating {@link
+     * com.guardtime.ksi.hashing.DataHash} for {@link com.guardtime.container.manifest.AnnotationDataReference}.
+     */
+    HashAlgorithm getAnnotationDataReferenceHashAlgorithm();
+
+    /**
+     * Returns a {@link HashAlgorithm} to be used when creating signature for the container.
+     */
+    HashAlgorithm getSignatureHashAlgorithm();
 }

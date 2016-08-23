@@ -1,5 +1,6 @@
 package com.guardtime.container.document;
 
+import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
@@ -7,6 +8,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.guardtime.container.util.Util.createTempFile;
 import static com.guardtime.container.util.Util.notNull;
@@ -47,6 +50,11 @@ public class StreamContainerDocument implements ContainerDocument {
     @Override
     public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
         return containerDocument.getDataHash(algorithm);
+    }
+
+    @Override
+    public List<DataHash> getDataHashList(HashAlgorithmProvider algorithmProvider) throws IOException {
+        return containerDocument.getDataHashList(algorithmProvider);
     }
 
     @Override
