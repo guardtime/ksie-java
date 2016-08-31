@@ -6,8 +6,7 @@ import com.guardtime.container.verification.policy.DefaultVerificationPolicy;
 import com.guardtime.container.verification.policy.VerificationPolicy;
 import com.guardtime.container.verification.result.ContainerVerifierResult;
 import com.guardtime.container.verification.result.VerificationResult;
-import com.guardtime.container.verification.rule.generic.ContainerSignatureIntegrityRule;
-import com.guardtime.container.verification.rule.signature.KsiPolicyBasedSignatureVerifier;
+import com.guardtime.container.verification.rule.signature.ksi.KsiPolicyBasedSignatureVerifier;
 import com.guardtime.ksi.unisignature.verifier.policies.CalendarBasedVerificationPolicy;
 import org.junit.Test;
 

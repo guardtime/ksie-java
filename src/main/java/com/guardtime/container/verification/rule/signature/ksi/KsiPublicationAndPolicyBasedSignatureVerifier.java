@@ -1,4 +1,4 @@
-package com.guardtime.container.verification.rule.signature;
+package com.guardtime.container.verification.rule.signature.ksi;
 
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.exceptions.KSIException;
@@ -8,7 +8,7 @@ import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.verifier.VerificationResult;
 import com.guardtime.ksi.unisignature.verifier.policies.Policy;
 
-public class KsiPublicationAndPolicyBasedSignatureVerifier extends KsiPolicyBasedSignatureVerifier {
+public class KsiPublicationAndPolicyBasedSignatureVerifier extends KsiBasedSignatureVerifier {
 
     private final PublicationData publication;
 
