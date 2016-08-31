@@ -15,11 +15,11 @@ public class SignatureContentIntegrityRule extends AbstractRule<Container> imple
     private DocumentsIntegrityRule documentsIntegrityRule;
     private AnnotationsIntegrityRule annotationsIntegrityRule;
 
-    public SignatureContentIntegrityRule(RuleState state, Rule signatureRule) {
-        super(state);
+    public SignatureContentIntegrityRule(RuleStateProvider stateProvider, Rule signatureRule) {
+        super(RuleState.FAIL);
         this.signatureRule = signatureRule;
-        documentsIntegrityRule = new DocumentsIntegrityRule(state);
-        annotationsIntegrityRule = new AnnotationsIntegrityRule(state);
+        documentsIntegrityRule = new DocumentsIntegrityRule(stateProvider);
+        annotationsIntegrityRule = new AnnotationsIntegrityRule(stateProvider);
     }
 
     @Override

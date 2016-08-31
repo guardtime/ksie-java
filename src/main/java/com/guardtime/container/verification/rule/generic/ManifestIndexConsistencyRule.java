@@ -10,15 +10,18 @@ import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.ContainerRule;
-import com.guardtime.container.verification.rule.RuleState;
+import com.guardtime.container.verification.rule.RuleStateProvider;
+import com.guardtime.container.verification.rule.RuleType;
 
 /**
  * This rule verifies that consecutive manifests have appropriate index numbers.
  */
 public class ManifestIndexConsistencyRule extends AbstractRule<Container> implements ContainerRule {
 
-    public ManifestIndexConsistencyRule(RuleState state) {
-        super(state);
+    private static final String NAME = RuleType.KSIE_VERIFY_MANIFEST_INDEX.name();
+
+    public ManifestIndexConsistencyRule(RuleStateProvider provider) {
+        super(provider.getStateForRule(NAME));
     }
 
     @Override
@@ -43,6 +46,6 @@ public class ManifestIndexConsistencyRule extends AbstractRule<Container> implem
 
     @Override
     public String getName() {
-        return "KSIE_VERIFY_MANIFEST_INDEX";
+        return NAME;
     }
 }

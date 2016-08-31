@@ -7,9 +7,7 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
-import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.container.verification.rule.RuleTerminatingException;
+import com.guardtime.container.verification.rule.*;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
@@ -20,8 +18,10 @@ import java.io.IOException;
  */
 public class AnnotationsManifestIntegrityRule extends AbstractRule<SignatureContent> {
 
-    public AnnotationsManifestIntegrityRule(RuleState state) {
-        super(state);
+    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST.name();
+
+    public AnnotationsManifestIntegrityRule(RuleStateProvider stateProvider) {
+        super(stateProvider.getStateForRule(NAME));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class AnnotationsManifestIntegrityRule extends AbstractRule<SignatureCont
 
     @Override
     public String getName() {
-        return "KSIE_VERIFY_ANNOTATION_MANIFEST";
+        return NAME;
     }
 
     @Override

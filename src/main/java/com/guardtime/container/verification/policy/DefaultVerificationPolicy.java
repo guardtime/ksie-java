@@ -1,11 +1,14 @@
 package com.guardtime.container.verification.policy;
 
 import com.guardtime.container.manifest.DocumentsManifest;
+import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.verification.rule.ContainerRule;
-import com.guardtime.container.verification.rule.Rule;
-import com.guardtime.container.verification.rule.RuleState;
+import com.guardtime.container.verification.rule.RuleStateProvider;
+import com.guardtime.container.verification.rule.generic.ContainerSignatureIntegrityRule;
 import com.guardtime.container.verification.rule.generic.ManifestIndexConsistencyRule;
+import com.guardtime.container.verification.rule.generic.MimeTypeIntegrityRule;
 import com.guardtime.container.verification.rule.generic.SignatureContentIntegrityRule;
+import com.guardtime.container.verification.rule.signature.SignatureVerifier;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -31,17 +34,18 @@ public class DefaultVerificationPolicy implements VerificationPolicy {
     private ArrayList<ContainerRule> containerRules = new ArrayList<>();
 
     /**
-     * @param signatureRule will be called for verifying each signature.
-     * @param mimetypeRule will be called to verify mimetype file.
+     * @param signatureVerifier will be called for verifying each signature.
+     * @param packagingFactory will be used to create the appropriate MIME type rule.
      */
-    public DefaultVerificationPolicy(Rule signatureRule, ContainerRule mimetypeRule) {
-        this(signatureRule, mimetypeRule, new LinkedList<ContainerRule>());
+    public DefaultVerificationPolicy(RuleStateProvider stateProvider, SignatureVerifier signatureVerifier, ContainerPackagingFactory packagingFactory) {
+        this(stateProvider, signatureVerifier, packagingFactory, new LinkedList<ContainerRule>());
     }
 
-    public DefaultVerificationPolicy(Rule signatureRule, ContainerRule mimetypeRule, List<ContainerRule> customRules) {
-        containerRules.add(mimetypeRule);
-        containerRules.add(new ManifestIndexConsistencyRule(RuleState.FAIL));
-        containerRules.add(new SignatureContentIntegrityRule(RuleState.FAIL, signatureRule)); // Nested rules inside
+    public DefaultVerificationPolicy(RuleStateProvider stateProvider, SignatureVerifier signatureVerifier, ContainerPackagingFactory packagingFactory, List<ContainerRule> customRules) {
+        containerRules.add(new MimeTypeIntegrityRule(stateProvider, packagingFactory));
+        containerRules.add(new ManifestIndexConsistencyRule(stateProvider));
+        ContainerSignatureIntegrityRule signatureRule = new ContainerSignatureIntegrityRule(stateProvider, signatureVerifier);
+        containerRules.add(new SignatureContentIntegrityRule(stateProvider, signatureRule)); // Nested rules inside
         containerRules.addAll(customRules);
     }
 

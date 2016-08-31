@@ -5,9 +5,7 @@ import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.verification.result.*;
-import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.container.verification.rule.RuleTerminatingException;
+import com.guardtime.container.verification.rule.*;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
@@ -21,8 +19,10 @@ import java.util.List;
  */
 public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureContent> {
 
-    public DocumentsManifestIntegrityRule(RuleState state) {
-        super(state);
+    private static final String NAME = RuleType.KSIE_VERIFY_DATA_MANIFEST.name();
+
+    public DocumentsManifestIntegrityRule(RuleStateProvider stateProvider) {
+        super(stateProvider.getStateForRule(NAME));
     }
 
     @Override
@@ -55,7 +55,7 @@ public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureConten
 
     @Override
     public String getName() {
-        return "KSIE_VERIFY_DATA_MANIFEST";
+        return NAME;
     }
 
     @Override

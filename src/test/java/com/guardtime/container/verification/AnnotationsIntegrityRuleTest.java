@@ -10,6 +10,7 @@ import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.rule.DefaultRuleStateProvider;
 import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.container.verification.rule.generic.AnnotationsIntegrityRule;
@@ -50,7 +51,7 @@ public class AnnotationsIntegrityRuleTest extends AbstractContainerTest {
     private KSISignature mockKsiSignature;
 
     private ContainerPackagingFactory packagingFactory;
-    private Rule rule = new AnnotationsIntegrityRule(RuleState.FAIL);
+    private Rule rule = new AnnotationsIntegrityRule(defaultRuleStateProvider);
 
     @Before
     public void setUp() throws Exception {

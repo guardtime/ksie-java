@@ -8,9 +8,7 @@ import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
-import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.container.verification.rule.RuleTerminatingException;
+import com.guardtime.container.verification.rule.*;
 
 /**
  * This rule verifies that the annotations manifest is actually present in the {@link
@@ -18,8 +16,10 @@ import com.guardtime.container.verification.rule.RuleTerminatingException;
  */
 public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureContent> {
 
-    public AnnotationsManifestExistenceRule(RuleState state) {
-        super(state);
+    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.name();
+
+    public AnnotationsManifestExistenceRule(RuleStateProvider stateProvider) {
+        super(stateProvider.getStateForRule(NAME));
     }
 
     @Override
@@ -42,7 +42,7 @@ public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureCont
 
     @Override
     public String getName() {
-        return "KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS";
+        return NAME;
     }
 
     @Override

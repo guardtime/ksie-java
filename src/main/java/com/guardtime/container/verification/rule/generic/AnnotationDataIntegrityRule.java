@@ -12,6 +12,8 @@ import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
+import com.guardtime.container.verification.rule.RuleStateProvider;
+import com.guardtime.container.verification.rule.RuleType;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.IOException;
@@ -21,8 +23,10 @@ import java.io.IOException;
  */
 public class AnnotationDataIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
-    public AnnotationDataIntegrityRule(RuleState state) {
-        super(state);
+    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_DATA.name();
+
+    public AnnotationDataIntegrityRule(RuleStateProvider stateProvider) {
+        super(stateProvider.getStateForRule(NAME));
     }
 
     @Override
@@ -70,7 +74,7 @@ public class AnnotationDataIntegrityRule extends AbstractRule<Pair<SignatureCont
 
     @Override
     public String getName() {
-        return "KSIE_VERIFY_ANNOTATION_DATA";
+        return NAME;
     }
 
     @Override

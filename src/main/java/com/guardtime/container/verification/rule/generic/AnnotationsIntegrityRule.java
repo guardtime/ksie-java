@@ -7,6 +7,7 @@ import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
+import com.guardtime.container.verification.rule.RuleStateProvider;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 
 import java.util.List;
@@ -24,14 +25,14 @@ public class AnnotationsIntegrityRule extends AbstractRule<SignatureContent> {
     private AnnotationDataExistenceRule annotationDataExistenceRule;
     private AnnotationDataIntegrityRule annotationDataIntegrityRule;
 
-    public AnnotationsIntegrityRule(RuleState state) {
-        super(state);
-        annotationsManifestExistenceRule = new AnnotationsManifestExistenceRule(state);
-        annotationsManifestIntegrityRule = new AnnotationsManifestIntegrityRule(state);
-        singleAnnotationManifestExistenceRule = new SingleAnnotationManifestExistenceRule(state);
-        singleAnnotationManifestIntegrityRule = new SingleAnnotationManifestIntegrityRule(state);
-        annotationDataExistenceRule = new AnnotationDataExistenceRule(state);
-        annotationDataIntegrityRule = new AnnotationDataIntegrityRule(state);
+    public AnnotationsIntegrityRule(RuleStateProvider stateProvider) {
+        super(RuleState.FAIL);
+        annotationsManifestExistenceRule = new AnnotationsManifestExistenceRule(stateProvider);
+        annotationsManifestIntegrityRule = new AnnotationsManifestIntegrityRule(stateProvider);
+        singleAnnotationManifestExistenceRule = new SingleAnnotationManifestExistenceRule(stateProvider);
+        singleAnnotationManifestIntegrityRule = new SingleAnnotationManifestIntegrityRule(stateProvider);
+        annotationDataExistenceRule = new AnnotationDataExistenceRule(stateProvider);
+        annotationDataIntegrityRule = new AnnotationDataIntegrityRule(stateProvider);
     }
 
     @Override

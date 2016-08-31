@@ -7,6 +7,7 @@ import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
+import com.guardtime.container.verification.rule.RuleStateProvider;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 
 import java.util.List;
@@ -23,12 +24,12 @@ public class DocumentsIntegrityRule extends AbstractRule<SignatureContent> {
     private DocumentExistenceRule documentExistenceRule;
     private DocumentIntegrityRule documentIntegrityRule;
 
-    public DocumentsIntegrityRule(RuleState state) {
-        super(state);
-        documentsManifestExistenceRule = new DocumentsManifestExistenceRule(state);
-        documentsManifestIntegrityRule = new DocumentsManifestIntegrityRule(state);
-        documentExistenceRule = new DocumentExistenceRule(state);
-        documentIntegrityRule = new DocumentIntegrityRule(state);
+    public DocumentsIntegrityRule(RuleStateProvider stateProvider) {
+        super(RuleState.FAIL);
+        documentsManifestExistenceRule = new DocumentsManifestExistenceRule(stateProvider);
+        documentsManifestIntegrityRule = new DocumentsManifestIntegrityRule(stateProvider);
+        documentExistenceRule = new DocumentExistenceRule(stateProvider);
+        documentIntegrityRule = new DocumentIntegrityRule(stateProvider);
     }
 
     @Override

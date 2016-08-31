@@ -9,7 +9,8 @@ import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.RuleState;
+import com.guardtime.container.verification.rule.RuleStateProvider;
+import com.guardtime.container.verification.rule.RuleType;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
@@ -20,8 +21,10 @@ import java.io.IOException;
  */
 public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, SignatureContent>> {
 
-    public DocumentIntegrityRule(RuleState state) {
-        super(state);
+    private static final String NAME = RuleType.KSIE_VERIFY_DATA_HASH.name();
+
+    public DocumentIntegrityRule(RuleStateProvider stateProvider) {
+        super(stateProvider.getStateForRule(NAME));
     }
 
     @Override
@@ -48,7 +51,7 @@ public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, Sign
 
     @Override
     public String getName() {
-        return "KSIE_VERIFY_DATA_HASH";
+        return NAME;
     }
 
     @Override

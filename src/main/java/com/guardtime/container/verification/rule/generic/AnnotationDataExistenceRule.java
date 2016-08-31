@@ -9,17 +9,17 @@ import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
-import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.container.verification.rule.RuleTerminatingException;
+import com.guardtime.container.verification.rule.*;
 
 /**
  * This rule verifies that the annotation data is actually present in the {@link com.guardtime.container.packaging.Container}
  */
 public class AnnotationDataExistenceRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
-    public AnnotationDataExistenceRule(RuleState ruleState) {
-        super(ruleState);
+    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_DATA_EXISTS.name();
+
+    public AnnotationDataExistenceRule(RuleStateProvider stateProvider) {
+        super(stateProvider.getStateForRule(NAME));
     }
 
     @Override
@@ -57,7 +57,7 @@ public class AnnotationDataExistenceRule extends AbstractRule<Pair<SignatureCont
 
     @Override
     public String getName() {
-        return "KSIE_VERIFY_ANNOTATION_DATA_EXISTS";
+        return NAME;
     }
 
     @Override

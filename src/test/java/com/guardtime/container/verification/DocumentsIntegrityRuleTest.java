@@ -38,7 +38,7 @@ public class DocumentsIntegrityRuleTest extends AbstractContainerTest {
     private KSISignature mockKsiSignature;
 
     private ContainerPackagingFactory packagingFactory;
-    private Rule rule = new DocumentsIntegrityRule(RuleState.FAIL);
+    private Rule rule = new DocumentsIntegrityRule(defaultRuleStateProvider);
 
     @Before
     public void setUp() throws Exception {
