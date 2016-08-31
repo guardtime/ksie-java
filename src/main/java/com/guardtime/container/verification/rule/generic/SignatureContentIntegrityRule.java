@@ -2,14 +2,8 @@ package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.ContainerRule;
-import com.guardtime.container.verification.rule.Rule;
-import com.guardtime.container.verification.rule.RuleState;
-
-import java.util.LinkedList;
-import java.util.List;
+import com.guardtime.container.verification.result.ResultHolder;
+import com.guardtime.container.verification.rule.*;
 
 /**
  * This is a delegating rule, not verifying directly but by calling relevant rules to verify sub-components. This rule
@@ -18,25 +12,23 @@ import java.util.List;
  */
 public class SignatureContentIntegrityRule extends AbstractRule<Container> implements ContainerRule {
     private final Rule signatureRule;
+    private DocumentsIntegrityRule documentsIntegrityRule;
+    private AnnotationsIntegrityRule annotationsIntegrityRule;
 
-    public SignatureContentIntegrityRule(Rule signatureRule) {
-        this(signatureRule, RuleState.FAIL);
-    }
-
-    public SignatureContentIntegrityRule(Rule signatureRule, RuleState state) {
+    public SignatureContentIntegrityRule(RuleState state, Rule signatureRule) {
         super(state);
         this.signatureRule = signatureRule;
+        documentsIntegrityRule = new DocumentsIntegrityRule(state);
+        annotationsIntegrityRule = new AnnotationsIntegrityRule(state);
     }
 
     @Override
-    protected List<RuleVerificationResult> verifyRule(Container verifiable) {
-        List<RuleVerificationResult> results = new LinkedList<>();
+    protected void verifyRule(ResultHolder holder, Container verifiable) throws RuleTerminatingException {
         for (SignatureContent content : verifiable.getSignatureContents()) {
-            results.addAll(signatureRule.verify(content));
-            results.addAll(new DocumentsIntegrityRule(state).verify(content));
-            results.addAll(new AnnotationsIntegrityRule(state).verify(content));
+            signatureRule.verify(holder, content);
+            documentsIntegrityRule.verify(holder, content);
+            annotationsIntegrityRule.verify(holder, content);
         }
-        return results;
     }
 
 }

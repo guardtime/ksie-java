@@ -7,9 +7,11 @@ import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.Rule;
+import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.container.verification.rule.generic.DocumentsIntegrityRule;
 import com.guardtime.ksi.unisignature.KSISignature;
 import org.junit.Before;
@@ -36,7 +38,7 @@ public class DocumentsIntegrityRuleTest extends AbstractContainerTest {
     private KSISignature mockKsiSignature;
 
     private ContainerPackagingFactory packagingFactory;
-    private Rule rule = new DocumentsIntegrityRule();
+    private Rule rule = new DocumentsIntegrityRule(RuleState.FAIL);
 
     @Before
     public void setUp() throws Exception {
@@ -53,8 +55,9 @@ public class DocumentsIntegrityRuleTest extends AbstractContainerTest {
         InputStream input = new FileInputStream(loadFile(path));
         Container container = packagingFactory.read(input);
         SignatureContent content = container.getSignatureContents().get(0);
-
-        return selectMostImportantResult(rule.verify(content));
+        ResultHolder holder = new ResultHolder();
+        rule.verify(holder, content);
+        return selectMostImportantResult(holder.getResults());
     }
 
     private RuleVerificationResult selectMostImportantResult(List<RuleVerificationResult> results) {

@@ -3,6 +3,7 @@ package com.guardtime.container.verification.policy;
 import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.verification.rule.ContainerRule;
 import com.guardtime.container.verification.rule.Rule;
+import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.container.verification.rule.generic.ManifestIndexConsistencyRule;
 import com.guardtime.container.verification.rule.generic.SignatureContentIntegrityRule;
 
@@ -39,8 +40,8 @@ public class DefaultVerificationPolicy implements VerificationPolicy {
 
     public DefaultVerificationPolicy(Rule signatureRule, ContainerRule mimetypeRule, List<ContainerRule> customRules) {
         containerRules.add(mimetypeRule);
-        containerRules.add(new ManifestIndexConsistencyRule());
-        containerRules.add(new SignatureContentIntegrityRule(signatureRule)); // Nested rules inside
+        containerRules.add(new ManifestIndexConsistencyRule(RuleState.FAIL));
+        containerRules.add(new SignatureContentIntegrityRule(RuleState.FAIL, signatureRule)); // Nested rules inside
         containerRules.addAll(customRules);
     }
 

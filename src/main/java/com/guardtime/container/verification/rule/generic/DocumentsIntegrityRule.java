@@ -4,11 +4,11 @@ import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
-import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
+import com.guardtime.container.verification.rule.RuleTerminatingException;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -18,33 +18,51 @@ import java.util.List;
  */
 public class DocumentsIntegrityRule extends AbstractRule<SignatureContent> {
 
-    public DocumentsIntegrityRule() {
-        this(RuleState.FAIL);
-    }
+    private DocumentsManifestExistenceRule documentsManifestExistenceRule;
+    private DocumentsManifestIntegrityRule documentsManifestIntegrityRule;
+    private DocumentExistenceRule documentExistenceRule;
+    private DocumentIntegrityRule documentIntegrityRule;
 
     public DocumentsIntegrityRule(RuleState state) {
         super(state);
+        documentsManifestExistenceRule = new DocumentsManifestExistenceRule(state);
+        documentsManifestIntegrityRule = new DocumentsManifestIntegrityRule(state);
+        documentExistenceRule = new DocumentExistenceRule(state);
+        documentIntegrityRule = new DocumentIntegrityRule(state);
     }
 
     @Override
-    protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
-        List<RuleVerificationResult> results = new LinkedList<>();
-        // DocumentsManifest existence
-        results.addAll(new DocumentsManifestExistenceRule(state).verify(verifiable));
-        if (mustTerminateVerification(results)) return results;
-        //DocumentsManifest integrity
-        results.addAll(new DocumentsManifestIntegrityRule(state).verify(verifiable));
-        if (mustTerminateVerification(results)) return results;
-        //Documents
-        DocumentsManifest documentsManifest = verifiable.getDocumentsManifest().getRight();
-        List<? extends FileReference> documentsReferences = documentsManifest.getDocumentReferences();
-        for (FileReference reference : documentsReferences) {
-            List<RuleVerificationResult> existenceResults = new DocumentExistenceRule(state).verify(Pair.of(reference, verifiable));
-            results.addAll(existenceResults);
-            if (mustTerminateVerification(existenceResults)) continue;
-            results.addAll(new DocumentIntegrityRule(state).verify(Pair.of(reference, verifiable)));
-        }
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) {
 
-        return results;
+        if (!processDocumentsManifestVerification(holder, verifiable)) return;
+        //Documents
+        for (FileReference reference : getDocumentsFileReferences(verifiable)) {
+            processDocumentVerification(holder, Pair.of(reference, verifiable));
+        }
+    }
+
+    private boolean processDocumentsManifestVerification(ResultHolder holder, SignatureContent verifiable) {
+        try {
+            documentsManifestExistenceRule.verify(holder, verifiable);
+            documentsManifestIntegrityRule.verify(holder, verifiable);
+        } catch (RuleTerminatingException e) {
+            LOGGER.info("Halting DocumentsManifest verification chain! Caused by '{}'", e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    private void processDocumentVerification(ResultHolder holder, Pair<FileReference, SignatureContent> verifiable) {
+        try {
+            documentExistenceRule.verify(holder, verifiable);
+            documentIntegrityRule.verify(holder, verifiable);
+        } catch (RuleTerminatingException e) {
+            LOGGER.info("Halting Document verification chain! Caused by '{}'", e.getMessage());
+        }
+    }
+
+    private List<? extends FileReference> getDocumentsFileReferences(SignatureContent verifiable) {
+        DocumentsManifest documentsManifest = verifiable.getDocumentsManifest().getRight();
+        return documentsManifest.getDocumentReferences();
     }
 }

@@ -1,44 +1,39 @@
 package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
+import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.manifest.AnnotationDataReference;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.GenericVerificationResult;
-import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * This rule verifies that the annotation data has not been corrupted.
  */
 public class AnnotationDataIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
-    public AnnotationDataIntegrityRule() {
-        this(RuleState.FAIL);
-    }
-
     public AnnotationDataIntegrityRule(RuleState state) {
         super(state);
     }
 
     @Override
-    protected List<RuleVerificationResult> verifyRule(Pair<SignatureContent, FileReference> verifiable) {
-        List<RuleVerificationResult> results = new LinkedList<>();
-        VerificationResult verificationResult = getFailureVerificationResult();
-
-        String manifestUri = verifiable.getRight().getUri();
+    protected void verifyRule(ResultHolder holder, Pair<SignatureContent, FileReference> verifiable) {
+        FileReference reference = verifiable.getRight();
         SignatureContent signatureContent = verifiable.getLeft();
-        SingleAnnotationManifest manifest = signatureContent.getSingleAnnotationManifests().get(manifestUri);
-        AnnotationDataReference annotationDataReference = manifest.getAnnotationReference();
+        RuleState ruleState = getRuleState(reference);
+        VerificationResult verificationResult = getFailureVerificationResult();
+        GenericVerificationResult result;
+
+        AnnotationDataReference annotationDataReference = getAnnotationDataReference(reference, signatureContent);
         String annotationDataUri = annotationDataReference.getUri();
         ContainerAnnotation annotation = signatureContent.getAnnotations().get(annotationDataUri);
 
@@ -48,12 +43,29 @@ public class AnnotationDataIntegrityRule extends AbstractRule<Pair<SignatureCont
             if (expectedHash.equals(realHash)) {
                 verificationResult = VerificationResult.OK;
             }
-            results.add(new GenericVerificationResult(verificationResult, this, annotationDataUri));
+            result = new GenericVerificationResult(verificationResult, this, annotationDataUri);
         } catch (IOException e) {
             LOGGER.info("Verifying annotation data failed!", e);
-            results.add(new GenericVerificationResult(verificationResult, this, annotationDataUri, e));
+            result = new GenericVerificationResult(verificationResult, this, annotationDataUri, e);
         }
-        return results;
+
+        if (!verificationResult.equals(VerificationResult.OK) && ruleState.equals(RuleState.IGNORE)) {
+            // We drop non OK for ignored
+            return;
+        }
+
+        holder.addResult(result);
+    }
+
+    private AnnotationDataReference getAnnotationDataReference(FileReference reference, SignatureContent signatureContent) {
+        String manifestUri = reference.getUri();
+        SingleAnnotationManifest manifest = signatureContent.getSingleAnnotationManifests().get(manifestUri);
+        return manifest.getAnnotationReference();
+    }
+
+    private RuleState getRuleState(FileReference reference) {
+        ContainerAnnotationType type = ContainerAnnotationType.fromContent(reference.getMimeType());
+        return type.equals(ContainerAnnotationType.NON_REMOVABLE) ? state : RuleState.IGNORE;
     }
 
     @Override

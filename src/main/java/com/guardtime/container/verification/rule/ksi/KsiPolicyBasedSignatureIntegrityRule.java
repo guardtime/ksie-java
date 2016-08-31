@@ -3,6 +3,7 @@ package com.guardtime.container.verification.rule.ksi;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.verification.result.GenericVerificationResult;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
@@ -38,16 +39,14 @@ public class KsiPolicyBasedSignatureIntegrityRule extends AbstractRule<Signature
     }
 
     @Override
-    protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
-        RuleVerificationResult verificationResult;
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) {
         String signatureUri = verifiable.getManifest().getRight().getSignatureReference().getUri();
         ContainerSignature containerSignature = verifiable.getContainerSignature();
         if (isSupported(containerSignature)) {
-            verificationResult = getKSISignatureVerificationResult((KSISignature) containerSignature.getSignature(), verifiable, signatureUri);
+            holder.addResult(getKSISignatureVerificationResult((KSISignature) containerSignature.getSignature(), verifiable, signatureUri));
         } else {
-            verificationResult = new GenericVerificationResult(getFailureVerificationResult(), this, signatureUri, new Exception("Unsupported "));
+            holder.addResult(new GenericVerificationResult(getFailureVerificationResult(), this, signatureUri, new Exception("Unsupported ")));
         }
-        return Arrays.asList(verificationResult);
     }
 
     private boolean isSupported(ContainerSignature containerSignature) {

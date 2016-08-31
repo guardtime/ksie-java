@@ -1,20 +1,20 @@
 package com.guardtime.container.verification.rule.generic;
 
+import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
-import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.result.TerminatingVerificationResult;
+import com.guardtime.container.verification.result.GenericVerificationResult;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
+import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,23 +22,22 @@ import java.util.Map;
  */
 public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
-    public SingleAnnotationManifestIntegrityRule() {
-        this(RuleState.FAIL);
-    }
-
     public SingleAnnotationManifestIntegrityRule(RuleState state) {
         super(state);
     }
 
     @Override
-    protected List<RuleVerificationResult> verifyRule(Pair<SignatureContent, FileReference> verifiable) {
-        RuleVerificationResult verificationResult;
+    protected void verifyRule(ResultHolder holder, Pair<SignatureContent, FileReference> verifiable) throws RuleTerminatingException {
+        FileReference reference = verifiable.getRight();
+        RuleState ruleState = getRuleState(reference);
+
+        GenericVerificationResult verificationResult;
         VerificationResult result = getFailureVerificationResult();
-        String manifestUri = verifiable.getRight().getUri();
+        String manifestUri = reference.getUri();
         try {
             Map<String, SingleAnnotationManifest> singleAnnotationManifests = verifiable.getLeft().getSingleAnnotationManifests();
             SingleAnnotationManifest manifest = singleAnnotationManifests.get(manifestUri);
-            for (DataHash expectedHash : verifiable.getRight().getHashList()) {
+            for (DataHash expectedHash : reference.getHashList()) {
                 if (expectedHash.getAlgorithm().getStatus() != HashAlgorithm.Status.NORMAL) {
                     continue; // Skip not implemented or not trusted
                 }
@@ -47,12 +46,27 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<Sig
                     result = VerificationResult.OK;
                 }
             }
-            verificationResult = new TerminatingVerificationResult(result, this, manifestUri);
+            verificationResult = new GenericVerificationResult(result, this, manifestUri);
         } catch (IOException e) {
             LOGGER.info("Verifying annotation meta-data failed!", e);
-            verificationResult = new TerminatingVerificationResult(result, this, manifestUri, e);
+            verificationResult = new GenericVerificationResult(result, this, manifestUri, e);
         }
-        return Arrays.asList(verificationResult);
+
+        if (!result.equals(VerificationResult.OK) && ruleState.equals(RuleState.IGNORE)) {
+            // We ignore problems for this manifest
+            return;
+        }
+
+        holder.addResult(verificationResult);
+
+        if (!result.equals(VerificationResult.OK)) {
+            throw new RuleTerminatingException("SingleAnnotationManifest integrity could not be verified for '" + manifestUri + "'");
+        }
+    }
+
+    private RuleState getRuleState(FileReference reference) {
+        ContainerAnnotationType type = ContainerAnnotationType.fromContent(reference.getMimeType());
+        return type.equals(ContainerAnnotationType.FULLY_REMOVABLE) ? RuleState.IGNORE : state;
     }
 
     @Override

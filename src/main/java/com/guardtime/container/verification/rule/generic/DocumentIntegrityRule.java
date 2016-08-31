@@ -5,8 +5,8 @@ import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Pair;
-import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.result.TerminatingVerificationResult;
+import com.guardtime.container.verification.result.GenericVerificationResult;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
@@ -14,25 +14,18 @@ import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * This rule verifies that the {@link ContainerDocument} being tested has not been corrupted.
  */
 public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, SignatureContent>> {
 
-    public DocumentIntegrityRule() {
-        this(RuleState.FAIL);
-    }
-
     public DocumentIntegrityRule(RuleState state) {
         super(state);
     }
 
     @Override
-    protected List<RuleVerificationResult> verifyRule(Pair<FileReference, SignatureContent> verifiable) {
-        RuleVerificationResult verificationResult;
+    protected void verifyRule(ResultHolder holder, Pair<FileReference, SignatureContent> verifiable) {
         VerificationResult result = getFailureVerificationResult();
         String documentUri = verifiable.getLeft().getUri();
         try {
@@ -46,12 +39,11 @@ public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, Sign
                     result = VerificationResult.OK;
                 }
             }
-            verificationResult = new TerminatingVerificationResult(result, this, documentUri);
+            holder.addResult(new GenericVerificationResult(result, this, documentUri));
         } catch (IOException | DataHashException e) {
             LOGGER.info("Verifying document failed!", e);
-            verificationResult = new TerminatingVerificationResult(result, this, documentUri, e);
+            holder.addResult(new GenericVerificationResult(result, this, documentUri, e));
         }
-        return Arrays.asList(verificationResult);
     }
 
     @Override

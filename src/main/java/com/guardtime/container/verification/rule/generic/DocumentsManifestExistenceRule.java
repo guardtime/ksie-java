@@ -5,30 +5,25 @@ import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
-import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.result.TerminatingVerificationResult;
+import com.guardtime.container.verification.result.GenericVerificationResult;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
-
-import java.util.Arrays;
-import java.util.List;
+import com.guardtime.container.verification.rule.RuleTerminatingException;
 
 /**
- * This rule verifies that the documents manifest is actually present in the {@link com.guardtime.container.packaging.Container}
+ * This rule verifies that the documents manifest is actually present in the {@link
+ * com.guardtime.container.packaging.Container}
  */
 public class DocumentsManifestExistenceRule extends AbstractRule<SignatureContent> {
-
-    public DocumentsManifestExistenceRule() {
-        this(RuleState.FAIL);
-    }
 
     public DocumentsManifestExistenceRule(RuleState state) {
         super(state);
     }
 
     @Override
-    protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
 
         VerificationResult verificationResult = getFailureVerificationResult();
         Manifest manifest = verifiable.getManifest().getRight();
@@ -37,8 +32,12 @@ public class DocumentsManifestExistenceRule extends AbstractRule<SignatureConten
         if (documentsManifest != null) {
             verificationResult = VerificationResult.OK;
         }
-        RuleVerificationResult result = new TerminatingVerificationResult(verificationResult, this, documentsManifestReference.getUri());
-        return Arrays.asList(result);
+        String manifestUri = documentsManifestReference.getUri();
+        holder.addResult(new GenericVerificationResult(verificationResult, this, manifestUri));
+
+        if (!verificationResult.equals(VerificationResult.OK)) {
+            throw new RuleTerminatingException("DocumentsManifest existence could not be verified for '" + manifestUri + "'");
+        }
     }
 
     @Override

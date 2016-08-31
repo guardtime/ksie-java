@@ -6,31 +6,23 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.result.GenericVerificationResult;
-import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.ContainerRule;
 import com.guardtime.container.verification.rule.RuleState;
-
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * This rule verifies that consecutive manifests have appropriate index numbers.
  */
 public class ManifestIndexConsistencyRule extends AbstractRule<Container> implements ContainerRule {
 
-    public ManifestIndexConsistencyRule() {
-        this(RuleState.FAIL);
-    }
-
     public ManifestIndexConsistencyRule(RuleState state) {
         super(state);
     }
 
     @Override
-    protected List<RuleVerificationResult> verifyRule(Container verifiable) {
-        List<RuleVerificationResult> results = new LinkedList<>();
+    protected void verifyRule(ResultHolder holder, Container verifiable) {
         int expectedIndex = 1;
         for (SignatureContent content : verifiable.getSignatureContents()) {
             VerificationResult result = getFailureVerificationResult();
@@ -40,9 +32,8 @@ public class ManifestIndexConsistencyRule extends AbstractRule<Container> implem
                 result = VerificationResult.OK;
             }
             expectedIndex = index + 1;
-            results.add(new GenericVerificationResult(result, this, manifest.getLeft()));
+            holder.addResult(new GenericVerificationResult(result, this, manifest.getLeft()));
         }
-        return results;
     }
 
     @Override

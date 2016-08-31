@@ -53,11 +53,6 @@ public class GenericVerificationResultTest {
     }
 
     @Test
-    public void terminatesVerification() throws Exception {
-        assertFalse(result.terminatesVerification());
-    }
-
-    @Test
     public void getRuleErrorMessageWithExceptionInConstructor() throws Exception {
         String exceptionMessage = "The exception occurred!";
         Exception exception = new Exception(exceptionMessage);

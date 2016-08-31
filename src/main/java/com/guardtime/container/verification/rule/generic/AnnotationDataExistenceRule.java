@@ -1,47 +1,58 @@
 package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
+import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
-import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.result.TerminatingVerificationResult;
+import com.guardtime.container.verification.result.GenericVerificationResult;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import com.guardtime.container.verification.rule.RuleTerminatingException;
 
 /**
  * This rule verifies that the annotation data is actually present in the {@link com.guardtime.container.packaging.Container}
  */
 public class AnnotationDataExistenceRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
-    public AnnotationDataExistenceRule() {
-        this(RuleState.FAIL);
-    }
-
     public AnnotationDataExistenceRule(RuleState ruleState) {
         super(ruleState);
     }
 
     @Override
-    protected List<RuleVerificationResult> verifyRule(Pair<SignatureContent, FileReference> verifiable) {
-        if (ignoreRule()) return new LinkedList<>();
-        VerificationResult result = getFailureVerificationResult();
-        String manifestUri = verifiable.getRight().getUri();
+    protected void verifyRule(ResultHolder holder, Pair<SignatureContent, FileReference> verifiable) throws RuleTerminatingException {
+        FileReference reference = verifiable.getRight();
         SignatureContent signatureContent = verifiable.getLeft();
-        SingleAnnotationManifest manifest = signatureContent.getSingleAnnotationManifests().get(manifestUri);
-        String dataUri = manifest.getAnnotationReference().getUri();
-        ContainerAnnotation annotation = signatureContent.getAnnotations().get(dataUri);
+        RuleState ruleState = getRuleState(reference);
+        VerificationResult result = getFailureVerificationResult();
+
+        String dataPath = getAnnotationDataPath(reference, signatureContent);
+        ContainerAnnotation annotation = signatureContent.getAnnotations().get(dataPath);
         if (annotation != null) {
             result = VerificationResult.OK;
         }
-        RuleVerificationResult verificationResult = new TerminatingVerificationResult(result, this, dataUri);
-        return Arrays.asList(verificationResult);
+
+        if (!ruleState.equals(RuleState.IGNORE) || result.equals(VerificationResult.OK)) {
+            holder.addResult(new GenericVerificationResult(result, this, dataPath));
+        }
+
+        if (!result.equals(VerificationResult.OK)) {
+            throw new RuleTerminatingException("AnnotationData existence could not be verified for '" + dataPath + "'");
+        }
+    }
+
+    private RuleState getRuleState(FileReference reference) {
+        ContainerAnnotationType type = ContainerAnnotationType.fromContent(reference.getMimeType());
+        return type.equals(ContainerAnnotationType.NON_REMOVABLE) ? state : RuleState.IGNORE;
+    }
+
+    private String getAnnotationDataPath(FileReference reference, SignatureContent signatureContent) {
+        String manifestUri = reference.getUri();
+        SingleAnnotationManifest manifest = signatureContent.getSingleAnnotationManifests().get(manifestUri);
+        return manifest.getAnnotationReference().getUri();
     }
 
     @Override

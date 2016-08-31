@@ -4,11 +4,10 @@ import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.result.TerminatingVerificationResult;
-import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.result.*;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
+import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
@@ -22,17 +21,12 @@ import java.util.List;
  */
 public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureContent> {
 
-    public DocumentsManifestIntegrityRule() {
-        this(RuleState.FAIL);
-    }
-
     public DocumentsManifestIntegrityRule(RuleState state) {
         super(state);
     }
 
     @Override
-    protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
-        RuleVerificationResult result;
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
         VerificationResult verificationResult = getFailureVerificationResult();
         DocumentsManifest documentsManifest = verifiable.getDocumentsManifest().getRight();
         Manifest manifest = verifiable.getManifest().getRight();
@@ -48,12 +42,15 @@ public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureConten
                     verificationResult = VerificationResult.OK;
                 }
             }
-            result = new TerminatingVerificationResult(verificationResult, this, testedElement);
+            holder.addResult(new GenericVerificationResult(verificationResult, this, testedElement));
         } catch (IOException e) {
             LOGGER.info("Verifying documents manifest failed!", e);
-            result = new TerminatingVerificationResult(verificationResult, this, testedElement, e);
+            holder.addResult(new GenericVerificationResult(verificationResult, this, testedElement, e));
         }
-        return Arrays.asList(result);
+
+        if (!verificationResult.equals(VerificationResult.OK)) {
+            throw new RuleTerminatingException("DocumentsManifest integrity could not be verified for '" + testedElement + "'");
+        }
     }
 
     @Override

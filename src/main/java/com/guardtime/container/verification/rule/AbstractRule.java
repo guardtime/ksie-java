@@ -1,11 +1,11 @@
 package com.guardtime.container.verification.rule;
 
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public abstract class AbstractRule<O> implements Rule<O> {
@@ -28,31 +28,19 @@ public abstract class AbstractRule<O> implements Rule<O> {
         }
     }
 
-    protected boolean mustTerminateVerification(List<RuleVerificationResult> verificationResults) {
-        if (verificationResults.isEmpty()) return true;
-        for (RuleVerificationResult result : verificationResults) {
-            if (result.terminatesVerification() && !VerificationResult.OK.equals(result.getVerificationResult())) {
-                return true;
-            }
-        }
-        return false;
+    @Override
+    public void verify(ResultHolder holder, O verifiable) throws RuleTerminatingException {
+        if (this.state != RuleState.IGNORE) verifyRule(holder, verifiable);
     }
 
-    protected boolean ignoreRule() {
-        return this.state == RuleState.IGNORE;
-    }
+    protected abstract void verifyRule(ResultHolder holder, O verifiable) throws RuleTerminatingException;
 
-    public List<RuleVerificationResult> verify(O verifiable) {
-        if (ignoreRule()) return new LinkedList<>();
-        return verifyRule(verifiable);
-    }
-
-    protected abstract List<RuleVerificationResult> verifyRule(O verifiable);
-
+    @Override
     public String getName() {
         return null;
     }
 
+    @Override
     public String getErrorMessage() {
         return null;
     }

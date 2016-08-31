@@ -6,6 +6,7 @@ import com.guardtime.container.verification.policy.DefaultVerificationPolicy;
 import com.guardtime.container.verification.policy.VerificationPolicy;
 import com.guardtime.container.verification.result.ContainerVerifierResult;
 import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.rule.RuleState;
 import com.guardtime.container.verification.rule.generic.MimeTypeIntegrityRule;
 import com.guardtime.container.verification.rule.ksi.KsiPolicyBasedSignatureIntegrityRule;
 import com.guardtime.ksi.unisignature.verifier.policies.CalendarBasedVerificationPolicy;
@@ -24,7 +25,7 @@ public class VerificationKsiServiceIT extends AbstractCommonKsiServiceIntegratio
         Container container = packagingFactory.read(fis);
         VerificationPolicy defaultPolicy = new DefaultVerificationPolicy(
                 new KsiPolicyBasedSignatureIntegrityRule(ksi, new CalendarBasedVerificationPolicy()),
-                new MimeTypeIntegrityRule(packagingFactory)
+                new MimeTypeIntegrityRule(RuleState.FAIL, packagingFactory)
         );
         ContainerVerifier verifier = new ContainerVerifier(defaultPolicy);
         ContainerVerifierResult verifierResult = verifier.verify(container);
