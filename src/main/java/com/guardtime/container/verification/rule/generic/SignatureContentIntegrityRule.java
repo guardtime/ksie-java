@@ -32,7 +32,10 @@ public class SignatureContentIntegrityRule extends AbstractRule<Container> imple
     protected List<RuleVerificationResult> verifyRule(Container verifiable) {
         List<RuleVerificationResult> results = new LinkedList<>();
         for (SignatureContent content : verifiable.getSignatureContents()) {
-            results.addAll(signatureRule.verify(content));
+            results.addAll(new SignatureExistenceRule(state).verify(content));
+            if(!mustTerminateVerification(results)) { //results contains only SignatureExistenceRule results
+                results.addAll(signatureRule.verify(content));
+            }
             results.addAll(new DocumentsIntegrityRule(state).verify(content));
             results.addAll(new AnnotationsIntegrityRule(state).verify(content));
         }

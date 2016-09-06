@@ -28,6 +28,9 @@ public abstract class AbstractRule<O> implements Rule<O> {
         }
     }
 
+    /**
+     * Returns true if any of the {@link RuleVerificationResult}s are not OK
+     */
     protected boolean mustTerminateVerification(List<RuleVerificationResult> verificationResults) {
         if (verificationResults.isEmpty()) return true;
         for (RuleVerificationResult result : verificationResults) {
