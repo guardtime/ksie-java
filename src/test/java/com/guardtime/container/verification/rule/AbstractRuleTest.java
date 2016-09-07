@@ -45,11 +45,11 @@ public class AbstractRuleTest {
     public void setUp() throws IOException, DataHashException, InvalidHashFormatException {
         MockitoAnnotations.initMocks(this);
         when(mockFileReference.getUri()).thenReturn("uri");
-        dataHash2256 = new DataHash(HashAlgorithm.SHA2_256, "................................".getBytes());
-        dataHash2512 = new DataHash(HashAlgorithm.SHA2_512, "................................................................".getBytes());
-        dataHashSha1 = new DataHash(HashAlgorithm.SHA1, "....................".getBytes());
-        dataHash3512 = new DataHash(HashAlgorithm.SHA3_512, "................................................................".getBytes());
-        dataHashSm3 = new DataHash(HashAlgorithm.SM3, "................................".getBytes());
+        dataHash2256 = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
+        dataHash2512 = new DataHash(HashAlgorithm.SHA2_512, new byte[64]);
+        dataHashSha1 = new DataHash(HashAlgorithm.SHA1, new byte[20]);
+        dataHash3512 = new DataHash(HashAlgorithm.SHA3_512, new byte[64]);
+        dataHashSm3 = new DataHash(HashAlgorithm.SM3, new byte[32]);
         when(mockMultiHashElement.getDataHash(HashAlgorithm.SHA2_256)).thenReturn(dataHash2256);
         when(mockMultiHashElement.getDataHash(HashAlgorithm.SHA2_512)).thenReturn(dataHash2512);
         when(mockMultiHashElement.getDataHash(HashAlgorithm.SHA1)).thenReturn(dataHashSha1);
