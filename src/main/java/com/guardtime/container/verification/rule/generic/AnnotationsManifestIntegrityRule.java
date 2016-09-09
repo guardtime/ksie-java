@@ -5,15 +5,9 @@ import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.result.TerminatingVerificationResult;
-import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.ksi.hashing.DataHash;
-import com.guardtime.ksi.hashing.HashAlgorithm;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,27 +25,10 @@ public class AnnotationsManifestIntegrityRule extends AbstractRule<SignatureCont
 
     @Override
     protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
-        RuleVerificationResult result;
-        VerificationResult verificationResult = getFailureVerificationResult();
         AnnotationsManifest annotationsManifest = verifiable.getAnnotationsManifest().getRight();
         Manifest manifest = verifiable.getManifest().getRight();
         FileReference annotationsManifestReference = manifest.getAnnotationsManifestReference();
-        try {
-            for (DataHash expectedHash : annotationsManifestReference.getHashList()) {
-                if (expectedHash.getAlgorithm().getStatus() != HashAlgorithm.Status.NORMAL) {
-                    continue; // Skip not implemented or not trusted
-                }
-                DataHash annotationsManifestHash = annotationsManifest.getDataHash(expectedHash.getAlgorithm());
-                if (expectedHash.equals(annotationsManifestHash)) {
-                    verificationResult = VerificationResult.OK;
-                }
-            }
-            result = new TerminatingVerificationResult(verificationResult, this, annotationsManifestReference.getUri());
-        } catch (IOException e) {
-            LOGGER.info("Verifying annotations manifest failed!", e);
-            result = new TerminatingVerificationResult(verificationResult, this, annotationsManifestReference.getUri(), e);
-        }
-        return Arrays.asList(result);
+        return getFileReferenceHashListVerificationResult(annotationsManifest, annotationsManifestReference);
     }
 
     @Override

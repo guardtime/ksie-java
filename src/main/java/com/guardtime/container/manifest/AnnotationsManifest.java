@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Container structure manifest containing references to {@link SingleAnnotationManifest} contained in the container.
  */
-public interface AnnotationsManifest {
+public interface AnnotationsManifest extends MultiHashElement {
 
     List<? extends FileReference> getSingleAnnotationManifestReferences();
 

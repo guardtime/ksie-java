@@ -1,7 +1,7 @@
 package com.guardtime.container.document;
 
-
 import com.guardtime.container.hash.HashAlgorithmProvider;
+import com.guardtime.container.manifest.MultiHashElement;
 import com.guardtime.container.util.DataHashException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Represents document data that is to be used in a container.
  */
-public interface ContainerDocument {
+public interface ContainerDocument extends MultiHashElement {
 
     String getFileName();
 

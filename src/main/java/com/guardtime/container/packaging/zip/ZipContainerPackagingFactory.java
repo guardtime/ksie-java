@@ -91,8 +91,6 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
         } catch (SignatureException e) {
             throw new InvalidPackageException("Failed to sign ZipContainer!", e);
-        } catch (ClassCastException e) {
-            throw new InvalidPackageException("Incorrect Container subclass instance provided!", e);
         }
     }
 
