@@ -44,8 +44,7 @@ public class DefaultVerificationPolicy implements VerificationPolicy {
     public DefaultVerificationPolicy(RuleStateProvider stateProvider, SignatureVerifier signatureVerifier, ContainerPackagingFactory packagingFactory, List<ContainerRule> customRules) {
         containerRules.add(new MimeTypeIntegrityRule(stateProvider, packagingFactory));
         containerRules.add(new ManifestIndexConsistencyRule(stateProvider));
-        ContainerSignatureIntegrityRule signatureRule = new ContainerSignatureIntegrityRule(stateProvider, signatureVerifier);
-        containerRules.add(new SignatureContentIntegrityRule(stateProvider, signatureRule)); // Nested rules inside
+        containerRules.add(new SignatureContentIntegrityRule(stateProvider, signatureVerifier)); // Nested rules inside
         containerRules.addAll(customRules);
     }
 
