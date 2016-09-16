@@ -1,10 +1,10 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
+import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.manifest.AnnotationDataReference;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
-import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 import com.guardtime.ksi.tlv.TLVStructure;
@@ -38,10 +38,10 @@ class TlvAnnotationDataReference extends TLVStructure implements AnnotationDataR
         }
     }
 
-    public TlvAnnotationDataReference(Pair<String, ContainerAnnotation> annotationPair, HashAlgorithm algorithm) throws TLVParserException, IOException {
+    public TlvAnnotationDataReference(Pair<String, ContainerAnnotation> annotationPair, HashAlgorithmProvider algorithmProvider) throws TLVParserException, IOException {
         ContainerAnnotation annotation = annotationPair.getRight();
         this.uri = annotationPair.getLeft();
-        this.hash = annotation.getDataHash(algorithm);
+        this.hash = annotation.getDataHash(algorithmProvider.getAnnotationDataReferenceHashAlgorithm());
         this.domain = annotation.getDomain();
         this.rootElement = new TlvReferenceBuilder().
                 withType(ANNOTATION_REFERENCE).

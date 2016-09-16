@@ -1,6 +1,7 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.util.DataHashException;
@@ -22,11 +23,11 @@ class TlvDocumentsManifest extends AbstractTlvManifestStructure implements Docum
 
     private List<TlvDocumentReference> documents = new LinkedList<>();
 
-    public TlvDocumentsManifest(List<ContainerDocument> documents, HashAlgorithm algorithm) throws InvalidManifestException {
+    public TlvDocumentsManifest(List<ContainerDocument> documents, HashAlgorithmProvider algorithmProvider) throws InvalidManifestException {
         super(MAGIC);
         try {
             for (ContainerDocument doc : documents) {
-                this.documents.add(new TlvDocumentReference(doc, algorithm));
+                this.documents.add(new TlvDocumentReference(doc, algorithmProvider));
             }
         } catch (DataHashException | TLVParserException | IOException e) {
             throw new InvalidManifestException("Failed to generate TlvDocumentsManifest", e);

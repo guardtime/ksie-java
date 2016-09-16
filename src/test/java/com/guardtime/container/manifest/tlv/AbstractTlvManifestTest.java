@@ -4,6 +4,8 @@ import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.hash.HashAlgorithmProvider;
+import com.guardtime.container.hash.SingleHashAlgorithmProvider;
 import com.guardtime.container.manifest.AnnotationDataReference;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -49,7 +51,7 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
     protected static final String MOCK_URI = "/mock/mock";
     protected static final String SIGNATURE_URI = "/META-INF/signature4.ksig";
     protected static final String SINGLE_ANNOTATION_MANIFEST_URI = "/META-INF/annotation1.tlv";
-    protected static final HashAlgorithm DEFAULT_HASH_ALGORITHM = HashAlgorithm.SHA2_256;
+    protected static final HashAlgorithmProvider DEFAULT_HASH_ALGORITHM_PROVIDER = new SingleHashAlgorithmProvider(HashAlgorithm.SHA2_256);
 
     @Mock
     protected TlvDocumentsManifest mockDocumentsManifest;

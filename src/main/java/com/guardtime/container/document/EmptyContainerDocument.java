@@ -1,5 +1,6 @@
 package com.guardtime.container.document;
 
+import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
@@ -54,5 +55,10 @@ public class EmptyContainerDocument implements ContainerDocument {
     @Override
     public boolean isWritable() {
         return false;
+    }
+
+    @Override
+    public List<DataHash> getDataHashList(HashAlgorithmProvider algorithmProvider) {
+        return hashList;
     }
 }

@@ -44,6 +44,7 @@ class ZipContainer implements Container {
         writeMimeTypeEntry(zipOutputStream);
         writeSignatures(signatureContents, zipOutputStream);
         writeExcessFiles(zipOutputStream);
+        zipOutputStream.flush();
     }
 
     @Override

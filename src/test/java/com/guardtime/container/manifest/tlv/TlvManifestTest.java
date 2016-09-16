@@ -34,7 +34,7 @@ public class TlvManifestTest extends AbstractTlvManifestTest {
         Pair<String, TlvDocumentsManifest> documentsManifest = Pair.of(DOCUMENTS_MANIFEST_URI, mockDocumentsManifest);
         Pair<String, TlvAnnotationsManifest> annotationsManifest = Pair.of(ANNOTATIONS_MANIFEST_URI, mockAnnotationsManifest);
         Pair<String, String> signatureReference = Pair.of(SIGNATURE_URI, SIGNATURE_TYPE);
-        TlvManifest manifest = new TlvManifest(documentsManifest, annotationsManifest, signatureReference, DEFAULT_HASH_ALGORITHM);
+        TlvManifest manifest = new TlvManifest(documentsManifest, annotationsManifest, signatureReference, DEFAULT_HASH_ALGORITHM_PROVIDER);
 
         assertArrayEquals(SIGNATURE_MANIFEST_MAGIC, manifest.getMagic());
         assertNotNull(manifest.getDocumentsManifestReference());
