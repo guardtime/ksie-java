@@ -1,8 +1,8 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.util.DataHashException;
-import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 
@@ -16,8 +16,8 @@ class TlvDocumentReference extends TlvFileReference {
         super(root);
     }
 
-    public TlvDocumentReference(ContainerDocument document, HashAlgorithm algorithm) throws TLVParserException, IOException, DataHashException {
-        super(document.getFileName(), document.getDataHash(algorithm), document.getMimeType());
+    public TlvDocumentReference(ContainerDocument document, HashAlgorithmProvider algorithmProvider) throws TLVParserException, IOException, DataHashException {
+        super(document.getFileName(), document.getDataHashList(algorithmProvider), document.getMimeType());
     }
 
     @Override

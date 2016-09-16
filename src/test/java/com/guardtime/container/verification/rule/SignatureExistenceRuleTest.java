@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
@@ -27,11 +28,14 @@ public class SignatureExistenceRuleTest extends AbstractContainerTest {
 
     @Mock
     private SignatureContent mockSignatureContent;
+    @Mock
+    private Manifest mockManifest;
+    @Mock
+    private SignatureReference mockSignatureReference;
 
     @Before
     public void setUpSignatureContent() {
-        Manifest mockManifest = Mockito.mock(Manifest.class);
-        SignatureReference mockSignatureReference = Mockito.mock(SignatureReference.class);
+        MockitoAnnotations.initMocks(this);
         when(mockSignatureReference.getUri()).thenReturn("uri");
         when(mockManifest.getSignatureReference()).thenReturn(mockSignatureReference);
         when(mockSignatureContent.getManifest()).thenReturn(Pair.of("", mockManifest));

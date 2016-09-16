@@ -5,6 +5,7 @@ import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
+import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.manifest.*;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.SignatureFactoryType;
@@ -76,10 +77,14 @@ public class AbstractContainerTest {
     @Mock
     private Manifest mockedManifest;
 
+    @Mock
+    private HashAlgorithmProvider mockHashAlgorithmProvider;
+
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         when(mockedManifestFactory.getManifestFactoryType()).thenReturn(mockedManifestFactoryType);
+        when(mockedManifestFactory.getHashAlgorithmProvider()).thenReturn(mockHashAlgorithmProvider);
         when(mockedManifestFactory.createDocumentsManifest(anyListOf(ContainerDocument.class))).thenReturn(mockedDocumentsManifest);
         when(mockedManifestFactory.createAnnotationsManifest(anyMap())).thenReturn(mockedAnnotationsManifest);
         when(mockedManifestFactory.createSingleAnnotationManifest(Mockito.any(Pair.class), Mockito.any(Pair.class))).thenReturn(mockedSingleAnnotationManifest);

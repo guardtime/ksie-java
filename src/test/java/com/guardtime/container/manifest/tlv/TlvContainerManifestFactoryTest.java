@@ -32,7 +32,7 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
     @Test
     public void testCreateTlvContainerManifestFactoryWithoutHashAlgorithm_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("Hash algorithm");
+        expectedException.expectMessage("Hash algorithm provider");
         new TlvContainerManifestFactory(null);
     }
 

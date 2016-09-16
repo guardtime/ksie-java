@@ -1,5 +1,6 @@
 package com.guardtime.container.document;
 
+import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -8,6 +9,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.guardtime.container.util.Util.notNull;
 
@@ -57,6 +60,15 @@ public class FileContainerDocument implements ContainerDocument {
     }
 
     @Override
+    public List<DataHash> getDataHashList(HashAlgorithmProvider algorithmProvider) throws IOException {
+        List<DataHash> hashList = new ArrayList<>();
+        for (HashAlgorithm algorithm : algorithmProvider.getDocumentReferenceHashAlgorithms()) {
+            hashList.add(getDataHash(algorithm));
+        }
+        return hashList;
+    }
+
+    @Override
     public boolean isWritable() {
         return true;
     }
@@ -65,6 +77,6 @@ public class FileContainerDocument implements ContainerDocument {
     public String toString() {
         return "{type=File" +
                 ", fileName=" + fileName +
-                ", mimeType=" + mimeType+ "}";
+                ", mimeType=" + mimeType + "}";
     }
 }

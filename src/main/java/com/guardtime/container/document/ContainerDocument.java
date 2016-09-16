@@ -1,6 +1,6 @@
 package com.guardtime.container.document;
 
-
+import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.manifest.MultiHashElement;
 import com.guardtime.container.util.DataHashException;
 import com.guardtime.ksi.hashing.DataHash;
@@ -8,6 +8,7 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * Represents document data that is to be used in a container.
@@ -32,9 +33,13 @@ public interface ContainerDocument extends MultiHashElement {
     DataHash getDataHash(HashAlgorithm algorithm) throws IOException, DataHashException;
 
     /**
-     * Returns true for any document thats InputSteam can be accessed and data extracted from it.
+     * Returns a List of {@link DataHash}es for {@link HashAlgorithm}s of {@param algorithmProvider}.
+     */
+    List<DataHash> getDataHashList(HashAlgorithmProvider algorithmProvider) throws IOException;
+
+    /**
+     * Returns true for any document that's InputSteam can be accessed and data extracted from it.
      */
     boolean isWritable();
-
 }
 
