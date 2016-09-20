@@ -42,8 +42,4 @@ public class GenericVerificationResult implements RuleVerificationResult {
         return testedElement;
     }
 
-    @Override
-    public boolean terminatesVerification() {
-        return false;
-    }
 }

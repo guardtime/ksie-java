@@ -4,36 +4,40 @@ import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
-import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.RuleState;
+import com.guardtime.container.verification.rule.RuleStateProvider;
+import com.guardtime.container.verification.rule.RuleTerminatingException;
+import com.guardtime.container.verification.rule.RuleType;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * This rule verifies that the {@link ContainerDocument} being tested has not been corrupted.
  */
 public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, SignatureContent>> {
 
-    public DocumentIntegrityRule() {
-        this(RuleState.FAIL);
-    }
+    private static final String NAME = RuleType.KSIE_VERIFY_DATA_HASH.name();
 
-    public DocumentIntegrityRule(RuleState state) {
-        super(state);
+    public DocumentIntegrityRule(RuleStateProvider stateProvider) {
+        super(stateProvider.getStateForRule(NAME));
     }
 
     @Override
-    protected List<RuleVerificationResult> verifyRule(Pair<FileReference, SignatureContent> verifiable) {
-        FileReference fileReference = verifiable.getLeft();
-        String documentUri = fileReference.getUri();
-        ContainerDocument document = verifiable.getRight().getDocuments().get(documentUri);
-        return getFileReferenceHashListVerificationResult(document, fileReference);
+    protected void verifyRule(ResultHolder holder, Pair<FileReference, SignatureContent> verifiable) {
+        FileReference documentReference = verifiable.getLeft();
+        Map<String, ContainerDocument> documents = verifiable.getRight().getDocuments();
+        ContainerDocument document = documents.get(documentReference.getUri());
+        try {
+            verifyMultiHashElement(document, documentReference, holder);
+        } catch (RuleTerminatingException e) {
+            LOGGER.info(e.getMessage());
+        }
     }
 
     @Override
     public String getName() {
-        return "KSIE_VERIFY_DATA_HASH";
+        return NAME;
     }
 
     @Override

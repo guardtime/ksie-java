@@ -1,15 +1,15 @@
 package com.guardtime.container.verification.rule.generic;
 
-import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
-import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleState;
+import com.guardtime.container.verification.rule.RuleStateProvider;
+import com.guardtime.container.verification.rule.RuleTerminatingException;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -18,60 +18,62 @@ import java.util.List;
  */
 public class AnnotationsIntegrityRule extends AbstractRule<SignatureContent> {
 
-    public AnnotationsIntegrityRule() {
-        this(RuleState.FAIL);
-    }
+    private AnnotationsManifestExistenceRule annotationsManifestExistenceRule;
+    private AnnotationsManifestIntegrityRule annotationsManifestIntegrityRule;
+    private SingleAnnotationManifestExistenceRule singleAnnotationManifestExistenceRule;
+    private SingleAnnotationManifestIntegrityRule singleAnnotationManifestIntegrityRule;
+    private AnnotationDataExistenceRule annotationDataExistenceRule;
+    private AnnotationDataIntegrityRule annotationDataIntegrityRule;
 
-    public AnnotationsIntegrityRule(RuleState state) {
-        super(state);
+    public AnnotationsIntegrityRule(RuleStateProvider stateProvider) {
+        super(RuleState.FAIL);
+        annotationsManifestExistenceRule = new AnnotationsManifestExistenceRule(stateProvider);
+        annotationsManifestIntegrityRule = new AnnotationsManifestIntegrityRule(stateProvider);
+        singleAnnotationManifestExistenceRule = new SingleAnnotationManifestExistenceRule(stateProvider);
+        singleAnnotationManifestIntegrityRule = new SingleAnnotationManifestIntegrityRule(stateProvider);
+        annotationDataExistenceRule = new AnnotationDataExistenceRule(stateProvider);
+        annotationDataIntegrityRule = new AnnotationDataIntegrityRule(stateProvider);
     }
 
     @Override
-    protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
-        List<RuleVerificationResult> results = new LinkedList<>();
-
-        //Annotmanifest existence
-        results.addAll(new AnnotationsManifestExistenceRule(state).verify(verifiable));
-        if (mustTerminateVerification(results)) return results;
-        //Annotmanifest integrity
-        results.addAll(new AnnotationsManifestIntegrityRule(state).verify(verifiable));
-        if (mustTerminateVerification(results)) return results;
-        //Annotations
-        AnnotationsManifest annotationsManifest = verifiable.getAnnotationsManifest().getRight();
-        List<? extends FileReference> singleAnnotationManifestReferences = annotationsManifest.getSingleAnnotationManifestReferences();
-        for (FileReference reference : singleAnnotationManifestReferences) {
-            List<RuleVerificationResult> manifestResults = getSingleAnnotationManifestVerificationResults(reference, verifiable);
-            results.addAll(manifestResults);
-            if (mustTerminateVerification(manifestResults)) continue;
-            results.addAll(getAnnotationDataVerificationResults(reference, verifiable));
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) {
+        if (!processAnnotationsManifestVerification(holder, verifiable)) {
+            return;
         }
 
-        return results;
+        //Annotations
+        for (FileReference reference : getSingleAnnotationManifestReferences(verifiable)) {
+            processAnnotationVerification(holder, Pair.of(verifiable, reference));
+        }
     }
 
-    private List<RuleVerificationResult> getSingleAnnotationManifestVerificationResults(FileReference reference, SignatureContent signatureContent) {
-        List<RuleVerificationResult> results = new LinkedList<>();
-        ContainerAnnotationType type = ContainerAnnotationType.fromContent(reference.getMimeType());
-        RuleState ruleState = type.equals(ContainerAnnotationType.FULLY_REMOVABLE) ? RuleState.IGNORE : state;
-
-        List<RuleVerificationResult> manifestExistenceResults = new SingleAnnotationManifestExistenceRule(ruleState).verify(Pair.of(signatureContent, reference));
-        results.addAll(manifestExistenceResults);
-        if (mustTerminateVerification(manifestExistenceResults)) return results;
-        List<RuleVerificationResult> manifestIntegrityResults = new SingleAnnotationManifestIntegrityRule(ruleState).verify(Pair.of(signatureContent, reference));
-        results.addAll(manifestIntegrityResults);
-        return results;
+    private boolean processAnnotationsManifestVerification(ResultHolder holder, SignatureContent verifiable) {
+        try {
+            annotationsManifestExistenceRule.verify(holder, verifiable);
+            annotationsManifestIntegrityRule.verify(holder, verifiable);
+        } catch (RuleTerminatingException e) {
+            LOGGER.info("Halting verification chain for annotations manifest!, caused by '{}'", e.getMessage());
+            return false;
+        }
+        return true;
     }
 
-    private List<RuleVerificationResult> getAnnotationDataVerificationResults(FileReference reference, SignatureContent signatureContent) {
-        List<RuleVerificationResult> results = new LinkedList<>();
-        ContainerAnnotationType type = ContainerAnnotationType.fromContent(reference.getMimeType());
-        RuleState ruleState = type.equals(ContainerAnnotationType.NON_REMOVABLE) ? state : RuleState.IGNORE;
-
-        List<RuleVerificationResult> annotationDataExistenceResults = new AnnotationDataExistenceRule(ruleState).verify(Pair.of(signatureContent, reference));
-        results.addAll(annotationDataExistenceResults);
-        if (mustTerminateVerification(annotationDataExistenceResults)) return results;
-        List<RuleVerificationResult> annotationDataIntegrityResults = new AnnotationDataIntegrityRule(ruleState).verify(Pair.of(signatureContent, reference));
-        results.addAll(annotationDataIntegrityResults);
-        return results;
+    private List<? extends FileReference> getSingleAnnotationManifestReferences(SignatureContent verifiable) {
+        AnnotationsManifest annotationsManifest = verifiable.getAnnotationsManifest().getRight();
+        return annotationsManifest.getSingleAnnotationManifestReferences();
     }
+
+    private void processAnnotationVerification(ResultHolder holder, Pair<SignatureContent, FileReference> verifiable) {
+        try {
+            singleAnnotationManifestExistenceRule.verify(holder, verifiable);
+            singleAnnotationManifestIntegrityRule.verify(holder, verifiable);
+
+            annotationDataExistenceRule.verify(holder, verifiable);
+            annotationDataIntegrityRule.verify(holder, verifiable);
+        } catch (RuleTerminatingException e) {
+            LOGGER.info("Halting verification chain for annotation!, caused by '{}'", e.getMessage());
+            return;
+        }
+    }
+
 }

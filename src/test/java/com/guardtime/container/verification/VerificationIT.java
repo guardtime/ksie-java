@@ -7,8 +7,7 @@ import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.verification.policy.DefaultVerificationPolicy;
 import com.guardtime.container.verification.result.ContainerVerifierResult;
 import com.guardtime.container.verification.result.VerificationResult;
-import com.guardtime.container.verification.rule.generic.MimeTypeIntegrityRule;
-import com.guardtime.container.verification.rule.ksi.KsiPolicyBasedSignatureIntegrityRule;
+import com.guardtime.container.verification.rule.signature.ksi.KsiPolicyBasedSignatureVerifier;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.KSISignature;
@@ -51,8 +50,9 @@ public class VerificationIT extends AbstractCommonIntegrationTest {
 
     private DefaultVerificationPolicy getDefaultVerificationPolicy() {
         return new DefaultVerificationPolicy(
-                new KsiPolicyBasedSignatureIntegrityRule(mockKsi, new KeyBasedVerificationPolicy()),
-                new MimeTypeIntegrityRule(packagingFactory)
+                defaultRuleStateProvider,
+                new KsiPolicyBasedSignatureVerifier(mockKsi, new KeyBasedVerificationPolicy()),
+                packagingFactory
         );
     }
 

@@ -24,8 +24,4 @@ public interface RuleVerificationResult {
      */
     String getTestedElementPath();
 
-    /**
-     * Indicates if the verification process should be terminated in case of failure result.
-     */
-    boolean terminatesVerification();
 }

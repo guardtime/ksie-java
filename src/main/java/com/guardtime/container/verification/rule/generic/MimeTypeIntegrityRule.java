@@ -3,55 +3,52 @@ package com.guardtime.container.verification.rule.generic;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.MimeType;
-import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.result.TerminatingVerificationResult;
+import com.guardtime.container.verification.result.GenericVerificationResult;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
-import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.ContainerRule;
-import com.guardtime.container.verification.rule.RuleState;
+import com.guardtime.container.verification.rule.*;
 import com.guardtime.ksi.util.Util;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Rule that verifies the existence and content of a MIMETYPE file in the container. The expected content is given by
  * {@link ContainerPackagingFactory}.
  */
 public class MimeTypeIntegrityRule extends AbstractRule<Container> implements ContainerRule {
+    private static final String NAME = RuleType.KSIE_FORMAT.name();
     private final byte[] expectedContent;
 
-    public MimeTypeIntegrityRule(ContainerPackagingFactory packagingFactory) {
-        this(RuleState.FAIL, packagingFactory);
-    }
-
-    public MimeTypeIntegrityRule(RuleState state, ContainerPackagingFactory packagingFactory) {
-        super(state);
+    public MimeTypeIntegrityRule(RuleStateProvider provider, ContainerPackagingFactory packagingFactory) {
+        super(provider.getStateForRule(NAME));
         this.expectedContent = packagingFactory.getMimeTypeContent();
     }
 
     @Override
-    protected List<RuleVerificationResult> verifyRule(Container verifiable) {
-        RuleVerificationResult verificationResult;
+    protected void verifyRule(ResultHolder holder, Container verifiable) throws RuleTerminatingException {
         MimeType mimetype = verifiable.getMimeType();
         VerificationResult result = getFailureVerificationResult();
+        String mimetypeUri = mimetype.getUri();
         try {
             byte[] realContent = Util.toByteArray(mimetype.getInputStream());
             if (Arrays.equals(expectedContent, realContent)) {
                 result = VerificationResult.OK;
             }
-            verificationResult = new TerminatingVerificationResult(result, this, mimetype.getUri());
+            holder.addResult(new GenericVerificationResult(result, this, mimetypeUri));
         } catch (IOException e) {
             LOGGER.info("Verifying MIME type failed!", e);
-            verificationResult = new TerminatingVerificationResult(result, this, mimetype.getUri(), e);
+            holder.addResult(new GenericVerificationResult(result, this, mimetypeUri, e));
         }
-        return Arrays.asList(verificationResult);
+
+        if (!result.equals(VerificationResult.OK)) {
+            throw new RuleTerminatingException("MIME type integrity could not be verified for '" + mimetypeUri + "'");
+        }
     }
 
     @Override
     public String getName() {
-        return "KSIE_FORMAT";
+        return NAME;
     }
 
     @Override

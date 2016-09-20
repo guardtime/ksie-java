@@ -3,8 +3,8 @@ package com.guardtime.container.verification.rule;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.MultiHashElement;
 import com.guardtime.container.util.DataHashException;
-import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.result.TerminatingVerificationResult;
+import com.guardtime.container.verification.result.GenericVerificationResult;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -12,9 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 public abstract class AbstractRule<O> implements Rule<O> {
     protected static final Logger LOGGER = LoggerFactory.getLogger(Rule.class);
@@ -36,33 +33,15 @@ public abstract class AbstractRule<O> implements Rule<O> {
         }
     }
 
-    /**
-     * Returns true if any of the {@link RuleVerificationResult}s are not OK
-     */
-    protected boolean mustTerminateVerification(List<RuleVerificationResult> verificationResults) {
-        if (verificationResults.isEmpty()) return true;
-        for (RuleVerificationResult result : verificationResults) {
-            if (result.terminatesVerification() && !VerificationResult.OK.equals(result.getVerificationResult())) {
-                return true;
-            }
-        }
-        return false;
+    @Override
+    public void verify(ResultHolder holder, O verifiable) throws RuleTerminatingException {
+        if (this.state != RuleState.IGNORE) verifyRule(holder, verifiable);
     }
 
-    protected boolean ignoreRule() {
-        return this.state == RuleState.IGNORE;
-    }
+    protected abstract void verifyRule(ResultHolder holder, O verifiable) throws RuleTerminatingException;
 
-    public List<RuleVerificationResult> verify(O verifiable) {
-        if (ignoreRule()) return new LinkedList<>();
-        return verifyRule(verifiable);
-    }
-
-    protected abstract List<RuleVerificationResult> verifyRule(O verifiable);
-
-    protected List<RuleVerificationResult> getFileReferenceHashListVerificationResult(MultiHashElement multiHashElement, FileReference fileReference) {
+    protected void verifyMultiHashElement(MultiHashElement multiHashElement, FileReference fileReference, ResultHolder holder) throws RuleTerminatingException {
         String testedElement = fileReference.getUri();
-        RuleVerificationResult result;
         VerificationResult verificationResult = getFailureVerificationResult();
         try {
             for (DataHash expectedHash : fileReference.getHashList()) {
@@ -81,19 +60,22 @@ public abstract class AbstractRule<O> implements Rule<O> {
                     LOGGER.warn("Generated hash does not match hash in reference. Expecting '{}', got '{}'", expectedHash, realHash);
                 }
             }
-            result = new TerminatingVerificationResult(verificationResult, this, testedElement);
+            holder.addResult(new GenericVerificationResult(verificationResult, this, testedElement));
         } catch (IOException | DataHashException e) {
             LOGGER.info("Verifying hash failed!", e);
-            result = new TerminatingVerificationResult(verificationResult, this, testedElement, e);
+            holder.addResult(new GenericVerificationResult(verificationResult, this, testedElement, e));
         }
-        return Arrays.asList(result);
-    }
 
+        if (!verificationResult.equals(VerificationResult.OK)) {
+            throw new RuleTerminatingException("'" + testedElement + "' integrity could not be verified.");
+        }
+    }
 
     public String getName() {
         return null;
     }
 
+    @Override
     public String getErrorMessage() {
         return null;
     }

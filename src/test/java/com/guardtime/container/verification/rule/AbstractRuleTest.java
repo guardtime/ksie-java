@@ -3,6 +3,7 @@ package com.guardtime.container.verification.rule;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.MultiHashElement;
 import com.guardtime.container.util.DataHashException;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.ksi.hashing.DataHash;
@@ -36,8 +37,8 @@ public class AbstractRuleTest {
 
     private AbstractRule rule = new AbstractRule<Object>(RuleState.FAIL) {
         @Override
-        protected List<RuleVerificationResult> verifyRule(Object verifiable) {
-            return null;
+        protected void verifyRule(ResultHolder holder, Object verifiable) throws RuleTerminatingException {
+
         }
     };
 
@@ -76,8 +77,13 @@ public class AbstractRuleTest {
     }
 
     private void testFileReferenceHashListVerification(MultiHashElement mockMultiHashElement, FileReference mockFileReference, VerificationResult expected) {
-        List<RuleVerificationResult> results = rule.getFileReferenceHashListVerificationResult(mockMultiHashElement, mockFileReference);
-        for (RuleVerificationResult verificationResult : results) {
+        ResultHolder resultHolder = new ResultHolder();
+        try {
+            rule.verifyMultiHashElement(mockMultiHashElement, mockFileReference, resultHolder);
+        } catch (RuleTerminatingException e) {
+            // Drop it as we don't test this at the moment
+        }
+        for (RuleVerificationResult verificationResult : resultHolder.getResults()) {
             assertEquals(expected, verificationResult.getVerificationResult());
         }
     }

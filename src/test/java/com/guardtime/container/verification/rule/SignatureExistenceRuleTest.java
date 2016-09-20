@@ -1,10 +1,12 @@
 package com.guardtime.container.verification.rule;
 
+import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.SignatureReference;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.Rule;
@@ -22,7 +24,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-public class SignatureExistenceRuleTest {
+public class SignatureExistenceRuleTest extends AbstractContainerTest {
 
     @Mock
     private SignatureContent mockSignatureContent;
@@ -43,11 +45,7 @@ public class SignatureExistenceRuleTest {
     public void testVerifyWithoutSignature() throws Exception {
         when(mockSignatureContent.getContainerSignature()).thenReturn(null);
 
-        Rule rule = new SignatureExistenceRule(RuleState.FAIL);
-        List<RuleVerificationResult> results = rule.verify(mockSignatureContent);
-        for (RuleVerificationResult verificationResult : results) {
-            assertEquals(verificationResult.getVerificationResult(), VerificationResult.NOK);
-        }
+        assertRuleResult(VerificationResult.NOK);
     }
 
     @Test
@@ -56,10 +54,19 @@ public class SignatureExistenceRuleTest {
         when(mockSignatureContent.getContainerSignature()).thenReturn(mockSignature);
         when(mockSignature.getSignature()).thenReturn(Mockito.mock(KSISignature.class));
 
-        Rule rule = new SignatureExistenceRule(RuleState.FAIL);
-        List<RuleVerificationResult> results = rule.verify(mockSignatureContent);
-        for (RuleVerificationResult verificationResult : results) {
-            assertEquals(verificationResult.getVerificationResult(), VerificationResult.OK);
+        assertRuleResult(VerificationResult.OK);
+    }
+
+    private void assertRuleResult(VerificationResult result) {
+        Rule rule = new SignatureExistenceRule(defaultRuleStateProvider);
+        ResultHolder holder = new ResultHolder();
+        try {
+            rule.verify(holder, mockSignatureContent);
+        } catch (RuleTerminatingException e) {
+            // Drop it as we don't test this at the moment
+        }
+        for (RuleVerificationResult verificationResult : holder.getResults()) {
+            assertEquals(verificationResult.getVerificationResult(), result);
         }
     }
 

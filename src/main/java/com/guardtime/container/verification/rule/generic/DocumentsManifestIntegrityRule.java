@@ -4,11 +4,11 @@ import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.RuleState;
-
-import java.util.List;
+import com.guardtime.container.verification.rule.RuleStateProvider;
+import com.guardtime.container.verification.rule.RuleTerminatingException;
+import com.guardtime.container.verification.rule.RuleType;
 
 /**
  * This rule verifies the validity of the datamanifest which contains records for all {@link
@@ -16,25 +16,24 @@ import java.util.List;
  */
 public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureContent> {
 
-    public DocumentsManifestIntegrityRule() {
-        this(RuleState.FAIL);
-    }
+    private static final String NAME = RuleType.KSIE_VERIFY_DATA_MANIFEST.name();
 
-    public DocumentsManifestIntegrityRule(RuleState state) {
-        super(state);
+    public DocumentsManifestIntegrityRule(RuleStateProvider stateProvider) {
+        super(stateProvider.getStateForRule(NAME));
     }
 
     @Override
-    protected List<RuleVerificationResult> verifyRule(SignatureContent verifiable) {
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
         DocumentsManifest documentsManifest = verifiable.getDocumentsManifest().getRight();
         Manifest manifest = verifiable.getManifest().getRight();
         FileReference documentsManifestReference = manifest.getDocumentsManifestReference();
-        return getFileReferenceHashListVerificationResult(documentsManifest, documentsManifestReference);
+        verifyMultiHashElement(documentsManifest, documentsManifestReference, holder);
+
     }
 
     @Override
     public String getName() {
-        return "KSIE_VERIFY_DATA_MANIFEST";
+        return NAME;
     }
 
     @Override
