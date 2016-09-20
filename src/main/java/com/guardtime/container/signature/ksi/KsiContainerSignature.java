@@ -1,6 +1,7 @@
 package com.guardtime.container.signature.ksi;
 
 import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.signature.SignatureException;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.unisignature.KSISignature;
 
@@ -14,7 +15,7 @@ class KsiContainerSignature implements ContainerSignature<KSISignature> {
 
     private KSISignature signature;
 
-    public KsiContainerSignature(KSISignature signature) {
+    KsiContainerSignature(KSISignature signature) {
         this.signature = signature;
     }
 
@@ -32,8 +33,15 @@ class KsiContainerSignature implements ContainerSignature<KSISignature> {
         }
     }
 
-    public void setSignature(KSISignature signature) {
-        this.signature = signature;
+    void setExtendedSignature(KSISignature newSignature) throws SignatureException {
+        if (!newSignature.isExtended() ||
+                !newSignature.getInputHash().equals(this.signature.getInputHash()) ||
+                !newSignature.getAggregationTime().equals(this.signature.getAggregationTime()) ||
+                !newSignature.getIdentity().equals(this.signature.getIdentity())
+                ) {
+            throw new SignatureException("Provided signature is not an extended variant of the existing signature!");
+        }
+        this.signature = newSignature;
     }
 
 }
