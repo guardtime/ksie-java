@@ -10,7 +10,7 @@ import com.guardtime.container.manifest.*;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.SignatureFactoryType;
 import com.guardtime.container.util.Pair;
-import com.guardtime.container.verification.rule.DefaultRuleStateProvider;
+import com.guardtime.container.verification.rule.state.DefaultRuleStateProvider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;

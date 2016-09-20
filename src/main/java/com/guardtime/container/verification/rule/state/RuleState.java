@@ -1,4 +1,4 @@
-package com.guardtime.container.verification.rule;
+package com.guardtime.container.verification.rule.state;
 
 /**
  * Rule states define how the rule should be handled as some states require the rule to be ignored while others require
