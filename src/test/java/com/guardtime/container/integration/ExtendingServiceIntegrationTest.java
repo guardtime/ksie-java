@@ -1,6 +1,7 @@
-package com.guardtime.container.extending;
+package com.guardtime.container.integration;
 
-import com.guardtime.container.AbstractCommonKsiServiceIntegrationTest;
+import com.guardtime.container.extending.ContainerSignatureExtender;
+import com.guardtime.container.extending.ExtendingPolicy;
 import com.guardtime.container.extending.ksi.KsiContainerSignatureExtendingPolicy;
 import com.guardtime.container.extending.ksi.PublicationKsiContainerSignatureExtendingPolicy;
 import com.guardtime.container.packaging.Container;

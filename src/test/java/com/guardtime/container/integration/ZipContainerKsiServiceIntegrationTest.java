@@ -1,7 +1,5 @@
 package com.guardtime.container.integration;
 
-
-import com.guardtime.container.AbstractCommonKsiServiceIntegrationTest;
 import com.guardtime.container.ContainerBuilder;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.packaging.Container;
@@ -15,7 +13,9 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class ZipContainerKsiServiceIT extends AbstractCommonKsiServiceIntegrationTest {
+public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
+
+    protected static final String CONTAINER_WITH_ONE_DOCUMENT = "containers/container-one-file.ksie";
 
     @Test
     public void testCreateContainer() throws Exception {

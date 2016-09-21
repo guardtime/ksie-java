@@ -1,7 +1,7 @@
-package com.guardtime.container.verification;
+package com.guardtime.container.integration;
 
-import com.guardtime.container.AbstractCommonKsiServiceIntegrationTest;
 import com.guardtime.container.packaging.Container;
+import com.guardtime.container.verification.ContainerVerifier;
 import com.guardtime.container.verification.policy.DefaultVerificationPolicy;
 import com.guardtime.container.verification.policy.VerificationPolicy;
 import com.guardtime.container.verification.result.ContainerVerifierResult;
@@ -14,7 +14,9 @@ import java.io.FileInputStream;
 
 import static org.junit.Assert.assertEquals;
 
-public class VerificationKsiServiceIT extends AbstractCommonKsiServiceIntegrationTest {
+public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
+
+    protected static final String CONTAINER_WITH_WRONG_SIGNATURE_FILE = "containers/container-wrong-signature-file.ksie";
 
     @Test
     public void testContainerWithInvalidSignature_VerificationFails() throws Exception {
