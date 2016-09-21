@@ -2,6 +2,7 @@ package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.MimeType;
+import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.util.Util;
 
@@ -18,19 +19,16 @@ class ZipContainer implements Container {
     private List<ZipSignatureContent> signatureContents = new LinkedList<>();
     private MimeType mimeType;
     private List<Pair<String, File>> unknownFiles = new LinkedList<>();
-    private ZipEntryNameProvider nameProvider;
 
-    public ZipContainer(ZipSignatureContent signatureContent, MimeType mimeType, ZipEntryNameProvider nameProvider) {
+    public ZipContainer(ZipSignatureContent signatureContent, MimeType mimeType) {
         this.signatureContents.add(signatureContent);
         this.mimeType = mimeType;
-        this.nameProvider = nameProvider;
     }
 
-    public ZipContainer(List<ZipSignatureContent> signatureContents, List<Pair<String, File>> unknownFiles, MimeType mimeType, ZipEntryNameProvider nameProvider) {
+    public ZipContainer(List<ZipSignatureContent> signatureContents, List<Pair<String, File>> unknownFiles, MimeType mimeType) {
         this.signatureContents = signatureContents;
-        this.unknownFiles = unknownFiles;
+        this.unknownFiles.addAll(unknownFiles);
         this.mimeType = mimeType;
-        this.nameProvider = nameProvider;
     }
 
     @Override
@@ -55,10 +53,6 @@ class ZipContainer implements Container {
     @Override
     public List<Pair<String, File>> getUnknownFiles() {
         return unknownFiles;
-    }
-
-    public ZipEntryNameProvider getNameProvider() {
-        return nameProvider;
     }
 
     private void writeExcessFiles(ZipOutputStream zipOutputStream) throws IOException {

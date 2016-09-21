@@ -11,10 +11,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import static com.guardtime.container.packaging.EntryNameProvider.ANNOTATIONS_MANIFEST_FORMAT;
+
 /**
  * This content holders is used for annotations manifests inside the container.
  */
-public class AnnotationsManifestHandler extends IndexedContentHandler<AnnotationsManifest> {
+public class AnnotationsManifestHandler extends ContentHandler<AnnotationsManifest> {
 
     private final ContainerManifestFactory manifestFactory;
 
@@ -24,8 +26,9 @@ public class AnnotationsManifestHandler extends IndexedContentHandler<Annotation
 
     @Override
     public boolean isSupported(String name) {
+        String regex = String.format(ANNOTATIONS_MANIFEST_FORMAT, ".+", manifestFactory.getManifestFactoryType().getManifestFileExtension());
         return matchesSingleDirectory(name, "META-INF") &&
-                fileNameMatches(name, "annotmanifest[0-9]+." + manifestFactory.getManifestFactoryType().getManifestFileExtension());
+                fileNameMatches(name, regex);
     }
 
     @Override
@@ -40,22 +43,6 @@ public class AnnotationsManifestHandler extends IndexedContentHandler<Annotation
         } catch (IOException e) {
             throw new ContentParsingException("Failed to read file", e);
         }
-    }
-
-    public int getMaxSingleAnnotationManifestIndex() {
-        int max = 0;
-        for (File file : entries.values()) {
-            try {
-                AnnotationsManifest annotationsManifest = manifestFactory.readAnnotationsManifest(new FileInputStream(file));
-                for (FileReference reference : annotationsManifest.getSingleAnnotationManifestReferences()) {
-                    int index = Util.extractIntegerFrom(reference.getUri());
-                    if (index > max) max = index;
-                }
-            } catch (Exception e) {
-                // We don't care about the manifests we can't access, ignore them
-            }
-        }
-        return max;
     }
 
 }

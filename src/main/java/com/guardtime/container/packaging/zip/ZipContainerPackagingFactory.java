@@ -3,10 +3,10 @@ package com.guardtime.container.packaging.zip;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.hash.HashAlgorithmProvider;
+import com.guardtime.container.indexing.IndexingException;
 import com.guardtime.container.manifest.*;
-import com.guardtime.container.packaging.Container;
-import com.guardtime.container.packaging.ContainerPackagingFactory;
-import com.guardtime.container.packaging.InvalidPackageException;
+import com.guardtime.container.packaging.*;
+import com.guardtime.container.indexing.IndexProvider;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureException;
 import com.guardtime.container.signature.SignatureFactory;
@@ -37,12 +37,17 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
 
     private final SignatureFactory signatureFactory;
     private final ContainerManifestFactory manifestFactory;
+    private final IndexProvider indexProvider;
 
-    public ZipContainerPackagingFactory(SignatureFactory signatureFactory, ContainerManifestFactory manifestFactory) {
+    /**
+     * @param indexProvider       Provides correct indexing for internal structure when creating containers. If null provided only reading containers is allowed!
+     */
+    public ZipContainerPackagingFactory(SignatureFactory signatureFactory, ContainerManifestFactory manifestFactory, IndexProvider indexProvider) {
         Util.notNull(signatureFactory, "Signature factory");
         Util.notNull(manifestFactory, "Manifest factory");
         this.signatureFactory = signatureFactory;
         this.manifestFactory = manifestFactory;
+        this.indexProvider = indexProvider;
         logger.info("Zip container factory initialized");
     }
 
@@ -59,12 +64,13 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
 
     @Override
     public ZipContainer create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
+        Util.notNull(indexProvider, "Index provider");
         Util.notEmpty(files, "Document files");
         try {
-            ContentSigner signer = new ContentSigner(files, annotations);
+            ContentSigner signer = new ContentSigner(files, annotations, indexProvider);
             ZipSignatureContent signatureContent = signer.sign();
             MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
-            return new ZipContainer(signatureContent, mimeType, signer.getNameProvider());
+            return new ZipContainer(signatureContent, mimeType);
         } catch (IOException | InvalidManifestException e) {
             throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
         } catch (SignatureException e) {
@@ -78,12 +84,13 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
 
     @Override
     public ZipContainer create(Container existingContainer, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
+        Util.notNull(indexProvider, "Index provider");
         Util.notNull(existingContainer, "Container");
-        // TODO: Possibility to add signature without adding data files. Spec needed for this
         Util.notEmpty(files, "Data files");
         try {
+            indexProvider.updateIndexes(existingContainer);
             ZipContainer existingZipContainer = (ZipContainer) existingContainer;
-            ContentSigner signer = new ContentSigner(files, annotations, existingZipContainer.getNameProvider());
+            ContentSigner signer = new ContentSigner(files, annotations, indexProvider);
             ZipSignatureContent signatureContent = signer.sign();
             existingZipContainer.getSignatureContents().add(signatureContent);
             return existingZipContainer;
@@ -91,6 +98,8 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
         } catch (SignatureException e) {
             throw new InvalidPackageException("Failed to sign ZipContainer!", e);
+        } catch (IndexingException e) {
+            throw new InvalidPackageException("Failed to extract signature indexes from existing Container!", e);
         }
     }
 
@@ -98,25 +107,19 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
 
         private List<ContainerDocument> documents;
         private List<ContainerAnnotation> annotations;
-        private ZipEntryNameProvider nameProvider;
+        private EntryNameProvider nameProvider;
 
         private List<Pair<String, ContainerAnnotation>> annotationPairs = new LinkedList<>();
         private List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifestPairs = new LinkedList<>();
         private Map<String, Pair<ContainerAnnotation, SingleAnnotationManifest>> annotationsManifestContent = new HashMap<>();
 
-        public ContentSigner(List<ContainerDocument> documents, List<ContainerAnnotation> annotations) {
+        public ContentSigner(List<ContainerDocument> documents, List<ContainerAnnotation> annotations, IndexProvider indexProvider) {
             this.documents = documents;
             this.annotations = annotations;
 
-            ManifestFactoryType manifestFactoryType = manifestFactory.getManifestFactoryType();
-            SignatureFactoryType signatureFactoryType = signatureFactory.getSignatureFactoryType();
-            this.nameProvider = new ZipEntryNameProvider(manifestFactoryType.getManifestFileExtension(), signatureFactoryType.getSignatureFileExtension());
-        }
-
-        public ContentSigner(List<ContainerDocument> documents, List<ContainerAnnotation> annotations, ZipEntryNameProvider nameProvider) {
-            this.documents = documents;
-            this.annotations = annotations;
-            this.nameProvider = nameProvider;
+            String manifestFileExtension = manifestFactory.getManifestFactoryType().getManifestFileExtension();
+            String signatureFileExtension = signatureFactory.getSignatureFactoryType().getSignatureFileExtension();
+            this.nameProvider = new EntryNameProvider(manifestFileExtension, signatureFileExtension, indexProvider);
         }
 
         public ZipSignatureContent sign() throws InvalidManifestException, SignatureException, IOException {
@@ -151,10 +154,6 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             Manifest manifest = signatureContent.getManifest().getRight();
             HashAlgorithmProvider algorithmProvider = manifestFactory.getHashAlgorithmProvider();
             return manifest.getDataHash(algorithmProvider.getSignatureHashAlgorithm());
-        }
-
-        public ZipEntryNameProvider getNameProvider() {
-            return nameProvider;
         }
 
         private void processAnnotations(Pair<String, DocumentsManifest> documentsManifest) throws InvalidManifestException {

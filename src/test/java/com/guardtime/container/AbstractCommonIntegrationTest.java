@@ -1,5 +1,7 @@
 package com.guardtime.container;
 
+import com.guardtime.container.indexing.IncrementingIndexProvider;
+import com.guardtime.container.indexing.IndexProvider;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
@@ -42,6 +44,6 @@ public class AbstractCommonIntegrationTest extends AbstractContainerTest {
         when(mockKsi.sign(Mockito.any(DataHash.class))).thenReturn(Mockito.mock(KSISignature.class));
         when(mockKsi.extend(Mockito.any(KSISignature.class))).thenReturn(Mockito.mock(KSISignature.class));
         signatureFactory = new KsiSignatureFactory(mockKsi);
-        packagingFactory = new ZipContainerPackagingFactory(signatureFactory, manifestFactory);
+        packagingFactory = new ZipContainerPackagingFactory(signatureFactory, manifestFactory, Mockito.mock(IndexProvider.class));
     }
 }

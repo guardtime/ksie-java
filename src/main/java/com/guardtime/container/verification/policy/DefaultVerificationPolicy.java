@@ -4,8 +4,6 @@ import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.verification.rule.ContainerRule;
 import com.guardtime.container.verification.rule.RuleStateProvider;
-import com.guardtime.container.verification.rule.generic.ContainerSignatureIntegrityRule;
-import com.guardtime.container.verification.rule.generic.ManifestIndexConsistencyRule;
 import com.guardtime.container.verification.rule.generic.MimeTypeIntegrityRule;
 import com.guardtime.container.verification.rule.generic.SignatureContentIntegrityRule;
 import com.guardtime.container.verification.rule.signature.SignatureVerifier;
@@ -19,7 +17,6 @@ import java.util.List;
  * Contains containerRules for:
  * <ol>
  *   <li>verifying MIME type</li>
- *   <li>verifying manifest indexes are consecutive</li>
  *   <li>verifying signature</li>
  *   <li>verifying {@link DocumentsManifest}</li>
  *   <li>verifying {@link com.guardtime.container.document.ContainerDocument}s</li>
@@ -43,7 +40,6 @@ public class DefaultVerificationPolicy implements VerificationPolicy {
 
     public DefaultVerificationPolicy(RuleStateProvider stateProvider, SignatureVerifier signatureVerifier, ContainerPackagingFactory packagingFactory, List<ContainerRule> customRules) {
         containerRules.add(new MimeTypeIntegrityRule(stateProvider, packagingFactory));
-        containerRules.add(new ManifestIndexConsistencyRule(stateProvider));
         containerRules.add(new SignatureContentIntegrityRule(stateProvider, signatureVerifier)); // Nested rules inside
         containerRules.addAll(customRules);
     }

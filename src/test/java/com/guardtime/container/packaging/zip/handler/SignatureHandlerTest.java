@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 
 public class SignatureHandlerTest {
 
-    private static final String VALID_SIGNATURE_PATH = "/META-INF/signature1.ksig";
+    private static final String VALID_SIGNATURE_PATH = "/META-INF/signature-1.ksig";
     private static final String INVALID_SIGNATURE_PATH = "funky_music.mp3";
     private SignatureHandler handler;
 

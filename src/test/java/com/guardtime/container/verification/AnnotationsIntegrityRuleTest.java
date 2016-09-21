@@ -61,7 +61,7 @@ public class AnnotationsIntegrityRuleTest extends AbstractContainerTest {
         when(mockedContainerSignature.getSignature()).thenReturn(mockKsiSignature);
         when(mockedSignatureFactory.read(Mockito.any(InputStream.class))).thenReturn(mockedContainerSignature);
 
-        this.packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory());
+        this.packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory(), null);
     }
 
     private RuleVerificationResult getRuleVerificationResult(String path) throws Exception {

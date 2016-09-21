@@ -1,6 +1,7 @@
 package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.manifest.ContainerManifestFactory;
+import com.guardtime.container.packaging.EntryNameProvider;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.SignatureContent;
@@ -71,10 +72,9 @@ class ZipContainerReader {
         List<ZipSignatureContent> contents = buildSignatures();
         MimeType mimeType = getMimeType();
         List<Pair<String, File>> unknownFiles = getUnknownFiles();
-        ZipEntryNameProvider nameProvider = getNameProvider();
 
         if (validMimeType(mimeType) && containsValidContents(contents)) {
-            return new ZipContainer(contents, unknownFiles, mimeType, nameProvider);
+            return new ZipContainer(contents, unknownFiles, mimeType);
         } else {
             throw new InvalidPackageException("Parsed container was not valid");
         }
@@ -105,26 +105,6 @@ class ZipContainerReader {
         } catch (IOException e) {
             return false;
         }
-    }
-
-    private ZipEntryNameProvider getNameProvider() {
-        int maxManifestIndex = Collections.max(Arrays.asList(
-                manifestHandler.getMaxIndex(),
-                signatureHandler.getMaxIndex(),
-                documentsManifestHandler.getMaxIndex(),
-                annotationsManifestHandler.getMaxIndex()
-        ));
-        int maxAnnotationIndex = Collections.max(Arrays.asList(
-                annotationContentHandler.getMaxIndex(),
-                singleAnnotationManifestHandler.getMaxIndex(),
-                annotationsManifestHandler.getMaxSingleAnnotationManifestIndex()
-        ));
-        return new ZipEntryNameProvider(
-                manifestSuffix,
-                signatureSuffix,
-                maxManifestIndex,
-                maxAnnotationIndex
-        );
     }
 
     private MimeType getMimeType() {

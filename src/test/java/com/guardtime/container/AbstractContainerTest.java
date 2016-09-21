@@ -41,9 +41,9 @@ public class AbstractContainerTest {
     protected static final String ANNOTATION_DOMAIN_COM_GUARDTIME = "com.guardtime";
 
     protected static final String ANNOTATION_CONTENT = "42";
-    protected static final String DOCUMENTS_MANIFEST_URI = "/META-INF/datamanifest1.tlv";
+    protected static final String DOCUMENTS_MANIFEST_URI = "/META-INF/datamanifest-1.tlv";
 
-    protected static final String ANNOTATIONS_MANIFEST_URI = "/META-INF/annotmanifest1.tlv";
+    protected static final String ANNOTATIONS_MANIFEST_URI = "/META-INF/annotmanifest-1.tlv";
     protected static final ContainerDocument TEST_DOCUMENT_HELLO_TEXT = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
     protected static final ContainerDocument TEST_DOCUMENT_HELLO_PDF = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_PDF_CONTENT), MIME_TYPE_APPLICATION_PDF, TEST_FILE_NAME_TEST_PDF);
     protected static final ContainerAnnotation MOCKED_ANNOTATION = new StringContainerAnnotation(ContainerAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME);
