@@ -47,7 +47,7 @@ public class DocumentsIntegrityRuleTest extends AbstractContainerTest {
         when(mockedContainerSignature.getSignature()).thenReturn(mockKsiSignature);
         when(mockedSignatureFactory.read(Mockito.any(InputStream.class))).thenReturn(mockedContainerSignature);
 
-        this.packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory(), null);
+        this.packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory(), mockIndexProvider);
     }
 
     private RuleVerificationResult getRuleVerificationResult(String path) throws Exception {

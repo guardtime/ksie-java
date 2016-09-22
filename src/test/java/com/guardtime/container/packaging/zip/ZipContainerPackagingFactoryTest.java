@@ -5,11 +5,8 @@ import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
-import com.guardtime.container.indexing.IncrementingIndexProvider;
-import com.guardtime.container.indexing.IndexProvider;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -32,14 +29,14 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
     public void testCreatePackagingFactoryWithoutSignatureFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Signature factory must be present");
-        new ZipContainerPackagingFactory(null, mockedManifestFactory, null);
+        new ZipContainerPackagingFactory(null, mockedManifestFactory, mockIndexProvider);
     }
 
     @Test
     public void testCreatePackagingFactoryWithoutManifestFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Manifest factory must be present");
-        new ZipContainerPackagingFactory(mockedSignatureFactory, null, null);
+        new ZipContainerPackagingFactory(mockedSignatureFactory, null, mockIndexProvider);
     }
 
 
@@ -47,20 +44,20 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
     public void testCreatePackagingFactoryWithoutDocuments_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Document files must not be empty");
-        ZipContainerPackagingFactory containerFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, Mockito.mock(IndexProvider.class));
+        ZipContainerPackagingFactory containerFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, mockIndexProvider);
         containerFactory.create(new ArrayList<ContainerDocument>(), annotations);
     }
 
     @Test
     public void testCreateContainerWithDocument() throws Exception {
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, Mockito.mock(IndexProvider.class));
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, mockIndexProvider);
         ZipContainer container = packagingFactory.create(documents, null);
         assertNotNull(container);
     }
 
     @Test
     public void testCreateContainerWithDocumentAndAnnotations() throws Exception {
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, Mockito.mock(IndexProvider.class));
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, mockIndexProvider);
         ZipContainer container = packagingFactory.create(documents, annotations);
         assertNotNull(container);
     }

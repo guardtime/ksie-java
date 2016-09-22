@@ -6,6 +6,7 @@ import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.hash.HashAlgorithmProvider;
+import com.guardtime.container.indexing.IndexProvider;
 import com.guardtime.container.manifest.*;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.SignatureFactoryType;
@@ -79,6 +80,9 @@ public class AbstractContainerTest {
 
     @Mock
     private HashAlgorithmProvider mockHashAlgorithmProvider;
+
+    @Mock
+    protected IndexProvider mockIndexProvider;
 
     @Before
     public void setUp() throws Exception {

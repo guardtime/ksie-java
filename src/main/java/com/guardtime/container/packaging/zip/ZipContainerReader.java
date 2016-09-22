@@ -1,7 +1,6 @@
 package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.manifest.ContainerManifestFactory;
-import com.guardtime.container.packaging.EntryNameProvider;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.SignatureContent;
@@ -16,7 +15,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -38,9 +39,6 @@ class ZipContainerReader {
     private final SignatureHandler signatureHandler;
     private final SignatureContentHandler signatureContentHandler;
 
-    private final String manifestSuffix;
-    private final String signatureSuffix;
-
     private ContentHandler[] handlers;
 
     ZipContainerReader(ContainerManifestFactory manifestFactory, SignatureFactory signatureFactory) {
@@ -51,9 +49,6 @@ class ZipContainerReader {
         this.signatureHandler = new SignatureHandler(signatureFactory);
         this.handlers = new ContentHandler[]{mimeTypeHandler, documentHandler, annotationContentHandler, documentsManifestHandler,
                 manifestHandler, annotationsManifestHandler, signatureHandler, singleAnnotationManifestHandler};
-
-        this.manifestSuffix = manifestFactory.getManifestFactoryType().getManifestFileExtension();
-        this.signatureSuffix = signatureFactory.getSignatureFactoryType().getSignatureFileExtension();
 
         this.signatureContentHandler = new SignatureContentHandler(documentHandler, annotationContentHandler, manifestHandler,
                 documentsManifestHandler, annotationsManifestHandler, singleAnnotationManifestHandler, signatureHandler);

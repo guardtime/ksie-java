@@ -45,7 +45,7 @@ public class VerificationIT extends AbstractCommonIntegrationTest {
         when(mockedKsiSignature.getInputHash()).thenReturn(new DataHash(HashAlgorithm.SHA2_256, "12345678901234567890123456789012".getBytes()));
         mockedDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
         when(mockedKsiSignature.getInputHash()).thenReturn(mockedDataHash);
-        this.packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, manifestFactory, null);
+        this.packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, manifestFactory, mockIndexProvider);
     }
 
     private DefaultVerificationPolicy getDefaultVerificationPolicy() {

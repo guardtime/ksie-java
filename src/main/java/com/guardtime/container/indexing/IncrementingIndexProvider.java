@@ -4,7 +4,9 @@ import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
+import org.mockito.internal.util.collections.Sets;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class IncrementingIndexProvider implements IndexProvider {
@@ -51,12 +53,16 @@ public class IncrementingIndexProvider implements IndexProvider {
         int maxAnnotationIndex = 0;
         for (SignatureContent content : container.getSignatureContents()) {
             Pair<String, Manifest> manifest = content.getManifest();
-            maxIndex = compareAndUpdate(manifest.getLeft(), maxIndex);
-            maxIndex = compareAndUpdate(content.getDocumentsManifest().getLeft(), maxIndex);
-            maxIndex = compareAndUpdate(content.getAnnotationsManifest().getLeft(), maxIndex);
-            maxIndex = compareAndUpdate(manifest.getRight().getSignatureReference().getUri(), maxIndex);
-            maxAnnotationIndex = compareAndUpdate(content.getSingleAnnotationManifests().keySet(), maxAnnotationIndex);
-            maxAnnotationIndex = compareAndUpdate(content.getAnnotations().keySet(), maxAnnotationIndex);
+            Set<String> manifestUriSet = Sets.newSet(
+                    manifest.getLeft(),
+                    content.getDocumentsManifest().getLeft(),
+                    content.getAnnotationsManifest().getLeft(),
+                    manifest.getRight().getSignatureReference().getUri()
+            );
+            Set<String> annotationUriSet = new HashSet<>(content.getSingleAnnotationManifests().keySet());
+            annotationUriSet.addAll(content.getAnnotations().keySet());
+            maxIndex = compareAndUpdate(manifestUriSet, maxIndex);
+            maxAnnotationIndex = compareAndUpdate(annotationUriSet, maxAnnotationIndex);
         }
         manifestIndex = maxIndex;
         signatureIndex = maxIndex;
