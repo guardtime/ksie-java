@@ -15,8 +15,6 @@ import static org.junit.Assert.assertNotNull;
 
 public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
 
-    protected static final String CONTAINER_WITH_ONE_DOCUMENT = "containers/container-one-file.ksie";
-
     @Test
     public void testCreateContainer() throws Exception {
         Container container = new ContainerBuilder(packagingFactory)

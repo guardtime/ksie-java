@@ -16,8 +16,6 @@ import static org.junit.Assert.assertEquals;
 
 public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
 
-    protected static final String CONTAINER_WITH_WRONG_SIGNATURE_FILE = "containers/container-wrong-signature-file.ksie";
-
     @Test
     public void testContainerWithInvalidSignature_VerificationFails() throws Exception {
         FileInputStream fis = new FileInputStream(loadFile(CONTAINER_WITH_WRONG_SIGNATURE_FILE));
