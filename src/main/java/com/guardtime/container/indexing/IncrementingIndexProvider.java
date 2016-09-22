@@ -52,13 +52,15 @@ public class IncrementingIndexProvider implements IndexProvider {
         int maxIndex = 0;
         int maxAnnotationIndex = 0;
         for (SignatureContent content : container.getSignatureContents()) {
-            Pair<String, Manifest> manifest = content.getManifest();
             Set<String> manifestUriSet = Sets.newSet(
-                    manifest.getLeft(),
+                    content.getManifest().getLeft(),
                     content.getDocumentsManifest().getLeft(),
-                    content.getAnnotationsManifest().getLeft(),
-                    manifest.getRight().getSignatureReference().getUri()
+                    content.getAnnotationsManifest().getLeft()
             );
+            Manifest manifest = content.getManifest().getRight();
+            if(manifest != null && manifest.getSignatureReference() != null) {
+                manifestUriSet.add(manifest.getSignatureReference().getUri());
+            }
             Set<String> annotationUriSet = new HashSet<>(content.getSingleAnnotationManifests().keySet());
             annotationUriSet.addAll(content.getAnnotations().keySet());
             maxIndex = compareAndUpdate(manifestUriSet, maxIndex);
