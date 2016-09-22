@@ -43,7 +43,6 @@ public class AnnotationsIntegrityRuleTest extends AbstractContainerTest {
     private static final String CONTAINER_WITH_NON_REMOVABLE_CORRUPT_ANNOTATION_DATA = "verification/annotations/container-with-non-removable-corrupt-annotation-data.ksie";
     private static final String CONTAINER_WITH_NON_REMOVABLE_MISSING_ANNOTATION = "verification/annotations/container-with-non-removable-missing-annotation.ksie";
     private static final String CONTAINER_WITH_NON_REMOVABLE_CORRUPT_ANNOTATION = "verification/annotations/container-with-non-removable-corrupt-annotation.ksie";
-    private static final String CONTAINER_WITH_ANNOTATIONS_MANIFEST = "verification/annotations/container-with-annotmanifest.ksie";
     private static final String CONTAINER_WITH_MISSING_ANNOTATIONS_MANIFEST = "verification/annotations/container-with-missing-annotmanifest.ksie";
     private static final String CONTAINER_WITH_CORRUPT_ANNOTATIONS_MANIFEST = "verification/annotations/container-with-corrupt-annotmanifest.ksie";
 
@@ -190,7 +189,7 @@ public class AnnotationsIntegrityRuleTest extends AbstractContainerTest {
 
     @Test
     public void testAnnotationsManifestPresent_OK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_ANNOTATIONS_MANIFEST);
+        RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_NON_REMOVABLE_ANNOTATION);
 
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }

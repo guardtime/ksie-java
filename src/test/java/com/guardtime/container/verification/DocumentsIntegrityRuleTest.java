@@ -27,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 public class DocumentsIntegrityRuleTest extends AbstractContainerTest {
-    private static final String CONTAINER_WITH_DOCUMENTS_MANIFEST = "verification/documents/container-with-documents-manifest.ksie";
     private static final String CONTAINER_WITH_MISSING_DOCUMENTS_MANIFEST = "verification/documents/container-with-missing-documents-manifest.ksie";
     private static final String CONTAINER_WITH_CORRUPT_DOCUMENTS_MANIFEST = "verification/documents/container-with-corrupt-documents-manifest.ksie";
     private static final String CONTAINER_WITH_DOCUMENT = "verification/documents/container-with-document.ksie";
@@ -68,13 +67,6 @@ public class DocumentsIntegrityRuleTest extends AbstractContainerTest {
             }
         }
         return returnable;
-    }
-
-    @Test
-    public void testDocumentsManifestPresent_OK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_DOCUMENTS_MANIFEST);
-
-        assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
