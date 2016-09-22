@@ -6,7 +6,6 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 
 import java.util.Set;
-import java.util.regex.Pattern;
 
 public class IncrementingIndexProvider implements IndexProvider {
     private int documentsManifestIndex = 0;
@@ -18,36 +17,32 @@ public class IncrementingIndexProvider implements IndexProvider {
 
     @Override
     public String getNextDocumentsManifestIndex() {
-        return incrementAndConvertToString(documentsManifestIndex);
+        return Integer.toString(++documentsManifestIndex);
     }
 
     @Override
     public String getNextManifestIndex() {
-        return incrementAndConvertToString(manifestIndex);
+        return Integer.toString(++manifestIndex);
     }
 
     @Override
     public String getNextAnnotationsManifestIndex() {
-        return incrementAndConvertToString(annotationsManifestIndex);
+        return Integer.toString(++annotationsManifestIndex);
     }
 
     @Override
     public String getNextSignatureIndex() {
-        return incrementAndConvertToString(signatureIndex);
+        return Integer.toString(++signatureIndex);
     }
 
     @Override
     public String getNextSingleAnnotationManifestIndex() {
-        return incrementAndConvertToString(singleAnnotationManifestIndex);
+        return Integer.toString(++singleAnnotationManifestIndex);
     }
 
     @Override
     public String getNextAnnotationIndex() {
-        return incrementAndConvertToString(annotationIndex);
-    }
-
-    String incrementAndConvertToString(int i) {
-        return Integer.toString(++i);
+        return Integer.toString(++annotationIndex);
     }
 
     @Override

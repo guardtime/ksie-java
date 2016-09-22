@@ -3,6 +3,7 @@ package com.guardtime.container.packaging.zip;
 import com.guardtime.container.AbstractCommonIntegrationTest;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.EmptyContainerDocument;
+import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
 import org.junit.Before;
@@ -45,7 +46,7 @@ public class ZipContainerReaderIT extends AbstractCommonIntegrationTest {
 
     @Test
     public void testReadContainerFileWithExtraFiles() throws Exception {
-        ZipContainer container = getContainer(CONTAINER_WITH_EXTRA_FILES);
+        ZipContainer container = getContainer(CONTAINER_WITH_UNKOWN_FILES);
         assertNotNull(container);
         assertFalse(container.getSignatureContents().isEmpty());
         assertFalse(container.getUnknownFiles().isEmpty());
@@ -70,6 +71,7 @@ public class ZipContainerReaderIT extends AbstractCommonIntegrationTest {
         assertFalse(container.getSignatureContents().isEmpty());
         for (SignatureContent content : container.getSignatureContents()) {
             assertTrue(content.getDocuments().isEmpty());
+            assertFalse(content.getDocumentsManifest().getRight().getDocumentReferences().isEmpty());
         }
     }
 
@@ -99,7 +101,10 @@ public class ZipContainerReaderIT extends AbstractCommonIntegrationTest {
         assertNotNull(container);
         assertFalse(container.getSignatureContents().isEmpty());
         for (SignatureContent content : container.getSignatureContents()) {
-            assertTrue(content.getAnnotations().size() > 1);
+            AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
+            int insertedAnnotationsCount = annotationsManifest.getSingleAnnotationManifestReferences().size();
+            int parsableAnnotationsCount = content.getAnnotations().size();
+            assertTrue(parsableAnnotationsCount < insertedAnnotationsCount);
         }
     }
 
@@ -122,13 +127,23 @@ public class ZipContainerReaderIT extends AbstractCommonIntegrationTest {
     public void testReadContainerFileWithMissingAnnotationData() throws Exception {
         ZipContainer container = getContainer(CONTAINER_WITH_MISSING_ANNOTATION_DATA);
         assertNotNull(container);
+        ZipSignatureContent signatureContent = container.getSignatureContents().get(0);
+        AnnotationsManifest annotationsManifest = signatureContent.getAnnotationsManifest().getRight();
         assertFalse(container.getSignatureContents().isEmpty());
+        assertTrue(signatureContent.getAnnotations().isEmpty());
+        assertFalse(signatureContent.getSingleAnnotationManifests().isEmpty());
+        assertFalse(annotationsManifest.getSingleAnnotationManifestReferences().isEmpty());
     }
 
     @Test
     public void testReadContainerFileWithMissingAnnotation() throws Exception {
         ZipContainer container = getContainer(CONTAINER_WITH_MISSING_ANNOTATION);
         assertNotNull(container);
+        ZipSignatureContent signatureContent = container.getSignatureContents().get(0);
+        AnnotationsManifest annotationsManifest = signatureContent.getAnnotationsManifest().getRight();
         assertFalse(container.getSignatureContents().isEmpty());
+        assertTrue(signatureContent.getAnnotations().isEmpty());
+        assertTrue(signatureContent.getSingleAnnotationManifests().isEmpty());
+        assertFalse(annotationsManifest.getSingleAnnotationManifestReferences().isEmpty());
     }
 }
