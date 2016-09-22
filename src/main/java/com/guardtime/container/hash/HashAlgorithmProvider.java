@@ -32,5 +32,5 @@ public interface HashAlgorithmProvider {
     /**
      * Returns a {@link HashAlgorithm} to be used when creating signature for the container.
      */
-    HashAlgorithm getSignatureHashAlgorithm();
+    HashAlgorithm getSigningHashAlgorithm();
 }
