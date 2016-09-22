@@ -1,4 +1,4 @@
-package com.guardtime.container;
+package com.guardtime.container.integration;
 
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 import com.guardtime.container.signature.ksi.KsiSignatureFactory;

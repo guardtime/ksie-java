@@ -1,9 +1,9 @@
-package com.guardtime.container.verification;
+package com.guardtime.container.integration;
 
-import com.guardtime.container.AbstractCommonIntegrationTest;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.verification.ContainerVerifier;
 import com.guardtime.container.verification.policy.DefaultVerificationPolicy;
 import com.guardtime.container.verification.result.ContainerVerifierResult;
 import com.guardtime.container.verification.result.VerificationResult;
@@ -24,7 +24,7 @@ import java.io.InputStream;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-public class VerificationIT extends AbstractCommonIntegrationTest {
+public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Mock
     private com.guardtime.ksi.unisignature.verifier.VerificationResult mockUnisignatureVerificationResult;
