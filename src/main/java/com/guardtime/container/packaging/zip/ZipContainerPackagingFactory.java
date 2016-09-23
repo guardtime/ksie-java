@@ -153,7 +153,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
         private DataHash getSignatureContentSigningHash(ZipSignatureContent signatureContent) throws IOException {
             Manifest manifest = signatureContent.getManifest().getRight();
             HashAlgorithmProvider algorithmProvider = manifestFactory.getHashAlgorithmProvider();
-            return manifest.getDataHash(algorithmProvider.getSignatureHashAlgorithm());
+            return manifest.getDataHash(algorithmProvider.getSigningHashAlgorithm());
         }
 
         private void processAnnotations(Pair<String, DocumentsManifest> documentsManifest) throws InvalidManifestException {

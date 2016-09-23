@@ -1,24 +1,42 @@
 package com.guardtime.container.packaging.zip;
 
-import com.guardtime.container.AbstractCommonIntegrationTest;
+import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.EmptyContainerDocument;
 import com.guardtime.container.manifest.AnnotationsManifest;
+import com.guardtime.container.manifest.ContainerManifestFactory;
+import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.signature.SignatureFactory;
+import com.guardtime.container.signature.ksi.KsiSignatureFactory;
+import com.guardtime.ksi.KSI;
+import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.unisignature.KSISignature;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
-public class ZipContainerReaderIT extends AbstractCommonIntegrationTest {
+public class ZipContainerReaderTest extends AbstractContainerTest {
     private ZipContainerReader reader;
+
+    @Mock
+    protected KSI mockKsi;
 
     @Before
     public void setUpReader() throws Exception {
+        ContainerManifestFactory manifestFactory = new TlvContainerManifestFactory();
+
+        when(mockKsi.sign(Mockito.any(DataHash.class))).thenReturn(Mockito.mock(KSISignature.class));
+        when(mockKsi.extend(Mockito.any(KSISignature.class))).thenReturn(Mockito.mock(KSISignature.class));
+        SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
         this.reader = new ZipContainerReader(manifestFactory, signatureFactory);
     }
 
@@ -46,7 +64,7 @@ public class ZipContainerReaderIT extends AbstractCommonIntegrationTest {
 
     @Test
     public void testReadContainerFileWithExtraFiles() throws Exception {
-        ZipContainer container = getContainer(CONTAINER_WITH_UNKOWN_FILES);
+        ZipContainer container = getContainer(CONTAINER_WITH_UNKNOWN_FILES);
         assertNotNull(container);
         assertFalse(container.getSignatureContents().isEmpty());
         assertFalse(container.getUnknownFiles().isEmpty());

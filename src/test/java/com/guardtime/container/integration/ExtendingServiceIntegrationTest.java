@@ -1,6 +1,7 @@
-package com.guardtime.container.extending;
+package com.guardtime.container.integration;
 
-import com.guardtime.container.AbstractCommonKsiServiceIntegrationTest;
+import com.guardtime.container.extending.ContainerSignatureExtender;
+import com.guardtime.container.extending.ExtendingPolicy;
 import com.guardtime.container.extending.ksi.KsiContainerSignatureExtendingPolicy;
 import com.guardtime.container.extending.ksi.PublicationKsiContainerSignatureExtendingPolicy;
 import com.guardtime.container.packaging.Container;
@@ -10,12 +11,15 @@ import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.publication.inmemory.PublicationsFilePublicationRecord;
 import com.guardtime.ksi.unisignature.KSISignature;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
 
@@ -38,6 +42,13 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
         PublicationData publicationData = new PublicationData("AAAAAA-CVFWVA-AAPV2S-SN3JLW-YEKPW3-AUSQP6-PF65K5-KVGZZA-7UYTOV-27VX54-VVJQFG-VCK6GR"); // Apr 2015 publication string
         PublicationsFilePublicationRecord publicationRecord = new PublicationsFilePublicationRecord(publicationData);
         ExtendingPolicy policy = new PublicationKsiContainerSignatureExtendingPolicy(ksi, publicationRecord);
+        doExtendingTest(signatureFactory, policy, false);
+    }
+
+    @Test
+    public void testExtendingWithInvalidSignature() throws Exception {
+        ExtendingPolicy policy = Mockito.mock(ExtendingPolicy.class);
+        when(policy.getExtendedSignature(Mockito.any(Object.class))).thenReturn(Mockito.mock(KSISignature.class));
         doExtendingTest(signatureFactory, policy, false);
     }
 

@@ -1,4 +1,4 @@
-package com.guardtime.container;
+package com.guardtime.container.integration;
 
 import com.guardtime.container.indexing.IncrementingIndexProvider;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
