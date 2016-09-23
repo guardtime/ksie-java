@@ -31,7 +31,7 @@ public class SingleHashAlgorithmProvider implements HashAlgorithmProvider {
     }
 
     @Override
-    public HashAlgorithm getSignatureHashAlgorithm() {
+    public HashAlgorithm getSigningHashAlgorithm() {
         return algorithm;
     }
 }
