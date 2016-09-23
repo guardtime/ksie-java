@@ -15,7 +15,7 @@ import com.guardtime.container.verification.rule.RuleType;
  */
 public class SignatureExistenceRule extends AbstractRule<SignatureContent> {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_SIGNATURE_EXISTS.name();
+    private static final String NAME = RuleType.KSIE_VERIFY_SIGNATURE_EXISTS.getName();
 
     public SignatureExistenceRule(RuleStateProvider stateProvider) {
         super(stateProvider.getStateForRule(NAME));

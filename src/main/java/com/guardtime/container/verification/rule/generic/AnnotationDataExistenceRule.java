@@ -16,7 +16,7 @@ import com.guardtime.container.verification.rule.*;
  */
 public class AnnotationDataExistenceRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_DATA_EXISTS.name();
+    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_DATA_EXISTS.getName();
 
     public AnnotationDataExistenceRule(RuleStateProvider stateProvider) {
         super(stateProvider.getStateForRule(NAME));

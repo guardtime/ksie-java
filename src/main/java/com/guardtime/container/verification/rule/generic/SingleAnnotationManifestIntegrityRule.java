@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION.name();
+    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION.getName();
 
     public SingleAnnotationManifestIntegrityRule(RuleStateProvider stateProvider) {
         super(stateProvider.getStateForRule(NAME));

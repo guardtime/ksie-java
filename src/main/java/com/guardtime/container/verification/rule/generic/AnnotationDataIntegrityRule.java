@@ -23,7 +23,7 @@ import java.io.IOException;
  */
 public class AnnotationDataIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_DATA.name();
+    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_DATA.getName();
 
     public AnnotationDataIntegrityRule(RuleStateProvider stateProvider) {
         super(stateProvider.getStateForRule(NAME));

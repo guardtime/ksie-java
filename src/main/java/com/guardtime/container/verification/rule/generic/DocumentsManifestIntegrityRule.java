@@ -16,7 +16,7 @@ import com.guardtime.container.verification.rule.RuleType;
  */
 public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureContent> {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_DATA_MANIFEST.name();
+    private static final String NAME = RuleType.KSIE_VERIFY_DATA_MANIFEST.getName();
 
     public DocumentsManifestIntegrityRule(RuleStateProvider stateProvider) {
         super(stateProvider.getStateForRule(NAME));

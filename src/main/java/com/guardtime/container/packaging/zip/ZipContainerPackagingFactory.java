@@ -13,6 +13,10 @@ import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.SignatureFactoryType;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
+import com.guardtime.container.verification.ContainerVerifier;
+import com.guardtime.container.verification.policy.InternalVerificationPolicy;
+import com.guardtime.container.verification.result.ContainerVerifierResult;
+import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.ksi.hashing.DataHash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,12 +41,18 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
 
     private final SignatureFactory signatureFactory;
     private final ContainerManifestFactory manifestFactory;
+    private final boolean disableVerification;
 
     public ZipContainerPackagingFactory(SignatureFactory signatureFactory, ContainerManifestFactory manifestFactory) {
+        this(signatureFactory, manifestFactory, false);
+    }
+
+    public ZipContainerPackagingFactory(SignatureFactory signatureFactory, ContainerManifestFactory manifestFactory, boolean disableVerification) {
         Util.notNull(signatureFactory, "Signature factory");
         Util.notNull(manifestFactory, "Manifest factory");
         this.signatureFactory = signatureFactory;
         this.manifestFactory = manifestFactory;
+        this.disableVerification = disableVerification;
         logger.info("Zip container factory initialized");
     }
 
@@ -64,7 +74,9 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             ContentSigner signer = new ContentSigner(files, annotations);
             ZipSignatureContent signatureContent = signer.sign();
             MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
-            return new ZipContainer(signatureContent, mimeType, signer.getNameProvider());
+            ZipContainer zipContainer = new ZipContainer(signatureContent, mimeType, signer.getNameProvider());
+            verifyContainer(zipContainer);
+            return zipContainer;
         } catch (IOException | InvalidManifestException e) {
             throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
         } catch (SignatureException e) {
@@ -85,12 +97,26 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             ZipContainer existingZipContainer = (ZipContainer) existingContainer;
             ContentSigner signer = new ContentSigner(files, annotations, existingZipContainer.getNameProvider());
             ZipSignatureContent signatureContent = signer.sign();
+            verifySignatureContent(signer, signatureContent);
             existingZipContainer.getSignatureContents().add(signatureContent);
             return existingZipContainer;
         } catch (IOException | InvalidManifestException e) {
             throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
         } catch (SignatureException e) {
             throw new InvalidPackageException("Failed to sign ZipContainer!", e);
+        }
+    }
+
+    private void verifySignatureContent(ContentSigner signer, ZipSignatureContent signatureContent) throws InvalidPackageException {
+        MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
+        verifyContainer(new ZipContainer(signatureContent, mimeType, signer.getNameProvider()));
+    }
+
+    private void verifyContainer(ZipContainer zipContainer) throws InvalidPackageException {
+        if(disableVerification) return;
+        ContainerVerifierResult result = new ContainerVerifier(new InternalVerificationPolicy(this)).verify(zipContainer);
+        if(!result.getVerificationResult().equals(VerificationResult.OK)) {
+            throw new InvalidPackageException("Created Container does not pass internal verification");
         }
     }
 

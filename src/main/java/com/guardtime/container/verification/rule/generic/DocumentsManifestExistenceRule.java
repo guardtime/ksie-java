@@ -19,7 +19,7 @@ import com.guardtime.container.verification.rule.RuleType;
  */
 public class DocumentsManifestExistenceRule extends AbstractRule<SignatureContent> {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_DATA_MANIFEST_EXISTS.name();
+    private static final String NAME = RuleType.KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName();
 
     public DocumentsManifestExistenceRule(RuleStateProvider stateProvider) {
         super(stateProvider.getStateForRule(NAME));

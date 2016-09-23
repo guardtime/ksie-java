@@ -72,7 +72,7 @@ public class ContainerBuilderTest extends AbstractContainerTest {
 
     @Test
     public void testCreateWithExistingContainer() throws Exception {
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory);
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, true);
         // build initial container
         ContainerBuilder builder = new ContainerBuilder(packagingFactory);
         builder.withDocument(TEST_DOCUMENT_HELLO_PDF);

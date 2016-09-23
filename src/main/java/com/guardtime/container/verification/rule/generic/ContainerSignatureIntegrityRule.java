@@ -11,15 +11,13 @@ import com.guardtime.container.verification.rule.RuleStateProvider;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.container.verification.rule.RuleType;
 import com.guardtime.container.verification.rule.signature.SignatureVerifier;
-import com.guardtime.ksi.unisignature.KSISignature;
-import com.guardtime.ksi.unisignature.verifier.policies.Policy;
 
 /**
  * Rule that verifies the {@link ContainerSignature} of a {@link SignatureContent} by using a {@link SignatureVerifier} to verify
  * the underlying signature.
  */
 public class ContainerSignatureIntegrityRule extends AbstractRule<SignatureContent> {
-    private static final String NAME = RuleType.KSIE_VERIFY_MANIFEST.name();
+    private static final String NAME = RuleType.KSIE_VERIFY_MANIFEST.getName();
     private final SignatureVerifier verifier;
 
     public ContainerSignatureIntegrityRule(RuleStateProvider stateProvider, SignatureVerifier verifier) {
