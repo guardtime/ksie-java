@@ -1,8 +1,8 @@
 package com.guardtime.container.integration;
 
 import com.guardtime.container.hash.HashAlgorithmProvider;
+import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.HashAlgorithm;
-import org.junit.Assert;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,7 +21,7 @@ public class IntegrationTestHashAlgorithmProvider implements HashAlgorithmProvid
     }
 
     public IntegrationTestHashAlgorithmProvider(HashAlgorithm algorithm) throws Exception {
-        Assert.assertNotNull(algorithm);
+        Util.notNull(algorithm, " Hashing algorithm");
         this.fileReferenceHashAlgorithms = Arrays.asList(algorithm);
         this.documentReferenceHashAlgorithms = Arrays.asList(algorithm);
         this.annotationDataReferenceHashAlgorithm = algorithm;
@@ -32,14 +32,15 @@ public class IntegrationTestHashAlgorithmProvider implements HashAlgorithmProvid
                                                 List<HashAlgorithm> documentReferenceHashAlgorithms,
                                                 HashAlgorithm annotationDataReferenceHashAlgorithm,
                                                 HashAlgorithm signingHashAlgorithm) throws Exception {
-        Assert.assertNotNull(fileReferenceHashAlgorithms);
-        Assert.assertNotNull(documentReferenceHashAlgorithms);
-        Assert.assertNotNull(annotationDataReferenceHashAlgorithm);
-        Assert.assertNotNull(signingHashAlgorithm);
+        Util.notNull(fileReferenceHashAlgorithms, "fileReferenceHashAlgorithms");
+        Util.notNull(documentReferenceHashAlgorithms, "documentReferenceHashAlgorithms");
+        Util.notNull(annotationDataReferenceHashAlgorithm, "annotationDataReferenceHashAlgorithm");
+        Util.notNull(signingHashAlgorithm, "signingHashAlgorithm");
         this.fileReferenceHashAlgorithms = fileReferenceHashAlgorithms;
         this.documentReferenceHashAlgorithms = documentReferenceHashAlgorithms;
         this.annotationDataReferenceHashAlgorithm = annotationDataReferenceHashAlgorithm;
         this.signingHashAlgorithm = signingHashAlgorithm;
+
     }
 
     @Override
