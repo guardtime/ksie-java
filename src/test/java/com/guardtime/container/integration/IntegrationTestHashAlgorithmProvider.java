@@ -5,7 +5,6 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import org.junit.Assert;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class IntegrationTestHashAlgorithmProvider implements HashAlgorithmProvider{
@@ -15,7 +14,7 @@ public class IntegrationTestHashAlgorithmProvider implements HashAlgorithmProvid
     private HashAlgorithm signingHashAlgorithm;
 
     public IntegrationTestHashAlgorithmProvider() throws Exception {
-        this.fileReferenceHashAlgorithms = Collections.singletonList(HashAlgorithm.SHA2_256);
+        this.fileReferenceHashAlgorithms = Arrays.asList(HashAlgorithm.SHA2_256);
         this.documentReferenceHashAlgorithms = Arrays.asList(HashAlgorithm.SHA2_256);
         this.annotationDataReferenceHashAlgorithm = HashAlgorithm.SHA2_256;
         this.signingHashAlgorithm = HashAlgorithm.SHA2_256;
