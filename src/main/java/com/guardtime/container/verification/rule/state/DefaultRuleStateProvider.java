@@ -1,4 +1,4 @@
-package com.guardtime.container.verification.rule;
+package com.guardtime.container.verification.rule.state;
 
 public class DefaultRuleStateProvider implements RuleStateProvider {
 

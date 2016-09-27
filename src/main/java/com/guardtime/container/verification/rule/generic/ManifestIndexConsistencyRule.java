@@ -10,8 +10,8 @@ import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.ContainerRule;
-import com.guardtime.container.verification.rule.RuleStateProvider;
 import com.guardtime.container.verification.rule.RuleType;
+import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
 /**
  * This rule verifies that consecutive manifests have appropriate index numbers.
