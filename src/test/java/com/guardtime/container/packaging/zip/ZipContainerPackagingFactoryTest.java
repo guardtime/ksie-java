@@ -1,19 +1,25 @@
 package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.AbstractContainerTest;
+import com.guardtime.container.ContainerBuilder;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.document.StreamContainerDocument;
+import com.guardtime.container.packaging.Container;
+import com.guardtime.container.packaging.SignatureContent;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.ByteArrayInputStream;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
     private List<ContainerAnnotation> annotations = new LinkedList<>();
@@ -56,10 +62,43 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
     }
 
     @Test
+    public void testCreateContainerWithMultipleDocumentsWithSameName() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+
+        List<ContainerDocument> containerDocuments = Arrays.asList(
+                (ContainerDocument) new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT),
+                new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)
+        );
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory);
+        packagingFactory.create(containerDocuments, null);
+    }
+
+    @Test
     public void testCreateContainerWithDocumentAndAnnotations() throws Exception {
         ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory);
         ZipContainer container = packagingFactory.create(documents, annotations);
         assertNotNull(container);
+    }
+
+    @Test
+    public void testCreateContainerWithExistingContainerWithDocumentsWithSameName() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+
+        // Set up existing container mocks
+        Container existingContainer = Mockito.mock(Container.class);
+        SignatureContent mockContent = Mockito.mock(SignatureContent.class);
+        Map<String, ContainerDocument> mockDocumentsMap = new HashMap<>();
+        ContainerDocument mockDocument = Mockito.mock(ContainerDocument.class);
+        when(mockDocument.getFileName()).thenReturn(TEST_FILE_NAME_TEST_TXT);
+        mockDocumentsMap.put(TEST_FILE_NAME_TEST_TXT, mockDocument);
+        when(mockContent.getDocuments()).thenReturn(mockDocumentsMap);
+        doReturn(Arrays.asList(mockContent)).when(existingContainer).getSignatureContents();
+
+        List<ContainerDocument> containerDocuments = Arrays.asList(
+                (ContainerDocument) new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)
+        );
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory);
+        packagingFactory.create(existingContainer, containerDocuments, null);
     }
 
 }
