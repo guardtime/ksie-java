@@ -7,6 +7,7 @@ import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.hash.HashAlgorithmProvider;
+import com.guardtime.container.indexing.IndexProvider;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
@@ -19,6 +20,7 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.KSISignature;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
 import java.util.*;
@@ -113,7 +115,7 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
 
     private ZipContainerPackagingFactory getContainerPackagingFactory(HashAlgorithmProvider provider) throws Exception {
         ContainerManifestFactory containerManifestFactory = new TlvContainerManifestFactory(provider);
-        return new ZipContainerPackagingFactory(signatureFactory, containerManifestFactory);
+        return new ZipContainerPackagingFactory(signatureFactory, containerManifestFactory, Mockito.mock(IndexProvider.class));
     }
 
     private Container createContainer(HashAlgorithmProvider provider) throws Exception {
