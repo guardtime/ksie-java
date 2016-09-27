@@ -1,4 +1,4 @@
-package com.guardtime.container.verification;
+package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
@@ -10,10 +10,7 @@ import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
-import com.guardtime.container.verification.rule.DefaultRuleStateProvider;
 import com.guardtime.container.verification.rule.Rule;
-import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.container.verification.rule.generic.AnnotationsIntegrityRule;
 import com.guardtime.ksi.unisignature.KSISignature;
 import org.junit.Before;
 import org.junit.Test;

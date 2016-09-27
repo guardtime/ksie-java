@@ -14,8 +14,9 @@ public interface Rule<O extends Object> {
      * ResultHolder}. Depending on the implementation, there can be nested Rules used during verification.
      * @param verifiable object to be examined
      * @param holder that maintains all rule verification results
+     * @return True unless the verification process is ignored.
      */
-    void verify(ResultHolder holder, O verifiable) throws RuleTerminatingException;
+    Boolean verify(ResultHolder holder, O verifiable) throws RuleTerminatingException;
 
     /**
      * Returns unique string which can be used to identify the type of the rule.
