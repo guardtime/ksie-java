@@ -7,14 +7,14 @@ import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.RuleStateProvider;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.container.verification.rule.RuleType;
 import com.guardtime.container.verification.rule.signature.SignatureVerifier;
+import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
 /**
- * Rule that verifies the {@link ContainerSignature} of a {@link SignatureContent} by using a {@link SignatureVerifier} to verify
- * the underlying signature.
+ * Rule that verifies the {@link ContainerSignature} of a {@link SignatureContent} by using a {@link SignatureVerifier}
+ * to verify the underlying signature.
  */
 public class ContainerSignatureIntegrityRule extends AbstractRule<SignatureContent> {
     private static final String NAME = RuleType.KSIE_VERIFY_MANIFEST.getName();

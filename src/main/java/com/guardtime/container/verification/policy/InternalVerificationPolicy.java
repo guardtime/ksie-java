@@ -4,8 +4,8 @@ import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.verification.result.VerificationResult;
-import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.container.verification.rule.RuleStateProvider;
+import com.guardtime.container.verification.rule.state.RuleState;
+import com.guardtime.container.verification.rule.state.RuleStateProvider;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.container.verification.rule.signature.SignatureVerifier;
 

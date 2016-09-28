@@ -6,9 +6,9 @@ import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.RuleStateProvider;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.container.verification.rule.RuleType;
+import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
 /**
  * Rule that verifies that there is a signature in the container for the given {@link SignatureContent}

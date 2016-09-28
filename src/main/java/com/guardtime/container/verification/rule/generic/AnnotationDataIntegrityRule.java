@@ -11,10 +11,11 @@ import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.container.verification.rule.RuleStateProvider;
 import com.guardtime.container.verification.rule.RuleType;
+import com.guardtime.container.verification.rule.state.RuleState;
+import com.guardtime.container.verification.rule.state.RuleStateProvider;
 import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.IOException;
 
@@ -44,7 +45,7 @@ public class AnnotationDataIntegrityRule extends AbstractRule<Pair<SignatureCont
         try {
             DataHash expectedHash = annotationDataReference.getHash();
             DataHash realHash = annotation.getDataHash(expectedHash.getAlgorithm());
-            if (expectedHash.equals(realHash)) {
+            if (expectedHash.getAlgorithm().getStatus() == HashAlgorithm.Status.NORMAL && expectedHash.equals(realHash)) {
                 verificationResult = VerificationResult.OK;
             }
             result = new GenericVerificationResult(verificationResult, this, annotationDataUri);

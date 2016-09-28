@@ -6,7 +6,11 @@ import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
-import com.guardtime.container.verification.rule.*;
+import com.guardtime.container.verification.rule.AbstractRule;
+import com.guardtime.container.verification.rule.ContainerRule;
+import com.guardtime.container.verification.rule.RuleTerminatingException;
+import com.guardtime.container.verification.rule.RuleType;
+import com.guardtime.container.verification.rule.state.RuleStateProvider;
 import com.guardtime.ksi.util.Util;
 
 import java.io.IOException;
