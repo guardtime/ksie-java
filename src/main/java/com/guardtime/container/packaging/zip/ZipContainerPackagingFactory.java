@@ -7,6 +7,7 @@ import com.guardtime.container.manifest.*;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.InvalidPackageException;
+import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureException;
 import com.guardtime.container.signature.SignatureFactory;
@@ -20,10 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Generates {@link Container} instances that use ZIP archiving for storing.
@@ -61,6 +59,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     public ZipContainer create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
         Util.notEmpty(files, "Document files");
         try {
+            verifyNoDuplicateDocumentNames(files);
             ContentSigner signer = new ContentSigner(files, annotations);
             ZipSignatureContent signatureContent = signer.sign();
             MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
@@ -79,18 +78,38 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     @Override
     public ZipContainer create(Container existingContainer, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
         Util.notNull(existingContainer, "Container");
-        // TODO: Possibility to add signature without adding data files. Spec needed for this
         Util.notEmpty(files, "Data files");
+
+        List<ContainerDocument> documents = new LinkedList<>();
+        documents.addAll(files);
+        for(SignatureContent content : existingContainer.getSignatureContents()) {
+            documents.addAll(content.getDocuments().values());
+        }
+        verifyNoDuplicateDocumentNames(documents);
+
         try {
             ZipContainer existingZipContainer = (ZipContainer) existingContainer;
-            ContentSigner signer = new ContentSigner(files, annotations, existingZipContainer.getNameProvider());
+            ZipEntryNameProvider nameProvider = existingZipContainer.getNameProvider();
+            ContentSigner signer = new ContentSigner(files, annotations, nameProvider);
             ZipSignatureContent signatureContent = signer.sign();
-            existingZipContainer.getSignatureContents().add(signatureContent);
-            return existingZipContainer;
+            List<ZipSignatureContent> contents = new LinkedList<>(existingZipContainer.getSignatureContents());
+            contents.add(signatureContent);
+            return new ZipContainer(contents, existingContainer.getUnknownFiles(), existingContainer.getMimeType(), nameProvider);
         } catch (IOException | InvalidManifestException e) {
             throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
         } catch (SignatureException e) {
             throw new InvalidPackageException("Failed to sign ZipContainer!", e);
+        }
+    }
+
+    private void verifyNoDuplicateDocumentNames(List<ContainerDocument> documents) throws IllegalArgumentException {
+        List<String> documentNameList = new LinkedList<>();
+        for(ContainerDocument doc : documents) {
+            documentNameList.add(doc.getFileName());
+        }
+
+        if(documentNameList.size() > new HashSet<>(documentNameList).size()) {
+            throw new IllegalArgumentException("Multiple documents with same name found!");
         }
     }
 

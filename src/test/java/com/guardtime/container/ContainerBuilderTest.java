@@ -88,4 +88,13 @@ public class ContainerBuilderTest extends AbstractContainerTest {
         assertEquals(2, newContainer.getSignatureContents().size());
     }
 
+    @Test
+    public void testCreateWithMultipleDocumentsWithSameFileName() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        ContainerBuilder builder = new ContainerBuilder(mockedPackagingFactory);
+        builder.withDocument(new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT));
+        builder.withDocument(new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT));
+        builder.build();
+    }
+
 }
