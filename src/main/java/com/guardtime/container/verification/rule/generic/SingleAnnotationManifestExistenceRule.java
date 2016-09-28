@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class SingleAnnotationManifestExistenceRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_EXISTS.name();
+    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_EXISTS.getName();
 
     public SingleAnnotationManifestExistenceRule(RuleStateProvider stateProvider) {
         super(stateProvider.getStateForRule(NAME));

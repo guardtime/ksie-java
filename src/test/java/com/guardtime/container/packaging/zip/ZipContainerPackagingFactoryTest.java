@@ -1,14 +1,17 @@
 package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.AbstractContainerTest;
-import com.guardtime.container.ContainerBuilder;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
+import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
+import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.ksi.hashing.DataHash;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -19,6 +22,7 @@ import java.util.*;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
@@ -56,7 +60,7 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
 
     @Test
     public void testCreateContainerWithDocument() throws Exception {
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory);
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, true);
         ZipContainer container = packagingFactory.create(documents, null);
         assertNotNull(container);
     }
@@ -75,9 +79,26 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
 
     @Test
     public void testCreateContainerWithDocumentAndAnnotations() throws Exception {
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory);
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, true);
         ZipContainer container = packagingFactory.create(documents, annotations);
         assertNotNull(container);
+    }
+
+    @Test
+    public void testCreateVerifiesContainer_OK() throws Exception {
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory());
+        ContainerSignature mockSignature = mock(ContainerSignature.class);
+        when(mockSignature.getSignature()).thenReturn("I decree this to be authentic!");
+        when(mockedSignatureFactory.create(Mockito.any(DataHash.class))).thenReturn(mockSignature);
+        ZipContainer container = packagingFactory.create(documents, annotations);
+        assertNotNull(container);
+    }
+
+    @Test
+    public void testCreateVerifiesInvalidContainer_NOK() throws Exception {
+        expectedException.expect(InvalidPackageException.class);
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory());
+        packagingFactory.create(documents, annotations);
     }
 
     @Test
@@ -85,10 +106,10 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
         expectedException.expect(IllegalArgumentException.class);
 
         // Set up existing container mocks
-        Container existingContainer = Mockito.mock(Container.class);
-        SignatureContent mockContent = Mockito.mock(SignatureContent.class);
+        Container existingContainer = mock(Container.class);
+        SignatureContent mockContent = mock(SignatureContent.class);
         Map<String, ContainerDocument> mockDocumentsMap = new HashMap<>();
-        ContainerDocument mockDocument = Mockito.mock(ContainerDocument.class);
+        ContainerDocument mockDocument = mock(ContainerDocument.class);
         when(mockDocument.getFileName()).thenReturn(TEST_FILE_NAME_TEST_TXT);
         mockDocumentsMap.put(TEST_FILE_NAME_TEST_TXT, mockDocument);
         when(mockContent.getDocuments()).thenReturn(mockDocumentsMap);

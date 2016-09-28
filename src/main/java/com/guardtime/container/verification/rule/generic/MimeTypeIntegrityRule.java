@@ -21,7 +21,7 @@ import java.util.Arrays;
  * {@link ContainerPackagingFactory}.
  */
 public class MimeTypeIntegrityRule extends AbstractRule<Container> implements ContainerRule {
-    private static final String NAME = RuleType.KSIE_FORMAT.name();
+    private static final String NAME = RuleType.KSIE_FORMAT.getName();
     private final byte[] expectedContent;
 
     public MimeTypeIntegrityRule(RuleStateProvider provider, ContainerPackagingFactory packagingFactory) {

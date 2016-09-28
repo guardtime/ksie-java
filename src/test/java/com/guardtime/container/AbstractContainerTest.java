@@ -72,13 +72,13 @@ public class AbstractContainerTest {
     protected AnnotationsManifest mockedAnnotationsManifest;
 
     @Mock
-    private SingleAnnotationManifest mockedSingleAnnotationManifest;
+    protected SingleAnnotationManifest mockedSingleAnnotationManifest;
 
     @Mock
-    private Manifest mockedManifest;
+    protected Manifest mockedManifest;
 
     @Mock
-    private HashAlgorithmProvider mockHashAlgorithmProvider;
+    protected HashAlgorithmProvider mockHashAlgorithmProvider;
 
     @Before
     public void setUp() throws Exception {

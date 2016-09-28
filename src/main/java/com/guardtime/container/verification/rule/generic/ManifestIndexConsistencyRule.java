@@ -18,7 +18,7 @@ import com.guardtime.container.verification.rule.state.RuleStateProvider;
  */
 public class ManifestIndexConsistencyRule extends AbstractRule<Container> implements ContainerRule {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_MANIFEST_INDEX.name();
+    private static final String NAME = RuleType.KSIE_VERIFY_MANIFEST_INDEX.getName();
 
     public ManifestIndexConsistencyRule(RuleStateProvider provider) {
         super(provider.getStateForRule(NAME));

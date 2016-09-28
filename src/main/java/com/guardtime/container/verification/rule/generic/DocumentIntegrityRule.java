@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, SignatureContent>> {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_DATA_HASH.name();
+    private static final String NAME = RuleType.KSIE_VERIFY_DATA_HASH.getName();
     private final MultiHashElementIntegrityRule integrityRule;
 
     public DocumentIntegrityRule(RuleStateProvider stateProvider) {
