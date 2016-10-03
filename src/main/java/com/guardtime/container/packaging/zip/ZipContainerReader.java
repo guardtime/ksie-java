@@ -77,15 +77,21 @@ class ZipContainerReader {
 
     private boolean containsValidContents(List<ZipSignatureContent> signatureContents) {
         for (SignatureContent content : signatureContents) {
-            if (containsManifest(content) || containsDocumentsOrAnnotations(content)) {
+            if (containsManifest(content) ||
+                    containsOrContainedDocuments(content) ||
+                    containsOrContainedAnnotations(content)) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean containsDocumentsOrAnnotations(SignatureContent content) {
-        return content.getDocuments().size() > 0 || content.getAnnotations().size() > 0;
+    private boolean containsOrContainedDocuments(SignatureContent content) {
+        return content.getDocuments().size() > 0 || content.getDocumentsManifest().getRight().getDocumentReferences().size() > 0;
+    }
+
+    private boolean containsOrContainedAnnotations(SignatureContent content) {
+        return content.getAnnotations().size() > 0 || content.getAnnotationsManifest().getRight().getSingleAnnotationManifestReferences().size() > 0;
     }
 
     private boolean containsManifest(SignatureContent content) {

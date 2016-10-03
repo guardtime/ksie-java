@@ -16,7 +16,7 @@ import com.guardtime.container.verification.rule.state.RuleStateProvider;
  */
 public class AnnotationsManifestIntegrityRule extends AbstractRule<SignatureContent> {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST.name();
+    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST.getName();
     private final MultiHashElementIntegrityRule integrityRule;
 
     public AnnotationsManifestIntegrityRule(RuleStateProvider stateProvider) {

@@ -74,7 +74,7 @@ public class ContainerBuilderTest extends AbstractContainerTest {
 
     @Test
     public void testCreateWithExistingContainer() throws Exception {
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, Mockito.mock(IndexProvider.class));
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, Mockito.mock(IndexProvider.class), true);
         // build initial container
         ContainerBuilder builder = new ContainerBuilder(packagingFactory);
         builder.withDocument(TEST_DOCUMENT_HELLO_PDF);
@@ -88,6 +88,15 @@ public class ContainerBuilderTest extends AbstractContainerTest {
 
         assertNotNull(newContainer);
         assertEquals(2, newContainer.getSignatureContents().size());
+    }
+
+    @Test
+    public void testCreateWithMultipleDocumentsWithSameFileName() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        ContainerBuilder builder = new ContainerBuilder(mockedPackagingFactory);
+        builder.withDocument(new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT));
+        builder.withDocument(new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT));
+        builder.build();
     }
 
 }

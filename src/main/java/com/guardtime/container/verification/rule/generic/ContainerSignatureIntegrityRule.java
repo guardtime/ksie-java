@@ -17,7 +17,7 @@ import com.guardtime.container.verification.rule.state.RuleStateProvider;
  * to verify the underlying signature.
  */
 public class ContainerSignatureIntegrityRule extends AbstractRule<SignatureContent> {
-    private static final String NAME = RuleType.KSIE_VERIFY_MANIFEST.name();
+    private static final String NAME = RuleType.KSIE_VERIFY_MANIFEST.getName();
     private final SignatureVerifier verifier;
 
     public ContainerSignatureIntegrityRule(RuleStateProvider stateProvider, SignatureVerifier verifier) {

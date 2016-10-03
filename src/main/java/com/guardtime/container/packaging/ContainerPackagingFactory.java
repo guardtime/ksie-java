@@ -38,8 +38,8 @@ public interface ContainerPackagingFactory<C extends Container> {
     C create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException;
 
     /**
-     * Updates an existing {@link Container} to include a new set of documents, annotations and a signature
-     * for the added elements.
+     * Creates a {@link Container} that combines everything from the existing {@link Container} and the new set of
+     * documents, annotations and a signature for the added elements.
      *
      * @param existingContainer
      *         An instance of {@link Container} which already has {@link com.guardtime.container.signature.ContainerSignature}(s)
@@ -47,8 +47,8 @@ public interface ContainerPackagingFactory<C extends Container> {
      *         List of {@link ContainerDocument} to be added and signed. Can NOT be null.
      * @param annotations
      *         List of {@link ContainerAnnotation} to be added and signed. Can be null.
-     * @return Updated {@link Container} which now contains the added documents and annotations and a
-     * signature to cover them.
+     * @return A new {@link Container} which contains everything from {@param existingContainer} and the added documents
+     * and annotations and a signature to cover them.
      * @throws InvalidPackageException
      *         When the input data can not be processed or signing fails.
      */

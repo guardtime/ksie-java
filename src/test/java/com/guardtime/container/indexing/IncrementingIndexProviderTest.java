@@ -16,7 +16,7 @@ public class IncrementingIndexProviderTest extends AbstractContainerTest {
 
     @Test
     public void testUpdateWithValidContainer() throws Exception {
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory(), new IncrementingIndexProvider());
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory(), new IncrementingIndexProvider(), true);
         Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(MOCKED_ANNOTATION));
 
         indexProvider.updateIndexes(container);
@@ -28,7 +28,7 @@ public class IncrementingIndexProviderTest extends AbstractContainerTest {
         expectedException.expect(IndexingException.class);
         expectedException.expectMessage("Not an integer based index");
 
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, Mockito.mock(IndexProvider.class));
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, Mockito.mock(IndexProvider.class), true);
         Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(MOCKED_ANNOTATION));
         indexProvider.updateIndexes(container);
     }

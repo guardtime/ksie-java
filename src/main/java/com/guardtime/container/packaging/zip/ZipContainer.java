@@ -7,6 +7,8 @@ import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.util.Util;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.CRC32;
@@ -18,22 +20,21 @@ class ZipContainer implements Container {
 
     private List<ZipSignatureContent> signatureContents = new LinkedList<>();
     private MimeType mimeType;
-    private List<Pair<String, File>> unknownFiles = new LinkedList<>();
+    private List<Pair<String, File>> unknownFiles;
 
     public ZipContainer(ZipSignatureContent signatureContent, MimeType mimeType) {
-        this.signatureContents.add(signatureContent);
-        this.mimeType = mimeType;
+        this(Arrays.asList(signatureContent), new LinkedList<Pair<String, File>>(), mimeType);
     }
 
     public ZipContainer(List<ZipSignatureContent> signatureContents, List<Pair<String, File>> unknownFiles, MimeType mimeType) {
         this.signatureContents = signatureContents;
-        this.unknownFiles.addAll(unknownFiles);
+        this.unknownFiles = unknownFiles;
         this.mimeType = mimeType;
     }
 
     @Override
     public List<ZipSignatureContent> getSignatureContents() {
-        return signatureContents;
+        return Collections.unmodifiableList(signatureContents);
     }
 
     @Override
@@ -84,4 +85,5 @@ class ZipContainer implements Container {
         Util.copyData(input, output);
         output.closeEntry();
     }
+
 }

@@ -22,7 +22,7 @@ import java.util.Map;
  */
 public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION.name();
+    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION.getName();
     private final MultiHashElementIntegrityRule integrityRule;
 
     public SingleAnnotationManifestIntegrityRule(RuleStateProvider stateProvider) {

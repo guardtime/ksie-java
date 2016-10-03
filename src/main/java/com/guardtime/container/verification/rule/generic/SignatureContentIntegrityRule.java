@@ -23,10 +23,10 @@ public class SignatureContentIntegrityRule extends AbstractRule<Container> imple
 
     public SignatureContentIntegrityRule(RuleStateProvider stateProvider, SignatureVerifier signatureVerifier) {
         super(RuleState.FAIL);
+        this.signatureExistenceRule = new SignatureExistenceRule(stateProvider);
         this.signatureIntegrityRule = new ContainerSignatureIntegrityRule(stateProvider, signatureVerifier);
-        signatureExistenceRule = new SignatureExistenceRule(stateProvider);
-        documentsIntegrityRule = new DocumentsIntegrityRule(stateProvider);
-        annotationsIntegrityRule = new AnnotationsIntegrityRule(stateProvider);
+        this.documentsIntegrityRule = new DocumentsIntegrityRule(stateProvider);
+        this.annotationsIntegrityRule = new AnnotationsIntegrityRule(stateProvider);
     }
 
     @Override
