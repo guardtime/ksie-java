@@ -7,7 +7,6 @@ import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.hash.HashAlgorithmProvider;
-import com.guardtime.container.indexing.IndexProvider;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
@@ -18,13 +17,17 @@ import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.KSISignature;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
 
@@ -117,7 +120,7 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
 
     private ZipContainerPackagingFactory getContainerPackagingFactory(HashAlgorithmProvider provider) throws Exception {
         ContainerManifestFactory containerManifestFactory = new TlvContainerManifestFactory(provider);
-        return new ZipContainerPackagingFactory(signatureFactory, containerManifestFactory, Mockito.mock(IndexProvider.class));
+        return new ZipContainerPackagingFactory(signatureFactory, containerManifestFactory);
     }
 
     private Container createContainer(HashAlgorithmProvider provider) throws Exception {
@@ -130,7 +133,7 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
     private void checkDataHashList(List<HashAlgorithm> expectedHashAlgorithms, List<DataHash> dataHashes) throws Exception {
         Assert.assertEquals(expectedHashAlgorithms.size(), dataHashes.size());
         List<HashAlgorithm> foundAlgorithms = new LinkedList<>();
-        for (DataHash dataHash : dataHashes){
+        for (DataHash dataHash : dataHashes) {
             foundAlgorithms.add(dataHash.getAlgorithm());
         }
         for (HashAlgorithm expectedAlgorithm : expectedHashAlgorithms) {

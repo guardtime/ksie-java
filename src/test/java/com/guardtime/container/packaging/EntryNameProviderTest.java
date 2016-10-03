@@ -1,9 +1,13 @@
 package com.guardtime.container.packaging;
 
-import com.guardtime.container.indexing.IncrementingIndexProvider;
+import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
+import com.guardtime.container.indexing.IndexProvider;
+import com.guardtime.container.indexing.IndexingException;
+
+import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -11,8 +15,14 @@ import static org.mockito.Mockito.verify;
 public class EntryNameProviderTest {
 
     private static final String META_INF = "META-INF/";
-    private final IncrementingIndexProvider indexProvider = spy(new IncrementingIndexProvider());
-    private EntryNameProvider nameProvider = new EntryNameProvider("tlv", "ksi", indexProvider);
+    private IndexProvider indexProvider;
+    private EntryNameProvider nameProvider;
+
+    @Before
+    public void setUp() throws IndexingException {
+        indexProvider = spy(new IncrementingIndexProviderFactory().create());
+        nameProvider = new EntryNameProvider("tlv", "ksi", indexProvider);
+    }
 
     @Test
     public void testNextDocumentsManifestName() throws Exception {

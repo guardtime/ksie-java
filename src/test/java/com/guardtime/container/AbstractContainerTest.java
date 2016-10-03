@@ -6,12 +6,18 @@ import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.hash.HashAlgorithmProvider;
-import com.guardtime.container.indexing.IndexProvider;
-import com.guardtime.container.manifest.*;
+import com.guardtime.container.indexing.IndexProviderFactory;
+import com.guardtime.container.manifest.AnnotationsManifest;
+import com.guardtime.container.manifest.ContainerManifestFactory;
+import com.guardtime.container.manifest.DocumentsManifest;
+import com.guardtime.container.manifest.Manifest;
+import com.guardtime.container.manifest.ManifestFactoryType;
+import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.SignatureFactoryType;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.rule.state.DefaultRuleStateProvider;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
@@ -97,7 +103,7 @@ public class AbstractContainerTest {
     protected HashAlgorithmProvider mockHashAlgorithmProvider;
 
     @Mock
-    protected IndexProvider mockIndexProvider;
+    protected IndexProviderFactory mockIndexProviderFactory;
 
     @Before
     public void setUp() throws Exception {

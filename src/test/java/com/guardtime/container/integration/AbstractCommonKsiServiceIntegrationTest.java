@@ -1,6 +1,5 @@
 package com.guardtime.container.integration;
 
-import com.guardtime.container.indexing.IncrementingIndexProvider;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 import com.guardtime.container.signature.ksi.KsiSignatureFactory;
 import com.guardtime.ksi.KSI;
@@ -9,6 +8,7 @@ import com.guardtime.ksi.service.client.KSIServiceCredentials;
 import com.guardtime.ksi.service.client.http.HttpClientSettings;
 import com.guardtime.ksi.service.http.simple.SimpleHttpClient;
 import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
+
 import org.junit.Before;
 
 public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCommonIntegrationTest {
@@ -35,6 +35,6 @@ public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCo
                 .setPublicationsFileTrustedCertSelector(new X509CertificateSubjectRdnSelector("E=publications@guardtime.com"))
                 .build();
         signatureFactory = new KsiSignatureFactory(ksi);
-        packagingFactory = new ZipContainerPackagingFactory(signatureFactory, manifestFactory, new IncrementingIndexProvider());
+        packagingFactory = new ZipContainerPackagingFactory(signatureFactory, manifestFactory);
     }
 }

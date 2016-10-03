@@ -13,6 +13,7 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.verifier.policies.KeyBasedVerificationPolicy;
 import com.guardtime.ksi.unisignature.verifier.policies.Policy;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -45,7 +46,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         when(mockedKsiSignature.getInputHash()).thenReturn(new DataHash(HashAlgorithm.SHA2_256, "12345678901234567890123456789012".getBytes()));
         mockedDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
         when(mockedKsiSignature.getInputHash()).thenReturn(mockedDataHash);
-        this.packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, manifestFactory, mockIndexProvider);
+        this.packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, manifestFactory);
     }
 
     private DefaultVerificationPolicy getDefaultVerificationPolicy() {

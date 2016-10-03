@@ -6,18 +6,25 @@ import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
+import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.ksi.hashing.DataHash;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertNotNull;
@@ -39,14 +46,14 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
     public void testCreatePackagingFactoryWithoutSignatureFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Signature factory must be present");
-        new ZipContainerPackagingFactory(null, mockedManifestFactory, mockIndexProvider);
+        new ZipContainerPackagingFactory(null, mockedManifestFactory);
     }
 
     @Test
     public void testCreatePackagingFactoryWithoutManifestFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Manifest factory must be present");
-        new ZipContainerPackagingFactory(mockedSignatureFactory, null, mockIndexProvider);
+        new ZipContainerPackagingFactory(mockedSignatureFactory, null);
     }
 
 
@@ -54,20 +61,20 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
     public void testCreatePackagingFactoryWithoutDocuments_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Document files must not be empty");
-        ZipContainerPackagingFactory containerFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, mockIndexProvider);
+        ZipContainerPackagingFactory containerFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory);
         containerFactory.create(new ArrayList<ContainerDocument>(), annotations);
     }
 
     @Test
     public void testCreateContainerWithDocument() throws Exception {
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, mockIndexProvider, true);
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, new IncrementingIndexProviderFactory(), true);
         ZipContainer container = packagingFactory.create(documents, null);
         assertNotNull(container);
     }
 
     @Test
     public void testCreateContainerWithDocumentAndAnnotations() throws Exception {
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, mockIndexProvider, true);
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, new IncrementingIndexProviderFactory(), true);
         ZipContainer container = packagingFactory.create(documents, annotations);
         assertNotNull(container);
     }
@@ -80,13 +87,13 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
                 (ContainerDocument) new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT),
                 new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)
         );
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, mockIndexProvider, true);
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, mockIndexProviderFactory, true);
         packagingFactory.create(containerDocuments, null);
     }
 
     @Test
     public void testCreateVerifiesContainer_OK() throws Exception {
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory(), mockIndexProvider);
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory());
         ContainerSignature mockSignature = mock(ContainerSignature.class);
         when(mockSignature.getSignature()).thenReturn("I decree this to be authentic!");
         when(mockedSignatureFactory.create(Mockito.any(DataHash.class))).thenReturn(mockSignature);
@@ -97,7 +104,7 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
     @Test
     public void testCreateVerifiesInvalidContainer_NOK() throws Exception {
         expectedException.expect(InvalidPackageException.class);
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory(), mockIndexProvider);
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory());
         packagingFactory.create(documents, annotations);
     }
 
@@ -118,7 +125,7 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
         List<ContainerDocument> containerDocuments = Arrays.asList(
                 (ContainerDocument) new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)
         );
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, mockIndexProvider);
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory);
         packagingFactory.create(existingContainer, containerDocuments, null);
     }
 

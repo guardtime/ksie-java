@@ -1,11 +1,11 @@
 package com.guardtime.container;
 
 import com.guardtime.container.document.StreamContainerDocument;
-import com.guardtime.container.indexing.IncrementingIndexProvider;
-import com.guardtime.container.indexing.IndexProvider;
+import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -74,7 +74,7 @@ public class ContainerBuilderTest extends AbstractContainerTest {
 
     @Test
     public void testCreateWithExistingContainer() throws Exception {
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, Mockito.mock(IndexProvider.class), true);
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, new IncrementingIndexProviderFactory(), true);
         // build initial container
         ContainerBuilder builder = new ContainerBuilder(packagingFactory);
         builder.withDocument(TEST_DOCUMENT_HELLO_PDF);

@@ -4,32 +4,32 @@ import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
+
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.util.Arrays;
 
-public class IncrementingIndexProviderTest extends AbstractContainerTest {
+public class IncrementingIndexProviderFactoryTest extends AbstractContainerTest {
 
-    private IndexProvider indexProvider = new IncrementingIndexProvider();
+    private IndexProviderFactory indexProviderFactory = new IncrementingIndexProviderFactory();
 
     @Test
-    public void testUpdateWithValidContainer() throws Exception {
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory(), new IncrementingIndexProvider(), true);
+    public void testCreateWithValidContainer() throws Exception {
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory(), new IncrementingIndexProviderFactory(), true);
         Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(MOCKED_ANNOTATION));
 
-        indexProvider.updateIndexes(container);
+        IndexProvider indexProvider = indexProviderFactory.create(container);
         Assert.assertEquals("2", indexProvider.getNextSignatureIndex());
     }
 
     @Test
-    public void testUpdateWithInvalidContainer() throws Exception {
+    public void testCreateWithInvalidContainer() throws Exception {
         expectedException.expect(IndexingException.class);
         expectedException.expectMessage("Not an integer based index");
 
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, Mockito.mock(IndexProvider.class), true);
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, new UuidIndexProviderFactory(), true);
         Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(MOCKED_ANNOTATION));
-        indexProvider.updateIndexes(container);
+        indexProviderFactory.create(container);
     }
 }
