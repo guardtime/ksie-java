@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-class UuidIndexProviderFactory implements IndexProviderFactory {
+public class UuidIndexProviderFactory implements IndexProviderFactory {
 
     @Override
     public IndexProvider create() throws IndexingException {
