@@ -28,7 +28,6 @@ public class InternalVerificationPolicy extends DefaultVerificationPolicy {
                 KSIE_FORMAT.getName(),
                 KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName(),
                 KSIE_VERIFY_DATA_MANIFEST.getName(),
-                KSIE_VERIFY_DATA_EXISTS.getName(),
                 KSIE_VERIFY_DATA_HASH.getName(),
                 KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName(),
                 KSIE_VERIFY_ANNOTATION_MANIFEST.getName(),
