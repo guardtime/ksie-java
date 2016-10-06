@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface Container {
     /**
-     * Returns Ordered list of SignatureContent where the order is ascending based on the index of manifest
+     * Returns list of {@link SignatureContent} contained in this container.
      */
     List<? extends SignatureContent> getSignatureContents();
 

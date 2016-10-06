@@ -6,11 +6,18 @@ import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.hash.HashAlgorithmProvider;
-import com.guardtime.container.manifest.*;
+import com.guardtime.container.indexing.IndexProviderFactory;
+import com.guardtime.container.manifest.AnnotationsManifest;
+import com.guardtime.container.manifest.ContainerManifestFactory;
+import com.guardtime.container.manifest.DocumentsManifest;
+import com.guardtime.container.manifest.Manifest;
+import com.guardtime.container.manifest.ManifestFactoryType;
+import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.SignatureFactoryType;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.rule.state.DefaultRuleStateProvider;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
@@ -28,6 +35,21 @@ import static org.mockito.Mockito.when;
 
 public class AbstractContainerTest {
 
+    protected static final String EMPTY_CONTAINER = "containers/container-empty.ksie";
+    protected static final String CONTAINER_WITH_NO_DOCUMENTS = "containers/container-no-documents.ksie";
+    protected static final String CONTAINER_WITH_ONE_DOCUMENT = "containers/container-one-document.ksie";
+    protected static final String CONTAINER_WITH_UNKNOWN_FILES = "containers/container-unknown-files.ksie";
+    protected static final String CONTAINER_WITH_BROKEN_SIGNATURE = "containers/container-broken-signature.ksie";
+    protected static final String CONTAINER_WITH_MISSING_ANNOTATION = "containers/container-missing-annotation.ksie";
+    protected static final String CONTAINER_WITH_MULTIPLE_SIGNATURES = "containers/container-multiple-signatures.ksie";
+    protected static final String CONTAINER_WITH_WRONG_SIGNATURE_FILE = "containers/container-wrong-signature-file.ksie";
+    protected static final String CONTAINER_WITH_MULTIPLE_ANNOTATIONS = "containers/container-multiple-annotations.ksie";
+    protected static final String CONTAINER_WITH_MISSING_ANNOTATION_DATA = "containers/container-missing-annotation-data.ksie";
+    protected static final String CONTAINERS_CONTAINER_INVALID_ANNOTATION_TYPE = "containers/container-invalid-annotation-type.ksie";
+    protected static final String CONTAINER_WITH_MULTIPLE_EXTENDABLE_SIGNATURES = "containers/container-multiple-signatures-non-verifying.ksie";
+    protected static final String CONTAINERS_CONTAINER_DOCUMENT_MISSING_MIMETYPE = "containers/container-document-missing-mimetype.ksie";
+    protected static final String CONTAINERS_CONTAINER_NO_DOCUMENT_URI_IN_MANIFEST = "containers/container-no-document-uri-in-manifest.ksie";
+
     protected static final String MIME_TYPE_APPLICATION_TXT = "application/txt";
     protected static final String MIME_TYPE_APPLICATION_PDF = "application/pdf";
     protected static final String SIGNATURE_MIME_TYPE = "application/ksi-signature";
@@ -41,9 +63,9 @@ public class AbstractContainerTest {
     protected static final String ANNOTATION_DOMAIN_COM_GUARDTIME = "com.guardtime";
 
     protected static final String ANNOTATION_CONTENT = "42";
-    protected static final String DOCUMENTS_MANIFEST_URI = "/META-INF/datamanifest1.tlv";
+    protected static final String DOCUMENTS_MANIFEST_URI = "/META-INF/datamanifest-1.tlv";
 
-    protected static final String ANNOTATIONS_MANIFEST_URI = "/META-INF/annotmanifest1.tlv";
+    protected static final String ANNOTATIONS_MANIFEST_URI = "/META-INF/annotmanifest-1.tlv";
     protected static final ContainerDocument TEST_DOCUMENT_HELLO_TEXT = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
     protected static final ContainerDocument TEST_DOCUMENT_HELLO_PDF = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_PDF_CONTENT), MIME_TYPE_APPLICATION_PDF, TEST_FILE_NAME_TEST_PDF);
     protected static final ContainerAnnotation MOCKED_ANNOTATION = new StringContainerAnnotation(ContainerAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME);
@@ -79,6 +101,9 @@ public class AbstractContainerTest {
 
     @Mock
     protected HashAlgorithmProvider mockHashAlgorithmProvider;
+
+    @Mock
+    protected IndexProviderFactory mockIndexProviderFactory;
 
     @Before
     public void setUp() throws Exception {

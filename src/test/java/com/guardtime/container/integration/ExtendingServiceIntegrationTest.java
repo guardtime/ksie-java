@@ -58,7 +58,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
 
     private void doExtendingTest(SignatureFactory factory, ExtendingPolicy policy, boolean extendedStatusAfterExtending) throws Exception {
         ContainerSignatureExtender extender = new ContainerSignatureExtender(factory, policy);
-        Container container = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
+        Container container = getContainer(CONTAINER_WITH_MULTIPLE_EXTENDABLE_SIGNATURES); // TODO: Revert to CONTAINER_WITH_MULTIPLE_SIGNATURES once newer publication is available
         assertSignaturesExtendedStatus(container, false);
         extender.extend(container);
         assertSignaturesExtendedStatus(container, extendedStatusAfterExtending);

@@ -17,12 +17,17 @@ import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.KSISignature;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
 
@@ -128,7 +133,7 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
     private void checkDataHashList(List<HashAlgorithm> expectedHashAlgorithms, List<DataHash> dataHashes) throws Exception {
         Assert.assertEquals(expectedHashAlgorithms.size(), dataHashes.size());
         List<HashAlgorithm> foundAlgorithms = new LinkedList<>();
-        for (DataHash dataHash : dataHashes){
+        for (DataHash dataHash : dataHashes) {
             foundAlgorithms.add(dataHash.getAlgorithm());
         }
         for (HashAlgorithm expectedAlgorithm : expectedHashAlgorithms) {

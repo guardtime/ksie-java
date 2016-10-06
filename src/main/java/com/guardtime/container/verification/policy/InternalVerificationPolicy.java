@@ -26,7 +26,6 @@ public class InternalVerificationPolicy extends DefaultVerificationPolicy {
     private static class InternalRuleStateProvider implements RuleStateProvider {
         private final List<String> allowedRules = Arrays.asList(
                 KSIE_FORMAT.getName(),
-                KSIE_VERIFY_MANIFEST_INDEX.getName(),
                 KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName(),
                 KSIE_VERIFY_DATA_MANIFEST.getName(),
                 KSIE_VERIFY_DATA_EXISTS.getName(),

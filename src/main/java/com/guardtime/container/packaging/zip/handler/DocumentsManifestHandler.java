@@ -9,10 +9,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import static com.guardtime.container.packaging.EntryNameProvider.DOCUMENTS_MANIFEST_FORMAT;
+
 /**
  * This content holders is used for data files manifests inside the container.
  */
-public class DocumentsManifestHandler extends IndexedContentHandler<DocumentsManifest> {
+public class DocumentsManifestHandler extends ContentHandler<DocumentsManifest> {
 
     private final ContainerManifestFactory manifestFactory;
 
@@ -22,8 +24,9 @@ public class DocumentsManifestHandler extends IndexedContentHandler<DocumentsMan
 
     @Override
     public boolean isSupported(String name) {
+        String regex = String.format(DOCUMENTS_MANIFEST_FORMAT, ".+", manifestFactory.getManifestFactoryType().getManifestFileExtension());
         return matchesSingleDirectory(name, "META-INF") &&
-                fileNameMatches(name, "datamanifest[0-9]+." + manifestFactory.getManifestFactoryType().getManifestFileExtension());
+                fileNameMatches(name, regex);
     }
 
     @Override

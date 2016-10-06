@@ -10,8 +10,7 @@ import static org.junit.Assert.*;
 
 public class ManifestHandlerTest extends AbstractContentHandlerTest {
 
-    private static final int MANIFEST_INDEX = 7;
-    private static final String VALID_MANIFEST_PATH = "/META-INF/manifest" + MANIFEST_INDEX + ".tlv";
+    private static final String VALID_MANIFEST_PATH = "/META-INF/manifest-7.tlv";
     private static final String INVALID_MANIFEST_PATH = "funky_music.mp3";
     private ManifestHandler handler;
 
@@ -21,13 +20,6 @@ public class ManifestHandlerTest extends AbstractContentHandlerTest {
     @Before
     public void setUpHandler() {
         handler = new ManifestHandler(mockManifestFactory);
-    }
-
-    @Test
-    public void testIndexExtraction() throws Exception {
-        assertEquals(0, handler.getMaxIndex());
-        handler.add(VALID_MANIFEST_PATH, mockFile);
-        assertEquals(MANIFEST_INDEX, handler.getMaxIndex());
     }
 
     @Test

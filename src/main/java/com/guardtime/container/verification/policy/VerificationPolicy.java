@@ -14,7 +14,6 @@ public interface VerificationPolicy {
      * As an example should contain rules for:
      * <ol>
      *   <li>verifying MIME-type</li>
-     *   <li>verifying manifest indexes are consecutive</li>
      *   <li>verifying signature</li>
      *   <li>verifying data manifest</li>
      *   <li>verifying data files</li>

@@ -8,6 +8,7 @@ import com.guardtime.ksi.service.client.KSIServiceCredentials;
 import com.guardtime.ksi.service.client.http.HttpClientSettings;
 import com.guardtime.ksi.service.http.simple.SimpleHttpClient;
 import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
+
 import org.junit.Before;
 
 public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCommonIntegrationTest {

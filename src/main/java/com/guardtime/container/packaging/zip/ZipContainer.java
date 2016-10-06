@@ -2,6 +2,7 @@ package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.MimeType;
+import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.util.Util;
 
@@ -20,17 +21,15 @@ class ZipContainer implements Container {
     private List<ZipSignatureContent> signatureContents = new LinkedList<>();
     private MimeType mimeType;
     private List<Pair<String, File>> unknownFiles;
-    private ZipEntryNameProvider nameProvider;
 
-    public ZipContainer(ZipSignatureContent signatureContent, MimeType mimeType, ZipEntryNameProvider nameProvider) {
-        this(Arrays.asList(signatureContent), new LinkedList<Pair<String, File>>(), mimeType, nameProvider);
+    public ZipContainer(ZipSignatureContent signatureContent, MimeType mimeType) {
+        this(Arrays.asList(signatureContent), new LinkedList<Pair<String, File>>(), mimeType);
     }
 
-    public ZipContainer(List<ZipSignatureContent> signatureContents, List<Pair<String, File>> unknownFiles, MimeType mimeType, ZipEntryNameProvider nameProvider) {
+    public ZipContainer(List<ZipSignatureContent> signatureContents, List<Pair<String, File>> unknownFiles, MimeType mimeType) {
         this.signatureContents = signatureContents;
         this.unknownFiles = unknownFiles;
         this.mimeType = mimeType;
-        this.nameProvider = nameProvider;
     }
 
     @Override
@@ -44,7 +43,7 @@ class ZipContainer implements Container {
         writeMimeTypeEntry(zipOutputStream);
         writeSignatures(signatureContents, zipOutputStream);
         writeExcessFiles(zipOutputStream);
-        zipOutputStream.flush();
+        zipOutputStream.close();
     }
 
     @Override
@@ -55,10 +54,6 @@ class ZipContainer implements Container {
     @Override
     public List<Pair<String, File>> getUnknownFiles() {
         return unknownFiles;
-    }
-
-    public ZipEntryNameProvider getNameProvider() {
-        return nameProvider;
     }
 
     private void writeExcessFiles(ZipOutputStream zipOutputStream) throws IOException {

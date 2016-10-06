@@ -8,7 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 public class AnnotationContentHandlerTest {
 
-    private static final String VALID_ANNOTATION_PATH = "/META-INF/annotation1.dat";
+    private static final String VALID_ANNOTATION_PATH = "/META-INF/annotation-1.dat";
     private static final String INVALID_ANNOTATION_PATH = "funky_music.mp3";
     private AnnotationContentHandler handler;
 

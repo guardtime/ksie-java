@@ -9,10 +9,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import static com.guardtime.container.packaging.EntryNameProvider.SINGLE_ANNOTATION_MANIFEST_FORMAT;
+
 /**
  * This content holders is used for annotation manifests inside the container.
  */
-public class SingleAnnotationManifestHandler extends IndexedContentHandler<SingleAnnotationManifest> {
+public class SingleAnnotationManifestHandler extends ContentHandler<SingleAnnotationManifest> {
 
     private final ContainerManifestFactory manifestFactory;
 
@@ -22,8 +24,9 @@ public class SingleAnnotationManifestHandler extends IndexedContentHandler<Singl
 
     @Override
     public boolean isSupported(String name) {
+        String regex = String.format(SINGLE_ANNOTATION_MANIFEST_FORMAT, ".+", manifestFactory.getManifestFactoryType().getManifestFileExtension());
         return matchesSingleDirectory(name, "META-INF") &&
-                fileNameMatches(name, "annotation[0-9]+." + manifestFactory.getManifestFactoryType().getManifestFileExtension());
+                fileNameMatches(name, regex);
     }
 
     @Override

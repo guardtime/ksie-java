@@ -1,5 +1,6 @@
 package com.guardtime.container.packaging.zip.handler;
 
+import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.util.Pair;
 
 import java.io.File;

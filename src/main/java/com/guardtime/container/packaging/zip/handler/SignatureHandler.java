@@ -8,10 +8,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import static com.guardtime.container.packaging.EntryNameProvider.SIGNATURE_FORMAT;
+
 /**
  * This content holders is used for signatures inside the container.
  */
-public class SignatureHandler extends IndexedContentHandler<ContainerSignature> {
+public class SignatureHandler extends ContentHandler<ContainerSignature> {
 
     private final SignatureFactory signatureFactory;
 
@@ -21,8 +23,9 @@ public class SignatureHandler extends IndexedContentHandler<ContainerSignature> 
 
     @Override
     public boolean isSupported(String name) {
+        String regex = String.format(SIGNATURE_FORMAT, ".+", signatureFactory.getSignatureFactoryType().getSignatureFileExtension());
         return matchesSingleDirectory(name, "META-INF") &&
-                fileNameMatches(name, "signature[0-9]+." + signatureFactory.getSignatureFactoryType().getSignatureFileExtension());
+                fileNameMatches(name, regex);
     }
 
     @Override

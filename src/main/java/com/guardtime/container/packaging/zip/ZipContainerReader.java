@@ -15,7 +15,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -37,9 +39,6 @@ class ZipContainerReader {
     private final SignatureHandler signatureHandler;
     private final SignatureContentHandler signatureContentHandler;
 
-    private final String manifestSuffix;
-    private final String signatureSuffix;
-
     private ContentHandler[] handlers;
 
     ZipContainerReader(ContainerManifestFactory manifestFactory, SignatureFactory signatureFactory) {
@@ -50,9 +49,6 @@ class ZipContainerReader {
         this.signatureHandler = new SignatureHandler(signatureFactory);
         this.handlers = new ContentHandler[]{mimeTypeHandler, documentHandler, annotationContentHandler, documentsManifestHandler,
                 manifestHandler, annotationsManifestHandler, signatureHandler, singleAnnotationManifestHandler};
-
-        this.manifestSuffix = manifestFactory.getManifestFactoryType().getManifestFileExtension();
-        this.signatureSuffix = signatureFactory.getSignatureFactoryType().getSignatureFileExtension();
 
         this.signatureContentHandler = new SignatureContentHandler(documentHandler, annotationContentHandler, manifestHandler,
                 documentsManifestHandler, annotationsManifestHandler, singleAnnotationManifestHandler, signatureHandler);
@@ -71,10 +67,9 @@ class ZipContainerReader {
         List<ZipSignatureContent> contents = buildSignatures();
         MimeType mimeType = getMimeType();
         List<Pair<String, File>> unknownFiles = getUnknownFiles();
-        ZipEntryNameProvider nameProvider = getNameProvider();
 
         if (validMimeType(mimeType) && containsValidContents(contents)) {
-            return new ZipContainer(contents, unknownFiles, mimeType, nameProvider);
+            return new ZipContainer(contents, unknownFiles, mimeType);
         } else {
             throw new InvalidPackageException("Parsed container was not valid");
         }
@@ -111,26 +106,6 @@ class ZipContainerReader {
         } catch (IOException e) {
             return false;
         }
-    }
-
-    private ZipEntryNameProvider getNameProvider() {
-        int maxManifestIndex = Collections.max(Arrays.asList(
-                manifestHandler.getMaxIndex(),
-                signatureHandler.getMaxIndex(),
-                documentsManifestHandler.getMaxIndex(),
-                annotationsManifestHandler.getMaxIndex()
-        ));
-        int maxAnnotationIndex = Collections.max(Arrays.asList(
-                annotationContentHandler.getMaxIndex(),
-                singleAnnotationManifestHandler.getMaxIndex(),
-                annotationsManifestHandler.getMaxSingleAnnotationManifestIndex()
-        ));
-        return new ZipEntryNameProvider(
-                manifestSuffix,
-                signatureSuffix,
-                maxManifestIndex,
-                maxAnnotationIndex
-        );
     }
 
     private MimeType getMimeType() {
