@@ -89,7 +89,6 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
     }
 
     @Test
-    @Ignore // TODO: Re-enable once newer KSI Java API version is used where SHA1 is no longer "NOT_TRUSTED"
     public void testDifferentHashingAlgorithmsForDifferentParts() throws Exception {
         List<HashAlgorithm> fileReferenceHashAlgorithms = Arrays.asList(HashAlgorithm.RIPEMD_160);
         List<HashAlgorithm> documentReferenceHashAlgorithms = Arrays.asList(HashAlgorithm.SHA1);

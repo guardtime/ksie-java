@@ -5,6 +5,7 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
+import com.guardtime.container.verification.result.SignatureResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
@@ -30,19 +31,19 @@ public class ContainerSignatureIntegrityRule extends AbstractRule<SignatureConte
         Manifest manifest = verifiable.getManifest().getRight();
         String signatureUri = manifest.getSignatureReference().getUri();
         ContainerSignature containerSignature = verifiable.getContainerSignature();
+        VerificationResult result = getFailureVerificationResult();
         if (verifier.isSupported(containerSignature)) {
             try {
-                VerificationResult result = verifier.getSignatureVerificationResult(containerSignature.getSignature(), manifest);
-                if (result == null) {
-                    result = getFailureVerificationResult();
-                }
-                holder.addResult(new GenericVerificationResult(result, this, signatureUri));
+                SignatureResult signatureResult = verifier.getSignatureVerificationResult(containerSignature.getSignature(), manifest);
+                signatureResult = new WrappedSignatureResult(signatureResult, result);
+                holder.setSignatureResult(signatureUri, signatureResult);
+                holder.addResult(new GenericVerificationResult(signatureResult.getSimplifiedResult(), this, signatureUri));
             } catch (RuleTerminatingException e) {
                 LOGGER.info("Verifying signature failed!", e);
-                holder.addResult(new GenericVerificationResult(getFailureVerificationResult(), this, signatureUri, e));
+                holder.addResult(new GenericVerificationResult(result, this, signatureUri, e));
             }
         } else {
-            holder.addResult(new GenericVerificationResult(getFailureVerificationResult(), this, signatureUri, new RuleTerminatingException("Unsupported signature type!")));
+            holder.addResult(new GenericVerificationResult(result, this, signatureUri, new RuleTerminatingException("Unsupported signature type!")));
         }
     }
 
@@ -52,5 +53,30 @@ public class ContainerSignatureIntegrityRule extends AbstractRule<SignatureConte
 
     public String getErrorMessage() {
         return "Signature mismatch.";
+    }
+
+    private class WrappedSignatureResult implements SignatureResult {
+        private final SignatureResult original;
+        private final VerificationResult simpleResult;
+
+        public WrappedSignatureResult(SignatureResult result, VerificationResult verificationResult) {
+            this.original = result;
+            this.simpleResult = original.getSimplifiedResult() == null ? verificationResult : original.getSimplifiedResult();
+        }
+
+        @Override
+        public VerificationResult getSimplifiedResult() {
+            return simpleResult;
+        }
+
+        @Override
+        public Object getSignature() {
+            return original.getSignature();
+        }
+
+        @Override
+        public Object getFullResult() {
+            return original.getFullResult();
+        }
     }
 }
