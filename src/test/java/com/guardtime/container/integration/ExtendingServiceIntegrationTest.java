@@ -7,6 +7,8 @@ import com.guardtime.container.extending.ksi.PublicationKsiContainerSignatureExt
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.SignatureFactory;
+import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.publication.inmemory.PublicationsFilePublicationRecord;
 import com.guardtime.ksi.unisignature.KSISignature;
@@ -15,10 +17,10 @@ import org.mockito.Mockito;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
@@ -42,23 +44,52 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
         PublicationData publicationData = new PublicationData("AAAAAA-CVFWVA-AAPV2S-SN3JLW-YEKPW3-AUSQP6-PF65K5-KVGZZA-7UYTOV-27VX54-VVJQFG-VCK6GR"); // Apr 2015 publication string
         PublicationsFilePublicationRecord publicationRecord = new PublicationsFilePublicationRecord(publicationData);
         ExtendingPolicy policy = new PublicationKsiContainerSignatureExtendingPolicy(ksi, publicationRecord);
-        doExtendingTest(signatureFactory, policy, false);
+        doExtendingTest(CONTAINER_WITH_MULTIPLE_EXTENDABLE_SIGNATURES, signatureFactory, policy, false);
     }
 
     @Test
-    public void testExtendingWithInvalidSignature() throws Exception {
+    public void testExtendingWithNotExtendedSignature_Nok() throws Exception {
+        KSISignature signature = getMockedSignature(CONTAINER_WITH_ONE_DOCUMENT);
+        when(signature.isExtended()).thenReturn(false);
         ExtendingPolicy policy = Mockito.mock(ExtendingPolicy.class);
-        when(policy.getExtendedSignature(Mockito.any(Object.class))).thenReturn(Mockito.mock(KSISignature.class));
-        doExtendingTest(signatureFactory, policy, false);
+        when(policy.getExtendedSignature(Mockito.any(Object.class))).thenReturn(signature);
+        doExtendingTest(CONTAINER_WITH_ONE_DOCUMENT, signatureFactory, policy, false);
+    }
+
+    @Test
+    public void testExtendingWithDifferentInputHash_Nok() throws Exception {
+        KSISignature signature = getMockedSignature(CONTAINER_WITH_ONE_DOCUMENT);
+        when(signature.getInputHash()).thenReturn(new DataHash(HashAlgorithm.SHA2_512, new byte[64]));
+        ExtendingPolicy policy = Mockito.mock(ExtendingPolicy.class);
+        when(policy.getExtendedSignature(Mockito.any(Object.class))).thenReturn(signature);
+        doExtendingTest(CONTAINER_WITH_ONE_DOCUMENT, signatureFactory, policy, false);
+    }
+
+    @Test
+    public void testExtendingWithDifferentAggregationTime_Nok() throws Exception {
+        KSISignature signature = getMockedSignature(CONTAINER_WITH_ONE_DOCUMENT);
+        when(signature.getAggregationTime()).thenReturn(new Date());
+        ExtendingPolicy policy = Mockito.mock(ExtendingPolicy.class);
+        when(policy.getExtendedSignature(Mockito.any(Object.class))).thenReturn(signature);
+        doExtendingTest(CONTAINER_WITH_ONE_DOCUMENT, signatureFactory, policy, false);
+    }
+
+    @Test
+    public void testExtendingWithDifferentIdentity_Nok() throws Exception {
+        KSISignature signature = getMockedSignature(CONTAINER_WITH_ONE_DOCUMENT);
+        when(signature.getIdentity()).thenReturn("Invalid identity.");
+        ExtendingPolicy policy = Mockito.mock(ExtendingPolicy.class);
+        when(policy.getExtendedSignature(Mockito.any(Object.class))).thenReturn(signature);
+        doExtendingTest(CONTAINER_WITH_ONE_DOCUMENT, signatureFactory, policy, false);
     }
 
     private void doExtendingTest(SignatureFactory factory, ExtendingPolicy policy) throws Exception {
-        doExtendingTest(factory, policy, true);
+        doExtendingTest(CONTAINER_WITH_MULTIPLE_EXTENDABLE_SIGNATURES, factory, policy, true);
     }
 
-    private void doExtendingTest(SignatureFactory factory, ExtendingPolicy policy, boolean extendedStatusAfterExtending) throws Exception {
+    private void doExtendingTest(String containerName, SignatureFactory factory, ExtendingPolicy policy, boolean extendedStatusAfterExtending) throws Exception {
         ContainerSignatureExtender extender = new ContainerSignatureExtender(factory, policy);
-        Container container = getContainer(CONTAINER_WITH_MULTIPLE_EXTENDABLE_SIGNATURES); // TODO: Revert to CONTAINER_WITH_MULTIPLE_SIGNATURES once newer publication is available
+        Container container = getContainer(containerName); // TODO: Revert to CONTAINER_WITH_MULTIPLE_SIGNATURES once newer publication is available
         assertSignaturesExtendedStatus(container, false);
         extender.extend(container);
         assertSignaturesExtendedStatus(container, extendedStatusAfterExtending);
@@ -76,5 +107,17 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
             assertNotNull(signature);
             assertEquals(status, signature.isExtended());
         }
+    }
+
+    private KSISignature getMockedSignature(String containerName) throws Exception {
+        Container container = getContainer(containerName);
+        KSISignature containerSignature = (KSISignature) container.getSignatureContents().get(0).getContainerSignature().getSignature();
+
+        KSISignature signature = Mockito.mock(KSISignature.class);
+        when(signature.isExtended()).thenReturn(true);
+        when(signature.getAggregationTime()).thenReturn(containerSignature.getAggregationTime());
+        when(signature.getInputHash()).thenReturn(containerSignature.getInputHash());
+        when(signature.getIdentity()).thenReturn(containerSignature.getIdentity());
+        return signature;
     }
 }
