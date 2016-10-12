@@ -11,7 +11,9 @@ import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.container.verification.rule.state.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
+
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -71,6 +73,7 @@ public class MultiHashElementIntegrityRuleTest extends AbstractContainerTest {
     }
 
     @Test
+    @Ignore(value = "No NOT_TRUSTED hash algorithms to use and can't mock ENUM")
     public void testMultiHashElementWithNotTrustedHashAlgorithm() throws Exception {
         expectedException.expect(RuleTerminatingException.class);
         expectedException.expectMessage("No hashes with trusted hash algorithm found.");
@@ -78,7 +81,7 @@ public class MultiHashElementIntegrityRuleTest extends AbstractContainerTest {
         MultiHashElement element = Mockito.mock(MultiHashElement.class);
         ResultHolder holder = new ResultHolder();
         FileReference reference = Mockito.mock(FileReference.class);
-        when(reference.getHashList()).thenReturn(Arrays.asList(new DataHash(HashAlgorithm.SHA1, new byte[20])));
+        when(reference.getHashList()).thenReturn(Arrays.asList(new DataHash(HashAlgorithm.SHA1, new byte[20]))); // TODO: Switch out to a NOT_TRUSTED algorithm
         rule.verify(holder, Pair.of(element, reference));
     }
 
