@@ -7,16 +7,20 @@ import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
+import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -28,8 +32,11 @@ import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
@@ -93,10 +100,21 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
 
     @Test
     public void testCreateVerifiesContainer_OK() throws Exception {
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory());
+        final DataHash nullDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
+        TlvContainerManifestFactory manifestFactorySpy = spy(new TlvContainerManifestFactory());
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, manifestFactorySpy);
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Manifest spyManifest = spy((Manifest) invocationOnMock.callRealMethod());
+                doReturn(nullDataHash).when(spyManifest).getDataHash(any(HashAlgorithm.class));
+                return spyManifest;
+            }
+        }).when(manifestFactorySpy).createManifest(any(Pair.class), any(Pair.class), any(Pair.class));
         ContainerSignature mockSignature = mock(ContainerSignature.class);
         when(mockSignature.getSignature()).thenReturn("I decree this to be authentic!");
-        when(mockedSignatureFactory.create(Mockito.any(DataHash.class))).thenReturn(mockSignature);
+        when(mockSignature.getSignedDataHash()).thenReturn(nullDataHash);
+        when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mockSignature);
         ZipContainer container = packagingFactory.create(documents, annotations);
         assertNotNull(container);
     }

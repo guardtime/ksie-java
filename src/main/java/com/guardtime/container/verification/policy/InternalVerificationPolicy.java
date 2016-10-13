@@ -35,7 +35,8 @@ public class InternalVerificationPolicy extends DefaultVerificationPolicy {
                 KSIE_VERIFY_ANNOTATION.getName(),
                 KSIE_VERIFY_ANNOTATION_DATA_EXISTS.getName(),
                 KSIE_VERIFY_ANNOTATION_DATA.getName(),
-                KSIE_VERIFY_SIGNATURE_EXISTS.getName()
+                KSIE_VERIFY_SIGNATURE_EXISTS.getName(),
+                KSIE_VERIFY_MANIFEST_HASH.getName()
         );
 
         @Override
