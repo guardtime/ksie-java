@@ -19,7 +19,6 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.KSISignature;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
