@@ -32,18 +32,17 @@ public class ContainerSignatureIntegrityRule extends AbstractRule<SignatureConte
         String signatureUri = manifest.getSignatureReference().getUri();
         ContainerSignature containerSignature = verifiable.getContainerSignature();
         VerificationResult result = getFailureVerificationResult();
-        if (verifier.isSupported(containerSignature)) {
-            try {
-                SignatureResult signatureResult = verifier.getSignatureVerificationResult(containerSignature.getSignature(), manifest);
-                signatureResult = new WrappedSignatureResult(signatureResult, result);
-                holder.setSignatureResult(signatureUri, signatureResult);
-                holder.addResult(new GenericVerificationResult(signatureResult.getSimplifiedResult(), this, signatureUri));
-            } catch (RuleTerminatingException e) {
-                LOGGER.info("Verifying signature failed!", e);
-                holder.addResult(new GenericVerificationResult(result, this, signatureUri, e));
+        try {
+            if (!verifier.isSupported(containerSignature)) {
+                throw new RuleTerminatingException("Unsupported signature type!");
             }
-        } else {
-            holder.addResult(new GenericVerificationResult(result, this, signatureUri, new RuleTerminatingException("Unsupported signature type!")));
+            SignatureResult signatureResult = verifier.getSignatureVerificationResult(containerSignature.getSignature(), manifest);
+            signatureResult = new WrappedSignatureResult(signatureResult, result);
+            holder.setSignatureResult(signatureUri, signatureResult);
+            holder.addResult(new GenericVerificationResult(signatureResult.getSimplifiedResult(), this, signatureUri));
+        } catch (RuleTerminatingException e) {
+            LOGGER.info("Verifying signature failed!", e);
+            holder.addResult(new GenericVerificationResult(result, this, signatureUri, e));
         }
     }
 
