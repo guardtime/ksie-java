@@ -3,6 +3,7 @@ package com.guardtime.container.signature.ksi;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureException;
 import com.guardtime.ksi.exceptions.KSIException;
+import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.unisignature.KSISignature;
 
 import java.io.IOException;
@@ -22,6 +23,11 @@ class KsiContainerSignature implements ContainerSignature<KSISignature> {
     @Override
     public KSISignature getSignature() {
         return signature;
+    }
+
+    @Override
+    public DataHash getSignedDataHash() {
+        return signature.getInputHash();
     }
 
     @Override
