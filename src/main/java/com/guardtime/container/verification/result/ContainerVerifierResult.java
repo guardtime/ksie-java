@@ -1,6 +1,7 @@
 package com.guardtime.container.verification.result;
 
 import com.guardtime.container.packaging.Container;
+import com.guardtime.container.packaging.SignatureContent;
 
 import java.util.List;
 
@@ -9,13 +10,13 @@ import java.util.List;
  */
 public class ContainerVerifierResult {
     private final VerificationResult aggregateResult;
-    private final List<RuleVerificationResult> verificationResults;
+    private final ResultHolder resultHolder;
     private final Container container;
 
-    public ContainerVerifierResult(Container container, List<RuleVerificationResult> verificationResults) {
+    public ContainerVerifierResult(Container container, ResultHolder holder) {
         this.container = container;
-        this.verificationResults = verificationResults;
-        this.aggregateResult = findHighestPriorityResult(verificationResults);
+        this.resultHolder = holder;
+        this.aggregateResult = findHighestPriorityResult(resultHolder.getResults());
     }
 
     /**
@@ -24,7 +25,7 @@ public class ContainerVerifierResult {
      * @return List of {@link RuleVerificationResult}
      */
     public List<RuleVerificationResult> getResults() {
-        return verificationResults;
+        return resultHolder.getResults();
     }
 
     /**
@@ -32,6 +33,11 @@ public class ContainerVerifierResult {
      */
     public VerificationResult getVerificationResult() {
         return aggregateResult;
+    }
+
+    public SignatureResult getSignatureResult(SignatureContent content) {
+        String path = content.getManifest().getRight().getSignatureReference().getUri();
+        return resultHolder.getSignatureResult(path);
     }
 
     /**

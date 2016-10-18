@@ -2,6 +2,7 @@ package com.guardtime.container.verification.rule.signature.ksi;
 
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.verification.result.SignatureResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.container.verification.rule.signature.SignatureVerifier;
@@ -19,7 +20,7 @@ abstract class KsiBasedSignatureVerifier implements SignatureVerifier<KSISignatu
     protected final KSI ksi;
     protected final Policy policy;
 
-    public KsiBasedSignatureVerifier(KSI ksi, Policy policy) {
+    KsiBasedSignatureVerifier(KSI ksi, Policy policy) {
         this.ksi = ksi;
         this.policy = policy;
     }
@@ -30,7 +31,7 @@ abstract class KsiBasedSignatureVerifier implements SignatureVerifier<KSISignatu
     }
 
     @Override
-    public VerificationResult getSignatureVerificationResult(KSISignature signature, Manifest manifest) throws RuleTerminatingException {
+    public SignatureResult getSignatureVerificationResult(KSISignature signature, Manifest manifest) throws RuleTerminatingException {
         VerificationResult ruleResult = null;
         try {
             HashAlgorithm hashAlgorithm = signature.getInputHash().getAlgorithm();
@@ -39,10 +40,10 @@ abstract class KsiBasedSignatureVerifier implements SignatureVerifier<KSISignatu
             if (ksiVerificationResult.isOk()) {
                 ruleResult = VerificationResult.OK;
             }
+            return new KsiSignatureResult(ksiVerificationResult, ruleResult, signature);
         } catch (KSIException | IOException e) {
             throw new RuleTerminatingException("Failed to verify KSI signature.", e);
         }
-        return ruleResult;
     }
 
     protected abstract com.guardtime.ksi.unisignature.verifier.VerificationResult getKsiVerificationResult(KSISignature signature, DataHash realHash) throws KSIException;
