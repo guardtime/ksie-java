@@ -26,7 +26,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
     @Test
     public void testExtendingWithKsiContainerSignatureExtender() throws Exception {
         ExtendingPolicy policy = new KsiContainerSignatureExtendingPolicy(ksi);
-        doExtendingTest(signatureFactory, policy);
+        doExtendingTest(signatureFactory, policy, true);
     }
 
     @Test
@@ -34,7 +34,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
         PublicationData publicationData = new PublicationData("AAAAAA-CXMCNI-AAJIV3-RB5OEJ-JBK57H-SJ42PI-IB2RE7-2CA2TM-H5W3EF-TF2BX7-HRNRP5-Q2E754"); // June 2016 publication string
         PublicationsFilePublicationRecord publicationRecord = new PublicationsFilePublicationRecord(publicationData);
         ExtendingPolicy policy = new PublicationKsiContainerSignatureExtendingPolicy(ksi, publicationRecord);
-        doExtendingTest(signatureFactory, policy);
+        doExtendingTest(signatureFactory, policy, true);
     }
 
     @Test
@@ -42,25 +42,25 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
         PublicationData publicationData = new PublicationData("AAAAAA-CVFWVA-AAPV2S-SN3JLW-YEKPW3-AUSQP6-PF65K5-KVGZZA-7UYTOV-27VX54-VVJQFG-VCK6GR"); // Apr 2015 publication string
         PublicationsFilePublicationRecord publicationRecord = new PublicationsFilePublicationRecord(publicationData);
         ExtendingPolicy policy = new PublicationKsiContainerSignatureExtendingPolicy(ksi, publicationRecord);
-        doExtendingTest(signatureFactory, policy, false);
+        doExtendingTest(signatureFactory, policy, false, false);
     }
 
     @Test
     public void testExtendingWithInvalidSignature() throws Exception {
         ExtendingPolicy policy = Mockito.mock(ExtendingPolicy.class);
         when(policy.getExtendedSignature(Mockito.any(Object.class))).thenReturn(Mockito.mock(KSISignature.class));
-        doExtendingTest(signatureFactory, policy, false);
+        doExtendingTest(signatureFactory, policy, false, false);
     }
 
-    private void doExtendingTest(SignatureFactory factory, ExtendingPolicy policy) throws Exception {
-        doExtendingTest(factory, policy, true);
+    private void doExtendingTest(SignatureFactory factory, ExtendingPolicy policy, boolean result) throws Exception {
+        doExtendingTest(factory, policy, true, result);
     }
 
-    private void doExtendingTest(SignatureFactory factory, ExtendingPolicy policy, boolean extendedStatusAfterExtending) throws Exception {
+    private void doExtendingTest(SignatureFactory factory, ExtendingPolicy policy, boolean extendedStatusAfterExtending, boolean result) throws Exception {
         ContainerSignatureExtender extender = new ContainerSignatureExtender(factory, policy);
         Container container = getContainer(CONTAINER_WITH_MULTIPLE_EXTENDABLE_SIGNATURES); // TODO: Revert to CONTAINER_WITH_MULTIPLE_SIGNATURES once newer publication is available
         assertSignaturesExtendedStatus(container, false);
-        extender.extend(container);
+        assertEquals(result, extender.extend(container));
         assertSignaturesExtendedStatus(container, extendedStatusAfterExtending);
     }
 
@@ -72,9 +72,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
     private void assertSignaturesExtendedStatus(Container container, boolean status) {
         for (SignatureContent content : container.getSignatureContents()) {
             assertNotNull(content.getContainerSignature());
-            KSISignature signature = (KSISignature) content.getContainerSignature().getSignature();
-            assertNotNull(signature);
-            assertEquals(status, signature.isExtended());
+            assertEquals(status, content.getContainerSignature().isExtended());
         }
     }
 }

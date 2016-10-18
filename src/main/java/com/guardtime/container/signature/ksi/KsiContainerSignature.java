@@ -31,6 +31,11 @@ class KsiContainerSignature implements ContainerSignature<KSISignature> {
     }
 
     @Override
+    public boolean isExtended() {
+        return signature.isExtended();
+    }
+
+    @Override
     public void writeTo(OutputStream output) throws IOException {
         try {
             signature.writeTo(output);

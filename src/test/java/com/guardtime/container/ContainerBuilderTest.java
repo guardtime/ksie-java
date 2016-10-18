@@ -4,6 +4,7 @@ import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
+import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 
 import org.junit.Before;
@@ -13,6 +14,8 @@ import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -81,10 +84,9 @@ public class ContainerBuilderTest extends AbstractContainerTest {
         Container container = builder.build();
 
         // add new documents to existing container
-        ContainerBuilder newBuilder = new ContainerBuilder(packagingFactory);
-        newBuilder.withDocument(TEST_DOCUMENT_HELLO_TEXT);
-        newBuilder.withExistingContainer(container);
-        Container newContainer = newBuilder.build();
+        builder.withDocument(TEST_DOCUMENT_HELLO_TEXT);
+        builder.withExistingContainer(container);
+        Container newContainer = builder.build();
 
         assertNotNull(newContainer);
         assertEquals(2, newContainer.getSignatureContents().size());
@@ -97,6 +99,43 @@ public class ContainerBuilderTest extends AbstractContainerTest {
         builder.withDocument(new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT));
         builder.withDocument(new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT));
         builder.build();
+    }
+
+    @Test
+    public void testCreateWithExistingContainerWithMultipleDocumentsWithSameFileName() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, new IncrementingIndexProviderFactory(), true);
+        // build initial container
+        ContainerBuilder builder = new ContainerBuilder(packagingFactory);
+        builder.withDocument(new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT));
+        Container container = builder.build();
+
+        // add new documents to existing container
+        builder.withDocument(new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-HAHA".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT));
+        builder.withExistingContainer(container);
+        builder.build();
+    }
+
+    @Test
+    public void testCreateWithExistingContainerWithSameContainerDocument() throws Exception {
+        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, new IncrementingIndexProviderFactory(), true);
+        // build initial container
+        ContainerBuilder builder = new ContainerBuilder(packagingFactory);
+        builder.withDocument(TEST_DOCUMENT_HELLO_PDF);
+        Container container = builder.build();
+
+        // add new documents to existing container
+        builder.withExistingContainer(container);
+        builder.withDocument(TEST_DOCUMENT_HELLO_PDF);
+        Container newContainer = builder.build();
+
+        assertNotNull(newContainer);
+        assertEquals(2, newContainer.getSignatureContents().size());
+        Set<String> documentPaths = new HashSet<>();
+        for (SignatureContent content : newContainer.getSignatureContents()) {
+            documentPaths.addAll(content.getDocuments().keySet());
+        }
+        assertEquals(1, documentPaths.size());
     }
 
 }

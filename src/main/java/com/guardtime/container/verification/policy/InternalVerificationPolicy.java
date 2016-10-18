@@ -3,6 +3,7 @@ package com.guardtime.container.verification.policy;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.verification.result.SignatureResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.state.RuleState;
 import com.guardtime.container.verification.rule.state.RuleStateProvider;
@@ -55,8 +56,23 @@ public class InternalVerificationPolicy extends DefaultVerificationPolicy {
         }
 
         @Override
-        public VerificationResult getSignatureVerificationResult(Object signature, Manifest manifest) throws RuleTerminatingException {
-            return VerificationResult.OK;
+        public SignatureResult getSignatureVerificationResult(final Object signature, Manifest manifest) throws RuleTerminatingException {
+            return new SignatureResult() {
+                @Override
+                public VerificationResult getSimplifiedResult() {
+                    return VerificationResult.OK;
+                }
+
+                @Override
+                public Object getSignature() {
+                    return signature;
+                }
+
+                @Override
+                public Object getFullResult() {
+                    return null;
+                }
+            };
         }
     }
 }

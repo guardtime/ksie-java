@@ -27,4 +27,10 @@ public interface ContainerSignature<O> {
      * Returns the {@link DataHash} that is signed by the underlying signature.
      */
     DataHash getSignedDataHash();
+
+    /**
+     * Returns true if the underlying signature has been extended.
+     */
+    boolean isExtended();
+
 }
