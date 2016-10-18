@@ -7,6 +7,7 @@ import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.SignatureContent;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,11 +75,16 @@ public class ContainerBuilder {
     }
 
     public Container build() throws ContainerException {
+        Container container;
         if (existingContainer == null) {
-            return packagingFactory.create(documents, annotations);
+            container = packagingFactory.create(documents, annotations);
         } else {
-            return packagingFactory.create(existingContainer, documents, annotations);
+            container = packagingFactory.create(existingContainer, documents, annotations);
         }
+        documents.clear();
+        annotations.clear();
+        existingContainer = null;
+        return container;
     }
 
     List<ContainerDocument> getDocuments() {
@@ -90,17 +96,20 @@ public class ContainerBuilder {
     }
 
     private void checkDocumentNameExistence(ContainerDocument document) {
-        for(ContainerDocument doc : getAddedDocuments()) {
-            if(doc.getFileName().equals(document.getFileName())) {
+        for (ContainerDocument doc : getAddedDocuments()) {
+            if (doc.equals(document)) {
+                continue;
+            }
+            if (doc.getFileName().equals(document.getFileName())) {
                 throw new IllegalArgumentException("Document with name '" + document.getFileName() + "' already exists!");
             }
         }
     }
 
     private List<ContainerDocument> getAddedDocuments() {
-        List<ContainerDocument> documents = this.documents;
-        if(existingContainer != null) {
-            for(SignatureContent content : existingContainer.getSignatureContents()) {
+        List<ContainerDocument> documents = new LinkedList<>(this.documents);
+        if (existingContainer != null) {
+            for (SignatureContent content : existingContainer.getSignatureContents()) {
                 documents.addAll(content.getDocuments().values());
             }
         }

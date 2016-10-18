@@ -42,15 +42,15 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Generates {@link Container} instances that use ZIP archiving for storing.
  */
 public class ZipContainerPackagingFactory implements ContainerPackagingFactory<ZipContainer> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ZipContainerPackagingFactory.class);
-
     public static final String MIME_TYPE_ENTRY_NAME = "mimetype";
+    private static final Logger logger = LoggerFactory.getLogger(ZipContainerPackagingFactory.class);
     private static final String CONTAINER_MIME_TYPE = "application/guardtime.ksie10+zip";
 
     private final SignatureFactory signatureFactory;
@@ -88,7 +88,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     public ZipContainer create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
         Util.notEmpty(files, "Document files");
         try {
-            verifyNoDuplicateDocumentNames(files);
+            verifyNoDuplicateDocumentNames(new HashSet<>(files));
             ContentSigner signer = new ContentSigner(files, annotations, indexProviderFactory.create());
             ZipSignatureContent signatureContent = signer.sign();
             MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
@@ -111,7 +111,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
         Util.notNull(existingContainer, "Container");
         Util.notEmpty(files, "Data files");
 
-        List<ContainerDocument> documents = new LinkedList<>();
+        Set<ContainerDocument> documents = new HashSet<>();
         documents.addAll(files);
         for (SignatureContent content : existingContainer.getSignatureContents()) {
             documents.addAll(content.getDocuments().values());
@@ -146,7 +146,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
         }
     }
 
-    private void verifyNoDuplicateDocumentNames(List<ContainerDocument> documents) throws IllegalArgumentException {
+    private void verifyNoDuplicateDocumentNames(Set<ContainerDocument> documents) throws IllegalArgumentException {
         List<String> documentNameList = new LinkedList<>();
         for (ContainerDocument doc : documents) {
             documentNameList.add(doc.getFileName());

@@ -82,4 +82,19 @@ public class StreamContainerDocument implements ContainerDocument {
 
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        StreamContainerDocument that = (StreamContainerDocument) o;
+
+        return containerDocument != null ? containerDocument.equals(that.containerDocument) : that.containerDocument == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return containerDocument != null ? containerDocument.hashCode() : 0;
+    }
 }
