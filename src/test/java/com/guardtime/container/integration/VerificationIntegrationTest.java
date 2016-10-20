@@ -1,5 +1,6 @@
 package com.guardtime.container.integration;
 
+import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
@@ -18,35 +19,48 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
-
     @Mock
     private KSISignature mockedKsiSignature;
 
     @Mock
     private SignatureVerifier<KSISignature> mockSignatureVerifier;
 
-    private DataHash mockedDataHash;
+    private DataHash nullDataHash;
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        when(mockSignatureVerifier.isSupported(Mockito.any(ContainerSignature.class))).thenReturn(true);
-        when(mockedSignatureFactoryType.getSignatureFileExtension()).thenReturn("ksi");
+        nullDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
         ContainerSignature mockedContainerSignature = Mockito.mock(ContainerSignature.class);
-        when(mockedContainerSignature.getSignature()).thenReturn(mockedKsiSignature);
         when(mockedSignatureFactory.read(Mockito.any(InputStream.class))).thenReturn(mockedContainerSignature);
-        when(mockedKsiSignature.getInputHash()).thenReturn(new DataHash(HashAlgorithm.SHA2_256, new byte[32]));
-        mockedDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
-        when(mockedKsiSignature.getInputHash()).thenReturn(mockedDataHash);
-        this.packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, manifestFactory);
+        when(mockSignatureVerifier.isSupported(Mockito.any(ContainerSignature.class))).thenReturn(true);
+        when(mockedContainerSignature.getSignature()).thenReturn(mockedKsiSignature);
+        when(mockKsi.read(any(InputStream.class))).thenReturn(mockedKsiSignature);
+        when(mockedKsiSignature.getInputHash()).thenReturn(nullDataHash);
+        ContainerManifestFactory manifestFactorySpy = spy(manifestFactory);
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Manifest spyManifest = (Manifest) spy(invocationOnMock.callRealMethod());
+                doReturn(nullDataHash).when(spyManifest).getDataHash(any(HashAlgorithm.class));
+                return spyManifest;
+            }
+        }).when(manifestFactorySpy).readManifest(any(InputStream.class));
+        this.packagingFactory = new ZipContainerPackagingFactory(signatureFactory, manifestFactorySpy);
     }
 
     private DefaultVerificationPolicy getDefaultVerificationPolicy() {
