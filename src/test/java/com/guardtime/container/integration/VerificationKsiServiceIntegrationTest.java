@@ -7,8 +7,9 @@ import com.guardtime.container.verification.policy.VerificationPolicy;
 import com.guardtime.container.verification.result.ContainerVerifierResult;
 import com.guardtime.container.verification.result.SignatureResult;
 import com.guardtime.container.verification.result.VerificationResult;
-import com.guardtime.container.verification.rule.signature.ksi.KsiPolicyBasedSignatureVerifier;
+import com.guardtime.container.verification.rule.signature.ksi.KsiBasedSignatureVerifier;
 import com.guardtime.ksi.unisignature.verifier.policies.CalendarBasedVerificationPolicy;
+
 import org.junit.Test;
 
 import java.io.FileInputStream;
@@ -24,7 +25,7 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
         Container container = packagingFactory.read(fis);
         VerificationPolicy defaultPolicy = new DefaultVerificationPolicy(
                 defaultRuleStateProvider,
-                new KsiPolicyBasedSignatureVerifier(ksi, new CalendarBasedVerificationPolicy()),
+                new KsiBasedSignatureVerifier(ksi, new CalendarBasedVerificationPolicy()),
                 packagingFactory
         );
         ContainerVerifier verifier = new ContainerVerifier(defaultPolicy);
