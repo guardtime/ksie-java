@@ -41,7 +41,7 @@ public class ContainerVerifier {
                 break; // TODO: Might as well step this outside the for cycle as we intend to break anyway. Would be a nice place to just log down the termination reason.
             }
         }
-        return new ContainerVerifierResult(container, holder.getResults());
+        return new ContainerVerifierResult(container, holder);
     }
 
 }

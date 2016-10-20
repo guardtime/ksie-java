@@ -3,6 +3,7 @@ package com.guardtime.container.verification.rule.signature.ksi;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Util;
+import com.guardtime.container.verification.result.SignatureResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.container.verification.rule.signature.SignatureVerifier;
@@ -39,7 +40,7 @@ public class KsiBasedSignatureVerifier implements SignatureVerifier<KSISignature
     }
 
     @Override
-    public VerificationResult getSignatureVerificationResult(KSISignature signature, Manifest manifest) throws RuleTerminatingException {
+    public SignatureResult getSignatureVerificationResult(KSISignature signature, Manifest manifest) throws RuleTerminatingException {
         VerificationResult ruleResult = null;
         try {
             HashAlgorithm hashAlgorithm = signature.getInputHash().getAlgorithm();
@@ -48,10 +49,10 @@ public class KsiBasedSignatureVerifier implements SignatureVerifier<KSISignature
             if (ksiVerificationResult.isOk()) {
                 ruleResult = VerificationResult.OK;
             }
+            return new KsiSignatureResult(ksiVerificationResult, ruleResult, signature);
         } catch (KSIException | IOException e) {
             throw new RuleTerminatingException("Failed to verify KSI signature.", e);
         }
-        return ruleResult;
     }
 
 }

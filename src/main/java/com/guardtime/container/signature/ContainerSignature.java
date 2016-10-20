@@ -21,4 +21,9 @@ public interface ContainerSignature<O> {
      */
     O getSignature();
 
+    /**
+     * Returns true if the underlying signature has been extended.
+     */
+    boolean isExtended();
+
 }

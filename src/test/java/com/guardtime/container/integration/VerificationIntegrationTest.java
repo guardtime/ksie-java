@@ -7,6 +7,7 @@ import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.verification.ContainerVerifier;
 import com.guardtime.container.verification.policy.DefaultVerificationPolicy;
 import com.guardtime.container.verification.result.ContainerVerifierResult;
+import com.guardtime.container.verification.result.SignatureResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.signature.SignatureVerifier;
 import com.guardtime.ksi.hashing.DataHash;
@@ -64,9 +65,24 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         return verifier.verify(container);
     }
 
-    private void setSignatureVerificationResult(VerificationResult result) throws Exception {
+    private void setSignatureVerificationResult(final VerificationResult result) throws Exception {
         when(mockSignatureVerifier.getSignatureVerificationResult(Mockito.any(KSISignature.class), Mockito.any(Manifest.class))).
-                thenReturn(result);
+                thenReturn(new SignatureResult() {
+                    @Override
+                    public VerificationResult getSimplifiedResult() {
+                        return result;
+                    }
+
+                    @Override
+                    public Object getSignature() {
+                        return null;
+                    }
+
+                    @Override
+                    public Object getFullResult() {
+                        return null;
+                    }
+                });
     }
 
     @Test
