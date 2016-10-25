@@ -31,7 +31,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
 
     @Test
     public void testExtendingWithPublicationKsiContainerSignatureExtender() throws Exception {
-        PublicationData publicationData = new PublicationData("AAAAAA-CXMCNI-AAJIV3-RB5OEJ-JBK57H-SJ42PI-IB2RE7-2CA2TM-H5W3EF-TF2BX7-HRNRP5-Q2E754"); // June 2016 publication string
+        PublicationData publicationData = new PublicationData("AAAAAA-CYAFYY-AAIE57-AEBVD7-XZ4QAB-MKNY3B-MPG6W3-OEWD7E-TCLVGT-TJTED7-7RLKHN-2VFJID"); // Oct 2016 publication string
         PublicationsFilePublicationRecord publicationRecord = new PublicationsFilePublicationRecord(publicationData);
         ExtendingPolicy policy = new PublicationKsiContainerSignatureExtendingPolicy(ksi, publicationRecord);
         doExtendingTest(signatureFactory, policy, true);
@@ -58,7 +58,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
 
     private void doExtendingTest(SignatureFactory factory, ExtendingPolicy policy, boolean extendedStatusAfterExtending, boolean result) throws Exception {
         ContainerSignatureExtender extender = new ContainerSignatureExtender(factory, policy);
-        Container container = getContainer(CONTAINER_WITH_MULTIPLE_EXTENDABLE_SIGNATURES); // TODO: Revert to CONTAINER_WITH_MULTIPLE_SIGNATURES once newer publication is available
+        Container container = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
         assertSignaturesExtendedStatus(container, false);
         assertEquals(result, extender.extend(container));
         assertSignaturesExtendedStatus(container, extendedStatusAfterExtending);

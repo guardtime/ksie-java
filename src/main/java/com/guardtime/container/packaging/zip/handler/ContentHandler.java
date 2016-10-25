@@ -1,6 +1,5 @@
 package com.guardtime.container.packaging.zip.handler;
 
-import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.util.Pair;
 
 import java.io.File;
@@ -49,7 +48,7 @@ public abstract class ContentHandler<T> {
     }
 
     protected boolean fileNameMatches(String str, String regex) {
-        int startingIndex = str.contains("/") ? str.lastIndexOf("/") + 1 : 0;
+        int startingIndex = str.startsWith("/") ? 1 : 0;
         return str.substring(startingIndex).matches(regex);
     }
 

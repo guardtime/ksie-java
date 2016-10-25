@@ -67,7 +67,9 @@ public class ContainerSignatureExtenderTest extends AbstractContainerTest {
 
     @Test
     public void testExtendingFails() throws Exception {
-        doThrow(SignatureException.class).when(mockSignatureFactory).extend(Mockito.any(ContainerSignature.class), Mockito.any(ExtendingPolicy.class));
+        doThrow(SignatureException.class)
+                .when(mockSignatureFactory)
+                .extend(Mockito.any(ContainerSignature.class), Mockito.any(ExtendingPolicy.class));
         assertFalse(extender.extend(makeMockContainer()));
     }
 

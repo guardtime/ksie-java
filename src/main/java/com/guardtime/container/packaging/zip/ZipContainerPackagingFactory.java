@@ -95,7 +95,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             ZipContainer zipContainer = new ZipContainer(signatureContent, mimeType);
             verifyContainer(zipContainer);
             return zipContainer;
-        } catch (IOException | InvalidManifestException | IndexingException e) {
+        } catch (IOException | InvalidManifestException e) {
             throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
         } catch (SignatureException e) {
             throw new InvalidPackageException("Failed to sign ZipContainer!", e);

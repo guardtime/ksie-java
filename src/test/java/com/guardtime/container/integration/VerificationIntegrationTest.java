@@ -71,7 +71,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         );
     }
 
-    private ContainerVerifierResult getGenericVerifierResult(String path) throws Exception {
+    private ContainerVerifierResult getContainerVerifierResult(String path) throws Exception {
         DefaultVerificationPolicy policy = getDefaultVerificationPolicy();
         ContainerVerifier verifier = new ContainerVerifier(policy);
         InputStream input = new FileInputStream(loadFile(path));
@@ -100,17 +100,17 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
-    public void testGenericVerificationWithValidContainer() throws Exception {
+    public void testVerificationWithValidContainer() throws Exception {
         setSignatureVerificationResult(VerificationResult.OK);
-        ContainerVerifierResult result = getGenericVerifierResult(CONTAINER_WITH_MULTIPLE_SIGNATURES);
+        ContainerVerifierResult result = getContainerVerifierResult(CONTAINER_WITH_MULTIPLE_SIGNATURES);
 
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
-    public void testGenericVerificationWithBrokenContainer() throws Exception {
+    public void testVerificationWithBrokenContainer() throws Exception {
         setSignatureVerificationResult(VerificationResult.NOK);
-        ContainerVerifierResult result = getGenericVerifierResult(CONTAINER_WITH_MULTIPLE_SIGNATURES);
+        ContainerVerifierResult result = getContainerVerifierResult(CONTAINER_WITH_MULTIPLE_SIGNATURES);
 
         assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }

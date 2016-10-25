@@ -13,8 +13,8 @@ import org.junit.Before;
 
 public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCommonIntegrationTest {
 
-    private static final String TEST_SIGNING_SERVICE = "http://ksigw.test.guardtime.com:3333/gt-signingservice";
-    private static final String TEST_EXTENDING_SERVICE = "http://ksigw.test.guardtime.com:8010/gt-extendingservice";
+    private static final String TEST_SIGNING_SERVICE = "http://ksigw.test.guardtime.com:8080/gt-signingservice";
+    private static final String TEST_EXTENDING_SERVICE = "http://ksigw.test.guardtime.com:8081/gt-extendingservice";
     private static final String GUARDTIME_PUBLICATIONS_FILE = "http://verify.guardtime.com/ksi-publications.bin";
     private static final KSIServiceCredentials KSI_SERVICE_CREDENTIALS = new KSIServiceCredentials("anon", "anon");
     protected KSI ksi;
