@@ -10,6 +10,10 @@ import com.guardtime.container.verification.rule.state.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
+/**
+ * Rule that checks if there are any {@link DataHash}es that use a {@link HashAlgorithm} which has state
+ * {@link HashAlgorithm#status#NOT_IMPLEMENTED}
+ */
 public class UnimplementedHashAlgorithmExistenceRule extends AbstractRule<FileReference> {
 
     private final String ruleName;

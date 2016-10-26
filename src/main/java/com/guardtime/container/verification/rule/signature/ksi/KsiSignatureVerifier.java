@@ -17,17 +17,17 @@ import com.guardtime.ksi.unisignature.verifier.policies.Policy;
 
 import java.io.IOException;
 
-public class KsiBasedSignatureVerifier implements SignatureVerifier<KSISignature> {
+public class KsiSignatureVerifier implements SignatureVerifier<KSISignature> {
 
     protected final KSI ksi;
     protected final Policy policy;
     private PublicationData publication;
 
-    public KsiBasedSignatureVerifier(KSI ksi, Policy policy) {
+    public KsiSignatureVerifier(KSI ksi, Policy policy) {
         this(ksi, policy, null);
     }
 
-    public KsiBasedSignatureVerifier(KSI ksi, Policy policy, PublicationData publicationData) {
+    public KsiSignatureVerifier(KSI ksi, Policy policy, PublicationData publicationData) {
         Util.notNull(ksi, "KSI instance");
         this.ksi = ksi;
         this.policy = policy;
