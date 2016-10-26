@@ -39,12 +39,10 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<Sig
         ResultHolder tempHolder = new ResultHolder();
         try {
             integrityRule.verify(tempHolder, Pair.of(manifest, reference));
-        } catch (RuleTerminatingException e) {
-            throw e;
         } finally {
             RuleState ruleState = getRuleState(reference);
             for (RuleVerificationResult result : tempHolder.getResults()) {
-                if (!result.equals(VerificationResult.OK) && ruleState.equals(RuleState.IGNORE)) {
+                if (!result.getVerificationResult().equals(VerificationResult.OK) && ruleState.equals(RuleState.IGNORE)) {
                     // We ignore problems
                     continue;
                 }

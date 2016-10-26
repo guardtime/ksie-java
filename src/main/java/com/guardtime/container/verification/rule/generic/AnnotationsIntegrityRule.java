@@ -75,7 +75,6 @@ public class AnnotationsIntegrityRule extends AbstractRule<SignatureContent> {
             }
         } catch (RuleTerminatingException e) {
             LOGGER.info("Halting verification chain for annotation!, caused by '{}'", e.getMessage());
-            return;
         }
     }
 

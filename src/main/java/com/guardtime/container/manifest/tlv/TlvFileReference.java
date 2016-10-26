@@ -6,7 +6,7 @@ import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 import com.guardtime.ksi.tlv.TLVStructure;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,7 +36,7 @@ abstract class TlvFileReference extends TLVStructure implements FileReference {
     }
 
     public TlvFileReference(String uri, DataHash dataHash, String mimeType) throws TLVParserException {
-        this(uri, Arrays.asList(dataHash), mimeType);
+        this(uri, Collections.singletonList(dataHash), mimeType);
     }
 
     public TlvFileReference(String uri, List<DataHash> dataHashList, String mimeType) throws TLVParserException {

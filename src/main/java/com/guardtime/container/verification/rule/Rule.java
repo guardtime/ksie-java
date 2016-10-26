@@ -7,7 +7,7 @@ import com.guardtime.container.verification.result.RuleVerificationResult;
  * Rule to be performed during verification of {@link com.guardtime.container.packaging.Container} or its components.
  * @param <O> Verifiable object class.
  */
-public interface Rule<O extends Object> {
+public interface Rule<O> {
 
     /**
      * Verifies {@link O} to produce a list of {@link RuleVerificationResult} which are added to the provided {@link

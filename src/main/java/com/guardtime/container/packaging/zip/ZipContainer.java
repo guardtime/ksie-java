@@ -2,12 +2,15 @@ package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.MimeType;
-import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.util.Util;
 
-import java.io.*;
-import java.util.Arrays;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,15 +23,15 @@ class ZipContainer implements Container {
 
     private List<ZipSignatureContent> signatureContents = new LinkedList<>();
     private MimeType mimeType;
-    private List<Pair<String, File>> unknownFiles;
+    private List<Pair<String, File>> unknownFiles = new LinkedList<>();
 
     public ZipContainer(ZipSignatureContent signatureContent, MimeType mimeType) {
-        this(Arrays.asList(signatureContent), new LinkedList<Pair<String, File>>(), mimeType);
+        this(Collections.singletonList(signatureContent), new LinkedList<Pair<String, File>>(), mimeType);
     }
 
     public ZipContainer(List<ZipSignatureContent> signatureContents, List<Pair<String, File>> unknownFiles, MimeType mimeType) {
-        this.signatureContents = signatureContents;
-        this.unknownFiles = unknownFiles;
+        this.signatureContents.addAll(signatureContents);
+        this.unknownFiles.addAll(unknownFiles);
         this.mimeType = mimeType;
     }
 

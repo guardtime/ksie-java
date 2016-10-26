@@ -2,7 +2,6 @@ package com.guardtime.container.hash;
 
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
