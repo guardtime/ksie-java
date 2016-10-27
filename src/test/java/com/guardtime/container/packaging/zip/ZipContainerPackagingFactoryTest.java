@@ -42,7 +42,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
-    public static final DataHash nullDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
+    private static final DataHash nullDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
     private List<ContainerAnnotation> containerAnnotationList = new ArrayList<>();
     private List<ContainerDocument> containerDocumentList = Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT);
 

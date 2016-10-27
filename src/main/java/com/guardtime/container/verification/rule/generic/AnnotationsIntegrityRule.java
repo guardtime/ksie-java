@@ -18,12 +18,12 @@ import java.util.List;
  */
 public class AnnotationsIntegrityRule extends AbstractRule<SignatureContent> {
 
-    private AnnotationsManifestExistenceRule annotationsManifestExistenceRule;
-    private AnnotationsManifestIntegrityRule annotationsManifestIntegrityRule;
-    private SingleAnnotationManifestExistenceRule singleAnnotationManifestExistenceRule;
-    private SingleAnnotationManifestIntegrityRule singleAnnotationManifestIntegrityRule;
-    private AnnotationDataExistenceRule annotationDataExistenceRule;
-    private AnnotationDataIntegrityRule annotationDataIntegrityRule;
+    private final AnnotationsManifestExistenceRule annotationsManifestExistenceRule;
+    private final AnnotationsManifestIntegrityRule annotationsManifestIntegrityRule;
+    private final SingleAnnotationManifestExistenceRule singleAnnotationManifestExistenceRule;
+    private final SingleAnnotationManifestIntegrityRule singleAnnotationManifestIntegrityRule;
+    private final AnnotationDataExistenceRule annotationDataExistenceRule;
+    private final AnnotationDataIntegrityRule annotationDataIntegrityRule;
 
     public AnnotationsIntegrityRule(RuleStateProvider stateProvider) {
         super(RuleState.FAIL);

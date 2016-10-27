@@ -17,11 +17,11 @@ import com.guardtime.container.verification.rule.state.RuleStateProvider;
  * Rule that verifies the {@link ContainerSignature} of a {@link SignatureContent} by using a {@link SignatureVerifier}
  * to verify the underlying signature.
  */
-public class ContainerSignatureIntegrityRule extends AbstractRule<SignatureContent> {
+public class SignatureIntegrityRule extends AbstractRule<SignatureContent> {
     private static final String NAME = RuleType.KSIE_VERIFY_MANIFEST.getName();
     private final SignatureVerifier verifier;
 
-    public ContainerSignatureIntegrityRule(RuleStateProvider stateProvider, SignatureVerifier verifier) {
+    public SignatureIntegrityRule(RuleStateProvider stateProvider, SignatureVerifier verifier) {
         super(stateProvider.getStateForRule(NAME));
         this.verifier = verifier;
     }
