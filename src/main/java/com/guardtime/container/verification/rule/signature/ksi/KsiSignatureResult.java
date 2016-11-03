@@ -4,7 +4,7 @@ import com.guardtime.container.verification.result.SignatureResult;
 import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.verifier.VerificationResult;
 
-public  class KsiSignatureResult implements SignatureResult<KSISignature, VerificationResult> {
+public class KsiSignatureResult implements SignatureResult<KSISignature, VerificationResult> {
     private final VerificationResult result;
     private final com.guardtime.container.verification.result.VerificationResult simpleResult;
     private final KSISignature signature;
