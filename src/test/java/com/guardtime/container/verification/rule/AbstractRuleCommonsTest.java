@@ -11,13 +11,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-public class RuleTest {
+public class AbstractRuleCommonsTest {
+
     @Test
     public void testVerifySkipsVerificationForIgnoreState() throws Exception {
         TestRule ruleSpy = spy(new TestRule(RuleState.IGNORE));
         assertFalse(ruleSpy.verify(Mockito.mock(ResultHolder.class), ""));
         verify(ruleSpy, never()).verifyRule(Mockito.any(ResultHolder.class), Mockito.any());
-
     }
 
     private class TestRule extends AbstractRule {

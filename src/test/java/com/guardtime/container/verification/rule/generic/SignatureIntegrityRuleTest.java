@@ -27,7 +27,7 @@ public class SignatureIntegrityRuleTest {
 
     @Test
     public void testSignatureIsInvalidResultsInNOK() throws Exception {
-        SignatureContent mockSignatureContent = setUpMockSignatureContentForSignatureResult(Mockito.mock(SignatureResult.class));
+        SignatureContent mockSignatureContent = setUpMockSignatureContent(Mockito.mock(SignatureResult.class));
 
         ResultHolder holder = new ResultHolder();
         rule.verify(holder, mockSignatureContent);
@@ -39,7 +39,7 @@ public class SignatureIntegrityRuleTest {
     @Test
     public void testSignatureIsValidResultsInOK() throws Exception {
         SignatureResult mockSignatureResult = Mockito.mock(SignatureResult.class);
-        SignatureContent mockSignatureContent = setUpMockSignatureContentForSignatureResult(mockSignatureResult);
+        SignatureContent mockSignatureContent = setUpMockSignatureContent(mockSignatureResult);
         when(mockSignatureResult.getSimplifiedResult()).thenReturn(VerificationResult.OK);
 
         ResultHolder holder = new ResultHolder();
@@ -49,7 +49,7 @@ public class SignatureIntegrityRuleTest {
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
-    private SignatureContent setUpMockSignatureContentForSignatureResult(SignatureResult mockSignatureResult) throws Exception {
+    private SignatureContent setUpMockSignatureContent(SignatureResult mockSignatureResult) throws Exception {
         Manifest mockedManifest = Mockito.mock(Manifest.class);
         SignatureContent mockSignatureContent = Mockito.mock(SignatureContent.class);
         SignatureReference mockSignatureReference = Mockito.mock(SignatureReference.class);
