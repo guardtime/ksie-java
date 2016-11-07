@@ -130,13 +130,10 @@ class SignatureContentHandler {
         }
 
         private boolean invalidReference(FileReference reference) {
-            if (reference.getUri() == null ||
+            return reference.getUri() == null ||
                     reference.getMimeType() == null ||
                     reference.getHashList() == null ||
-                    reference.getHashList().isEmpty()) {
-                return true;
-            }
-            return false;
+                    reference.getHashList().isEmpty();
         }
 
         private void populateAnnotationsWithManifests() {

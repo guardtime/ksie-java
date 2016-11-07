@@ -3,24 +3,71 @@ package com.guardtime.container.indexing;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
+
 import org.mockito.internal.util.collections.Sets;
 
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Produces {@link IndexProvider} that provides integer values that increment for each index. Continues from last used index of
+ * provided {@link Container}
+ */
 public class IncrementingIndexProviderFactory implements IndexProviderFactory {
 
     @Override
-    public IndexProvider create() throws IndexingException {
+    public IndexProvider create() {
         return new IncrementingIndexProvider();
     }
 
     @Override
     public IndexProvider create(Container container) throws IndexingException {
-        return new IncrementingIndexProvider(container);
+        int maxIndex = 0;
+        int maxAnnotationIndex = 0;
+        for (SignatureContent content : container.getSignatureContents()) {
+            Set<String> manifestUriSet = Sets.newSet(
+                    content.getManifest().getLeft(),
+                    content.getDocumentsManifest().getLeft(),
+                    content.getAnnotationsManifest().getLeft()
+            );
+            Manifest manifest = content.getManifest().getRight();
+            if (manifest != null && manifest.getSignatureReference() != null) {
+                manifestUriSet.add(manifest.getSignatureReference().getUri());
+            }
+            Set<String> annotationUriSet = new HashSet<>(content.getSingleAnnotationManifests().keySet());
+            annotationUriSet.addAll(content.getAnnotations().keySet());
+            maxIndex = compareAndUpdate(manifestUriSet, maxIndex);
+            maxAnnotationIndex = compareAndUpdate(annotationUriSet, maxAnnotationIndex);
+        }
+
+        return new IncrementingIndexProvider(maxIndex, maxIndex, maxIndex, maxIndex, maxAnnotationIndex, maxAnnotationIndex);
     }
 
-    class IncrementingIndexProvider implements IndexProvider {
+    private int compareAndUpdate(String str, int value) throws IndexingException {
+        int tmp = getIndex(str);
+        if (value < tmp) {
+            return tmp;
+        }
+        return value;
+    }
+
+    private int compareAndUpdate(Set<String> set, int value) throws IndexingException {
+        for (String str : set) {
+            value = compareAndUpdate(str, value);
+        }
+        return value;
+    }
+
+    private int getIndex(String str) throws IndexingException {
+        str = str.substring(str.lastIndexOf("/") + 1);
+        String index = str.substring(str.indexOf("-") + 1, str.lastIndexOf("."));
+        if (!index.equals(index.replaceAll("[^0-9]", ""))) {
+            throw new IndexingException("Not an integer based index");
+        }
+        return new Integer(index);
+    }
+
+    private class IncrementingIndexProvider implements IndexProvider {
         private int documentsManifestIndex = 0;
         private int manifestIndex = 0;
         private int signatureIndex = 0;
@@ -31,8 +78,14 @@ public class IncrementingIndexProviderFactory implements IndexProviderFactory {
         IncrementingIndexProvider() {
         }
 
-        IncrementingIndexProvider(Container container) throws IndexingException {
-            updateIndexes(container);
+        IncrementingIndexProvider(int documentsManifestIndex, int manifestIndex, int signatureIndex, int annotationsManifestIndex,
+                                  int singleAnnotationManifestIndex, int annotationIndex) throws IndexingException {
+            this.documentsManifestIndex = documentsManifestIndex;
+            this.manifestIndex = manifestIndex;
+            this.signatureIndex = signatureIndex;
+            this.annotationsManifestIndex = annotationsManifestIndex;
+            this.singleAnnotationManifestIndex = singleAnnotationManifestIndex;
+            this.annotationIndex = annotationIndex;
         }
 
         @Override
@@ -65,55 +118,6 @@ public class IncrementingIndexProviderFactory implements IndexProviderFactory {
             return Integer.toString(++annotationIndex);
         }
 
-        private void updateIndexes(Container container) throws IndexingException {
-            int maxIndex = 0;
-            int maxAnnotationIndex = 0;
-            for (SignatureContent content : container.getSignatureContents()) {
-                Set<String> manifestUriSet = Sets.newSet(
-                        content.getManifest().getLeft(),
-                        content.getDocumentsManifest().getLeft(),
-                        content.getAnnotationsManifest().getLeft()
-                );
-                Manifest manifest = content.getManifest().getRight();
-                if (manifest != null && manifest.getSignatureReference() != null) {
-                    manifestUriSet.add(manifest.getSignatureReference().getUri());
-                }
-                Set<String> annotationUriSet = new HashSet<>(content.getSingleAnnotationManifests().keySet());
-                annotationUriSet.addAll(content.getAnnotations().keySet());
-                maxIndex = compareAndUpdate(manifestUriSet, maxIndex);
-                maxAnnotationIndex = compareAndUpdate(annotationUriSet, maxAnnotationIndex);
-            }
-            manifestIndex = maxIndex;
-            signatureIndex = maxIndex;
-            documentsManifestIndex = maxIndex;
-            annotationsManifestIndex = maxIndex;
-            singleAnnotationManifestIndex = maxAnnotationIndex;
-            annotationIndex = maxAnnotationIndex;
-        }
-
-        private int compareAndUpdate(String str, int value) throws IndexingException {
-            int tmp = getIndex(str);
-            if (value < tmp) {
-                return tmp;
-            }
-            return value;
-        }
-
-        private int compareAndUpdate(Set<String> set, int value) throws IndexingException {
-            for (String str : set) {
-                value = compareAndUpdate(str, value);
-            }
-            return value;
-        }
-
-        private int getIndex(String str) throws IndexingException {
-            str = str.substring(str.lastIndexOf("/") + 1);
-            String index = str.substring(str.indexOf("-") + 1, str.lastIndexOf("."));
-            if (!index.equals(index.replaceAll("[^0-9]", ""))) {
-                throw new IndexingException("Not an integer based index");
-            }
-            return new Integer(index);
-        }
     }
 
 }

@@ -11,13 +11,32 @@ import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
 
 import org.junit.Before;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Properties;
+
 public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCommonIntegrationTest {
 
-    private static final String TEST_SIGNING_SERVICE = "http://ksigw.test.guardtime.com:3333/gt-signingservice";
-    private static final String TEST_EXTENDING_SERVICE = "http://ksigw.test.guardtime.com:8010/gt-extendingservice";
-    private static final String GUARDTIME_PUBLICATIONS_FILE = "http://verify.guardtime.com/ksi-publications.bin";
-    private static final KSIServiceCredentials KSI_SERVICE_CREDENTIALS = new KSIServiceCredentials("anon", "anon");
+    private static final String TEST_SIGNING_SERVICE;
+    private static final String TEST_EXTENDING_SERVICE;
+    private static final String GUARDTIME_PUBLICATIONS_FILE;
+    private static final KSIServiceCredentials KSI_SERVICE_CREDENTIALS;
     protected KSI ksi;
+
+    static{
+        try {
+            Properties properties = new Properties();
+            URL url = Thread.currentThread().getContextClassLoader().getResource("config.properties");
+            properties.load(new FileInputStream(url.getFile()));
+            TEST_SIGNING_SERVICE = properties.getProperty("service.signing");
+            TEST_EXTENDING_SERVICE = properties.getProperty("service.extending");
+            GUARDTIME_PUBLICATIONS_FILE = properties.getProperty("publications.file.url");
+            KSI_SERVICE_CREDENTIALS = new KSIServiceCredentials(properties.getProperty("credentials.id"), properties.getProperty("credentials.key"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Before
     public void setUp() throws Exception {

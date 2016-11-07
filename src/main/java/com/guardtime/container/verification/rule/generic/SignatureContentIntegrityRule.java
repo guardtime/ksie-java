@@ -16,15 +16,17 @@ import com.guardtime.container.verification.rule.state.RuleStateProvider;
  * and the annotations contained by the {@link SignatureContent}.
  */
 public class SignatureContentIntegrityRule extends AbstractRule<Container> implements ContainerRule {
-    private final ContainerSignatureIntegrityRule signatureIntegrityRule;
-    private DocumentsIntegrityRule documentsIntegrityRule;
-    private AnnotationsIntegrityRule annotationsIntegrityRule;
-    private SignatureExistenceRule signatureExistenceRule;
+    private final SignatureIntegrityRule signatureIntegrityRule;
+    private final DocumentsIntegrityRule documentsIntegrityRule;
+    private final AnnotationsIntegrityRule annotationsIntegrityRule;
+    private final SignatureExistenceRule signatureExistenceRule;
+    private final SignatureSignsManifestRule signatureSignsManifestRule;
 
     public SignatureContentIntegrityRule(RuleStateProvider stateProvider, SignatureVerifier signatureVerifier) {
         super(RuleState.FAIL);
         this.signatureExistenceRule = new SignatureExistenceRule(stateProvider);
-        this.signatureIntegrityRule = new ContainerSignatureIntegrityRule(stateProvider, signatureVerifier);
+        this.signatureSignsManifestRule = new SignatureSignsManifestRule(stateProvider);
+        this.signatureIntegrityRule = new SignatureIntegrityRule(stateProvider, signatureVerifier);
         this.documentsIntegrityRule = new DocumentsIntegrityRule(stateProvider);
         this.annotationsIntegrityRule = new AnnotationsIntegrityRule(stateProvider);
     }
@@ -34,6 +36,7 @@ public class SignatureContentIntegrityRule extends AbstractRule<Container> imple
         for (SignatureContent content : verifiable.getSignatureContents()) {
             try {
                 signatureExistenceRule.verify(holder, content);
+                signatureSignsManifestRule.verify(holder, content);
                 signatureIntegrityRule.verify(holder, content);
                 documentsIntegrityRule.verify(holder, content);
                 annotationsIntegrityRule.verify(holder, content);

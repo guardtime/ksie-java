@@ -19,10 +19,10 @@ import java.util.List;
  */
 public class DocumentsIntegrityRule extends AbstractRule<SignatureContent> {
 
-    private DocumentsManifestExistenceRule documentsManifestExistenceRule;
-    private DocumentsManifestIntegrityRule documentsManifestIntegrityRule;
-    private DocumentExistenceRule documentExistenceRule;
-    private DocumentIntegrityRule documentIntegrityRule;
+    private final DocumentsManifestExistenceRule documentsManifestExistenceRule;
+    private final DocumentsManifestIntegrityRule documentsManifestIntegrityRule;
+    private final DocumentExistenceRule documentExistenceRule;
+    private final DocumentIntegrityRule documentIntegrityRule;
 
     public DocumentsIntegrityRule(RuleStateProvider stateProvider) {
         super(RuleState.FAIL);

@@ -17,9 +17,9 @@ import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.KSISignature;
+import com.guardtime.util.TestHashAlgorithmProvider;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -42,7 +42,7 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
     @Test
     public void testCheckNonDefaultHashingAlgorithm() throws Exception {
         HashAlgorithm hashingAlgorithm = HashAlgorithm.SHA2_512;
-        HashAlgorithmProvider provider = new IntegrationTestHashAlgorithmProvider(hashingAlgorithm);
+        HashAlgorithmProvider provider = new TestHashAlgorithmProvider(hashingAlgorithm);
         Container container = createContainer(provider);
 
         SignatureContent signatureContent = container.getSignatureContents().get(0);
@@ -68,7 +68,7 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
                 HashAlgorithm.SHA2_256,
                 HashAlgorithm.SHA2_384,
                 HashAlgorithm.SHA2_512);
-        HashAlgorithmProvider provider = new IntegrationTestHashAlgorithmProvider(
+        HashAlgorithmProvider provider = new TestHashAlgorithmProvider(
                 hashes, hashes, HashAlgorithm.SHA2_256, HashAlgorithm.SHA2_256);
 
         Container container = createContainer(provider);
@@ -89,13 +89,12 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
     }
 
     @Test
-    @Ignore // TODO: Re-enable once newer KSI Java API version is used where SHA1 is no longer "NOT_TRUSTED"
     public void testDifferentHashingAlgorithmsForDifferentParts() throws Exception {
         List<HashAlgorithm> fileReferenceHashAlgorithms = Arrays.asList(HashAlgorithm.RIPEMD_160);
         List<HashAlgorithm> documentReferenceHashAlgorithms = Arrays.asList(HashAlgorithm.SHA1);
         HashAlgorithm annotationDataReferenceHashAlgorithm = HashAlgorithm.SHA2_384;
         HashAlgorithm signingHashAlgorithm = HashAlgorithm.SHA2_512;
-        HashAlgorithmProvider provider = new IntegrationTestHashAlgorithmProvider(
+        HashAlgorithmProvider provider = new TestHashAlgorithmProvider(
                 fileReferenceHashAlgorithms,
                 documentReferenceHashAlgorithms,
                 annotationDataReferenceHashAlgorithm,

@@ -10,6 +10,10 @@ import com.guardtime.container.verification.rule.state.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
+/**
+ * Rule that checks whether there are any {@link DataHash}es with {@link HashAlgorithm} that have state of
+ * {@link HashAlgorithm#status#NORMAL}
+ */
 public class TrustedHashAlgorithmExistenceRule extends AbstractRule<FileReference> {
     private final String ruleName;
 

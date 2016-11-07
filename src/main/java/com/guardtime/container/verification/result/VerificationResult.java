@@ -17,8 +17,8 @@ public enum VerificationResult {
     }
 
     /**
-     * Compares this with that to determine which hash higher priority.
-     * @param that
+     * Compares this with {@param that} to determine which hash higher priority.
+     * @param that    The other {@link VerificationResult} to compare with
      * @return true when this has higher priority than that.
      */
     public boolean isMoreImportantThan(VerificationResult that) {
