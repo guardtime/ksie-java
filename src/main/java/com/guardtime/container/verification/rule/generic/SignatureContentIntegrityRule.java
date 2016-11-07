@@ -16,17 +16,17 @@ import com.guardtime.container.verification.rule.state.RuleStateProvider;
  * and the annotations contained by the {@link SignatureContent}.
  */
 public class SignatureContentIntegrityRule extends AbstractRule<Container> implements ContainerRule {
-    private final ContainerSignatureIntegrityRule signatureIntegrityRule;
-    private DocumentsIntegrityRule documentsIntegrityRule;
-    private AnnotationsIntegrityRule annotationsIntegrityRule;
-    private SignatureExistenceRule signatureExistenceRule;
-    private SignatureSignsManifestRule signatureSignsManifestRule;
+    private final SignatureIntegrityRule signatureIntegrityRule;
+    private final DocumentsIntegrityRule documentsIntegrityRule;
+    private final AnnotationsIntegrityRule annotationsIntegrityRule;
+    private final SignatureExistenceRule signatureExistenceRule;
+    private final SignatureSignsManifestRule signatureSignsManifestRule;
 
     public SignatureContentIntegrityRule(RuleStateProvider stateProvider, SignatureVerifier signatureVerifier) {
         super(RuleState.FAIL);
         this.signatureExistenceRule = new SignatureExistenceRule(stateProvider);
         this.signatureSignsManifestRule = new SignatureSignsManifestRule(stateProvider);
-        this.signatureIntegrityRule = new ContainerSignatureIntegrityRule(stateProvider, signatureVerifier);
+        this.signatureIntegrityRule = new SignatureIntegrityRule(stateProvider, signatureVerifier);
         this.documentsIntegrityRule = new DocumentsIntegrityRule(stateProvider);
         this.annotationsIntegrityRule = new AnnotationsIntegrityRule(stateProvider);
     }

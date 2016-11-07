@@ -15,6 +15,9 @@ import com.guardtime.ksi.hashing.DataHash;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Rule that checks whether {@link DataHash}es in {@link FileReference} match those in {@link MultiHashElement}.
+ */
 public class TrustedHashListIntegrityRule extends AbstractRule<Pair<MultiHashElement, FileReference>> {
     private final String ruleName;
 

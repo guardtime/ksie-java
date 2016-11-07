@@ -3,7 +3,6 @@ package com.guardtime.container.verification.rule.signature;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.verification.result.SignatureResult;
-import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 
 /**

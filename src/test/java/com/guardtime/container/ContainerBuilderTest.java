@@ -53,8 +53,11 @@ public class ContainerBuilderTest extends AbstractContainerTest {
         builder.withDocument(content);
         assertEquals(1, builder.getDocuments().size());
 
-        builder.withDocument(Mockito.mock(File.class), "application/binary");
+        builder.withDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), TEST_FILE_NAME_TEST_DOC, MIME_TYPE_APPLICATION_TXT);
         assertEquals(2, builder.getDocuments().size());
+
+        builder.withDocument(Mockito.mock(File.class), "application/binary");
+        assertEquals(3, builder.getDocuments().size());
     }
 
     @Test

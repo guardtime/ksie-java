@@ -30,11 +30,11 @@ public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureCont
         VerificationResult verificationResult = getFailureVerificationResult();
         Manifest manifest = verifiable.getManifest().getRight();
         FileReference annotationsManifestReference = manifest.getAnnotationsManifestReference();
+        String annotationsManifestUri = annotationsManifestReference.getUri();
         Pair<String, AnnotationsManifest> annotationsManifest = verifiable.getAnnotationsManifest();
-        if (annotationsManifest != null) {
+        if (annotationsManifest != null && annotationsManifest.getLeft().equals(annotationsManifestUri)) {
             verificationResult = VerificationResult.OK;
         }
-        String annotationsManifestUri = annotationsManifestReference.getUri();
         holder.addResult(new GenericVerificationResult(verificationResult, this, annotationsManifestUri));
 
 

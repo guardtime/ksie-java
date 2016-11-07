@@ -1,0 +1,5 @@
+service.signing=http://test.gateway.com:666
+service.extending=http://test.gateway.com:6666
+publications.file.url=http://verify.guardtime.com/ksi-publications.bin
+credentials.id=id
+credentials.key=key

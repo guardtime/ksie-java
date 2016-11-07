@@ -8,6 +8,9 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+
 public class UuidIndexProviderFactoryTest extends AbstractContainerTest {
 
     private IndexProviderFactory indexProviderFactory = new UuidIndexProviderFactory();
@@ -20,6 +23,18 @@ public class UuidIndexProviderFactoryTest extends AbstractContainerTest {
         ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, new IncrementingIndexProviderFactory(), true);
         Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(MOCKED_ANNOTATION));
         indexProviderFactory.create(container);
+    }
+
+    @Test
+    public void testNextValueDiffersFromPrevious() {
+        IndexProvider indexProvider = indexProviderFactory.create();
+        assertNotEquals(indexProvider.getNextAnnotationIndex(), indexProvider.getNextAnnotationIndex());
+    }
+
+    @Test
+    public void testDifferentManifestIndexesDoNotMatch() {
+        IndexProvider indexProvider = indexProviderFactory.create();
+        assertNotEquals(indexProvider.getNextManifestIndex(), indexProvider.getNextDocumentsManifestIndex());
     }
 
 }
