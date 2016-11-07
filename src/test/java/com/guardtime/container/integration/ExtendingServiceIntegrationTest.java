@@ -48,6 +48,13 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
     }
 
     @Test
+     public void testExtendingWithInvalidSignature() throws Exception {
+        ExtendingPolicy policy = Mockito.mock(ExtendingPolicy.class);
+        when(policy.getExtendedSignature(Mockito.any(Object.class))).thenReturn(Mockito.mock(KSISignature.class));
+        doExtendingTest(CONTAINER_WITH_ONE_DOCUMENT, signatureFactory, policy, false);
+    }
+
+    @Test
     public void testExtendingWithNotExtendedSignature_Nok() throws Exception {
         KSISignature mockedSignature = getSpySignature(CONTAINER_WITH_ONE_DOCUMENT);
         when(mockedSignature.isExtended()).thenReturn(false);
