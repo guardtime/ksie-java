@@ -56,28 +56,28 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
 
     @Test
     public void testExtendingWithNotExtendedSignature_Nok() throws Exception {
-        KSISignature mockedSignature = getSpySignature(CONTAINER_WITH_ONE_DOCUMENT);
+        KSISignature mockedSignature = getMockedSignature(CONTAINER_WITH_ONE_DOCUMENT);
         when(mockedSignature.isExtended()).thenReturn(false);
         doExtendingTest(CONTAINER_WITH_ONE_DOCUMENT, signatureFactory, false, mockedSignature);
     }
 
     @Test
     public void testExtendingWithDifferentInputHash_Nok() throws Exception {
-        KSISignature mockedSignature = getSpySignature(CONTAINER_WITH_ONE_DOCUMENT);
+        KSISignature mockedSignature = getMockedSignature(CONTAINER_WITH_ONE_DOCUMENT);
         when(mockedSignature.getInputHash()).thenReturn(new DataHash(HashAlgorithm.SHA2_512, new byte[64]));
         doExtendingTest(CONTAINER_WITH_ONE_DOCUMENT, signatureFactory, false, mockedSignature);
     }
 
     @Test
     public void testExtendingWithDifferentAggregationTime_Nok() throws Exception {
-        KSISignature mockedSignature = getSpySignature(CONTAINER_WITH_ONE_DOCUMENT);
+        KSISignature mockedSignature = getMockedSignature(CONTAINER_WITH_ONE_DOCUMENT);
         when(mockedSignature.getAggregationTime()).thenReturn(new Date());
         doExtendingTest(CONTAINER_WITH_ONE_DOCUMENT, signatureFactory, false, mockedSignature);
     }
 
     @Test
     public void testExtendingWithDifferentIdentity_Nok() throws Exception {
-        KSISignature mockedSignature = getSpySignature(CONTAINER_WITH_ONE_DOCUMENT);
+        KSISignature mockedSignature = getMockedSignature(CONTAINER_WITH_ONE_DOCUMENT);
         when(mockedSignature.getIdentity()).thenReturn("Invalid identity.");
         doExtendingTest(CONTAINER_WITH_ONE_DOCUMENT, signatureFactory, false, mockedSignature);
     }
@@ -114,7 +114,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
         }
     }
 
-    private KSISignature getSpySignature(String containerName) throws Exception {
+    private KSISignature getMockedSignature(String containerName) throws Exception {
         Container container = getContainer(containerName);
         KSISignature containerSignature = (KSISignature) container.getSignatureContents().get(0).getContainerSignature().getSignature();
 
