@@ -10,8 +10,6 @@ import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.container.verification.rule.state.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
-
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -24,17 +22,6 @@ import static org.mockito.Mockito.when;
 public class TrustedHashAlgorithmExistenceRuleTest extends AbstractContainerTest {
 
     private Rule rule = new TrustedHashAlgorithmExistenceRule(RuleState.FAIL, "RandomName");
-
-    @Test
-    @Ignore(value = "No NOT_TRUSTED hash algorithms to use and can't mock ENUM")
-    public void testMultiHashElementWithNotTrustedHashAlgorithm() throws Exception {
-        expectedException.expect(RuleTerminatingException.class);
-        expectedException.expectMessage("No hashes with trusted hash algorithm found.");
-
-        FileReference reference = Mockito.mock(FileReference.class);
-        when(reference.getHashList()).thenReturn(Arrays.asList(new DataHash(HashAlgorithm.SHA1, new byte[20]))); // TODO: Switch out to a NOT_TRUSTED algorithm
-        rule.verify(new ResultHolder(), reference);
-    }
 
     @Test
     public void testNoHashes() throws Exception {
