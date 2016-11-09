@@ -49,8 +49,8 @@ public class ContainerBuilderTest extends AbstractContainerTest {
     @Test
     public void testAddDocumentToContainer() throws Exception {
         ContainerBuilder builder = new ContainerBuilder(mockedPackagingFactory);
-        StreamContainerDocument content = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
-        builder.withDocument(content);
+        StreamContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
+        builder.withDocument(document);
         assertEquals(1, builder.getDocuments().size());
 
         builder.withDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), TEST_FILE_NAME_TEST_DOC, MIME_TYPE_APPLICATION_TXT);
@@ -58,6 +58,8 @@ public class ContainerBuilderTest extends AbstractContainerTest {
 
         builder.withDocument(Mockito.mock(File.class), "application/binary");
         assertEquals(3, builder.getDocuments().size());
+
+        closeAll(builder.getDocuments());
     }
 
     @Test

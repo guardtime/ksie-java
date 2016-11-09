@@ -25,6 +25,7 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
                 .withDocument(new ByteArrayInputStream("Test_Data".getBytes()), TEST_FILE_NAME_TEST_TXT, "application/txt")
                 .build();
         assertSingleContentsWithSingleDocumentWithName(container, TEST_FILE_NAME_TEST_TXT);
+        container.close();
     }
 
     @Test
@@ -32,6 +33,7 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
         InputStream stream = new FileInputStream(loadFile(CONTAINER_WITH_ONE_DOCUMENT));
         Container container = packagingFactory.read(stream);
         assertSingleContentsWithSingleDocument(container);
+        container.close();
     }
 
     @Test
@@ -44,6 +46,7 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
         InputStream stream = new ByteArrayInputStream(bos.toByteArray());
         Container parsedInContainer = packagingFactory.read(stream);
         assertSingleContentsWithSingleDocument(parsedInContainer);
+        container.close();
     }
 
     private void assertSingleContentsWithSingleDocumentWithName(Container container, String testFileName) {

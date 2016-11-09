@@ -55,6 +55,7 @@ public class DocumentsIntegrityRuleTest extends AbstractContainerTest {
         SignatureContent content = container.getSignatureContents().get(0);
         ResultHolder holder = new ResultHolder();
         rule.verify(holder, content);
+        container.close();
         return selectMostImportantResult(holder.getResults());
     }
 

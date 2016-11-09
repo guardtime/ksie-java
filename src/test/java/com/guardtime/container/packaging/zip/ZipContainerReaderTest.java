@@ -6,6 +6,7 @@ import com.guardtime.container.document.EmptyContainerDocument;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
+import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.SignatureFactory;
@@ -14,6 +15,7 @@ import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.unisignature.KSISignature;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -30,7 +32,10 @@ import static org.mockito.Mockito.when;
 public class ZipContainerReaderTest extends AbstractContainerTest {
     @Mock
     protected KSI mockKsi;
+
     private ZipContainerReader reader;
+    private Container container;
+
 
     @Before
     public void setUpReader() throws Exception {
@@ -42,31 +47,39 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
         this.reader = new ZipContainerReader(manifestFactory, signatureFactory);
     }
 
-    private ZipContainer getContainer(String containerPath) throws Exception {
+    @After
+    public void closeContainer() throws Exception {
+        if (container != null) {
+            container.close();
+        }
+    }
+
+    private void setUpContainer(String containerPath) throws Exception {
         InputStream input = new FileInputStream(loadFile(containerPath));
-        return reader.read(input);
+        this.container = reader.read(input);
     }
 
     @Test
     public void testReadContainerFileWithDocument() throws Exception {
-        ZipContainer container = getContainer(CONTAINER_WITH_ONE_DOCUMENT);
+        setUpContainer(CONTAINER_WITH_ONE_DOCUMENT);
         assertNotNull(container);
         assertFalse(container.getSignatureContents().isEmpty());
         for (SignatureContent content : container.getSignatureContents()) {
             assertFalse(content.getDocuments().isEmpty());
         }
+        container.close();
     }
 
     @Test
     public void testReadEmptyContainerFile_ThrowsInvalidPackageException() throws Exception {
         expectedException.expect(InvalidPackageException.class);
         expectedException.expectMessage("Parsed container was not valid");
-        getContainer(EMPTY_CONTAINER);
+        setUpContainer(EMPTY_CONTAINER);
     }
 
     @Test
     public void testReadContainerFileWithExtraFiles() throws Exception {
-        ZipContainer container = getContainer(CONTAINER_WITH_UNKNOWN_FILES);
+        setUpContainer(CONTAINER_WITH_UNKNOWN_FILES);
         assertNotNull(container);
         assertFalse(container.getSignatureContents().isEmpty());
         assertFalse(container.getUnknownFiles().isEmpty());
@@ -74,7 +87,7 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
 
     @Test
     public void testReadContainerFileWithoutDocuments() throws Exception {
-        ZipContainer container = getContainer(CONTAINER_WITH_NO_DOCUMENTS);
+        setUpContainer(CONTAINER_WITH_NO_DOCUMENTS);
         assertNotNull(container);
         assertFalse(container.getSignatureContents().isEmpty());
         for (SignatureContent content : container.getSignatureContents()) {
@@ -86,7 +99,7 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
 
     @Test
     public void testReadContainerFileWithMissingDocumentUri() throws Exception {
-        ZipContainer container = getContainer(CONTAINERS_CONTAINER_NO_DOCUMENT_URI_IN_MANIFEST);
+        setUpContainer(CONTAINERS_CONTAINER_NO_DOCUMENT_URI_IN_MANIFEST);
         assertNotNull(container);
         assertFalse(container.getSignatureContents().isEmpty());
         for (SignatureContent content : container.getSignatureContents()) {
@@ -97,7 +110,7 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
 
     @Test
     public void testReadContainerFileWithMissingDocumentMIMEType() throws Exception {
-        ZipContainer container = getContainer(CONTAINERS_CONTAINER_DOCUMENT_MISSING_MIMETYPE);
+        setUpContainer(CONTAINERS_CONTAINER_DOCUMENT_MISSING_MIMETYPE);
         assertNotNull(container);
         assertFalse(container.getSignatureContents().isEmpty());
         for (SignatureContent content : container.getSignatureContents()) {
@@ -107,7 +120,7 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
 
     @Test
     public void testReadContainerFileWithMultipleAnnotations() throws Exception {
-        ZipContainer container = getContainer(CONTAINER_WITH_MULTIPLE_ANNOTATIONS);
+        setUpContainer(CONTAINER_WITH_MULTIPLE_ANNOTATIONS);
         assertNotNull(container);
         assertFalse(container.getSignatureContents().isEmpty());
         for (SignatureContent content : container.getSignatureContents()) {
@@ -117,7 +130,7 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
 
     @Test
     public void testReadContainerFileWithInvalidAnnotationType() throws Exception {
-        ZipContainer container = getContainer(CONTAINERS_CONTAINER_INVALID_ANNOTATION_TYPE);
+        setUpContainer(CONTAINERS_CONTAINER_INVALID_ANNOTATION_TYPE);
         assertNotNull(container);
         assertFalse(container.getSignatureContents().isEmpty());
         for (SignatureContent content : container.getSignatureContents()) {
@@ -130,14 +143,14 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
 
     @Test
     public void testReadContainerFileWithMultipleSignatures() throws Exception {
-        ZipContainer container = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
+        setUpContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
         assertNotNull(container);
         assertTrue(container.getSignatureContents().size() > 1);
     }
 
     @Test
     public void testReadContainerFileWithBrokenSignatures() throws Exception {
-        ZipContainer container = getContainer(CONTAINER_WITH_BROKEN_SIGNATURE);
+        setUpContainer(CONTAINER_WITH_BROKEN_SIGNATURE);
         assertNotNull(container);
         assertFalse(container.getSignatureContents().isEmpty());
         assertFalse(container.getUnknownFiles().isEmpty());
@@ -145,9 +158,9 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
 
     @Test
     public void testReadContainerFileWithMissingAnnotationData() throws Exception {
-        ZipContainer container = getContainer(CONTAINER_WITH_MISSING_ANNOTATION_DATA);
+        setUpContainer(CONTAINER_WITH_MISSING_ANNOTATION_DATA);
         assertNotNull(container);
-        ZipSignatureContent signatureContent = container.getSignatureContents().get(0);
+        SignatureContent signatureContent = container.getSignatureContents().get(0);
         AnnotationsManifest annotationsManifest = signatureContent.getAnnotationsManifest().getRight();
         assertFalse(container.getSignatureContents().isEmpty());
         assertTrue(signatureContent.getAnnotations().isEmpty());
@@ -157,9 +170,9 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
 
     @Test
     public void testReadContainerFileWithMissingAnnotation() throws Exception {
-        ZipContainer container = getContainer(CONTAINER_WITH_MISSING_ANNOTATION);
+        setUpContainer(CONTAINER_WITH_MISSING_ANNOTATION);
         assertNotNull(container);
-        ZipSignatureContent signatureContent = container.getSignatureContents().get(0);
+        SignatureContent signatureContent = container.getSignatureContents().get(0);
         AnnotationsManifest annotationsManifest = signatureContent.getAnnotationsManifest().getRight();
         assertFalse(container.getSignatureContents().isEmpty());
         assertTrue(signatureContent.getAnnotations().isEmpty());

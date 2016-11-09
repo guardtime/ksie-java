@@ -39,6 +39,7 @@ public class StreamContainerDocumentTest extends AbstractContainerTest {
         assertEquals(TEST_FILE_NAME_TEST_TXT, document.getFileName());
         assertEquals(MIME_TYPE_APPLICATION_TXT, document.getMimeType());
         assertEquals(Util.hash(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), HashAlgorithm.SHA2_256), document.getDataHash(HashAlgorithm.SHA2_256));
+        document.close();
     }
 
 }

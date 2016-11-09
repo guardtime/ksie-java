@@ -99,6 +99,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
         assertSignaturesExtendedStatus(container, false);
         extender.extend(container);
         assertSignaturesExtendedStatus(container, extendedStatusAfterExtending);
+        container.close();
     }
 
     private Container getContainer(String path) throws Exception {
