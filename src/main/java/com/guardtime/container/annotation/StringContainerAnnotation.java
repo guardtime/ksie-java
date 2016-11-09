@@ -5,6 +5,7 @@ import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
@@ -58,4 +59,8 @@ public class StringContainerAnnotation implements ContainerAnnotation {
                 ", domain='" + domain + "\'}";
     }
 
+    @Override
+    public void close() throws IOException {
+        //Nothing to do here, no resources held.
+    }
 }

@@ -4,10 +4,20 @@ import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.packaging.zip.handler.*;
+import com.guardtime.container.packaging.zip.handler.AnnotationContentHandler;
+import com.guardtime.container.packaging.zip.handler.AnnotationsManifestHandler;
+import com.guardtime.container.packaging.zip.handler.ContentHandler;
+import com.guardtime.container.packaging.zip.handler.ContentParsingException;
+import com.guardtime.container.packaging.zip.handler.DocumentContentHandler;
+import com.guardtime.container.packaging.zip.handler.DocumentsManifestHandler;
+import com.guardtime.container.packaging.zip.handler.ManifestHandler;
+import com.guardtime.container.packaging.zip.handler.MimeTypeHandler;
+import com.guardtime.container.packaging.zip.handler.SignatureHandler;
+import com.guardtime.container.packaging.zip.handler.SingleAnnotationManifestHandler;
+import com.guardtime.container.packaging.zip.handler.UnknownFileHandler;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.util.Pair;
-import com.guardtime.container.util.Util;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,9 +25,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -38,10 +50,12 @@ class ZipContainerReader {
     private final SingleAnnotationManifestHandler singleAnnotationManifestHandler;
     private final SignatureHandler signatureHandler;
     private final SignatureContentHandler signatureContentHandler;
+    private final File tempDirectory;
 
     private ContentHandler[] handlers;
 
-    ZipContainerReader(ContainerManifestFactory manifestFactory, SignatureFactory signatureFactory) {
+    ZipContainerReader(ContainerManifestFactory manifestFactory, SignatureFactory signatureFactory) throws IOException {
+        this.tempDirectory = getTempDirectory();
         this.manifestHandler = new ManifestHandler(manifestFactory);
         this.documentsManifestHandler = new DocumentsManifestHandler(manifestFactory);
         this.annotationsManifestHandler = new AnnotationsManifestHandler(manifestFactory);
@@ -52,6 +66,12 @@ class ZipContainerReader {
 
         this.signatureContentHandler = new SignatureContentHandler(documentHandler, annotationContentHandler, manifestHandler,
                 documentsManifestHandler, annotationsManifestHandler, singleAnnotationManifestHandler, signatureHandler);
+    }
+
+    private File getTempDirectory() throws IOException {
+        File tempDirectory = Files.createTempDirectory("KSIE_" + UUID.randomUUID().toString()).toFile();
+        tempDirectory.deleteOnExit();
+        return tempDirectory;
     }
 
     ZipContainer read(InputStream input) throws IOException, InvalidPackageException {
@@ -69,7 +89,7 @@ class ZipContainerReader {
         List<Pair<String, File>> unknownFiles = getUnknownFiles();
 
         if (validMimeType(mimeType) && containsValidContents(contents)) {
-            return new ZipContainer(contents, unknownFiles, mimeType);
+            return new ZipContainer(contents, unknownFiles, mimeType, tempDirectory);
         } else {
             throw new InvalidPackageException("Parsed container was not valid");
         }
@@ -156,7 +176,9 @@ class ZipContainerReader {
     }
 
     private File createTempFile() throws IOException {
-        return Util.createTempFile("ksie_", ".tmp");
+        File file = Files.createTempFile(tempDirectory.toPath(), "ksie_", "tmp").toFile();
+        file.deleteOnExit();
+        return file;
     }
 
 }

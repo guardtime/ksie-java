@@ -4,9 +4,13 @@ import com.guardtime.container.ContainerBuilder;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
+
 import org.junit.Test;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 

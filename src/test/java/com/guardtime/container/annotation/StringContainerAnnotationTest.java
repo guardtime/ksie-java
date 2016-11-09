@@ -2,6 +2,7 @@ package com.guardtime.container.annotation;
 
 import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.ksi.hashing.HashAlgorithm;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

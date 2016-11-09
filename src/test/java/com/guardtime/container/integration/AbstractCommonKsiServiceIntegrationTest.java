@@ -22,9 +22,8 @@ public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCo
     private static final String TEST_EXTENDING_SERVICE;
     private static final String GUARDTIME_PUBLICATIONS_FILE;
     private static final KSIServiceCredentials KSI_SERVICE_CREDENTIALS;
-    protected KSI ksi;
 
-    static{
+    static {
         try {
             Properties properties = new Properties();
             URL url = Thread.currentThread().getContextClassLoader().getResource("config.properties");
@@ -37,6 +36,8 @@ public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCo
             throw new RuntimeException(e);
         }
     }
+
+    protected KSI ksi;
 
     @Before
     public void setUp() throws Exception {

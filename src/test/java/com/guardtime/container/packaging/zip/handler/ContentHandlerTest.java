@@ -1,7 +1,7 @@
 package com.guardtime.container.packaging.zip.handler;
 
 import com.guardtime.container.util.Pair;
-import org.junit.Before;
+
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -9,7 +9,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;

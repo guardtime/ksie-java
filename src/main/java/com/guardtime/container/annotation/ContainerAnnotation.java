@@ -3,6 +3,7 @@ package com.guardtime.container.annotation;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -10,7 +11,7 @@ import java.io.InputStream;
  * Represents annotations that can be used in container. Combines annotation data and annotation
  * meta-data into one object.
  */
-public interface ContainerAnnotation {
+public interface ContainerAnnotation extends Closeable {
 
     ContainerAnnotationType getAnnotationType();
 

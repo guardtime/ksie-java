@@ -13,6 +13,7 @@ import com.guardtime.container.signature.ksi.KsiSignatureFactory;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.unisignature.KSISignature;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -21,14 +22,15 @@ import org.mockito.Mockito;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 public class ZipContainerReaderTest extends AbstractContainerTest {
-    private ZipContainerReader reader;
-
     @Mock
     protected KSI mockKsi;
+    private ZipContainerReader reader;
 
     @Before
     public void setUpReader() throws Exception {

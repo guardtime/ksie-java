@@ -60,11 +60,16 @@ public final class Util {
         return tempFile;
     }
 
-    /**
-     * Extracts integer value from a string containing numbers. E.g. input string "town125" will return integer 125.
-     */
-    public static Integer extractIntegerFrom(String str) {
-        return Integer.parseInt(str.replaceAll("[^0-9]", ""));
+    public static void deleteFileOrDirectory(File file) {
+        if(file != null) {
+            File[] contents = file.listFiles();
+            if (contents != null) {
+                for (File f : contents) {
+                    deleteFileOrDirectory(f);
+                }
+            }
+            file.delete();
+        }
     }
 
     private Util() {

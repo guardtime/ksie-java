@@ -7,6 +7,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+
+import static java.nio.file.StandardOpenOption.DELETE_ON_CLOSE;
 
 /**
  * This content holders is used for MIMETYPE file inside the container.
@@ -20,9 +24,9 @@ public class MimeTypeHandler extends ContentHandler<byte[]> {
 
     @Override
     protected byte[] getEntry(String name) throws ContentParsingException {
-        try {
-            File file = fetchFileFromEntries(name);
-            return Util.toByteArray(new FileInputStream(file));
+        File file = fetchFileFromEntries(name);
+        try (InputStream input = Files.newInputStream(file.toPath(), DELETE_ON_CLOSE)) {
+            return Util.toByteArray(input);
         } catch (FileNotFoundException e) {
             throw new ContentParsingException("Failed to locate requested file in filesystem", e);
         } catch (IOException e) {

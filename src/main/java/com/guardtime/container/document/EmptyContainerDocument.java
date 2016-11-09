@@ -90,4 +90,9 @@ public class EmptyContainerDocument implements ContainerDocument {
         result = 31 * result + (dataHashMap != null ? dataHashMap.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public void close() throws IOException {
+        //Nothing to do here, no resources held.
+    }
 }

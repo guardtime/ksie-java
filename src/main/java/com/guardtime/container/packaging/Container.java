@@ -2,6 +2,7 @@ package com.guardtime.container.packaging;
 
 import com.guardtime.container.util.Pair;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -11,7 +12,7 @@ import java.util.List;
  * Container that encompasses documents, annotations and structure elements that links the annotations to the documents
  * and signatures that validate the content of the container.
  */
-public interface Container {
+public interface Container extends Closeable {
     /**
      * Returns list of {@link SignatureContent} contained in this container.
      */

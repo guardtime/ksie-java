@@ -23,8 +23,8 @@ public class DocumentContentHandler extends ContentHandler<File> {
     }
 
     @Override
-    protected File getEntry(String name) {
-        return entries.get(name);
+    protected File getEntry(String name) throws ContentParsingException {
+        return fetchFileFromEntries(name);
     }
 
 }

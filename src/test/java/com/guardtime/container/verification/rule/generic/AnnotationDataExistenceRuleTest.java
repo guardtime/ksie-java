@@ -106,7 +106,7 @@ public class AnnotationDataExistenceRuleTest extends AbstractContainerTest {
         when(mockAnnotationManifestReference.getMimeType()).thenReturn(annotationType.getContent());
         when(mockAnnotationReference.getUri()).thenReturn(annotationPath);
         when(mockSignaleAnnotationManifest.getAnnotationReference()).thenReturn(mockAnnotationReference);
-        if(setUpAnnotation) {
+        if (setUpAnnotation) {
             when(mockSignatureContent.getAnnotations()).thenReturn(Collections.singletonMap(annotationPath, Mockito.mock(ContainerAnnotation.class)));
         }
         when(mockSignatureContent.getSingleAnnotationManifests()).thenReturn(Collections.singletonMap(annotationManifestPath, mockSignaleAnnotationManifest));

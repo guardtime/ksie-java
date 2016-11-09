@@ -104,4 +104,9 @@ public class FileContainerDocument implements ContainerDocument {
         result = 31 * result + (fileName != null ? fileName.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public void close() throws IOException {
+        //Nothing to do here, we don't know where the input file is from so can't delete it.
+    }
 }

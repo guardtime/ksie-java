@@ -3,6 +3,7 @@ package com.guardtime.container.document;
 import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.HashAlgorithm;
+
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;

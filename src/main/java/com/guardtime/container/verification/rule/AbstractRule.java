@@ -3,6 +3,7 @@ package com.guardtime.container.verification.rule;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.state.RuleState;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
