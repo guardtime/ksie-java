@@ -98,10 +98,10 @@ public class ContainerBuilderTest extends AbstractContainerTest {
     @Test
     public void testCreateWithMultipleDocumentsWithSameFileName() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Document with name '" + TEST_FILE_NAME_TEST_TXT + "' already exists!");
         ContainerBuilder builder = new ContainerBuilder(mockedPackagingFactory);
         builder.withDocument(new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT));
         builder.withDocument(new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT));
-        builder.build();
     }
 
     @Test
@@ -120,7 +120,7 @@ public class ContainerBuilderTest extends AbstractContainerTest {
     }
 
     @Test
-    public void testCreateWithExistingContainerWithSameContainerDocument() throws Exception {
+    public void testCreateNewContainerUsingExistingContainerAndExistingDocument() throws Exception {
         ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, new IncrementingIndexProviderFactory(), true);
         // build initial container
         ContainerBuilder builder = new ContainerBuilder(packagingFactory);

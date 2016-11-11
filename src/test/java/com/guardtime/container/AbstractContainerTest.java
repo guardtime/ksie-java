@@ -46,9 +46,11 @@ public class AbstractContainerTest {
     protected static final String CONTAINER_WITH_MULTIPLE_ANNOTATIONS = "containers/container-multiple-annotations.ksie";
     protected static final String CONTAINER_WITH_MISSING_ANNOTATION_DATA = "containers/container-missing-annotation-data.ksie";
     protected static final String CONTAINERS_CONTAINER_INVALID_ANNOTATION_TYPE = "containers/container-invalid-annotation-type.ksie";
-    protected static final String CONTAINER_WITH_MULTIPLE_EXTENDABLE_SIGNATURES = "containers/container-multiple-signatures-non-verifying.ksie";
     protected static final String CONTAINERS_CONTAINER_DOCUMENT_MISSING_MIMETYPE = "containers/container-document-missing-mimetype.ksie";
     protected static final String CONTAINERS_CONTAINER_NO_DOCUMENT_URI_IN_MANIFEST = "containers/container-no-document-uri-in-manifest.ksie";
+    protected static final String CONTAINER_WITH_MULTIPLE_EXTENDABLE_SIGNATURES = "containers/container-multiple-signatures-non-verifying.ksie";
+    protected static final String CONTAINER_WITH_CHANGED_SIGNATURE_FILE = "containers/container-invalid-signature-from-last-aggregation-hash-chain.ksie";
+    protected static final String CONTAINER_WITH_CHANGED_AND_EXTENDED_SIGNATURE_FILE = "containers/container-invalid-signature-from-last-aggregation-hash-chain-extended.ksie";
 
     protected static final String MIME_TYPE_APPLICATION_TXT = "application/txt";
     protected static final String MIME_TYPE_APPLICATION_PDF = "application/pdf";
