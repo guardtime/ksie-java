@@ -25,13 +25,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import static com.guardtime.container.util.Util.createTempFile;
+import static com.guardtime.container.util.Util.getTempDirectory;
 
 /**
  * Helper class for reading Zip container.
@@ -50,7 +52,7 @@ class ZipContainerReader {
     private final SingleAnnotationManifestHandler singleAnnotationManifestHandler;
     private final SignatureHandler signatureHandler;
     private final SignatureContentHandler signatureContentHandler;
-    private final File tempDirectory;
+    private final Path tempDirectory;
 
     private ContentHandler[] handlers;
 
@@ -66,12 +68,6 @@ class ZipContainerReader {
 
         this.signatureContentHandler = new SignatureContentHandler(documentHandler, annotationContentHandler, manifestHandler,
                 documentsManifestHandler, annotationsManifestHandler, singleAnnotationManifestHandler, signatureHandler);
-    }
-
-    private File getTempDirectory() throws IOException {
-        File tempDirectory = Files.createTempDirectory("KSIE_" + UUID.randomUUID().toString()).toFile();
-        tempDirectory.deleteOnExit();
-        return tempDirectory;
     }
 
     ZipContainer read(InputStream input) throws IOException, InvalidPackageException {
@@ -150,7 +146,7 @@ class ZipContainerReader {
 
     private void readEntry(ZipInputStream zipInput, ZipEntry entry) throws IOException {
         String name = entry.getName();
-        File tempFile = createTempFile();
+        File tempFile = createTempFile(tempDirectory);
         com.guardtime.ksi.util.Util.copyData(zipInput, new FileOutputStream(tempFile));
         for (ContentHandler handler : handlers) {
             if (handler.isSupported(name)) {
@@ -173,12 +169,6 @@ class ZipContainerReader {
             }
         }
         return signatures;
-    }
-
-    private File createTempFile() throws IOException {
-        File file = Files.createTempFile(tempDirectory.toPath(), "ksie_", "tmp").toFile();
-        file.deleteOnExit();
-        return file;
     }
 
 }

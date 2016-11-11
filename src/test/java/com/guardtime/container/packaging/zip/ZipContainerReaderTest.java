@@ -67,7 +67,6 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
         for (SignatureContent content : container.getSignatureContents()) {
             assertFalse(content.getDocuments().isEmpty());
         }
-        container.close();
     }
 
     @Test

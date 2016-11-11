@@ -132,8 +132,8 @@ public class AbstractContainerTest {
         ));
     }
 
-    protected void closeAll(Collection<? extends Closeable> list) throws IOException {
-        for (Closeable c : list) {
+    protected void closeAll(Collection<? extends AutoCloseable> list) throws Exception {
+        for (AutoCloseable c : list) {
             c.close();
         }
     }

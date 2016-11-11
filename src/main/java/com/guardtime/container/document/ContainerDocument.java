@@ -5,7 +5,6 @@ import com.guardtime.container.util.DataHashException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.List;
 /**
  * Represents document data that is to be used in a container.
  */
-public interface ContainerDocument extends MultiHashElement, Closeable {
+public interface ContainerDocument extends MultiHashElement, AutoCloseable {
 
     String getFileName();
 

@@ -92,7 +92,7 @@ public class EmptyContainerDocument implements ContainerDocument {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         //Nothing to do here, no resources held.
     }
 }

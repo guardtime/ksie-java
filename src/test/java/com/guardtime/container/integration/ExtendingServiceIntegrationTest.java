@@ -119,6 +119,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
     private KSISignature getMockedSignature(String containerName) throws Exception {
         Container container = getContainer(containerName);
         KSISignature containerSignature = (KSISignature) container.getSignatureContents().get(0).getContainerSignature().getSignature();
+        container.close();
 
         KSISignature mockedSignature = Mockito.mock(KSISignature.class);
         when(mockedSignature.getAggregationTime()).thenReturn(containerSignature.getAggregationTime());

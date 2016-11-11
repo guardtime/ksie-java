@@ -18,8 +18,6 @@ import static com.guardtime.container.util.Util.notNull;
  */
 public class StreamContainerDocument implements ContainerDocument {
 
-    private static final String TEMP_FILE_PREFIX = "bcc-";
-    private static final String TEMP_FILE_SUFFIX = ".dat";
     private final File tempFile;
     private FileContainerDocument containerDocument;
 
@@ -71,7 +69,7 @@ public class StreamContainerDocument implements ContainerDocument {
     protected File copy(InputStream input) {
         FileOutputStream output = null;
         try {
-            File tempFile = createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
+            File tempFile = createTempFile();
             output = new FileOutputStream(tempFile);
             com.guardtime.ksi.util.Util.copyData(input, output);
             return tempFile;

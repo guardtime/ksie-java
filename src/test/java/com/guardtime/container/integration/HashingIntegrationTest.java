@@ -24,7 +24,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -43,7 +42,7 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
     private Container container;
 
     @After
-    public void cleanUp() throws IOException {
+    public void cleanUp() throws Exception {
         CONTAINER_ANNOTATION.close();
         CONTAINER_DOCUMENT.close();
         if (container != null) {

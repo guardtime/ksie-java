@@ -106,7 +106,7 @@ public class FileContainerDocument implements ContainerDocument {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         //Nothing to do here, we don't know where the input file is from so can't delete it.
     }
 }
