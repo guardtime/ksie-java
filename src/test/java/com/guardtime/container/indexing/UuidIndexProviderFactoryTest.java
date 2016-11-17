@@ -9,7 +9,6 @@ import org.junit.Test;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 
 public class UuidIndexProviderFactoryTest extends AbstractContainerTest {
 

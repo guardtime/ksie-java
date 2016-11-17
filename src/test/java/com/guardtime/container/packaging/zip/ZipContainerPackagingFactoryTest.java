@@ -16,6 +16,7 @@ import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -50,6 +51,12 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
     public void setUp() throws Exception {
         super.setUp();
         containerAnnotationList.add(new StringContainerAnnotation(ContainerAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME));
+    }
+
+    @After
+    public void cleanUp() throws Exception {
+        closeAll(containerAnnotationList);
+        closeAll(containerDocumentList);
     }
 
     private ZipContainer createInternallyValidContainer(List<ContainerDocument> documents, List<ContainerAnnotation> annotations) throws Exception {
@@ -103,12 +110,14 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
     public void testCreateContainerWithDocument() throws Exception {
         ZipContainer container = createInternallyValidContainer(containerDocumentList, null);
         assertNotNull(container);
+        container.close();
     }
 
     @Test
     public void testCreateContainerWithDocumentAndAnnotation() throws Exception {
         ZipContainer container = createInternallyValidContainer(containerDocumentList, containerAnnotationList);
         assertNotNull(container);
+        container.close();
     }
 
     @Test
@@ -120,6 +129,7 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
         Collection<ContainerDocument> containedDocuments = container.getSignatureContents().get(0).getDocuments().values();
         assertNotNull(containedDocuments);
         assertTrue(containedDocuments.containsAll(documentsList));
+        container.close();
     }
 
     @Test
@@ -133,6 +143,7 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
         Collection<ContainerAnnotation> containedAnnotations = container.getSignatureContents().get(0).getAnnotations().values();
         assertNotNull(containedAnnotations);
         assertTrue(containedAnnotations.containsAll(annotationsList));
+        container.close();
     }
 
     @Test
@@ -151,6 +162,7 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
         Collection<ContainerAnnotation> containedAnnotations = newContainer.getSignatureContents().get(1).getAnnotations().values();
         assertNotNull(containedAnnotations);
         assertTrue(containedAnnotations.containsAll(annotationsList));
+        container.close();
     }
 
     @Test
@@ -167,7 +179,9 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
 
     @Test
     public void testCreateVerifiesContainer_OK() throws Exception {
-        assertNotNull(createInternallyValidContainer(containerDocumentList, containerAnnotationList));
+        ZipContainer container = createInternallyValidContainer(containerDocumentList, containerAnnotationList);
+        assertNotNull(container);
+        container.close();
     }
 
     @Test
@@ -183,9 +197,10 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
         List<ContainerDocument> containerDocuments = Collections.singletonList(
                 (ContainerDocument) new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_PDF)
         );
-        ZipContainer internallyValidContainer = createInternallyValidContainer(containerDocumentList, containerAnnotationList);
-        ZipContainer newContainer = createInternallyValidContainer(containerDocuments, containerAnnotationList, internallyValidContainer);
+        ZipContainer container = createInternallyValidContainer(containerDocumentList, containerAnnotationList);
+        ZipContainer newContainer = createInternallyValidContainer(containerDocuments, containerAnnotationList, container);
         assertNotNull(newContainer);
+        container.close();
     }
 
     @Test
@@ -228,6 +243,8 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
             documentPaths.addAll(content.getDocuments().keySet());
         }
         assertEquals(1, documentPaths.size());
+        container.close();
+        newContainer.close();
     }
 
 }

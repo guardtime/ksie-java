@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Represents document data that is to be used in a container.
  */
-public interface ContainerDocument extends MultiHashElement {
+public interface ContainerDocument extends MultiHashElement, AutoCloseable {
 
     String getFileName();
 

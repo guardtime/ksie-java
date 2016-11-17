@@ -5,15 +5,26 @@ import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.verification.result.SignatureResult;
 import com.guardtime.container.verification.result.VerificationResult;
-import com.guardtime.container.verification.rule.state.RuleState;
-import com.guardtime.container.verification.rule.state.RuleStateProvider;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.container.verification.rule.signature.SignatureVerifier;
+import com.guardtime.container.verification.rule.state.RuleState;
+import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static com.guardtime.container.verification.rule.RuleType.*;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_FORMAT;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_DATA;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_DATA_EXISTS;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_EXISTS;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_DATA_HASH;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_DATA_MANIFEST;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_DATA_MANIFEST_EXISTS;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_MANIFEST_HASH;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_SIGNATURE_EXISTS;
 
 public class InternalVerificationPolicy extends DefaultVerificationPolicy {
 

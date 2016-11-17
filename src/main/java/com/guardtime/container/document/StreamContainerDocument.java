@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.List;
 
 import static com.guardtime.container.util.Util.createTempFile;
@@ -17,16 +18,14 @@ import static com.guardtime.container.util.Util.notNull;
  */
 public class StreamContainerDocument implements ContainerDocument {
 
-    private static final String TEMP_FILE_PREFIX = "bcc-";
-    private static final String TEMP_FILE_SUFFIX = ".dat";
-
+    private final File tempFile;
     private FileContainerDocument containerDocument;
 
     public StreamContainerDocument(InputStream input, String mimeType, String fileName) {
         notNull(input, "Input stream");
         notNull(mimeType, "MIME type");
         notNull(fileName, "File name");
-        File tempFile = copy(input);
+        this.tempFile = copy(input);
         this.containerDocument = new FileContainerDocument(tempFile, mimeType, fileName);
     }
 
@@ -70,7 +69,7 @@ public class StreamContainerDocument implements ContainerDocument {
     protected File copy(InputStream input) {
         FileOutputStream output = null;
         try {
-            File tempFile = createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
+            File tempFile = createTempFile();
             output = new FileOutputStream(tempFile);
             com.guardtime.ksi.util.Util.copyData(input, output);
             return tempFile;
@@ -96,5 +95,16 @@ public class StreamContainerDocument implements ContainerDocument {
     @Override
     public int hashCode() {
         return containerDocument != null ? containerDocument.hashCode() : 0;
+    }
+
+    @Override
+    public void close() throws IOException {
+        containerDocument.close();
+        Files.deleteIfExists(tempFile.toPath());
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        close();
     }
 }

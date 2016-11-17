@@ -8,6 +8,7 @@ import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.KSISignature;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

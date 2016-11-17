@@ -3,12 +3,15 @@ package com.guardtime.container.manifest.tlv;
 import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.tlv.TLVElement;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TlvSingleAnnotationManifestTest extends AbstractTlvManifestTest {
 

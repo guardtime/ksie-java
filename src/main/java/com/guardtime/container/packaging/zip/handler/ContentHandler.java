@@ -3,7 +3,12 @@ package com.guardtime.container.packaging.zip.handler;
 import com.guardtime.container.util.Pair;
 
 import java.io.File;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * Helper class for reading specific type of zip file entry. To check if zip entry can be used by current handler use

@@ -7,7 +7,7 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import java.util.Arrays;
 import java.util.List;
 
-public class TestHashAlgorithmProvider implements HashAlgorithmProvider{
+public class TestHashAlgorithmProvider implements HashAlgorithmProvider {
     private List<HashAlgorithm> fileReferenceHashAlgorithms;
     private List<HashAlgorithm> documentReferenceHashAlgorithms;
     private HashAlgorithm annotationDataReferenceHashAlgorithm;

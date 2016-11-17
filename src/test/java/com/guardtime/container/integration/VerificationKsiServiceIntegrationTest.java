@@ -47,6 +47,7 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
         assertNotNull(signatureResult);
         assertEquals(VerificationResult.NOK, signatureResult.getSimplifiedResult());
         assertNotNull(signatureResult.getFullResult());
+        container.close();
     }
 
     @Test
@@ -59,5 +60,6 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
         assertNotNull(signatureResult);
         assertEquals(VerificationResult.OK, signatureResult.getSimplifiedResult());
         assertNotNull(signatureResult.getFullResult());
+        container.close();
     }
 }

@@ -3,10 +3,10 @@ package com.guardtime.container.verification.policy;
 import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.verification.rule.ContainerRule;
-import com.guardtime.container.verification.rule.state.RuleStateProvider;
 import com.guardtime.container.verification.rule.generic.MimeTypeIntegrityRule;
 import com.guardtime.container.verification.rule.generic.SignatureContentIntegrityRule;
 import com.guardtime.container.verification.rule.signature.SignatureVerifier;
+import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
