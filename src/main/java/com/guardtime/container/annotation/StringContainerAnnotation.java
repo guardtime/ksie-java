@@ -5,6 +5,7 @@ import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
@@ -45,9 +46,11 @@ public class StringContainerAnnotation implements ContainerAnnotation {
     }
 
     @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) {
+    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
         if (dataHash == null || !dataHash.getAlgorithm().equals(algorithm)) {
-            dataHash = hash(getInputStream(), algorithm);
+            InputStream inputStream = getInputStream();
+            dataHash = hash(inputStream, algorithm);
+            inputStream.close();
         }
         return dataHash;
     }

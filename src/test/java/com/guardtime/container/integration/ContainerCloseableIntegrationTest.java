@@ -41,8 +41,7 @@ public class ContainerCloseableIntegrationTest {
 
     @Test
     public void testClosingClosedContainerDoesNotThrowException() throws Exception {
-        File file = loadFile();
-        FileInputStream input = new FileInputStream(file);
+        FileInputStream input = new FileInputStream(loadFile());
         Container container = packagingFactory.read(input);
         input.close();
         container.close();

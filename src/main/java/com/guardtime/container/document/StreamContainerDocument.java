@@ -67,16 +67,14 @@ public class StreamContainerDocument implements ContainerDocument {
     }
 
     protected File copy(InputStream input) {
-        FileOutputStream output = null;
         try {
             File tempFile = createTempFile();
-            output = new FileOutputStream(tempFile);
+            FileOutputStream output = new FileOutputStream(tempFile);
             com.guardtime.ksi.util.Util.copyData(input, output);
+            output.close();
             return tempFile;
         } catch (IOException e) {
             throw new IllegalArgumentException("Can not copy input stream", e);
-        } finally {
-            com.guardtime.ksi.util.Util.closeQuietly(output);
         }
 
     }

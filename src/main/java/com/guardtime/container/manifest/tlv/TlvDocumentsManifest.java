@@ -70,9 +70,4 @@ class TlvDocumentsManifest extends AbstractTlvManifestStructure implements Docum
         }
     }
 
-    @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
-        return Util.hash(getInputStream(), algorithm);
-    }
-
 }

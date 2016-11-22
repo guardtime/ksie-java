@@ -3,6 +3,8 @@ package com.guardtime.container.manifest.tlv;
 import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.exceptions.KSIException;
+import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVInputStream;
 import com.guardtime.ksi.tlv.TLVParserException;
@@ -102,9 +104,10 @@ abstract class AbstractTlvManifestStructure {
     }
 
     public InputStream getInputStream() throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        writeTo(bos);
-        return new ByteArrayInputStream(bos.toByteArray());
+        try(ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            writeTo(bos);
+            return new ByteArrayInputStream(bos.toByteArray());
+        }
     }
 
     @Override
@@ -128,6 +131,12 @@ abstract class AbstractTlvManifestStructure {
             code += element.hashCode();
         }
         return code;
+    }
+
+    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
+        try(InputStream inputStream = getInputStream()) {
+            return Util.hash(inputStream, algorithm);
+        }
     }
 
 }

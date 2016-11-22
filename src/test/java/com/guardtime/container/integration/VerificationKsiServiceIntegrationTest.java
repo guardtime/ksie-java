@@ -33,10 +33,9 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
     }
 
     private Container getContainer(String filePath) throws Exception {
-        FileInputStream fis = new FileInputStream(loadFile(filePath));
-        Container container = packagingFactory.read(fis);
-        fis.close();
-        return container;
+        try (FileInputStream fis = new FileInputStream(loadFile(filePath))) {
+            return packagingFactory.read(fis);
+        }
     }
 
     @Test

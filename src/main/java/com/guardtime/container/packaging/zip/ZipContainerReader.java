@@ -117,8 +117,11 @@ class ZipContainerReader {
     }
 
     private boolean validMimeType(MimeType mimeType) {
-        try {
-            return mimeType != null && mimeType.getInputStream().available() > 0;
+        if(mimeType == null) {
+            return false;
+        }
+        try (InputStream inputStream = mimeType.getInputStream()) {
+            return inputStream.available() > 0;
         } catch (IOException e) {
             return false;
         }

@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
@@ -40,7 +41,9 @@ public class EmptyContainerDocumentTest extends AbstractContainerTest {
 
     @Test
     public void testGetInputStream() throws Exception {
-        assertNull(document.getInputStream());
+        try(InputStream inputStream = document.getInputStream()) {
+            assertNull(inputStream);
+        }
     }
 
     @Test

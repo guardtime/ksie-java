@@ -19,6 +19,7 @@ public class TlvDocumentsManifestTest extends AbstractTlvManifestTest {
         TlvDocumentsManifest documentsManifest = new TlvDocumentsManifest(asList(TEST_DOCUMENT_HELLO_TEXT), DEFAULT_HASH_ALGORITHM_PROVIDER);
         InputStream is = documentsManifest.getInputStream();
         testMagic(is, DOCUMENTS_MANIFEST_MAGIC);
+        is.close();
         Assert.assertEquals(1, documentsManifest.getDocumentReferences().size());
         TlvDocumentReference reference = documentsManifest.getDocumentReferences().get(0);
         Assert.assertEquals(TEST_FILE_NAME_TEST_TXT, reference.getUri());
@@ -33,6 +34,7 @@ public class TlvDocumentsManifestTest extends AbstractTlvManifestTest {
         TlvDocumentsManifest documentsManifest = new TlvDocumentsManifest(new ByteArrayInputStream(bytes));
         InputStream is = documentsManifest.getInputStream();
         testMagic(is, DOCUMENTS_MANIFEST_MAGIC);
+        is.close();
         Assert.assertEquals(1, documentsManifest.getDocumentReferences().size());
         TlvDocumentReference ref = documentsManifest.getDocumentReferences().get(0);
         Assert.assertEquals(TEST_FILE_NAME_TEST_TXT, ref.getUri());

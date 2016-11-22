@@ -52,7 +52,9 @@ public class FileContainerDocument implements ContainerDocument {
 
     @Override
     public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
-        return Util.hash(getInputStream(), algorithm);
+        try (InputStream inputStream = getInputStream()) {
+            return Util.hash(inputStream, algorithm);
+        }
     }
 
     @Override
