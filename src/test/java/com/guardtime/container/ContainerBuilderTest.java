@@ -65,7 +65,7 @@ public class ContainerBuilderTest extends AbstractContainerTest {
     @Test
     public void testAddAnnotationToContainer() throws Exception {
         ContainerBuilder builder = new ContainerBuilder(mockedPackagingFactory);
-        builder.withAnnotation(MOCKED_ANNOTATION);
+        builder.withAnnotation(STRING_CONTAINER_ANNOTATION);
         assertEquals(1, builder.getAnnotations().size());
     }
 
@@ -75,7 +75,7 @@ public class ContainerBuilderTest extends AbstractContainerTest {
         builder.withDocument(TEST_DOCUMENT_HELLO_TEXT);
         builder.withDocument(TEST_DOCUMENT_HELLO_PDF);
 
-        builder.withAnnotation(MOCKED_ANNOTATION);
+        builder.withAnnotation(STRING_CONTAINER_ANNOTATION);
         Container container = builder.build();
         assertNotNull(container);
     }
