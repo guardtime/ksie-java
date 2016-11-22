@@ -227,18 +227,27 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
         assertSingleContentsWithSingleDocumentWithName(container, null);
     }
 
+    /*
+    Created container will be closed in the end.
+     */
     private void createContainerWriteItToAndReadFromStream(String documentFileName) throws Exception {
         Container container = packagingFactory.create(getContainerDocument(documentFileName), Collections.singletonList(STRING_CONTAINER_ANNOTATION));
         writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+        container.close();
     }
 
+    /*
+    Original and created container will be closed.
+     */
     private void writeContainerToAndReadFromStream(Container container, ZipContainerPackagingFactory packagingFactory) throws Exception {
         assertNotNull(container);
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         container.writeTo(bos);
+        container.close();
 
         Container inputContainer = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()));
         assertNotNull(inputContainer);
+        inputContainer.close();
     }
 }
