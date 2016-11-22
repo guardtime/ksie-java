@@ -130,7 +130,10 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
         expectedException.expectMessage("Hash algorithm SHA3_512 is not implemented");
         HashAlgorithm hashAlgorithm = HashAlgorithm.SHA3_512;
         HashAlgorithmProvider hashAlgorithmProvider = new TestHashAlgorithmProvider(hashAlgorithm);
-        createContainer(hashAlgorithmProvider);
+        ContainerBuilder builder = new ContainerBuilder(getContainerPackagingFactory(hashAlgorithmProvider));
+        builder.withAnnotation(CONTAINER_ANNOTATION);
+        builder.withDocument(CONTAINER_DOCUMENT);
+        builder.build();
     }
 
     @Test
@@ -140,7 +143,10 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
         List<HashAlgorithm> hashAlgorithmList = Arrays.asList(HashAlgorithm.SHA1, HashAlgorithm.SHA2_256, HashAlgorithm.SM3);
         HashAlgorithm hashAlgorithm = HashAlgorithm.SHA2_512;
         HashAlgorithmProvider hashAlgorithmProvider = new TestHashAlgorithmProvider(hashAlgorithmList, hashAlgorithmList, hashAlgorithm, hashAlgorithm);
-        createContainer(hashAlgorithmProvider);
+        ContainerBuilder builder = new ContainerBuilder(getContainerPackagingFactory(hashAlgorithmProvider));
+        builder.withAnnotation(CONTAINER_ANNOTATION);
+        builder.withDocument(CONTAINER_DOCUMENT);
+        builder.build();
     }
 
     private ZipContainerPackagingFactory getContainerPackagingFactory(HashAlgorithmProvider provider) throws Exception {
