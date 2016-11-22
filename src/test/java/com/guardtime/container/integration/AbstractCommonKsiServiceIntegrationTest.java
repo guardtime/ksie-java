@@ -1,5 +1,7 @@
 package com.guardtime.container.integration;
 
+import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
+import com.guardtime.container.indexing.UuidIndexProviderFactory;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 import com.guardtime.container.signature.ksi.KsiSignatureFactory;
 import com.guardtime.ksi.KSI;
@@ -8,7 +10,6 @@ import com.guardtime.ksi.service.client.KSIServiceCredentials;
 import com.guardtime.ksi.service.client.http.HttpClientSettings;
 import com.guardtime.ksi.service.http.simple.SimpleHttpClient;
 import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
-
 import org.junit.Before;
 
 import java.io.FileInputStream;
@@ -23,6 +24,8 @@ public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCo
     private static final String GUARDTIME_PUBLICATIONS_FILE;
     private static final KSIServiceCredentials KSI_SERVICE_CREDENTIALS;
     protected KSI ksi;
+    protected ZipContainerPackagingFactory packagingFactoryWithIncIndex;
+    protected ZipContainerPackagingFactory packagingFactoryWithUuid;
 
     static{
         try {
@@ -55,5 +58,8 @@ public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCo
                 .build();
         signatureFactory = new KsiSignatureFactory(ksi);
         packagingFactory = new ZipContainerPackagingFactory(signatureFactory, manifestFactory);
+
+        packagingFactoryWithIncIndex = new ZipContainerPackagingFactory(signatureFactory, manifestFactory,  new IncrementingIndexProviderFactory(), false);
+        packagingFactoryWithUuid = new ZipContainerPackagingFactory(signatureFactory, manifestFactory, new UuidIndexProviderFactory(), false);
     }
 }
