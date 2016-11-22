@@ -4,10 +4,20 @@ import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.packaging.zip.handler.*;
+import com.guardtime.container.packaging.zip.handler.AnnotationContentHandler;
+import com.guardtime.container.packaging.zip.handler.AnnotationsManifestHandler;
+import com.guardtime.container.packaging.zip.handler.ContentHandler;
+import com.guardtime.container.packaging.zip.handler.ContentParsingException;
+import com.guardtime.container.packaging.zip.handler.DocumentContentHandler;
+import com.guardtime.container.packaging.zip.handler.DocumentsManifestHandler;
+import com.guardtime.container.packaging.zip.handler.ManifestHandler;
+import com.guardtime.container.packaging.zip.handler.MimeTypeHandler;
+import com.guardtime.container.packaging.zip.handler.SignatureHandler;
+import com.guardtime.container.packaging.zip.handler.SingleAnnotationManifestHandler;
+import com.guardtime.container.packaging.zip.handler.UnknownFileHandler;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.util.Pair;
-import com.guardtime.container.util.Util;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,11 +25,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import static com.guardtime.container.util.Util.createTempFile;
+import static com.guardtime.container.util.Util.getTempDirectory;
 
 /**
  * Helper class for reading Zip container.
@@ -38,10 +52,12 @@ class ZipContainerReader {
     private final SingleAnnotationManifestHandler singleAnnotationManifestHandler;
     private final SignatureHandler signatureHandler;
     private final SignatureContentHandler signatureContentHandler;
+    private final Path tempDirectory;
 
     private ContentHandler[] handlers;
 
-    ZipContainerReader(ContainerManifestFactory manifestFactory, SignatureFactory signatureFactory) {
+    ZipContainerReader(ContainerManifestFactory manifestFactory, SignatureFactory signatureFactory) throws IOException {
+        this.tempDirectory = getTempDirectory();
         this.manifestHandler = new ManifestHandler(manifestFactory);
         this.documentsManifestHandler = new DocumentsManifestHandler(manifestFactory);
         this.annotationsManifestHandler = new AnnotationsManifestHandler(manifestFactory);
@@ -69,7 +85,7 @@ class ZipContainerReader {
         List<Pair<String, File>> unknownFiles = getUnknownFiles();
 
         if (validMimeType(mimeType) && containsValidContents(contents)) {
-            return new ZipContainer(contents, unknownFiles, mimeType);
+            return new ZipContainer(contents, unknownFiles, mimeType, tempDirectory);
         } else {
             throw new InvalidPackageException("Parsed container was not valid");
         }
@@ -130,7 +146,7 @@ class ZipContainerReader {
 
     private void readEntry(ZipInputStream zipInput, ZipEntry entry) throws IOException {
         String name = entry.getName();
-        File tempFile = createTempFile();
+        File tempFile = createTempFile(tempDirectory);
         com.guardtime.ksi.util.Util.copyData(zipInput, new FileOutputStream(tempFile));
         for (ContentHandler handler : handlers) {
             if (handler.isSupported(name)) {
@@ -153,10 +169,6 @@ class ZipContainerReader {
             }
         }
         return signatures;
-    }
-
-    private File createTempFile() throws IOException {
-        return Util.createTempFile("ksie_", ".tmp");
     }
 
 }

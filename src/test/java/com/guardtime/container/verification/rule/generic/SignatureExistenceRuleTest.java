@@ -12,6 +12,7 @@ import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.ksi.unisignature.KSISignature;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

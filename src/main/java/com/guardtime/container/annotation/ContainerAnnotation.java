@@ -10,7 +10,7 @@ import java.io.InputStream;
  * Represents annotations that can be used in container. Combines annotation data and annotation
  * meta-data into one object.
  */
-public interface ContainerAnnotation {
+public interface ContainerAnnotation extends AutoCloseable {
 
     ContainerAnnotationType getAnnotationType();
 

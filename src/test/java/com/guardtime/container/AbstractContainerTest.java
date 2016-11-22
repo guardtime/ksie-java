@@ -7,17 +7,12 @@ import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.indexing.IndexProviderFactory;
-import com.guardtime.container.manifest.AnnotationsManifest;
-import com.guardtime.container.manifest.ContainerManifestFactory;
-import com.guardtime.container.manifest.DocumentsManifest;
-import com.guardtime.container.manifest.Manifest;
-import com.guardtime.container.manifest.ManifestFactoryType;
-import com.guardtime.container.manifest.SingleAnnotationManifest;
+import com.guardtime.container.manifest.*;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.SignatureFactoryType;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.rule.state.DefaultRuleStateProvider;
-
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
@@ -28,6 +23,8 @@ import org.mockito.MockitoAnnotations;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyMap;
@@ -66,10 +63,10 @@ public class AbstractContainerTest {
     protected static final String DOCUMENTS_MANIFEST_URI = "/META-INF/datamanifest-1.tlv";
 
     protected static final String ANNOTATIONS_MANIFEST_URI = "/META-INF/annotmanifest-1.tlv";
-    protected static final ContainerDocument TEST_DOCUMENT_HELLO_TEXT = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
-    protected static final ContainerDocument TEST_DOCUMENT_HELLO_PDF = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_PDF_CONTENT), MIME_TYPE_APPLICATION_PDF, TEST_FILE_NAME_TEST_PDF);
-    protected static final ContainerAnnotation STRING_CONTAINER_ANNOTATION = new StringContainerAnnotation(ContainerAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME);
 
+    protected final ContainerAnnotation STRING_CONTAINER_ANNOTATION = new StringContainerAnnotation(ContainerAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME);
+    protected final ContainerDocument TEST_DOCUMENT_HELLO_TEXT = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
+    protected final ContainerDocument TEST_DOCUMENT_HELLO_PDF = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_PDF_CONTENT), MIME_TYPE_APPLICATION_PDF, TEST_FILE_NAME_TEST_PDF);
     protected final DefaultRuleStateProvider defaultRuleStateProvider = new DefaultRuleStateProvider();
 
     @Rule
@@ -118,6 +115,20 @@ public class AbstractContainerTest {
         when(mockedSignatureFactoryType.getSignatureMimeType()).thenReturn(SIGNATURE_MIME_TYPE);
     }
 
+    @After
+    public void tearDown() throws Exception {
+        closeAll(Arrays.asList(
+                TEST_DOCUMENT_HELLO_PDF,
+                TEST_DOCUMENT_HELLO_TEXT,
+                STRING_CONTAINER_ANNOTATION
+        ));
+    }
+
+    protected void closeAll(Collection<? extends AutoCloseable> list) throws Exception {
+        for (AutoCloseable c : list) {
+            c.close();
+        }
+    }
 
     protected File loadFile(String filePath) throws Exception {
         URL url = Thread.currentThread().getContextClassLoader().getResource(filePath);

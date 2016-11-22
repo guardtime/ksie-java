@@ -1,6 +1,7 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.ksi.tlv.TLVElement;
+
 import org.junit.Test;
 
 import static java.util.Arrays.asList;

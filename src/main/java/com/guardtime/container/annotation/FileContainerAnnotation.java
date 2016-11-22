@@ -51,4 +51,8 @@ public class FileContainerAnnotation implements ContainerAnnotation {
         return dataHash;
     }
 
+    @Override
+    public void close() {
+        //Nothing to do here, we don't know where the input File is from so can't delete it.
+    }
 }
