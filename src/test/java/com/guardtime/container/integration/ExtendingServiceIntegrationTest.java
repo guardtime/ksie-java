@@ -104,7 +104,9 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
 
     private Container getContainer(String path) throws Exception {
         InputStream input = new FileInputStream(loadFile(path));
-        return packagingFactory.read(input);
+        Container container = packagingFactory.read(input);
+        input.close();
+        return container;
     }
 
     private void assertSignaturesExtendedStatus(Container container, boolean status) {

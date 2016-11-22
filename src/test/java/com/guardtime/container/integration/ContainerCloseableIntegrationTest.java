@@ -42,7 +42,9 @@ public class ContainerCloseableIntegrationTest {
     @Test
     public void testClosingClosedContainerDoesNotThrowException() throws Exception {
         File file = loadFile();
-        Container container = packagingFactory.read(new FileInputStream(file));
+        FileInputStream input = new FileInputStream(file);
+        Container container = packagingFactory.read(input);
+        input.close();
         container.close();
         container.close();
     }
@@ -51,7 +53,9 @@ public class ContainerCloseableIntegrationTest {
     public void testCloseDeletesTemporaryFiles() throws Exception {
         assertFalse("Unclean test system! There are some 'ksie' files in " + tmpDir, anyKsieTempFiles());
         File file = loadFile();
-        Container container = packagingFactory.read(new FileInputStream(file));
+        FileInputStream input = new FileInputStream(file);
+        Container container = packagingFactory.read(input);
+        input.close();
         assertTrue("Temporary files not found!", anyKsieTempFiles());
         container.close();
         assertFalse("Close did not delete all temporary files!", anyKsieTempFiles());
@@ -61,10 +65,12 @@ public class ContainerCloseableIntegrationTest {
     public void testContainerWithTryWithResources() throws Exception {
         assertFalse("Unclean test system! There are some 'ksie' files in " + tmpDir, anyKsieTempFiles());
         File file = loadFile();
-        try(Container container = packagingFactory.read(new FileInputStream(file))) {
+        FileInputStream input = new FileInputStream(file);
+        try(Container container = packagingFactory.read(input)) {
             assertFalse(container.getSignatureContents().isEmpty());
             assertTrue("Temporary files not found!", anyKsieTempFiles());
         }
+        input.close();
         assertFalse("Close did not delete all temporary files!", anyKsieTempFiles());
     }
 

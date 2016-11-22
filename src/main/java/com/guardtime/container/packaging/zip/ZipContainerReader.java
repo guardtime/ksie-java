@@ -146,8 +146,7 @@ class ZipContainerReader {
 
     private void readEntry(ZipInputStream zipInput, ZipEntry entry) throws IOException {
         String name = entry.getName();
-        File tempFile = createTempFile(tempDirectory);
-        com.guardtime.ksi.util.Util.copyData(zipInput, new FileOutputStream(tempFile));
+        File tempFile = createAndFillTempFile(zipInput);
         for (ContentHandler handler : handlers) {
             if (handler.isSupported(name)) {
                 LOGGER.info("Reading zip entry '{}'. Using handler '{}' ", name, handler.getClass().getName());
@@ -156,6 +155,14 @@ class ZipContainerReader {
             }
         }
         unknownFileHandler.add(name, tempFile);
+    }
+
+    private File createAndFillTempFile(ZipInputStream zipInput) throws IOException {
+        File tempFile = createTempFile(tempDirectory);
+        FileOutputStream tempFileOutStream = new FileOutputStream(tempFile);
+        com.guardtime.ksi.util.Util.copyData(zipInput, tempFileOutStream);
+        tempFileOutStream.close();
+        return tempFile;
     }
 
     private List<ZipSignatureContent> buildSignatures() {

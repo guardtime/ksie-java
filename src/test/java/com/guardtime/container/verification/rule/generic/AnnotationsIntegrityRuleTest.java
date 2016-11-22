@@ -64,6 +64,7 @@ public class AnnotationsIntegrityRuleTest extends AbstractContainerTest {
     private RuleVerificationResult getRuleVerificationResult(String path) throws Exception {
         InputStream input = new FileInputStream(loadFile(path));
         Container container = packagingFactory.read(input);
+        input.close();
         SignatureContent content = container.getSignatureContents().get(0);
         ResultHolder holder = new ResultHolder();
         rule.verify(holder, content);
