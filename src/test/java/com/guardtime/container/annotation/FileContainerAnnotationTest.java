@@ -9,6 +9,7 @@ import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class FileContainerAnnotationTest extends AbstractContainerTest {
 
@@ -39,6 +40,15 @@ public class FileContainerAnnotationTest extends AbstractContainerTest {
         assertEquals(ANNOTATION_DOMAIN_COM_GUARDTIME, annotation.getDomain());
         assertEquals(ContainerAnnotationType.NON_REMOVABLE, annotation.getAnnotationType());
         assertNotNull(annotation.getDataHash(HashAlgorithm.SHA2_256));
+    }
+
+
+    @Test
+    public void testCloseDoesNotDeleteFile() throws Exception {
+        File file = loadFile(TEST_FILE_PATH_TEST_TXT);
+        FileContainerAnnotation annotation = new FileContainerAnnotation(file, ANNOTATION_DOMAIN_COM_GUARDTIME, ContainerAnnotationType.NON_REMOVABLE);
+        annotation.close();
+        assertTrue(file.exists());
     }
 
 }

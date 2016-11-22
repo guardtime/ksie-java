@@ -6,10 +6,23 @@ import com.guardtime.container.annotation.FileContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.EmptyContainerDocument;
 import com.guardtime.container.document.FileContainerDocument;
-import com.guardtime.container.manifest.*;
-import com.guardtime.container.packaging.zip.handler.*;
+import com.guardtime.container.manifest.AnnotationDataReference;
+import com.guardtime.container.manifest.AnnotationsManifest;
+import com.guardtime.container.manifest.DocumentsManifest;
+import com.guardtime.container.manifest.FileReference;
+import com.guardtime.container.manifest.Manifest;
+import com.guardtime.container.manifest.SingleAnnotationManifest;
+import com.guardtime.container.packaging.zip.handler.AnnotationContentHandler;
+import com.guardtime.container.packaging.zip.handler.AnnotationsManifestHandler;
+import com.guardtime.container.packaging.zip.handler.ContentParsingException;
+import com.guardtime.container.packaging.zip.handler.DocumentContentHandler;
+import com.guardtime.container.packaging.zip.handler.DocumentsManifestHandler;
+import com.guardtime.container.packaging.zip.handler.ManifestHandler;
+import com.guardtime.container.packaging.zip.handler.SignatureHandler;
+import com.guardtime.container.packaging.zip.handler.SingleAnnotationManifestHandler;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,24 +121,20 @@ class SignatureContentHandler {
         private void populateDocuments() {
             if (documentsManifest == null) return;
             for (FileReference reference : documentsManifest.getRight().getDocumentReferences()) {
-                try {
-                    ContainerDocument containerDocument = fetchDocumentFromHandler(reference);
-                    if (containerDocument != null) documents.add(containerDocument);
-                } catch (ContentParsingException e) {
-                    throw new RuntimeException("Programming bug! This should never happen. Investigate why DocumentContentHandler#getEntry() threw exception.", e);
-                }
+                ContainerDocument containerDocument = fetchDocumentFromHandler(reference);
+                if (containerDocument != null) documents.add(containerDocument);
             }
         }
 
-        private ContainerDocument fetchDocumentFromHandler(FileReference reference) throws ContentParsingException {
+        private ContainerDocument fetchDocumentFromHandler(FileReference reference) {
             if (invalidReference(reference)) return null;
             String documentUri = reference.getUri();
-            File file = documentHandler.get(documentUri);
-            if (file == null) {
+            try {
+                File file = documentHandler.get(documentUri);
+                return new FileContainerDocument(file, reference.getMimeType(), documentUri);
+            } catch (ContentParsingException e) {
                 // either removed or was never present in the first place, verifier will decide
                 return new EmptyContainerDocument(documentUri, reference.getMimeType(), reference.getHashList());
-            } else {
-                return new FileContainerDocument(file, reference.getMimeType(), documentUri);
             }
         }
 

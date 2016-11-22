@@ -53,6 +53,7 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
         com.guardtime.ksi.unisignature.verifier.VerificationResult signatureVerificationFullResults = (com.guardtime.ksi.unisignature.verifier.VerificationResult) signatureResult.getFullResult();
         assertNotNull(signatureVerificationFullResults);
         assertEquals(VerificationErrorCode.GEN_1, signatureVerificationFullResults.getErrorCode());
+        container.close();
 
     }
     @Test
@@ -64,6 +65,7 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
         assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
         SignatureResult signatureResult = result.getSignatureResult(container.getSignatureContents().get(0));
         checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.GEN_1, signatureResult);
+        container.close();
     }
 
     @Test
@@ -75,6 +77,7 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
         assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
         SignatureResult signatureResult = result.getSignatureResult(container.getSignatureContents().get(0));
         checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.CAL_02, signatureResult);
+        container.close();
     }
 
     @Test
@@ -86,6 +89,7 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
         assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
         SignatureResult signatureResult = result.getSignatureResult(container.getSignatureContents().get(0));
         checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.KEY_02, signatureResult);
+        container.close();
     }
 
     @Test
@@ -102,6 +106,7 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
         assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
         SignatureResult signatureResult = result.getSignatureResult(container.getSignatureContents().get(0));
         checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.INT_09, signatureResult);
+        container.close();
     }
 
     @Test
@@ -113,6 +118,7 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
         assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
         SignatureResult signatureResult = result.getSignatureResult(container.getSignatureContents().get(0));
         checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.PUB_03, signatureResult);
+        container.close();
     }
 
     @Test
@@ -125,6 +131,7 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
         assertNotNull(signatureResult);
         assertEquals(VerificationResult.OK, signatureResult.getSimplifiedResult());
         assertNotNull(signatureResult.getFullResult());
+        container.close();
     }
 
     private ContainerVerifier getContainerVerifier(Policy policy) {

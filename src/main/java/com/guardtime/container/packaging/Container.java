@@ -11,7 +11,7 @@ import java.util.List;
  * Container that encompasses documents, annotations and structure elements that links the annotations to the documents
  * and signatures that validate the content of the container.
  */
-public interface Container {
+public interface Container extends AutoCloseable {
     /**
      * Returns list of {@link SignatureContent} contained in this container.
      */

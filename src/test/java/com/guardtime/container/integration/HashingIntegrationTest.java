@@ -19,6 +19,7 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.util.TestHashAlgorithmProvider;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,14 +33,24 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
     private static final String CONTAINER_DOCUMENT_FILE_NAME = "StreamFile.txt";
     private static final String CONTAINER_DOCUMENT_MIME_TYPE = "Stream";
     private static final String INPUT_STREAM_STRING = "Input from stream.";
-    private static ContainerAnnotation CONTAINER_ANNOTATION = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, CONTAINER_ANNOTATION_CONTENT, CONTAINER_ANNOTATION_TYPE_DOMAIN);
-    private static ContainerDocument CONTAINER_DOCUMENT = new StreamContainerDocument(new ByteArrayInputStream(INPUT_STREAM_STRING.getBytes()), CONTAINER_DOCUMENT_MIME_TYPE, CONTAINER_DOCUMENT_FILE_NAME);
+    private final ContainerAnnotation CONTAINER_ANNOTATION = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, CONTAINER_ANNOTATION_CONTENT, CONTAINER_ANNOTATION_TYPE_DOMAIN);
+    private final ContainerDocument CONTAINER_DOCUMENT = new StreamContainerDocument(new ByteArrayInputStream(INPUT_STREAM_STRING.getBytes()), CONTAINER_DOCUMENT_MIME_TYPE, CONTAINER_DOCUMENT_FILE_NAME);
+    private Container container;
+
+    @After
+    public void cleanUp() throws Exception {
+        CONTAINER_ANNOTATION.close();
+        CONTAINER_DOCUMENT.close();
+        if (container != null) {
+            container.close();
+        }
+    }
 
     @Test
     public void testCheckNonDefaultHashingAlgorithm() throws Exception {
         HashAlgorithm hashingAlgorithm = HashAlgorithm.SHA2_512;
         HashAlgorithmProvider provider = new TestHashAlgorithmProvider(hashingAlgorithm);
-        Container container = createContainer(provider);
+        setUpContainer(provider);
 
         SignatureContent signatureContent = container.getSignatureContents().get(0);
 
@@ -67,7 +78,7 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
         HashAlgorithmProvider provider = new TestHashAlgorithmProvider(
                 hashes, hashes, HashAlgorithm.SHA2_256, HashAlgorithm.SHA2_256);
 
-        Container container = createContainer(provider);
+        setUpContainer(provider);
         SignatureContent signatureContent = container.getSignatureContents().get(0);
         Manifest manifest = signatureContent.getManifest().getRight();
         Collection<SingleAnnotationManifest> singleAnnotationManifestValues = signatureContent.getSingleAnnotationManifests().values();
@@ -96,7 +107,7 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
                 annotationDataReferenceHashAlgorithm,
                 signingHashAlgorithm);
 
-        Container container = createContainer(provider);
+        setUpContainer(provider);
         SignatureContent signatureContent = container.getSignatureContents().get(0);
         Manifest manifest = signatureContent.getManifest().getRight();
         Collection<SingleAnnotationManifest> singleAnnotationManifestValues = signatureContent.getSingleAnnotationManifests().values();
@@ -137,11 +148,11 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
         return new ZipContainerPackagingFactory(signatureFactory, containerManifestFactory);
     }
 
-    private Container createContainer(HashAlgorithmProvider provider) throws Exception {
+    private void setUpContainer(HashAlgorithmProvider provider) throws Exception {
         ContainerBuilder builder = new ContainerBuilder(getContainerPackagingFactory(provider));
         builder.withAnnotation(CONTAINER_ANNOTATION);
         builder.withDocument(CONTAINER_DOCUMENT);
-        return builder.build();
+        this.container = builder.build();
     }
 
     private void checkDataHashList(List<HashAlgorithm> expectedHashAlgorithms, List<DataHash> dataHashes) throws Exception {

@@ -58,4 +58,8 @@ public class StringContainerAnnotation implements ContainerAnnotation {
                 ", domain='" + domain + "\'}";
     }
 
+    @Override
+    public void close() {
+        //Nothing to do here, no resources held.
+    }
 }

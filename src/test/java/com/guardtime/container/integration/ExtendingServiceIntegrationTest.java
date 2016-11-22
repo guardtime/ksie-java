@@ -12,6 +12,7 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.publication.inmemory.PublicationsFilePublicationRecord;
 import com.guardtime.ksi.unisignature.KSISignature;
+
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -98,6 +99,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
         assertSignaturesExtendedStatus(container, false);
         extender.extend(container);
         assertSignaturesExtendedStatus(container, extendedStatusAfterExtending);
+        container.close();
     }
 
     private Container getContainer(String path) throws Exception {
@@ -116,6 +118,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
     private KSISignature getMockedSignature(String containerName) throws Exception {
         Container container = getContainer(containerName);
         KSISignature containerSignature = (KSISignature) container.getSignatureContents().get(0).getContainerSignature().getSignature();
+        container.close();
 
         KSISignature mockedSignature = Mockito.mock(KSISignature.class);
         when(mockedSignature.getAggregationTime()).thenReturn(containerSignature.getAggregationTime());

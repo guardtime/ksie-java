@@ -11,8 +11,10 @@ import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
 
 import org.junit.Before;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
@@ -22,21 +24,22 @@ public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCo
     private static final String TEST_EXTENDING_SERVICE;
     private static final String GUARDTIME_PUBLICATIONS_FILE;
     private static final KSIServiceCredentials KSI_SERVICE_CREDENTIALS;
-    protected KSI ksi;
 
-    static{
+    static {
         try {
             Properties properties = new Properties();
             URL url = Thread.currentThread().getContextClassLoader().getResource("config.properties");
-            properties.load(new FileInputStream(url.getFile()));
+            properties.load(new FileInputStream(new File(url.toURI())));
             TEST_SIGNING_SERVICE = properties.getProperty("service.signing");
             TEST_EXTENDING_SERVICE = properties.getProperty("service.extending");
             GUARDTIME_PUBLICATIONS_FILE = properties.getProperty("publications.file.url");
             KSI_SERVICE_CREDENTIALS = new KSIServiceCredentials(properties.getProperty("credentials.id"), properties.getProperty("credentials.key"));
-        } catch (IOException e) {
+        } catch (URISyntaxException | IOException e) {
             throw new RuntimeException(e);
         }
     }
+
+    protected KSI ksi;
 
     @Before
     public void setUp() throws Exception {

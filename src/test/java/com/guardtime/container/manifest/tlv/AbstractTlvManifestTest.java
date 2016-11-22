@@ -13,6 +13,7 @@ import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 import com.guardtime.ksi.tlv.TLVStructure;
 import com.guardtime.ksi.util.Util;
+
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -67,11 +68,9 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
 
     @Mock
     protected ContainerDocument mockDocument;
-
+    protected DataHash dataHash;
     @Mock
     private AnnotationDataReference mockAnnotationDataReference;
-
-    protected DataHash dataHash;
 
     @Before
     public void setUp() throws Exception {
@@ -123,7 +122,7 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
             reference.addChildElement(mime);
         }
         if (dataHashList != null) {
-            for(DataHash dataHash : dataHashList) {
+            for (DataHash dataHash : dataHashList) {
                 TLVElement hash = new TLVElement(false, false, TLV_ELEMENT_DATA_HASH_TYPE);
                 hash.setDataHashContent(dataHash);
                 reference.addChildElement(hash);

@@ -10,6 +10,7 @@ import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.container.verification.rule.state.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
+
 import org.junit.Test;
 import org.mockito.Mockito;
 

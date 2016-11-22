@@ -2,6 +2,7 @@ package com.guardtime.container.packaging.zip.handler;
 
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.ManifestFactoryType;
+
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;

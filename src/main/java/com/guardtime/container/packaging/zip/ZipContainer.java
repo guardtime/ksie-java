@@ -1,7 +1,10 @@
 package com.guardtime.container.packaging.zip;
 
+import com.guardtime.container.annotation.ContainerAnnotation;
+import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.MimeType;
+import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.util.Util;
 
@@ -11,6 +14,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,8 +24,11 @@ import java.util.zip.Checksum;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static com.guardtime.container.util.Util.deleteFileOrDirectory;
+
 class ZipContainer implements Container {
 
+    private final Path temporaryDirectory;
     private List<ZipSignatureContent> signatureContents = new LinkedList<>();
     private MimeType mimeType;
     private List<Pair<String, File>> unknownFiles = new LinkedList<>();
@@ -30,9 +38,14 @@ class ZipContainer implements Container {
     }
 
     public ZipContainer(List<ZipSignatureContent> signatureContents, List<Pair<String, File>> unknownFiles, MimeType mimeType) {
-        this.signatureContents.addAll(signatureContents);
+        this(signatureContents, unknownFiles, mimeType, null);
+    }
+
+    public ZipContainer(List<ZipSignatureContent> contents, List<Pair<String, File>> unknownFiles, MimeType mimeType, Path tempDirectory) {
+        this.signatureContents.addAll(contents);
         this.unknownFiles.addAll(unknownFiles);
         this.mimeType = mimeType;
+        this.temporaryDirectory = tempDirectory;
     }
 
     @Override
@@ -56,7 +69,29 @@ class ZipContainer implements Container {
 
     @Override
     public List<Pair<String, File>> getUnknownFiles() {
-        return unknownFiles;
+        return Collections.unmodifiableList(unknownFiles);
+    }
+
+    @Override
+    public void close() throws Exception {
+        for (SignatureContent content : getSignatureContents()) {
+            for (ContainerAnnotation annotation : content.getAnnotations().values()) {
+                annotation.close();
+            }
+
+            for (ContainerDocument document : content.getDocuments().values()) {
+                document.close();
+            }
+            for (Pair<String, File> f : getUnknownFiles()) {
+                Files.deleteIfExists(f.getRight().toPath());
+            }
+        }
+        deleteFileOrDirectory(temporaryDirectory);
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        close();
     }
 
     private void writeExcessFiles(ZipOutputStream zipOutputStream) throws IOException {
@@ -88,5 +123,4 @@ class ZipContainer implements Container {
         Util.copyData(input, output);
         output.closeEntry();
     }
-
 }
