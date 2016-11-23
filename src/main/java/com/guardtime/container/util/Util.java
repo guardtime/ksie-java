@@ -78,18 +78,15 @@ public final class Util {
         return tempDirectory.toPath();
     }
 
-    public static void deleteFileOrDirectory(Path path) {
+    public static void deleteFileOrDirectory(Path path) throws IOException {
         if (path != null) {
-            File file = path.toFile();
-            if (file != null) {
-                File[] contents = file.listFiles();
-                if (contents != null) {
-                    for (File f : contents) {
-                        deleteFileOrDirectory(f.toPath());
-                    }
+            File[] contents = path.toFile().listFiles();
+            if (contents != null) {
+                for (File f : contents) {
+                    deleteFileOrDirectory(f.toPath());
                 }
-                file.delete();
             }
+            Files.deleteIfExists(path);
         }
     }
 
