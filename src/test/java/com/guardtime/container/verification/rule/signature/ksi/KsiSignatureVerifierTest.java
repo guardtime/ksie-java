@@ -12,7 +12,6 @@ import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.unisignature.KSISignature;
-import com.guardtime.ksi.unisignature.verifier.VerificationContext;
 import com.guardtime.ksi.unisignature.verifier.VerificationResult;
 import com.guardtime.ksi.unisignature.verifier.policies.Policy;
 
@@ -55,7 +54,7 @@ public class KsiSignatureVerifierTest extends AbstractContainerTest {
 
         when(mockSignature.getInputHash()).thenReturn(nullDataHash);
         when(mockManifest.getDataHash(HashAlgorithm.SHA2_256)).thenReturn(nullDataHash);
-        when(mockKsi.verify(Mockito.any(VerificationContext.class), Mockito.any(Policy.class))).thenReturn(Mockito.mock(VerificationResult.class));
+        when(mockKsi.verify(Mockito.any(KSISignature.class), Mockito.any(Policy.class), Mockito.any(DataHash.class), Mockito.any(PublicationData.class))).thenReturn(Mockito.mock(VerificationResult.class));
 
 
         SignatureVerifier<KSISignature> verifier = new KsiSignatureVerifier(mockKsi, policy, publicationData);
