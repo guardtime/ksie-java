@@ -75,6 +75,7 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
         Container existingContainer = packagingFactoryWithIncIndex.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_CONTAINER_ANNOTATION));
         Container container = packagingFactoryWithUuid.create(existingContainer, Collections.singletonList(TEST_DOCUMENT_HELLO_PDF), Collections.singletonList(STRING_CONTAINER_ANNOTATION));
         writeContainerToAndReadFromStream(container, packagingFactoryWithUuid);
+        existingContainer.close();
     }
 
     @Ignore //Should be possible.
@@ -83,6 +84,7 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
         Container existingContainer = packagingFactoryWithUuid.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_CONTAINER_ANNOTATION));
         Container container = packagingFactoryWithIncIndex.create(existingContainer, Collections.singletonList(TEST_DOCUMENT_HELLO_PDF), Collections.singletonList(STRING_CONTAINER_ANNOTATION));
         writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+        existingContainer.close();
     }
 
     @Test
@@ -92,6 +94,7 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
                 Collections.singletonList((ContainerDocument) new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc")),
                 Collections.singletonList(STRING_CONTAINER_ANNOTATION));
         writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+        existingContainer.close();
     }
 
     @Test
@@ -101,6 +104,7 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
                 Collections.singletonList((ContainerDocument) new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc")),
                 Collections.singletonList(STRING_CONTAINER_ANNOTATION));
         writeContainerToAndReadFromStream(container, packagingFactoryWithUuid);
+        existingContainer.close();
     }
 
     @Ignore //Should be possible.
@@ -111,6 +115,7 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
                 Collections.singletonList((ContainerDocument) new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc")),
                 Collections.singletonList(STRING_CONTAINER_ANNOTATION));
         writeContainerToAndReadFromStream(container, packagingFactoryWithUuid);
+        existingContainer.close();
     }
 
     @Ignore //Should be possible.
@@ -121,16 +126,18 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
                 Collections.singletonList((ContainerDocument) new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc")),
                 Collections.singletonList(STRING_CONTAINER_ANNOTATION));
         writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+        existingContainer.close();
     }
 
     @Ignore //Should be possible.
     @Test
     public void testAddDocumentsToExistingContainerWithUnknownFiles_OK() throws Exception {
-        Container container = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile("containers/container-two-contents-one-manifest-removed.ksie")));
-        Container container2 = packagingFactoryWithIncIndex.create(container,
-                Collections.singletonList((ContainerDocument)new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc")),
+        Container existingContainer = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile("containers/container-two-contents-one-manifest-removed.ksie")));
+        Container container = packagingFactoryWithIncIndex.create(existingContainer,
+                Collections.singletonList((ContainerDocument) new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc")),
                 Collections.singletonList((ContainerAnnotation) new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime")));
-        writeContainerToAndReadFromStream(container2, packagingFactoryWithIncIndex);
+        writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+        existingContainer.close();
     }
 
     @Ignore //Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
