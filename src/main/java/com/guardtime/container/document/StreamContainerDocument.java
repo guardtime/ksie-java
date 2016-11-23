@@ -1,10 +1,10 @@
 package com.guardtime.container.document;
 
+import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -69,9 +69,7 @@ public class StreamContainerDocument implements ContainerDocument {
     protected File copy(InputStream input) {
         try {
             File tempFile = createTempFile();
-            FileOutputStream output = new FileOutputStream(tempFile);
-            com.guardtime.ksi.util.Util.copyData(input, output);
-            output.close();
+            Util.copyToTempFile(input, tempFile);
             return tempFile;
         } catch (IOException e) {
             throw new IllegalArgumentException("Can not copy input stream", e);

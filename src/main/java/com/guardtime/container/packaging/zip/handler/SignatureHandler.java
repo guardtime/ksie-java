@@ -34,7 +34,7 @@ public class SignatureHandler extends ContentHandler<ContainerSignature> {
     @Override
     protected ContainerSignature getEntry(String name) throws ContentParsingException {
         File file = fetchFileFromEntries(name);
-        try (InputStream stream = Files.newInputStream(file.toPath(), DELETE_ON_CLOSE)){
+        try (InputStream stream = Files.newInputStream(file.toPath(), DELETE_ON_CLOSE)) {
             return signatureFactory.read(stream);
         } catch (SignatureException e) {
             throw new ContentParsingException("Failed to parse content of signature file", e);

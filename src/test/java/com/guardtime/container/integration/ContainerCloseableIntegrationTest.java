@@ -56,37 +56,32 @@ public class ContainerCloseableIntegrationTest {
 
     @Test
     public void testClosingClosedContainerDoesNotThrowException() throws Exception {
-        FileInputStream input = new FileInputStream(loadFile());
-        Container container = packagingFactory.read(input);
-        input.close();
+        Container container = getContainer();
         container.close();
         container.close();
     }
 
     @Test
     public void testCloseDeletesTemporaryFiles() throws Exception {
-        File file = loadFile();
-        FileInputStream input = new FileInputStream(file);
-        Container container = packagingFactory.read(input);
-        input.close();
+        Container container = getContainer();
         assertTrue("Temporary files not found!", anyKsieTempFiles());
         container.close();
+        assertFalse("Close did not delete all temporary files!", anyKsieTempFiles());
     }
 
     @Test
     public void testContainerWithTryWithResources() throws Exception {
-        File file = loadFile();
-        FileInputStream input = new FileInputStream(file);
-        try(Container container = packagingFactory.read(input)) {
+        try (Container container = getContainer()) {
             assertFalse(container.getSignatureContents().isEmpty());
             assertTrue("Temporary files not found!", anyKsieTempFiles());
         }
-        input.close();
     }
 
-    protected File loadFile() throws Exception {
+    private Container getContainer() throws Exception {
         URL url = Thread.currentThread().getContextClassLoader().getResource("containers/container-one-document.ksie");
-        return new File(url.toURI());
+        File file = new File(url.toURI());
+        FileInputStream input = new FileInputStream(file);
+        return packagingFactory.read(input);
     }
 
     private boolean anyKsieTempFiles() {
@@ -108,10 +103,9 @@ public class ContainerCloseableIntegrationTest {
 
     private List<String> tempFiles() {
         String[] list = tmpDir.toFile().list();
-        if(list == null) {
+        if (list == null) {
             return new LinkedList<>();
-        }
-        else {
+        } else {
             return Arrays.asList(list);
         }
     }

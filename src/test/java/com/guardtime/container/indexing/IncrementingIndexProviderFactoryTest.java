@@ -20,10 +20,11 @@ public class IncrementingIndexProviderFactoryTest extends AbstractContainerTest 
     @Test
     public void testCreateWithValidContainer() throws Exception {
         ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory(), new IncrementingIndexProviderFactory(), true);
-        Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(MOCKED_ANNOTATION));
+        try (Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(MOCKED_ANNOTATION))) {
 
-        IndexProvider indexProvider = indexProviderFactory.create(container);
-        Assert.assertEquals("2", indexProvider.getNextSignatureIndex());
+            IndexProvider indexProvider = indexProviderFactory.create(container);
+            Assert.assertEquals("2", indexProvider.getNextSignatureIndex());
+        }
     }
 
     @Test
@@ -32,8 +33,9 @@ public class IncrementingIndexProviderFactoryTest extends AbstractContainerTest 
         expectedException.expectMessage("Not an integer based index");
 
         ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, new UuidIndexProviderFactory(), true);
-        Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(MOCKED_ANNOTATION));
-        indexProviderFactory.create(container);
+        try (Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(MOCKED_ANNOTATION))) {
+            indexProviderFactory.create(container);
+        }
     }
 
     @Test

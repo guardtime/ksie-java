@@ -55,11 +55,11 @@ class ZipContainer implements Container {
 
     @Override
     public void writeTo(OutputStream output) throws IOException {
-        ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(output));
-        writeMimeTypeEntry(zipOutputStream);
-        writeSignatures(signatureContents, zipOutputStream);
-        writeExcessFiles(zipOutputStream);
-        zipOutputStream.close();
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(output))) {
+            writeMimeTypeEntry(zipOutputStream);
+            writeSignatures(signatureContents, zipOutputStream);
+            writeExcessFiles(zipOutputStream);
+        }
     }
 
     @Override

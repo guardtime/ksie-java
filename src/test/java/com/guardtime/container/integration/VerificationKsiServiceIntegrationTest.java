@@ -40,27 +40,27 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
 
     @Test
     public void testContainerWithInvalidSignature_VerificationFails() throws Exception {
-        Container container = getContainer(CONTAINER_WITH_WRONG_SIGNATURE_FILE);
-        ContainerVerifierResult verifierResult = verifier.verify(container);
+        try (Container container = getContainer(CONTAINER_WITH_WRONG_SIGNATURE_FILE)) {
+            ContainerVerifierResult verifierResult = verifier.verify(container);
 
-        SignatureResult signatureResult = verifierResult.getSignatureResult(container.getSignatureContents().get(0));
-        assertEquals(VerificationResult.NOK, verifierResult.getVerificationResult());
-        assertNotNull(signatureResult);
-        assertEquals(VerificationResult.NOK, signatureResult.getSimplifiedResult());
-        assertNotNull(signatureResult.getFullResult());
-        container.close();
+            SignatureResult signatureResult = verifierResult.getSignatureResult(container.getSignatureContents().get(0));
+            assertEquals(VerificationResult.NOK, verifierResult.getVerificationResult());
+            assertNotNull(signatureResult);
+            assertEquals(VerificationResult.NOK, signatureResult.getSimplifiedResult());
+            assertNotNull(signatureResult.getFullResult());
+        }
     }
 
     @Test
     public void testContainerWithValidSignature_VerificationSucceeds() throws Exception {
-        Container container = getContainer(CONTAINER_WITH_ONE_DOCUMENT);
-        ContainerVerifierResult verifierResult = verifier.verify(container);
+        try (Container container = getContainer(CONTAINER_WITH_ONE_DOCUMENT)) {
+            ContainerVerifierResult verifierResult = verifier.verify(container);
 
-        SignatureResult signatureResult = verifierResult.getSignatureResult(container.getSignatureContents().get(0));
-        assertEquals(VerificationResult.OK, verifierResult.getVerificationResult());
-        assertNotNull(signatureResult);
-        assertEquals(VerificationResult.OK, signatureResult.getSimplifiedResult());
-        assertNotNull(signatureResult.getFullResult());
-        container.close();
+            SignatureResult signatureResult = verifierResult.getSignatureResult(container.getSignatureContents().get(0));
+            assertEquals(VerificationResult.OK, verifierResult.getVerificationResult());
+            assertNotNull(signatureResult);
+            assertEquals(VerificationResult.OK, signatureResult.getSimplifiedResult());
+            assertNotNull(signatureResult.getFullResult());
+        }
     }
 }

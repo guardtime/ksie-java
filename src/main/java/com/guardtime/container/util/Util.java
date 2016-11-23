@@ -6,6 +6,7 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.hashing.HashException;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -70,6 +71,12 @@ public final class Util {
         File file = Files.createTempFile(directory, TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX).toFile();
         file.deleteOnExit();
         return file;
+    }
+
+    public static void copyToTempFile(InputStream inputStream, File temp) throws IOException {
+        try (FileOutputStream tempFileOutStream = new FileOutputStream(temp)) {
+            com.guardtime.ksi.util.Util.copyData(inputStream, tempFileOutStream);
+        }
     }
 
     public static Path getTempDirectory() throws IOException {

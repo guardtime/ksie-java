@@ -95,18 +95,16 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
 
     private void doExtendingTest(String containerName, SignatureFactory factory, ExtendingPolicy policy, boolean extendedStatusAfterExtending) throws Exception {
         ContainerSignatureExtender extender = new ContainerSignatureExtender(factory, policy);
-        Container container = getContainer(containerName);
-        assertSignaturesExtendedStatus(container, false);
-        extender.extend(container);
-        assertSignaturesExtendedStatus(container, extendedStatusAfterExtending);
-        container.close();
+        try (Container container = getContainer(containerName)) {
+            assertSignaturesExtendedStatus(container, false);
+            extender.extend(container);
+            assertSignaturesExtendedStatus(container, extendedStatusAfterExtending);
+        }
     }
 
     private Container getContainer(String path) throws Exception {
         InputStream input = new FileInputStream(loadFile(path));
-        Container container = packagingFactory.read(input);
-        input.close();
-        return container;
+        return packagingFactory.read(input);
     }
 
     private void assertSignaturesExtendedStatus(Container container, boolean status) {
@@ -119,15 +117,15 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
     }
 
     private KSISignature getMockedSignature(String containerName) throws Exception {
-        Container container = getContainer(containerName);
-        KSISignature containerSignature = (KSISignature) container.getSignatureContents().get(0).getContainerSignature().getSignature();
-        container.close();
+        try (Container container = getContainer(containerName)) {
+            KSISignature containerSignature = (KSISignature) container.getSignatureContents().get(0).getContainerSignature().getSignature();
 
-        KSISignature mockedSignature = Mockito.mock(KSISignature.class);
-        when(mockedSignature.getAggregationTime()).thenReturn(containerSignature.getAggregationTime());
-        when(mockedSignature.getIdentity()).thenReturn(containerSignature.getIdentity());
-        when(mockedSignature.isExtended()).thenReturn(true);
-        when(mockedSignature.getInputHash()).thenReturn(containerSignature.getInputHash());
-        return mockedSignature;
+            KSISignature mockedSignature = Mockito.mock(KSISignature.class);
+            when(mockedSignature.getAggregationTime()).thenReturn(containerSignature.getAggregationTime());
+            when(mockedSignature.getIdentity()).thenReturn(containerSignature.getIdentity());
+            when(mockedSignature.isExtended()).thenReturn(true);
+            when(mockedSignature.getInputHash()).thenReturn(containerSignature.getInputHash());
+            return mockedSignature;
+        }
     }
 }

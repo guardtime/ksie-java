@@ -21,38 +21,37 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
 
     @Test
     public void testCreateContainer() throws Exception {
-        Container container = new ContainerBuilder(packagingFactory)
-                .withDocument(new ByteArrayInputStream("Test_Data".getBytes()), TEST_FILE_NAME_TEST_TXT, "application/txt")
-                .build();
-        assertSingleContentsWithSingleDocumentWithName(container, TEST_FILE_NAME_TEST_TXT);
-        container.close();
+        try (
+                Container container = new ContainerBuilder(packagingFactory)
+                        .withDocument(new ByteArrayInputStream("Test_Data".getBytes()), TEST_FILE_NAME_TEST_TXT, "application/txt")
+                        .build()
+        ) {
+            assertSingleContentsWithSingleDocumentWithName(container, TEST_FILE_NAME_TEST_TXT);
+        }
     }
 
     @Test
     public void testReadContainer() throws Exception {
         InputStream inputStream = new FileInputStream(loadFile(CONTAINER_WITH_ONE_DOCUMENT));
-        Container container = packagingFactory.read(inputStream);
-        assertSingleContentsWithSingleDocument(container);
-        //close all the things
-        inputStream.close();
-        container.close();
+        try (Container container = packagingFactory.read(inputStream)) {
+            assertSingleContentsWithSingleDocument(container);
+        }
     }
 
     @Test
     public void testReadCreatedContainer() throws Exception {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        Container container = new ContainerBuilder(packagingFactory)
-                .withDocument(new ByteArrayInputStream("Test_Data".getBytes()), TEST_FILE_NAME_TEST_TXT, "application/txt")
-                .build();
-        container.writeTo(bos);
-        InputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
-        Container parsedInContainer = packagingFactory.read(inputStream);
-        assertSingleContentsWithSingleDocument(parsedInContainer);
-        //close all the things
-        bos.close();
-        container.close();
-        inputStream.close();
-        parsedInContainer.close();
+        try (
+                Container container = new ContainerBuilder(packagingFactory)
+                        .withDocument(new ByteArrayInputStream("Test_Data".getBytes()), TEST_FILE_NAME_TEST_TXT, "application/txt")
+                        .build()
+        ) {
+            container.writeTo(bos);
+            InputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
+            try (Container parsedInContainer = packagingFactory.read(inputStream)) {
+                assertSingleContentsWithSingleDocument(parsedInContainer);
+            }
+        }
     }
 
     private void assertSingleContentsWithSingleDocumentWithName(Container container, String testFileName) {

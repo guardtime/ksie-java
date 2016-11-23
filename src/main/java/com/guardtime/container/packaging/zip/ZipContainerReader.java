@@ -17,12 +17,12 @@ import com.guardtime.container.packaging.zip.handler.SingleAnnotationManifestHan
 import com.guardtime.container.packaging.zip.handler.UnknownFileHandler;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.util.Pair;
+import com.guardtime.container.util.Util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -117,7 +117,7 @@ class ZipContainerReader {
     }
 
     private boolean validMimeType(MimeType mimeType) {
-        if(mimeType == null) {
+        if (mimeType == null) {
             return false;
         }
         try (InputStream inputStream = mimeType.getInputStream()) {
@@ -162,9 +162,7 @@ class ZipContainerReader {
 
     private File createAndFillTempFile(ZipInputStream zipInput) throws IOException {
         File tempFile = createTempFile(tempDirectory);
-        FileOutputStream tempFileOutStream = new FileOutputStream(tempFile);
-        com.guardtime.ksi.util.Util.copyData(zipInput, tempFileOutStream);
-        tempFileOutStream.close();
+        Util.copyToTempFile(zipInput, tempFile);
         return tempFile;
     }
 
