@@ -17,12 +17,12 @@ import com.guardtime.container.packaging.zip.handler.SingleAnnotationManifestHan
 import com.guardtime.container.packaging.zip.handler.UnknownFileHandler;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.util.Pair;
+import com.guardtime.container.util.Util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -71,14 +71,15 @@ class ZipContainerReader {
     }
 
     ZipContainer read(InputStream input) throws IOException, InvalidPackageException {
-        ZipInputStream zipInput = new ZipInputStream(input);
-        ZipEntry entry;
-        while ((entry = zipInput.getNextEntry()) != null) {
-            if (entry.isDirectory()) {
-                LOGGER.trace("Skipping directory '{}'", entry.getName());
-                continue;
+        try(ZipInputStream zipInput = new ZipInputStream(input)) {
+            ZipEntry entry;
+            while ((entry = zipInput.getNextEntry()) != null) {
+                if (entry.isDirectory()) {
+                    LOGGER.trace("Skipping directory '{}'", entry.getName());
+                    continue;
+                }
+                readEntry(zipInput, entry);
             }
-            readEntry(zipInput, entry);
         }
         List<ZipSignatureContent> contents = buildSignatures();
         MimeType mimeType = getMimeType();
@@ -117,8 +118,11 @@ class ZipContainerReader {
     }
 
     private boolean validMimeType(MimeType mimeType) {
-        try {
-            return mimeType != null && mimeType.getInputStream().available() > 0;
+        if (mimeType == null) {
+            return false;
+        }
+        try (InputStream inputStream = mimeType.getInputStream()) {
+            return inputStream.available() > 0;
         } catch (IOException e) {
             return false;
         }
@@ -147,7 +151,7 @@ class ZipContainerReader {
     private void readEntry(ZipInputStream zipInput, ZipEntry entry) throws IOException {
         String name = entry.getName();
         File tempFile = createTempFile(tempDirectory);
-        com.guardtime.ksi.util.Util.copyData(zipInput, new FileOutputStream(tempFile));
+        Util.copyToTempFile(zipInput, tempFile);
         for (ContentHandler handler : handlers) {
             if (handler.isSupported(name)) {
                 LOGGER.info("Reading zip entry '{}'. Using handler '{}' ", name, handler.getClass().getName());

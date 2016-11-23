@@ -108,28 +108,29 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
 
     @Test
     public void testCreateContainerWithDocument() throws Exception {
-        ZipContainer container = createInternallyValidContainer(containerDocumentList, null);
-        assertNotNull(container);
-        container.close();
+        try (ZipContainer container = createInternallyValidContainer(containerDocumentList, null)) {
+            assertNotNull(container);
+        }
     }
 
     @Test
     public void testCreateContainerWithDocumentAndAnnotation() throws Exception {
-        ZipContainer container = createInternallyValidContainer(containerDocumentList, containerAnnotationList);
-        assertNotNull(container);
-        container.close();
+        try (ZipContainer container = createInternallyValidContainer(containerDocumentList, containerAnnotationList)) {
+            assertNotNull(container);
+        }
     }
 
     @Test
     public void testCreateContainerWithMultipleDocuments() throws Exception {
         List<ContainerDocument> documentsList = new ArrayList<>(containerDocumentList);
         documentsList.add(TEST_DOCUMENT_HELLO_PDF);
-        ZipContainer container = createInternallyValidContainer(documentsList, null);
-        assertNotNull(container);
-        Collection<ContainerDocument> containedDocuments = container.getSignatureContents().get(0).getDocuments().values();
-        assertNotNull(containedDocuments);
-        assertTrue(containedDocuments.containsAll(documentsList));
-        container.close();
+
+        try (ZipContainer container = createInternallyValidContainer(documentsList, null)) {
+            assertNotNull(container);
+            Collection<ContainerDocument> containedDocuments = container.getSignatureContents().get(0).getDocuments().values();
+            assertNotNull(containedDocuments);
+            assertTrue(containedDocuments.containsAll(documentsList));
+        }
     }
 
     @Test
@@ -138,31 +139,37 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
         documentsList.add(TEST_DOCUMENT_HELLO_PDF);
         List<ContainerAnnotation> annotationsList = new ArrayList<>(containerAnnotationList);
         annotationsList.add(new StringContainerAnnotation(ContainerAnnotationType.VALUE_REMOVABLE, "moreContent", "com.guardtime.test.inner"));
-        ZipContainer container = createInternallyValidContainer(documentsList, annotationsList);
-        assertNotNull(container);
-        Collection<ContainerAnnotation> containedAnnotations = container.getSignatureContents().get(0).getAnnotations().values();
-        assertNotNull(containedAnnotations);
-        assertTrue(containedAnnotations.containsAll(annotationsList));
-        container.close();
+
+        try (ZipContainer container = createInternallyValidContainer(documentsList, annotationsList)) {
+            assertNotNull(container);
+            Collection<ContainerAnnotation> containedAnnotations = container.getSignatureContents().get(0).getAnnotations().values();
+            assertNotNull(containedAnnotations);
+            assertTrue(containedAnnotations.containsAll(annotationsList));
+        }
     }
 
     @Test
     public void testCreateContainerWithExistingContainerAndMultipleDocumentsAndAnnotations() throws Exception {
-        Container container = createInternallyValidContainer(containerDocumentList, containerAnnotationList);
-        List<ContainerDocument> documentsList = new ArrayList<>();
-        documentsList.add(TEST_DOCUMENT_HELLO_PDF);
-        documentsList.add(new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_DOC));
-        List<ContainerAnnotation> annotationsList = new ArrayList<>(containerAnnotationList);
-        annotationsList.add(new StringContainerAnnotation(ContainerAnnotationType.VALUE_REMOVABLE, "moreContent", "com.guardtime.test.inner"));
-        ZipContainer newContainer = createInternallyValidContainer(documentsList, annotationsList, container);
-        assertNotNull(newContainer);
-        Collection<ContainerDocument> containedDocuments = newContainer.getSignatureContents().get(1).getDocuments().values();
-        assertNotNull(containedDocuments);
-        assertTrue(containedDocuments.containsAll(documentsList));
-        Collection<ContainerAnnotation> containedAnnotations = newContainer.getSignatureContents().get(1).getAnnotations().values();
-        assertNotNull(containedAnnotations);
-        assertTrue(containedAnnotations.containsAll(annotationsList));
-        container.close();
+        try (
+                Container container = createInternallyValidContainer(containerDocumentList, containerAnnotationList);
+                ContainerDocument streamContainerDocument = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_DOC);
+        ) {
+            List<ContainerDocument> documentsList = new ArrayList<>();
+            documentsList.add(TEST_DOCUMENT_HELLO_PDF);
+            documentsList.add(streamContainerDocument);
+            List<ContainerAnnotation> annotationsList = new ArrayList<>(containerAnnotationList);
+            annotationsList.add(new StringContainerAnnotation(ContainerAnnotationType.VALUE_REMOVABLE, "moreContent", "com.guardtime.test.inner"));
+
+            try (ZipContainer newContainer = createInternallyValidContainer(documentsList, annotationsList, container)) {
+                assertNotNull(newContainer);
+                Collection<ContainerDocument> containedDocuments = newContainer.getSignatureContents().get(1).getDocuments().values();
+                assertNotNull(containedDocuments);
+                assertTrue(containedDocuments.containsAll(documentsList));
+                Collection<ContainerAnnotation> containedAnnotations = newContainer.getSignatureContents().get(1).getAnnotations().values();
+                assertNotNull(containedAnnotations);
+                assertTrue(containedAnnotations.containsAll(annotationsList));
+            }
+        }
     }
 
     @Test
@@ -179,9 +186,9 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
 
     @Test
     public void testCreateVerifiesContainer_OK() throws Exception {
-        ZipContainer container = createInternallyValidContainer(containerDocumentList, containerAnnotationList);
-        assertNotNull(container);
-        container.close();
+        try (ZipContainer container = createInternallyValidContainer(containerDocumentList, containerAnnotationList)) {
+            assertNotNull(container);
+        }
     }
 
     @Test
@@ -194,13 +201,13 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
 
     @Test
     public void testCreateWithExistingContainerVerifiesContainer_OK() throws Exception {
-        List<ContainerDocument> containerDocuments = Collections.singletonList(
-                (ContainerDocument) new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_PDF)
-        );
-        ZipContainer container = createInternallyValidContainer(containerDocumentList, containerAnnotationList);
-        ZipContainer newContainer = createInternallyValidContainer(containerDocuments, containerAnnotationList, container);
-        assertNotNull(newContainer);
-        container.close();
+        try (
+                ContainerDocument streamContainerDocument = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_PDF);
+                ZipContainer container = createInternallyValidContainer(containerDocumentList, containerAnnotationList);
+                ZipContainer newContainer = createInternallyValidContainer(Collections.singletonList(streamContainerDocument), containerAnnotationList, container)
+        ) {
+            assertNotNull(newContainer);
+        }
     }
 
     @Test
@@ -217,34 +224,31 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
     public void testCreateContainerWithExistingContainerWithDocumentsWithSameName() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Multiple documents with same name found!");
+        try (
+                ContainerDocument containerDocument = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
+                ContainerDocument streamContainerDocument = new StreamContainerDocument(new ByteArrayInputStream("MoreImportantDocument-0411".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)
+        ) {
+            List<ContainerDocument> containerDocuments = Collections.singletonList(containerDocument);
+            Container existingContainer = createInternallyValidContainer(containerDocuments, null);
 
-        List<ContainerDocument> containerDocuments = Collections.singletonList(
-                (ContainerDocument) new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)
-        );
-        Container existingContainer = createInternallyValidContainer(containerDocuments, null);
-
-        List<ContainerDocument> newContainerDocuments = Arrays.asList(
-                (ContainerDocument) new StreamContainerDocument(new ByteArrayInputStream("MoreImportantDocument-0411".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)
-        );
-        createInternallyValidContainer(newContainerDocuments, null, existingContainer);
+            List<ContainerDocument> newContainerDocuments = Collections.singletonList(streamContainerDocument);
+            createInternallyValidContainer(newContainerDocuments, null, existingContainer);
+        }
     }
 
     @Test
     public void testCreateContainerWithExistingContainerWithSameDocument() throws Exception {
-        List<ContainerDocument> containerDocuments = Arrays.asList(
-                (ContainerDocument) new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)
-        );
-        Container container = createInternallyValidContainer(containerDocuments, null);
-        Container newContainer = createInternallyValidContainer(containerDocuments, null, container);
-
-
-        Set<String> documentPaths = new HashSet<>();
-        for (SignatureContent content : newContainer.getSignatureContents()) {
-            documentPaths.addAll(content.getDocuments().keySet());
+        try (
+                ContainerDocument streamContainerDocument = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
+                Container container = createInternallyValidContainer(Collections.singletonList(streamContainerDocument), null);
+                Container newContainer = createInternallyValidContainer(Collections.singletonList(streamContainerDocument), null, container)
+        ) {
+            Set<String> documentPaths = new HashSet<>();
+            for (SignatureContent content : newContainer.getSignatureContents()) {
+                documentPaths.addAll(content.getDocuments().keySet());
+            }
+            assertEquals(1, documentPaths.size());
         }
-        assertEquals(1, documentPaths.size());
-        container.close();
-        newContainer.close();
     }
 
 }

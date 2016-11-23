@@ -83,9 +83,4 @@ class TlvSingleAnnotationManifest extends AbstractTlvManifestStructure implement
         return documentsManifestReference;
     }
 
-    @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
-        return Util.hash(getInputStream(), algorithm);
-    }
-
 }

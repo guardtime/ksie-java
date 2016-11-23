@@ -20,8 +20,9 @@ public class UuidIndexProviderFactoryTest extends AbstractContainerTest {
         expectedException.expectMessage("Not a RFC4122 UUID based index");
 
         ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, new IncrementingIndexProviderFactory(), true);
-        Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(MOCKED_ANNOTATION));
-        indexProviderFactory.create(container);
+        try (Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(MOCKED_ANNOTATION))) {
+            indexProviderFactory.create(container);
+        }
     }
 
     @Test

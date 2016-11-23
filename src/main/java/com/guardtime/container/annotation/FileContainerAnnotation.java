@@ -46,7 +46,9 @@ public class FileContainerAnnotation implements ContainerAnnotation {
     @Override
     public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
         if (dataHash == null || !dataHash.getAlgorithm().equals(algorithm)) {
-            dataHash = Util.hash(getInputStream(), algorithm);
+            try (InputStream inputStream = getInputStream()) {
+                dataHash = Util.hash(inputStream, algorithm);
+            }
         }
         return dataHash;
     }
