@@ -77,9 +77,9 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     @Override
     public ZipContainer read(InputStream stream) throws InvalidPackageException {
         Util.notNull(stream, "Input stream");
-        try (InputStream input = new BufferedInputStream(stream)) {
+        try {
             ZipContainerReader reader = new ZipContainerReader(manifestFactory, signatureFactory);
-            return reader.read(input);
+            return reader.read(stream);
         } catch (IOException e) {
             throw new InvalidPackageException("Failed to parse InputStream", e);
         }

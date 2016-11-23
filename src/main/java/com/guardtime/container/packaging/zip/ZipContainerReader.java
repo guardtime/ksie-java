@@ -71,14 +71,15 @@ class ZipContainerReader {
     }
 
     ZipContainer read(InputStream input) throws IOException, InvalidPackageException {
-        ZipInputStream zipInput = new ZipInputStream(input);
-        ZipEntry entry;
-        while ((entry = zipInput.getNextEntry()) != null) {
-            if (entry.isDirectory()) {
-                LOGGER.trace("Skipping directory '{}'", entry.getName());
-                continue;
+        try(ZipInputStream zipInput = new ZipInputStream(input)) {
+            ZipEntry entry;
+            while ((entry = zipInput.getNextEntry()) != null) {
+                if (entry.isDirectory()) {
+                    LOGGER.trace("Skipping directory '{}'", entry.getName());
+                    continue;
+                }
+                readEntry(zipInput, entry);
             }
-            readEntry(zipInput, entry);
         }
         List<ZipSignatureContent> contents = buildSignatures();
         MimeType mimeType = getMimeType();
