@@ -6,9 +6,13 @@ import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
+import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
+import com.guardtime.container.indexing.UuidIndexProviderFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
+
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -26,6 +30,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
+
+    private ZipContainerPackagingFactory packagingFactoryWithIncIndex;
+    private ZipContainerPackagingFactory packagingFactoryWithUuid;
+
+    @Before
+    public void setUpPackagingFactories() {
+
+
+        this.packagingFactoryWithIncIndex = new ZipContainerPackagingFactory(signatureFactory, manifestFactory,  new IncrementingIndexProviderFactory(), false);
+        this.packagingFactoryWithUuid = new ZipContainerPackagingFactory(signatureFactory, manifestFactory, new UuidIndexProviderFactory(), false);
+    }
 
     @Test
     public void testCreateContainer() throws Exception {
