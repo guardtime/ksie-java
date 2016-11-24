@@ -179,31 +179,29 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
     @Ignore //Should be possible.
     @Test
     public void testAddDocumentsToExistingContainerWithOneContentRemoved_OK() throws Exception {
-        try (Container existingContainer = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(CONTAINER_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED)))) {
-            try (
-                    ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc");
-                    ContainerAnnotation containerAnnotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime");
-                    Container container = packagingFactoryWithIncIndex.create(existingContainer,
-                        Collections.singletonList(document),
-                        Collections.singletonList(containerAnnotation))
-            ) {
-                writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
-            }
+        try (
+                Container existingContainer = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(CONTAINER_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED)));
+                ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc");
+                ContainerAnnotation containerAnnotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime");
+                Container container = packagingFactoryWithIncIndex.create(existingContainer,
+                    Collections.singletonList(document),
+                    Collections.singletonList(containerAnnotation))
+        ) {
+            writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
         }
     }
 
     @Test
     public void testAddDocumentsToExistingContainerUnknownFiles_OK() throws Exception {
-        try (Container existingContainer = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(CONTAINER_WITH_UNKNOWN_FILES)))) {
-            try (
-                    ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc");
-                    ContainerAnnotation containerAnnotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime");
-                    Container container = packagingFactoryWithIncIndex.create(existingContainer,
-                            Collections.singletonList(document),
-                            Collections.singletonList(containerAnnotation))
-            ) {
-                writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
-            }
+        try (
+                Container existingContainer = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(CONTAINER_WITH_UNKNOWN_FILES)));
+                ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc");
+                ContainerAnnotation containerAnnotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime");
+                Container container = packagingFactoryWithIncIndex.create(existingContainer,
+                        Collections.singletonList(document),
+                        Collections.singletonList(containerAnnotation))
+        ) {
+            writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
         }
     }
 
