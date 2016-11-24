@@ -55,8 +55,9 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
     }
 
     private void setUpContainer(String containerPath) throws Exception {
-        InputStream input = new FileInputStream(loadFile(containerPath));
-        this.container = reader.read(input);
+        try (InputStream input = new FileInputStream(loadFile(containerPath))) {
+            this.container = reader.read(input);
+        }
     }
 
     @Test

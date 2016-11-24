@@ -36,102 +36,102 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
     }
 
     private Container getContainer(String filePath) throws Exception {
-        FileInputStream fis = new FileInputStream(loadFile(filePath));
-        return packagingFactory.read(fis);
+        try (FileInputStream fis = new FileInputStream(loadFile(filePath))) {
+            return packagingFactory.read(fis);
+        }
     }
 
     @Test
     public void testContainerWithInvalidSignature_VerificationFails() throws Exception {
-        Container container = getContainer(CONTAINER_WITH_WRONG_SIGNATURE_FILE);
-        ContainerVerifierResult verifierResult = verifier.verify(container);
+        try (Container container = getContainer(CONTAINER_WITH_WRONG_SIGNATURE_FILE)) {
+            ContainerVerifierResult verifierResult = verifier.verify(container);
+            SignatureResult signatureResult = verifierResult.getSignatureResult(container.getSignatureContents().get(0));
+            assertEquals(VerificationResult.NOK, verifierResult.getVerificationResult());
+            assertNotNull(signatureResult);
+            assertEquals(VerificationResult.NOK, signatureResult.getSimplifiedResult());
 
-        SignatureResult signatureResult = verifierResult.getSignatureResult(container.getSignatureContents().get(0));
-        assertEquals(VerificationResult.NOK, verifierResult.getVerificationResult());
-        assertNotNull(signatureResult);
-        assertEquals(VerificationResult.NOK, signatureResult.getSimplifiedResult());
-
-        com.guardtime.ksi.unisignature.verifier.VerificationResult signatureVerificationFullResults = (com.guardtime.ksi.unisignature.verifier.VerificationResult) signatureResult.getFullResult();
-        assertNotNull(signatureVerificationFullResults);
-        assertEquals(VerificationErrorCode.GEN_1, signatureVerificationFullResults.getErrorCode());
-        container.close();
+            com.guardtime.ksi.unisignature.verifier.VerificationResult signatureVerificationFullResults = (com.guardtime.ksi.unisignature.verifier.VerificationResult) signatureResult.getFullResult();
+            assertNotNull(signatureVerificationFullResults);
+            assertEquals(VerificationErrorCode.GEN_1, signatureVerificationFullResults.getErrorCode());
+        }
 
     }
     @Test
     public void testUsingInternalVerification() throws Exception {
         Policy signatureVerificationPolicy = new InternalVerificationPolicy();
-        Container container = getContainer(CONTAINER_WITH_WRONG_SIGNATURE_FILE);
-        ContainerVerifier verifier = getContainerVerifier(signatureVerificationPolicy);
-        ContainerVerifierResult result = verifier.verify(container);
-        assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
-        SignatureResult signatureResult = result.getSignatureResult(container.getSignatureContents().get(0));
-        checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.GEN_1, signatureResult);
-        container.close();
+        try (Container container = getContainer(CONTAINER_WITH_WRONG_SIGNATURE_FILE)){
+            ContainerVerifier verifier = getContainerVerifier(signatureVerificationPolicy);
+            ContainerVerifierResult result = verifier.verify(container);
+            assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
+            SignatureResult signatureResult = result.getSignatureResult(container.getSignatureContents().get(0));
+            checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.GEN_1, signatureResult);
+        }
     }
 
     @Test
     public void testUsingCalendarBasedVerification() throws Exception{
         Policy signatureVerificationPolicy = new CalendarBasedVerificationPolicy();
-        Container container = getContainer(CONTAINER_WITH_CHANGED_SIGNATURE_FILE);
-        ContainerVerifier verifier = getContainerVerifier(signatureVerificationPolicy);
-        ContainerVerifierResult result = verifier.verify(container);
-        assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
-        SignatureResult signatureResult = result.getSignatureResult(container.getSignatureContents().get(0));
-        checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.CAL_02, signatureResult);
-        container.close();
+        try (Container container = getContainer(CONTAINER_WITH_CHANGED_SIGNATURE_FILE)) {
+            ContainerVerifier verifier = getContainerVerifier(signatureVerificationPolicy);
+            ContainerVerifierResult result = verifier.verify(container);
+            assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
+            SignatureResult signatureResult = result.getSignatureResult(container.getSignatureContents().get(0));
+            checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.CAL_02, signatureResult);
+        }
     }
 
     @Test
     public void testUsingKeyBasedVerification() throws Exception{
         Policy signatureVerificationPolicy = new KeyBasedVerificationPolicy();
-        Container container = getContainer(CONTAINER_WITH_CHANGED_SIGNATURE_FILE);
-        ContainerVerifier verifier = getContainerVerifier(signatureVerificationPolicy);
-        ContainerVerifierResult result = verifier.verify(container);
-        assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
-        SignatureResult signatureResult = result.getSignatureResult(container.getSignatureContents().get(0));
-        checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.KEY_02, signatureResult);
-        container.close();
+        try (Container container = getContainer(CONTAINER_WITH_CHANGED_SIGNATURE_FILE)) {
+            ContainerVerifier verifier = getContainerVerifier(signatureVerificationPolicy);
+            ContainerVerifierResult result = verifier.verify(container);
+            assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
+            SignatureResult signatureResult = result.getSignatureResult(container.getSignatureContents().get(0));
+            checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.KEY_02, signatureResult);
+        }
     }
 
     @Test
     public void testUsingUserPublicationBasedVerification() throws Exception{
         Policy signatureVerificationPolicy = new UserProvidedPublicationBasedVerificationPolicy();
-        Container container = getContainer(CONTAINER_WITH_CHANGED_AND_EXTENDED_SIGNATURE_FILE);
-        VerificationPolicy policy = new DefaultVerificationPolicy(
-                defaultRuleStateProvider,
-                new KsiSignatureVerifier(ksi, signatureVerificationPolicy, new PublicationData("AAAAAA-CX4K4D-6AMFWE-EMMHOH-WZT2ZR-Q5MUMQ-DGYCW5-LV5IID-GA672M-LHP5GW-GUGHQN-DA7CGV")),
-                packagingFactory
-        );
-        ContainerVerifier verifier = new ContainerVerifier(policy);
-        ContainerVerifierResult result = verifier.verify(container);
-        assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
-        SignatureResult signatureResult = result.getSignatureResult(container.getSignatureContents().get(0));
-        checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.INT_09, signatureResult);
-        container.close();
+        try (Container container = getContainer(CONTAINER_WITH_CHANGED_AND_EXTENDED_SIGNATURE_FILE)) {
+            VerificationPolicy policy = new DefaultVerificationPolicy(
+                    defaultRuleStateProvider,
+                    new KsiSignatureVerifier(ksi, signatureVerificationPolicy, new PublicationData("AAAAAA-CX4K4D-6AMFWE-EMMHOH-WZT2ZR-Q5MUMQ-DGYCW5-LV5IID-GA672M-LHP5GW-GUGHQN-DA7CGV")),
+                    packagingFactory
+            );
+            ContainerVerifier verifier = new ContainerVerifier(policy);
+            ContainerVerifierResult result = verifier.verify(container);
+            assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
+            SignatureResult signatureResult = result.getSignatureResult(container.getSignatureContents().get(0));
+            checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.INT_09, signatureResult);
+        }
     }
 
     @Test
     public void testUsingPublicationFileBasedVerification() throws Exception{
         Policy signatureVerificationPolicy = new PublicationsFileBasedVerificationPolicy();
-        Container container = getContainer(CONTAINER_WITH_CHANGED_SIGNATURE_FILE);
-        ContainerVerifier verifier = getContainerVerifier(signatureVerificationPolicy);
-        ContainerVerifierResult result = verifier.verify(container);
-        assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
-        SignatureResult signatureResult = result.getSignatureResult(container.getSignatureContents().get(0));
-        checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.PUB_03, signatureResult);
-        container.close();
+        try (Container container = getContainer(CONTAINER_WITH_CHANGED_SIGNATURE_FILE)){
+            ContainerVerifier verifier = getContainerVerifier(signatureVerificationPolicy);
+            ContainerVerifierResult result = verifier.verify(container);
+            assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
+            SignatureResult signatureResult = result.getSignatureResult(container.getSignatureContents().get(0));
+            checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.PUB_03, signatureResult);
+        }
     }
 
     @Test
     public void testContainerWithValidSignature_VerificationSucceeds() throws Exception {
-        Container container = getContainer(CONTAINER_WITH_ONE_DOCUMENT);
-        ContainerVerifierResult verifierResult = verifier.verify(container);
+        try (Container container = getContainer(CONTAINER_WITH_ONE_DOCUMENT)) {
+            ContainerVerifierResult verifierResult = verifier.verify(container);
 
-        SignatureResult signatureResult = verifierResult.getSignatureResult(container.getSignatureContents().get(0));
-        assertEquals(VerificationResult.OK, verifierResult.getVerificationResult());
-        assertNotNull(signatureResult);
-        assertEquals(VerificationResult.OK, signatureResult.getSimplifiedResult());
-        assertNotNull(signatureResult.getFullResult());
-        container.close();
+            SignatureResult signatureResult = verifierResult.getSignatureResult(container.getSignatureContents().get(0));
+            assertEquals(VerificationResult.OK, verifierResult.getVerificationResult());
+            assertNotNull(signatureResult);
+            assertEquals(VerificationResult.OK, signatureResult.getSimplifiedResult());
+            assertNotNull(signatureResult.getFullResult());
+        }
     }
 
     private ContainerVerifier getContainerVerifier(Policy policy) {

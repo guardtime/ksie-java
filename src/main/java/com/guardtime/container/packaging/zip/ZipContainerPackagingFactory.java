@@ -34,6 +34,7 @@ import com.guardtime.ksi.hashing.DataHash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -74,11 +75,11 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
     }
 
     @Override
-    public ZipContainer read(InputStream input) throws InvalidPackageException {
-        Util.notNull(input, "Input stream");
+    public ZipContainer read(InputStream stream) throws InvalidPackageException {
+        Util.notNull(stream, "Input stream");
         try {
             ZipContainerReader reader = new ZipContainerReader(manifestFactory, signatureFactory);
-            return reader.read(input);
+            return reader.read(stream);
         } catch (IOException e) {
             throw new InvalidPackageException("Failed to parse InputStream", e);
         }

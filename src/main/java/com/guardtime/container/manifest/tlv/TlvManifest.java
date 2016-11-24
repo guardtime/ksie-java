@@ -53,11 +53,6 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
         checkMandatoryElement(annotationsManifestReference, "Annotations manifest reference");
     }
 
-    @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
-        return Util.hash(getInputStream(), algorithm);
-    }
-
     public FileReference getDocumentsManifestReference() {
         return documentsManifestReference;
     }

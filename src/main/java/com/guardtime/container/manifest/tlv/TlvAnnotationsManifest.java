@@ -75,8 +75,4 @@ class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements Ann
         return singleAnnotationManifestReferences;
     }
 
-    @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
-        return Util.hash(getInputStream(), algorithm);
-    }
 }
