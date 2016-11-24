@@ -16,7 +16,7 @@ import static com.guardtime.container.util.Util.notNull;
 /**
  * Document that is based on a {@link InputStream}.
  */
-public class StreamContainerDocument implements ContainerDocument {
+public class StreamContainerDocument implements UnknownDocument {
 
     private final File tempFile;
     private FileContainerDocument containerDocument;
@@ -102,5 +102,15 @@ public class StreamContainerDocument implements ContainerDocument {
     @Override
     protected void finalize() throws Throwable {
         close();
+    }
+
+
+    @Override
+    public UnknownDocument clone() {
+        try (InputStream inputStream = getInputStream()) {
+            return new StreamContainerDocument(inputStream, getMimeType(), getFileName());
+        } catch (IOException e) {
+            return null;
+        }
     }
 }

@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 
 import static com.guardtime.container.packaging.EntryNameProvider.DOCUMENTS_MANIFEST_FORMAT;
-import static java.nio.file.StandardOpenOption.DELETE_ON_CLOSE;
 
 /**
  * This content holders is used for data files manifests inside the container.
@@ -34,8 +33,10 @@ public class DocumentsManifestHandler extends ContentHandler<DocumentsManifest> 
     @Override
     protected DocumentsManifest getEntry(String name) throws ContentParsingException {
         File file = fetchFileFromEntries(name);
-        try (InputStream input = Files.newInputStream(file.toPath(), DELETE_ON_CLOSE)) {
-            return manifestFactory.readDocumentsManifest(input);
+        try (InputStream input = Files.newInputStream(file.toPath())) {
+            DocumentsManifest documentsManifest = manifestFactory.readDocumentsManifest(input);
+            Files.deleteIfExists(file.toPath());
+            return documentsManifest;
         } catch (InvalidManifestException e) {
             throw new ContentParsingException("Failed to parse content of datamanifest file", e);
         } catch (FileNotFoundException e) {

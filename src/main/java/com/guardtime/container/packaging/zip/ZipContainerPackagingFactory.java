@@ -2,6 +2,7 @@ package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.container.indexing.IndexProvider;
@@ -34,7 +35,6 @@ import com.guardtime.ksi.hashing.DataHash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -125,7 +125,7 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
             ZipSignatureContent signatureContent = signer.sign();
             List<ZipSignatureContent> contents = new LinkedList<>(existingZipContainer.getSignatureContents());
             contents.add(signatureContent);
-            ZipContainer zipContainer = new ZipContainer(contents, existingContainer.getUnknownFiles(), existingContainer.getMimeType());
+            ZipContainer zipContainer = new ZipContainer(contents, getCopies(existingContainer.getUnknownFiles()), existingContainer.getMimeType());
             verifyContainer(zipContainer);
             return zipContainer;
         } catch (IOException | InvalidManifestException e) {
@@ -135,6 +135,14 @@ public class ZipContainerPackagingFactory implements ContainerPackagingFactory<Z
         } catch (IndexingException e) {
             throw new InvalidPackageException("Failed to extract signature indexes from existing Container!", e);
         }
+    }
+
+    private List<UnknownDocument> getCopies(List<UnknownDocument> existingList) {
+        List<UnknownDocument> newList = new LinkedList<>();
+        for (UnknownDocument doc : existingList) {
+            newList.add(doc.clone());
+        }
+        return newList;
     }
 
     private void verifyContainer(ZipContainer zipContainer) throws InvalidPackageException {

@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 
 import static com.guardtime.container.packaging.EntryNameProvider.SIGNATURE_FORMAT;
-import static java.nio.file.StandardOpenOption.DELETE_ON_CLOSE;
 
 /**
  * This content holders is used for signatures inside the container.
@@ -34,8 +33,10 @@ public class SignatureHandler extends ContentHandler<ContainerSignature> {
     @Override
     protected ContainerSignature getEntry(String name) throws ContentParsingException {
         File file = fetchFileFromEntries(name);
-        try (InputStream stream = Files.newInputStream(file.toPath(), DELETE_ON_CLOSE)) {
-            return signatureFactory.read(stream);
+        try (InputStream stream = Files.newInputStream(file.toPath())) {
+            ContainerSignature signature = signatureFactory.read(stream);
+            Files.deleteIfExists(file.toPath());
+            return signature;
         } catch (SignatureException e) {
             throw new ContentParsingException("Failed to parse content of signature file", e);
         } catch (FileNotFoundException e) {

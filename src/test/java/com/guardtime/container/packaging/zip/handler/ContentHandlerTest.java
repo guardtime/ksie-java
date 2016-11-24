@@ -1,6 +1,8 @@
 package com.guardtime.container.packaging.zip.handler;
 
+import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.util.Pair;
+import com.guardtime.container.util.Util;
 
 import org.junit.Test;
 import org.mockito.Mock;
@@ -9,9 +11,11 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 public class ContentHandlerTest extends AbstractContentHandlerTest {
 
@@ -32,16 +36,18 @@ public class ContentHandlerTest extends AbstractContentHandlerTest {
 
     @Test
     public void testGetUnrequestedFiles() throws Exception {
-        Pair<String, File> requestablePathFilePair = Pair.of("name.txt", mockFile1);
-        Pair<String, File> unrequestedPathFilePair = Pair.of("awesomesouce2.txt", mockFile2);
+        String requestedFileName = "name.txt";
+        String unrequestedFileName = "awesomesouce2.txt";
 
-        handler.add(requestablePathFilePair.getLeft(), requestablePathFilePair.getRight());
-        handler.add(unrequestedPathFilePair.getLeft(), unrequestedPathFilePair.getRight());
-        handler.get(requestablePathFilePair.getLeft());
+        handler.add(requestedFileName, mockFile1);
+        handler.add(unrequestedFileName, Util.createTempFile());
+        handler.get(requestedFileName);
 
-        List<Pair<String, File>> unrequested = handler.getUnrequestedFiles();
-        assertFalse(unrequested.contains(requestablePathFilePair));
-        assertTrue(unrequested.contains(unrequestedPathFilePair));
+        List unrequested = handler.getUnrequestedFiles();
+        assertEquals(1, unrequested.size());
+        UnknownDocument doc = (UnknownDocument) unrequested.get(0);
+        assertFalse(doc.getFileName().equals(requestedFileName));
+        assertTrue(doc.getFileName().equals(unrequestedFileName));
     }
 
     @Test

@@ -1,8 +1,12 @@
 package com.guardtime.container.packaging.zip.handler;
 
-import com.guardtime.container.util.Pair;
+import com.guardtime.container.document.StreamContainerDocument;
+import com.guardtime.container.document.UnknownDocument;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -40,10 +44,12 @@ public abstract class ContentHandler<T> {
         return entries.keySet();
     }
 
-    public List<Pair<String, File>> getUnrequestedFiles() {
-        List<Pair<String, File>> returnable = new LinkedList<>();
+    public List<UnknownDocument> getUnrequestedFiles() throws IOException {
+        List<UnknownDocument> returnable = new LinkedList<>();
         for (String name : unrequestedEntries) {
-            returnable.add(Pair.of(name, entries.get(name)));
+            try (InputStream inputStream = new FileInputStream(entries.get(name))) {
+                returnable.add(new StreamContainerDocument(inputStream, "unknown", name));
+            }
         }
         return returnable;
     }

@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 
 import static com.guardtime.container.packaging.EntryNameProvider.ANNOTATIONS_MANIFEST_FORMAT;
-import static java.nio.file.StandardOpenOption.DELETE_ON_CLOSE;
 
 /**
  * This content holders is used for annotations manifests inside the container.
@@ -34,8 +33,10 @@ public class AnnotationsManifestHandler extends ContentHandler<AnnotationsManife
     @Override
     protected AnnotationsManifest getEntry(String name) throws ContentParsingException {
         File file = fetchFileFromEntries(name);
-        try (InputStream input = Files.newInputStream(file.toPath(), DELETE_ON_CLOSE)) {
-            return manifestFactory.readAnnotationsManifest(input);
+        try (InputStream input = Files.newInputStream(file.toPath())) {
+            AnnotationsManifest annotationsManifest = manifestFactory.readAnnotationsManifest(input);
+            Files.deleteIfExists(file.toPath());
+            return annotationsManifest;
         } catch (InvalidManifestException e) {
             throw new ContentParsingException("Failed to parse content of annotmanifest file", e);
         } catch (FileNotFoundException e) {

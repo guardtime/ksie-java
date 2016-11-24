@@ -1,5 +1,6 @@
 package com.guardtime.container.packaging.zip;
 
+import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.MimeType;
@@ -16,7 +17,6 @@ import com.guardtime.container.packaging.zip.handler.SignatureHandler;
 import com.guardtime.container.packaging.zip.handler.SingleAnnotationManifestHandler;
 import com.guardtime.container.packaging.zip.handler.UnknownFileHandler;
 import com.guardtime.container.signature.SignatureFactory;
-import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 
 import org.slf4j.Logger;
@@ -83,7 +83,7 @@ class ZipContainerReader {
         }
         List<ZipSignatureContent> contents = buildSignatures();
         MimeType mimeType = getMimeType();
-        List<Pair<String, File>> unknownFiles = getUnknownFiles();
+        List<UnknownDocument> unknownFiles = getUnknownFiles();
 
         if (validMimeType(mimeType) && containsValidContents(contents)) {
             return new ZipContainer(contents, unknownFiles, mimeType, tempDirectory);
@@ -139,8 +139,8 @@ class ZipContainerReader {
         }
     }
 
-    private List<Pair<String, File>> getUnknownFiles() {
-        List<Pair<String, File>> returnable = new LinkedList<>();
+    private List<UnknownDocument> getUnknownFiles() throws IOException {
+        List<UnknownDocument> returnable = new LinkedList<>();
         returnable.addAll(unknownFileHandler.getUnrequestedFiles());
         for (ContentHandler handler : handlers) {
             returnable.addAll(handler.getUnrequestedFiles());
