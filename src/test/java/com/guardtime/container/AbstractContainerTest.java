@@ -48,6 +48,11 @@ public class AbstractContainerTest {
     protected static final String CONTAINER_WITH_MULTIPLE_EXTENDABLE_SIGNATURES = "containers/container-multiple-signatures-non-verifying.ksie";
     protected static final String CONTAINER_WITH_CHANGED_SIGNATURE_FILE = "containers/container-invalid-signature-from-last-aggregation-hash-chain.ksie";
     protected static final String CONTAINER_WITH_CHANGED_AND_EXTENDED_SIGNATURE_FILE = "containers/container-invalid-signature-from-last-aggregation-hash-chain-extended.ksie";
+    protected static final String CONTAINER_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED = "containers/container-two-contents-one-manifest-removed.ksie";
+    protected static final String CONTAINER_WITH_MIXED_INDEX_TYPES_IN_CONTENTS = "containers/container-contents-with-different-index-types.ksie";
+    protected static final String CONTAINER_CONTENT_WITH_MIXED_INDEX_TYPES = "containers/container-content-with-mixed-index-types.ksie";
+    protected static final String CONTAINER_WITH_RANDOM_INCREMENTING_INDEXES = "containers/multi-content-random-incrementing-indexes.ksie";
+    protected static final String CONTAINER_WITH_RANDOM_UUID_INDEXES = "containers/container-random-uuid-indexes.ksie";
 
     protected static final String MIME_TYPE_APPLICATION_TXT = "application/txt";
     protected static final String MIME_TYPE_APPLICATION_PDF = "application/pdf";

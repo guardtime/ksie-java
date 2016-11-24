@@ -16,13 +16,11 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.Collections;
-
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -121,7 +119,7 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
     @Test
     public void testReadContainerWithRandomIncrementingIndexesAndAddNewContent_OK() throws Exception {
         try (
-                FileInputStream stream = new FileInputStream(loadFile("containers/multi-content-random-incrementing-indexes.ksie"));
+                FileInputStream stream = new FileInputStream(loadFile(CONTAINER_WITH_RANDOM_INCREMENTING_INDEXES));
                 Container existingContainer = packagingFactory.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
                 ContainerDocument document = new StreamContainerDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc");
@@ -136,7 +134,7 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
     @Test
     public void testReadContainerWithRandomUuidIndexesAndAddNewContent_OK() throws Exception {
         try (
-                FileInputStream stream = new FileInputStream(loadFile("containers/container-random-uuid-indexes.ksie"));
+                FileInputStream stream = new FileInputStream(loadFile(CONTAINER_WITH_RANDOM_UUID_INDEXES));
                 Container existingContainer = packagingFactoryWithUuid.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
                 ContainerDocument document = new StreamContainerDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc");
@@ -152,7 +150,7 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
     @Test
     public void testCreateContainerFromExistingWithDifferentIndexTypesInSameContent_OK() throws Exception {
         try (
-                FileInputStream stream = new FileInputStream(loadFile("containers/container-content-with-mixed-index-types.ksie"));
+                FileInputStream stream = new FileInputStream(loadFile(CONTAINER_CONTENT_WITH_MIXED_INDEX_TYPES));
                 Container existingContainer  = packagingFactoryWithUuid.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
                 ContainerDocument document = new StreamContainerDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc");
@@ -168,7 +166,7 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
     @Test
     public void testCreateContainerFromExistingWithDifferentIndexesInContents_OK() throws Exception {
         try (
-                Container existingContainer = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile("containers/container-contents-with-different-index-types.ksie")));
+                Container existingContainer = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(CONTAINER_WITH_MIXED_INDEX_TYPES_IN_CONTENTS)));
                 ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc");
                 Container container = packagingFactoryWithUuid.create(existingContainer,
                     Collections.singletonList(document),
@@ -180,14 +178,29 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
 
     @Ignore //Should be possible.
     @Test
-    public void testAddDocumentsToExistingContainerWithUnknownFiles_OK() throws Exception {
-        try (Container existingContainer = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile("containers/container-two-contents-one-manifest-removed.ksie")))) {
+    public void testAddDocumentsToExistingContainerWithOneContentRemoved_OK() throws Exception {
+        try (Container existingContainer = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(CONTAINER_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED)))) {
             try (
                     ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc");
                     ContainerAnnotation containerAnnotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime");
                     Container container = packagingFactoryWithIncIndex.create(existingContainer,
                         Collections.singletonList(document),
                         Collections.singletonList(containerAnnotation))
+            ) {
+                writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+            }
+        }
+    }
+
+    @Test
+    public void testAddDocumentsToExistingContainerUnknownFiles_OK() throws Exception {
+        try (Container existingContainer = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(CONTAINER_WITH_UNKNOWN_FILES)))) {
+            try (
+                    ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc");
+                    ContainerAnnotation containerAnnotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime");
+                    Container container = packagingFactoryWithIncIndex.create(existingContainer,
+                            Collections.singletonList(document),
+                            Collections.singletonList(containerAnnotation))
             ) {
                 writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
             }
