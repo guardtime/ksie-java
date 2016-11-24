@@ -1,16 +1,26 @@
 package com.guardtime.container.integration;
 
 import com.guardtime.container.ContainerBuilder;
+import com.guardtime.container.annotation.ContainerAnnotation;
+import com.guardtime.container.annotation.ContainerAnnotationType;
+import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.document.StreamContainerDocument;
+import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
+import com.guardtime.container.indexing.UuidIndexProviderFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
 
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +28,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
+
+    private ZipContainerPackagingFactory packagingFactoryWithIncIndex;
+    private ZipContainerPackagingFactory packagingFactoryWithUuid;
+
+    @Before
+    public void setUpPackagingFactories() {
+
+
+        this.packagingFactoryWithIncIndex = new ZipContainerPackagingFactory(signatureFactory, manifestFactory,  new IncrementingIndexProviderFactory(), false);
+        this.packagingFactoryWithUuid = new ZipContainerPackagingFactory(signatureFactory, manifestFactory, new UuidIndexProviderFactory(), false);
+    }
 
     @Test
     public void testCreateContainer() throws Exception {
@@ -32,26 +53,232 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
 
     @Test
     public void testReadContainer() throws Exception {
-        InputStream inputStream = new FileInputStream(loadFile(CONTAINER_WITH_ONE_DOCUMENT));
-        try (Container container = packagingFactory.read(inputStream)) {
+        try (
+                InputStream inputStream = new FileInputStream(loadFile(CONTAINER_WITH_ONE_DOCUMENT));
+                Container container = packagingFactory.read(inputStream)
+        ) {
             assertSingleContentsWithSingleDocument(container);
         }
     }
 
     @Test
     public void testReadCreatedContainer() throws Exception {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try (
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 Container container = new ContainerBuilder(packagingFactory)
                         .withDocument(new ByteArrayInputStream("Test_Data".getBytes()), TEST_FILE_NAME_TEST_TXT, "application/txt")
                         .build()
-        ) {
-            container.writeTo(bos);
-            InputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
-            try (Container parsedInContainer = packagingFactory.read(inputStream)) {
-                assertSingleContentsWithSingleDocument(parsedInContainer);
+            ) {
+                container.writeTo(bos);
+
+                try (
+                        InputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
+                        Container parsedInContainer = packagingFactory.read(inputStream)
+                ) {
+                    assertSingleContentsWithSingleDocument(parsedInContainer);
             }
         }
+    }
+
+    @Test
+    public void testReadContainerWithDifferentIndexProviderCombination1_OK() throws Exception {
+        try (Container container = packagingFactoryWithUuid.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_CONTAINER_ANNOTATION))) {
+            writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+        }
+    }
+
+    @Test
+    public void testReadContainerWithDifferentIndexProviderCombination2_OK() throws Exception {
+        try (Container container = packagingFactoryWithIncIndex.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_CONTAINER_ANNOTATION))) {
+            writeContainerToAndReadFromStream(container, packagingFactoryWithUuid);
+        }
+    }
+
+    @Ignore //Should be possible.
+    @Test
+    public void testCreateContainerFromExistingWithDifferentIndexProviderCombination_OK() throws Exception {
+        try (
+                Container existingContainer = packagingFactoryWithIncIndex.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_CONTAINER_ANNOTATION));
+                Container container = packagingFactoryWithUuid.create(existingContainer, Collections.singletonList(TEST_DOCUMENT_HELLO_PDF), Collections.singletonList(STRING_CONTAINER_ANNOTATION))
+        ){
+            writeContainerToAndReadFromStream(container, packagingFactoryWithUuid);
+        }
+    }
+
+    @Ignore //Should be possible.
+    @Test
+    public void testCreateContainerFromExistingWithDifferentIndexProviderCombination2_OK() throws Exception {
+        try (
+                Container existingContainer = packagingFactoryWithUuid.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_CONTAINER_ANNOTATION));
+                Container container = packagingFactoryWithIncIndex.create(existingContainer, Collections.singletonList(TEST_DOCUMENT_HELLO_PDF), Collections.singletonList(STRING_CONTAINER_ANNOTATION))
+            ){
+                writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+        }
+    }
+
+    @Test
+    public void testReadContainerWithRandomIncrementingIndexesAndAddNewContent_OK() throws Exception {
+        try (
+                FileInputStream stream = new FileInputStream(loadFile(CONTAINER_WITH_RANDOM_INCREMENTING_INDEXES));
+                Container existingContainer = packagingFactory.read(stream);
+                ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
+                ContainerDocument document = new StreamContainerDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc");
+                Container container = packagingFactory.create(existingContainer,
+                        Collections.singletonList(document),
+                        Collections.singletonList(STRING_CONTAINER_ANNOTATION))
+        ) {
+            writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+        }
+    }
+
+    @Test
+    public void testReadContainerWithRandomUuidIndexesAndAddNewContent_OK() throws Exception {
+        try (
+                FileInputStream stream = new FileInputStream(loadFile(CONTAINER_WITH_RANDOM_UUID_INDEXES));
+                Container existingContainer = packagingFactoryWithUuid.read(stream);
+                ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
+                ContainerDocument document = new StreamContainerDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc");
+                Container container = packagingFactoryWithUuid.create(existingContainer,
+                    Collections.singletonList(document),
+                    Collections.singletonList(STRING_CONTAINER_ANNOTATION))
+        ) {
+            writeContainerToAndReadFromStream(container, packagingFactoryWithUuid);
+        }
+    }
+
+    @Ignore //Should be possible.
+    @Test
+    public void testCreateContainerFromExistingWithDifferentIndexTypesInSameContent_OK() throws Exception {
+        try (
+                FileInputStream stream = new FileInputStream(loadFile(CONTAINER_CONTENT_WITH_MIXED_INDEX_TYPES));
+                Container existingContainer  = packagingFactoryWithUuid.read(stream);
+                ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
+                ContainerDocument document = new StreamContainerDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc");
+                Container container = packagingFactoryWithUuid.create(existingContainer,
+                    Collections.singletonList(document),
+                    Collections.singletonList(STRING_CONTAINER_ANNOTATION))
+        ) {
+            writeContainerToAndReadFromStream(container, packagingFactoryWithUuid);
+        }
+    }
+
+    @Ignore //Should be possible.
+    @Test
+    public void testCreateContainerFromExistingWithDifferentIndexesInContents_OK() throws Exception {
+        try (
+                Container existingContainer = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(CONTAINER_WITH_MIXED_INDEX_TYPES_IN_CONTENTS)));
+                ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc");
+                Container container = packagingFactoryWithUuid.create(existingContainer,
+                    Collections.singletonList(document),
+                    Collections.singletonList(STRING_CONTAINER_ANNOTATION))
+        ) {
+            writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+        }
+    }
+
+    @Ignore //Should be possible.
+    @Test
+    public void testAddDocumentsToExistingContainerWithOneContentRemoved_OK() throws Exception {
+        try (
+                Container existingContainer = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(CONTAINER_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED)));
+                ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc");
+                ContainerAnnotation containerAnnotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime");
+                Container container = packagingFactoryWithIncIndex.create(existingContainer,
+                    Collections.singletonList(document),
+                    Collections.singletonList(containerAnnotation))
+        ) {
+            writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+        }
+    }
+
+    @Test
+    public void testAddDocumentsToExistingContainerUnknownFiles_OK() throws Exception {
+        try (
+                Container existingContainer = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(CONTAINER_WITH_UNKNOWN_FILES)));
+                ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc");
+                ContainerAnnotation containerAnnotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime");
+                Container container = packagingFactoryWithIncIndex.create(existingContainer,
+                        Collections.singletonList(document),
+                        Collections.singletonList(containerAnnotation))
+        ) {
+            writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+        }
+    }
+
+    @Ignore //Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
+    @Test
+    public void testCreateContainerWhereDocumentFileUriMatchesManifestUri_throws() throws Exception {
+        String item = "META-INF/manifest-1.tlv";
+        createContainerWriteItToAndReadFromStream(item);
+    }
+
+    @Ignore //Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
+    @Test
+    public void testCreateContainerWhereDocumentFileUriMatchesDocumentManifestUri_throws() throws Exception {
+        String item = "META-INF/datamanifest-1.tlv";
+        createContainerWriteItToAndReadFromStream(item);
+    }
+
+    @Ignore //Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
+    @Test
+    public void testCreateContainerWhereDocumentFileUriMatchesAnnotationsManifestUri_throws() throws Exception {
+        String item = "META-INF/annotmanifest-1.tlv";
+        createContainerWriteItToAndReadFromStream(item);
+    }
+
+    @Ignore //Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
+    @Test
+    public void testCreateContainerWhereDocumentFileUriMatchesSingleAnnotationManifestUri_throws() throws Exception {
+        String item = "META-INF/annotation-1.tlv";
+        createContainerWriteItToAndReadFromStream(item);
+    }
+
+    @Ignore //Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
+    @Test
+    public void testCreateContainerWhereDocumentFileUriMatchesAnnotationUri_throws() throws Exception {
+        String item = "META-INF/annotation-1.dat";
+        createContainerWriteItToAndReadFromStream(item);
+    }
+
+    @Ignore //Exception is expected because it should not be possible to add document with file ur is "mimetype". Not because of duplicate entry.
+    @Test
+    public void testCreateContainerWhereDocumentFileUriMatchesMimeTypeUri_throws() throws Exception {
+        String item = "mimetype";
+        createContainerWriteItToAndReadFromStream(item);
+    }
+
+    @Ignore //Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
+    @Test
+    public void testCreateContainerWhereDocumentFileUriMatchesSignatureUri_throws() throws Exception {
+        String item = "META-INF/signature-1.ksi";
+        createContainerWriteItToAndReadFromStream(item);
+    }
+
+    @Ignore //Exception is expected because document file name is dir and it should not be possible to add documents to META-INF. Not because of duplicate entry.
+    @Test
+    public void testCreateContainerWhereDocumentIsWrittenAsMetaInfDirectory_throws() throws Exception {
+        createContainerWriteItToAndReadFromStream("META-INF/");
+    }
+
+    @Ignore //Exception is expected because document file name matches with META-INF directory name. Not because of duplicate entry.
+    @Test
+    public void testCreateContainerWhereDocumentFileUriMatchesMetaInfDirectoryName_throws() throws Exception {
+        createContainerWriteItToAndReadFromStream("META-INF");
+    }
+
+    @Ignore //Exception is expected because document file name is dir
+    @Test
+    public void testCreateContainerWhereDocumentIsWrittenAsDirectory_throws() throws Exception {
+        createContainerWriteItToAndReadFromStream("SubDir/");
+    }
+
+    @Test
+    public void testCreateContainerWhereDocumentIsWrittenToSubDirectory_Ok() throws Exception {
+        createContainerWriteItToAndReadFromStream("SubDir/AddedDocument.txt");
+    }
+
+    private List<ContainerDocument> getContainerDocument(String fileName) throws Exception {
+        return Collections.singletonList((ContainerDocument)new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, fileName));
     }
 
     private void assertSingleContentsWithSingleDocumentWithName(Container container, String testFileName) {
@@ -72,4 +299,27 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
         assertSingleContentsWithSingleDocumentWithName(container, null);
     }
 
+    /*
+    Created container will be closed in the end.
+     */
+    private void createContainerWriteItToAndReadFromStream(String documentFileName) throws Exception {
+        try (Container container = packagingFactory.create(getContainerDocument(documentFileName), Collections.singletonList(STRING_CONTAINER_ANNOTATION))) {
+            writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+        }
+    }
+
+    /*
+    Created container will be closed.
+     */
+    private void writeContainerToAndReadFromStream(Container container, ZipContainerPackagingFactory packagingFactory) throws Exception {
+        assertNotNull(container);
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            container.writeTo(bos);
+            try (
+                    ByteArrayInputStream stream = new ByteArrayInputStream(bos.toByteArray());
+                    Container inputContainer = packagingFactory.read(stream)) {
+                assertNotNull(inputContainer);
+            }
+        }
+    }
 }

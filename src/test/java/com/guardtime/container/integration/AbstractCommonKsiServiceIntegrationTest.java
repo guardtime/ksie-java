@@ -8,7 +8,6 @@ import com.guardtime.ksi.service.client.KSIServiceCredentials;
 import com.guardtime.ksi.service.client.http.HttpClientSettings;
 import com.guardtime.ksi.service.http.simple.SimpleHttpClient;
 import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
-
 import org.junit.Before;
 
 import java.io.File;
@@ -39,6 +38,7 @@ public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCo
         }
     }
 
+
     protected KSI ksi;
 
     @Before
@@ -58,5 +58,6 @@ public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCo
                 .build();
         signatureFactory = new KsiSignatureFactory(ksi);
         packagingFactory = new ZipContainerPackagingFactory(signatureFactory, manifestFactory);
+
     }
 }

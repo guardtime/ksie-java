@@ -67,7 +67,7 @@ public class ContainerBuilderTest extends AbstractContainerTest {
     @Test
     public void testAddAnnotationToContainer() throws Exception {
         ContainerBuilder builder = new ContainerBuilder(mockedPackagingFactory);
-        builder.withAnnotation(MOCKED_ANNOTATION);
+        builder.withAnnotation(STRING_CONTAINER_ANNOTATION);
         assertEquals(1, builder.getAnnotations().size());
     }
 
@@ -77,7 +77,7 @@ public class ContainerBuilderTest extends AbstractContainerTest {
         builder.withDocument(TEST_DOCUMENT_HELLO_TEXT);
         builder.withDocument(TEST_DOCUMENT_HELLO_PDF);
 
-        builder.withAnnotation(MOCKED_ANNOTATION);
+        builder.withAnnotation(STRING_CONTAINER_ANNOTATION);
         try (Container container = builder.build()) {
             assertNotNull(container);
         }
@@ -104,6 +104,7 @@ public class ContainerBuilderTest extends AbstractContainerTest {
 
     @Test
     public void testCreateWithMultipleDocumentsWithSameFileName() throws Exception {
+        expectedException.expectMessage("Document with name '" + TEST_FILE_NAME_TEST_TXT + "' already exists!");
         expectedException.expect(IllegalArgumentException.class);
         try (
                 ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
@@ -138,7 +139,7 @@ public class ContainerBuilderTest extends AbstractContainerTest {
     }
 
     @Test
-    public void testCreateWithExistingContainerWithSameContainerDocument() throws Exception {
+    public void testCreateNewContainerUsingExistingContainerAndExistingDocument() throws Exception {
         ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, new IncrementingIndexProviderFactory(), true);
         // build initial container
         ContainerBuilder builder = new ContainerBuilder(packagingFactory);

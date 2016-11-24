@@ -24,11 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
 
@@ -101,8 +97,8 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
 
     @Test
     public void testDifferentHashingAlgorithmsForDifferentParts() throws Exception {
-        List<HashAlgorithm> fileReferenceHashAlgorithms = Arrays.asList(HashAlgorithm.RIPEMD_160);
-        List<HashAlgorithm> documentReferenceHashAlgorithms = Arrays.asList(HashAlgorithm.SHA1);
+        List<HashAlgorithm> fileReferenceHashAlgorithms = Collections.singletonList(HashAlgorithm.RIPEMD_160);
+        List<HashAlgorithm> documentReferenceHashAlgorithms = Collections.singletonList(HashAlgorithm.SHA1);
         HashAlgorithm annotationDataReferenceHashAlgorithm = HashAlgorithm.SHA2_384;
         HashAlgorithm signingHashAlgorithm = HashAlgorithm.SHA2_512;
         HashAlgorithmProvider provider = new TestHashAlgorithmProvider(
@@ -126,6 +122,31 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
         }
         KSISignature signature = (KSISignature) signatureContent.getContainerSignature().getSignature();
         Assert.assertEquals(signingHashAlgorithm, signature.getInputHash().getAlgorithm());
+    }
+
+    @Test
+    public void testUsingNotImplementedHashingAlgorithm() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Hash algorithm SHA3_512 is not implemented");
+        HashAlgorithm hashAlgorithm = HashAlgorithm.SHA3_512;
+        HashAlgorithmProvider hashAlgorithmProvider = new TestHashAlgorithmProvider(hashAlgorithm);
+        ContainerBuilder builder = new ContainerBuilder(getContainerPackagingFactory(hashAlgorithmProvider));
+        builder.withAnnotation(CONTAINER_ANNOTATION);
+        builder.withDocument(CONTAINER_DOCUMENT);
+        builder.build();
+    }
+
+    @Test
+     public void testUsingNotImplementedHashingAlgorithmInList() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Hash algorithm SM3 is not implemented");
+        List<HashAlgorithm> hashAlgorithmList = Arrays.asList(HashAlgorithm.SHA1, HashAlgorithm.SHA2_256, HashAlgorithm.SM3);
+        HashAlgorithm hashAlgorithm = HashAlgorithm.SHA2_512;
+        HashAlgorithmProvider hashAlgorithmProvider = new TestHashAlgorithmProvider(hashAlgorithmList, hashAlgorithmList, hashAlgorithm, hashAlgorithm);
+        ContainerBuilder builder = new ContainerBuilder(getContainerPackagingFactory(hashAlgorithmProvider));
+        builder.withAnnotation(CONTAINER_ANNOTATION);
+        builder.withDocument(CONTAINER_DOCUMENT);
+        builder.build();
     }
 
     private ZipContainerPackagingFactory getContainerPackagingFactory(HashAlgorithmProvider provider) throws Exception {

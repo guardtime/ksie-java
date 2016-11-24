@@ -110,9 +110,8 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
     private void assertSignaturesExtendedStatus(Container container, boolean status) {
         for (SignatureContent content : container.getSignatureContents()) {
             assertNotNull(content.getContainerSignature());
-            KSISignature signature = (KSISignature) content.getContainerSignature().getSignature();
-            assertNotNull(signature);
-            assertEquals(status, signature.isExtended());
+            assertNotNull(content.getContainerSignature().getSignature());
+            assertEquals(status, content.getContainerSignature().isExtended());
         }
     }
 
