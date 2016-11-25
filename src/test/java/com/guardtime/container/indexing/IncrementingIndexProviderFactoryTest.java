@@ -1,7 +1,6 @@
 package com.guardtime.container.indexing;
 
 import com.guardtime.container.AbstractContainerTest;
-import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;

@@ -20,6 +20,9 @@ import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.EntryNameProvider;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.packaging.zip.parsing.ParsingStoreException;
+import com.guardtime.container.packaging.zip.parsing.ParsingStoreFactory;
+import com.guardtime.container.packaging.zip.parsing.TemporaryFileBasedParsingStoreFactory;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureException;
 import com.guardtime.container.signature.SignatureFactory;
@@ -35,7 +38,6 @@ import com.guardtime.ksi.hashing.DataHash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -47,17 +49,17 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Generates {@link Container} instances that use ZIP archiving for storing.
+ * Builds {@link ContainerPackagingFactory} for generating {@link Container} instances that use ZIP archiving for storing.
  */
 
 public class ZipContainerPackagingFactoryBuilder {
-    private static final Logger logger = LoggerFactory.getLogger(ZipContainerPackagingFactory.class);
     public static final String MIME_TYPE_ENTRY_NAME = "mimetype";
-
+    private static final Logger logger = LoggerFactory.getLogger(ZipContainerPackagingFactory.class);
     private SignatureFactory signatureFactory;
     private ContainerManifestFactory manifestFactory = new TlvContainerManifestFactory();
     private boolean disableInternalVerification = false;
     private IndexProviderFactory indexProviderFactory = new IncrementingIndexProviderFactory();
+    private ParsingStoreFactory parsingStoreFactory = new TemporaryFileBasedParsingStoreFactory();
 
     public ZipContainerPackagingFactoryBuilder withSignatureFactory(SignatureFactory factory) {
         this.signatureFactory = factory;
@@ -74,6 +76,11 @@ public class ZipContainerPackagingFactoryBuilder {
         return this;
     }
 
+    public ZipContainerPackagingFactoryBuilder withParsingStoreFactory(ParsingStoreFactory storeFactory) {
+        this.parsingStoreFactory = storeFactory;
+        return this;
+    }
+
     public ZipContainerPackagingFactoryBuilder disableInternalVerification() {
         this.disableInternalVerification = true;
         return this;
@@ -86,7 +93,7 @@ public class ZipContainerPackagingFactoryBuilder {
 
     public ContainerPackagingFactory<ZipContainer> build() {
         Util.notNull(signatureFactory, "Signature factory");
-        return new ZipContainerPackagingFactory(signatureFactory, manifestFactory, indexProviderFactory, disableInternalVerification);
+        return new ZipContainerPackagingFactory(signatureFactory, manifestFactory, indexProviderFactory, disableInternalVerification, parsingStoreFactory);
     }
 
 
@@ -97,15 +104,18 @@ public class ZipContainerPackagingFactoryBuilder {
         private final ContainerManifestFactory manifestFactory;
         private final IndexProviderFactory indexProviderFactory;
         private final boolean disableVerification;
+        private final ParsingStoreFactory parsingStoreFactory;
 
-        private ZipContainerPackagingFactory(SignatureFactory signatureFactory, ContainerManifestFactory manifestFactory, IndexProviderFactory indexProviderFactory, boolean disableVerification) {
+        private ZipContainerPackagingFactory(SignatureFactory signatureFactory, ContainerManifestFactory manifestFactory, IndexProviderFactory indexProviderFactory, boolean disableVerification, ParsingStoreFactory storeFactory) {
             Util.notNull(signatureFactory, "Signature factory");
             Util.notNull(manifestFactory, "Manifest factory");
             Util.notNull(indexProviderFactory, "Index provider factory");
+            Util.notNull(storeFactory, "Parsing store factory");
             this.signatureFactory = signatureFactory;
             this.manifestFactory = manifestFactory;
             this.indexProviderFactory = indexProviderFactory;
             this.disableVerification = disableVerification;
+            this.parsingStoreFactory = storeFactory;
             logger.info("Zip container factory initialized");
         }
 
@@ -113,10 +123,12 @@ public class ZipContainerPackagingFactoryBuilder {
         public ZipContainer read(InputStream stream) throws InvalidPackageException {
             Util.notNull(stream, "Input stream");
             try {
-                ZipContainerReader reader = new ZipContainerReader(manifestFactory, signatureFactory);
+                ZipContainerReader reader = new ZipContainerReader(this.manifestFactory, this.signatureFactory, this.parsingStoreFactory.build());
                 return reader.read(stream);
             } catch (IOException e) {
                 throw new InvalidPackageException("Failed to parse InputStream", e);
+            } catch (ParsingStoreException e) {
+                throw new InvalidPackageException("Failed to store parsed container data", e);
             }
         }
 

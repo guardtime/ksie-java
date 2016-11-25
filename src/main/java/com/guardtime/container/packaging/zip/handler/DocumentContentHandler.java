@@ -1,13 +1,18 @@
 package com.guardtime.container.packaging.zip.handler;
 
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
+import com.guardtime.container.packaging.zip.parsing.ParsingStore;
 
-import java.io.File;
+import java.io.InputStream;
 
 /**
  * This content holders is used for documents inside the container.
  */
-public class DocumentContentHandler extends ContentHandler<File> {
+public class DocumentContentHandler extends ContentHandler<InputStream> {
+
+    public DocumentContentHandler(ParsingStore store) {
+        super(store);
+    }
 
     @Override
     public boolean isSupported(String name) {
@@ -23,8 +28,8 @@ public class DocumentContentHandler extends ContentHandler<File> {
     }
 
     @Override
-    protected File getEntry(String name) throws ContentParsingException {
-        return fetchFileFromEntries(name);
+    protected InputStream getEntry(String name) throws ContentParsingException {
+        return fetchStreamFromEntries(name);
     }
 
 }

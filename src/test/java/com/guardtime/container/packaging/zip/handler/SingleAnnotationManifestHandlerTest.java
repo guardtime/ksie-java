@@ -10,11 +10,10 @@ public class SingleAnnotationManifestHandlerTest extends AbstractContentHandlerT
 
     private static final String VALID_SINGLE_ANNOTATION_MANIFEST_PATH = "/META-INF/annotation-1.tlv";
     private static final String INVALID_SINGLE_ANNOTATION_MANIFEST_PATH = "funky_music.mp3";
-    private SingleAnnotationManifestHandler handler;
 
     @Before
     public void setUpHandler() {
-        handler = new SingleAnnotationManifestHandler(mockManifestFactory);
+        handler = new SingleAnnotationManifestHandler(mockManifestFactory, mockStore);
     }
 
     @Test

@@ -1,17 +1,15 @@
 package com.guardtime.container.packaging.zip.handler;
 
+import com.guardtime.container.packaging.zip.parsing.ParsingStore;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureException;
 import com.guardtime.container.signature.SignatureFactory;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 
 import static com.guardtime.container.packaging.EntryNameProvider.SIGNATURE_FORMAT;
-import static java.nio.file.StandardOpenOption.DELETE_ON_CLOSE;
 
 /**
  * This content holders is used for signatures inside the container.
@@ -20,7 +18,8 @@ public class SignatureHandler extends ContentHandler<ContainerSignature> {
 
     private final SignatureFactory signatureFactory;
 
-    public SignatureHandler(SignatureFactory signatureFactory) {
+    public SignatureHandler(SignatureFactory signatureFactory, ParsingStore store) {
+        super(store);
         this.signatureFactory = signatureFactory;
     }
 
@@ -33,8 +32,7 @@ public class SignatureHandler extends ContentHandler<ContainerSignature> {
 
     @Override
     protected ContainerSignature getEntry(String name) throws ContentParsingException {
-        File file = fetchFileFromEntries(name);
-        try (InputStream stream = Files.newInputStream(file.toPath(), DELETE_ON_CLOSE)) {
+        try (InputStream stream = fetchStreamFromEntries(name)) {
             return signatureFactory.read(stream);
         } catch (SignatureException e) {
             throw new ContentParsingException("Failed to parse content of signature file", e);

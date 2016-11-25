@@ -1,13 +1,13 @@
 package com.guardtime.container.packaging.zip.handler;
 
+import com.guardtime.container.packaging.zip.parsing.ParsingStore;
+import com.guardtime.container.packaging.zip.parsing.ParsingStoreException;
 import com.guardtime.container.util.Pair;
 
-import java.io.File;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
@@ -18,13 +18,17 @@ import java.util.TreeSet;
  */
 public abstract class ContentHandler<T> {
 
-    protected Map<String, File> entries = new TreeMap<>();
+    protected final ParsingStore entries;
     private Set<String> unrequestedEntries = new TreeSet<>();
+
+    protected ContentHandler(ParsingStore entries) {
+        this.entries = entries;
+    }
 
     public abstract boolean isSupported(String name);
 
-    public void add(String name, File file) {
-        entries.put(name, file);
+    public void add(String name, InputStream stream) throws ParsingStoreException {
+        entries.store(name, stream);
         unrequestedEntries.add(name);
     }
 
@@ -37,11 +41,11 @@ public abstract class ContentHandler<T> {
     protected abstract T getEntry(String name) throws ContentParsingException;
 
     public Set<String> getNames() {
-        return entries.keySet();
+        return entries.getStoredNames();
     }
 
-    public List<Pair<String, File>> getUnrequestedFiles() {
-        List<Pair<String, File>> returnable = new LinkedList<>();
+    public List<Pair<String, InputStream>> getUnrequestedFiles() throws ParsingStoreException {
+        List<Pair<String, InputStream>> returnable = new LinkedList<>();
         for (String name : unrequestedEntries) {
             returnable.add(Pair.of(name, entries.get(name)));
         }
@@ -57,10 +61,15 @@ public abstract class ContentHandler<T> {
         return str.substring(startingIndex).matches(regex);
     }
 
-    protected File fetchFileFromEntries(String name) throws ContentParsingException {
-        File file = entries.get(name);
-        if (file == null) throw new ContentParsingException("Failed to fetch file '" + name + "' from entries.");
-        return file;
+    protected InputStream fetchStreamFromEntries(String name) throws ContentParsingException {
+        String exceptionMessage = "Failed to fetch file '" + name + "' from entries.";
+        try {
+            InputStream inputStream = entries.get(name);
+            if (inputStream == null) throw new ContentParsingException(exceptionMessage);
+            return inputStream;
+        } catch (ParsingStoreException e) {
+            throw new ContentParsingException(exceptionMessage, e);
+        }
     }
 
     private void markEntryRequested(String name) {

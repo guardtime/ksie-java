@@ -20,6 +20,7 @@ public class StreamContainerDocument implements ContainerDocument {
 
     private final File tempFile;
     private FileContainerDocument containerDocument;
+    private boolean closed;
 
     public StreamContainerDocument(InputStream input, String mimeType, String fileName) {
         notNull(input, "Input stream");
@@ -41,16 +42,19 @@ public class StreamContainerDocument implements ContainerDocument {
 
     @Override
     public InputStream getInputStream() throws IOException {
+        checkClosed();
         return containerDocument.getInputStream();
     }
 
     @Override
     public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
+        checkClosed();
         return containerDocument.getDataHash(algorithm);
     }
 
     @Override
     public List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws IOException {
+        checkClosed();
         return containerDocument.getDataHashList(algorithmList);
     }
 
@@ -97,10 +101,17 @@ public class StreamContainerDocument implements ContainerDocument {
     public void close() throws IOException {
         containerDocument.close();
         Files.deleteIfExists(tempFile.toPath());
+        this.closed = true;
     }
 
     @Override
     protected void finalize() throws Throwable {
         close();
+    }
+
+    private void checkClosed() throws IOException {
+        if(closed) {
+            throw new IOException("Can't access closed document!");
+        }
     }
 }

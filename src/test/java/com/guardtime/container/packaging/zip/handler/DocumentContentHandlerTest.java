@@ -7,15 +7,14 @@ import static com.guardtime.container.packaging.zip.ZipContainerPackagingFactory
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class DocumentContentHandlerTest {
+public class DocumentContentHandlerTest extends AbstractContentHandlerTest {
 
     private static final String VALID_DOCUMENT_PATH = "important_document_is_important.doc";
     private static final String INVALID_DOCUMENT_PATH = "/META-INF/manifest-1.tlv";
-    private DocumentContentHandler handler;
 
     @Before
-    public void setUp() {
-        handler = new DocumentContentHandler();
+    public void setUpHandler() {
+        handler = new DocumentContentHandler(mockStore);
     }
 
     @Test

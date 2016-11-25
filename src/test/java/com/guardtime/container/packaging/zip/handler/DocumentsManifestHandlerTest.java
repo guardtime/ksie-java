@@ -10,11 +10,10 @@ public class DocumentsManifestHandlerTest extends AbstractContentHandlerTest {
 
     private static final String VALID_DATA_FILES_MANIFEST_PATH = "/META-INF/datamanifest-1.tlv";
     private static final String INVALID_DATA_FILES_MANIFEST_PATH = "funky_music.mp3";
-    private DocumentsManifestHandler handler;
 
     @Before
     public void setUpHandler() {
-        handler = new DocumentsManifestHandler(mockManifestFactory);
+        handler = new DocumentsManifestHandler(mockManifestFactory, mockStore);
     }
 
     @Test

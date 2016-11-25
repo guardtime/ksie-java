@@ -1,7 +1,6 @@
 package com.guardtime.container.integration;
 
 import com.guardtime.container.AbstractContainerTest;
-import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 import com.guardtime.container.signature.SignatureFactory;
