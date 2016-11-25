@@ -14,7 +14,7 @@ public class DocumentContentHandlerTest extends AbstractContentHandlerTest {
 
     @Before
     public void setUpHandler() {
-        handler = new DocumentContentHandler(mockStore);
+        handler = new DocumentContentHandler(store);
     }
 
     @Test

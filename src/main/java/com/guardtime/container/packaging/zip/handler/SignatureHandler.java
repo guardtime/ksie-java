@@ -5,7 +5,6 @@ import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureException;
 import com.guardtime.container.signature.SignatureFactory;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -36,8 +35,6 @@ public class SignatureHandler extends ContentHandler<ContainerSignature> {
             return signatureFactory.read(stream);
         } catch (SignatureException e) {
             throw new ContentParsingException("Failed to parse content of signature file", e);
-        } catch (FileNotFoundException e) {
-            throw new ContentParsingException("Failed to locate requested file in filesystem", e);
         } catch (IOException e) {
             throw new ContentParsingException("Failed to read file", e);
         }

@@ -13,7 +13,7 @@ public class AnnotationContentHandlerTest extends AbstractContentHandlerTest {
 
     @Before
     public void setUpHandler() {
-        handler = new AnnotationContentHandler(mockStore);
+        handler = new AnnotationContentHandler(store);
     }
 
     @Test

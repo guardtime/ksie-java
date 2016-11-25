@@ -36,8 +36,6 @@ public class ManifestHandler extends ContentHandler<Manifest> {
             return manifestFactory.readManifest(input);
         } catch (InvalidManifestException e) {
             throw new ContentParsingException("Failed to parse content of manifest file", e);
-        } catch (FileNotFoundException e) {
-            throw new ContentParsingException("Failed to locate requested file in filesystem", e);
         } catch (IOException e) {
             throw new ContentParsingException("Failed to read file", e);
         }

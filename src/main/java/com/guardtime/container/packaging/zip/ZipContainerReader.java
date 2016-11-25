@@ -1,5 +1,6 @@
 package com.guardtime.container.packaging.zip;
 
+import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.MimeType;
@@ -18,13 +19,10 @@ import com.guardtime.container.packaging.zip.handler.UnknownFileHandler;
 import com.guardtime.container.packaging.zip.parsing.ParsingStore;
 import com.guardtime.container.packaging.zip.parsing.ParsingStoreException;
 import com.guardtime.container.signature.SignatureFactory;
-import com.guardtime.container.util.Pair;
-import com.guardtime.container.util.Util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -86,7 +84,7 @@ class ZipContainerReader {
         }
         List<ZipSignatureContent> contents = buildSignatures();
         MimeType mimeType = getMimeType();
-        List<Pair<String, File>> unknownFiles = getUnknownFiles();
+        List<UnknownDocument> unknownFiles = getUnknownFiles();
 
         if (validMimeType(mimeType) && containsValidContents(contents)) {
             return new ZipContainer(contents, unknownFiles, mimeType, parsingStore);
@@ -142,26 +140,11 @@ class ZipContainerReader {
         }
     }
 
-    private List<Pair<String, File>> getUnknownFiles() throws ParsingStoreException {
-        List<Pair<String, File>> returnable = new LinkedList<>();
-        List<ContentHandler> contentHandlers = new LinkedList<>();
-        contentHandlers.add(unknownFileHandler);
-        for (ContentHandler h : handlers) {
-            contentHandlers.add(h);
-        }
-
-        for (ContentHandler handler : contentHandlers) {
-            for (Object o : handler.getUnrequestedFiles()) {
-                try {
-                    // TODO: REFACTOR once fix has been merged to develop!!!!!
-                    Pair<String, InputStream> p = (Pair<String, InputStream>) o;
-                    File tmpFile = Util.createTempFile();
-                    Util.copyToTempFile(p.getRight(), tmpFile);
-                    returnable.add(Pair.of(p.getLeft(), tmpFile));
-                } catch (IOException e) {
-                    throw new ParsingStoreException("Failed to read stored stream", e);
-                }
-            }
+    private List<UnknownDocument> getUnknownFiles() throws ParsingStoreException {
+        List<UnknownDocument> returnable = new LinkedList<>();
+        returnable.addAll(unknownFileHandler.getUnrequestedFiles());
+        for (ContentHandler handler : handlers) {
+            returnable.addAll(handler.getUnrequestedFiles());
         }
         return returnable;
     }

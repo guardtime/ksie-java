@@ -16,7 +16,7 @@ import static com.guardtime.container.util.Util.notNull;
 /**
  * Document that is based on a {@link InputStream}.
  */
-public class StreamContainerDocument implements ContainerDocument {
+public class StreamContainerDocument implements UnknownDocument {
 
     private final File tempFile;
     private FileContainerDocument containerDocument;
@@ -112,6 +112,15 @@ public class StreamContainerDocument implements ContainerDocument {
     private void checkClosed() throws IOException {
         if(closed) {
             throw new IOException("Can't access closed document!");
+        }
+    }
+
+    @Override
+    public UnknownDocument clone() {
+        try (InputStream inputStream = getInputStream()) {
+            return new StreamContainerDocument(inputStream, getMimeType(), getFileName());
+        } catch (IOException e) {
+            return null;
         }
     }
 }

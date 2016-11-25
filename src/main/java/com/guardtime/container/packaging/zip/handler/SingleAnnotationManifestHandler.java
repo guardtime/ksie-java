@@ -5,7 +5,6 @@ import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.packaging.zip.parsing.ParsingStore;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -36,8 +35,6 @@ public class SingleAnnotationManifestHandler extends ContentHandler<SingleAnnota
             return manifestFactory.readSingleAnnotationManifest(input);
         } catch (InvalidManifestException e) {
             throw new ContentParsingException("Failed to parse content of annotation manifest file", e);
-        } catch (FileNotFoundException e) {
-            throw new ContentParsingException("Failed to locate requested file in filesystem", e);
         } catch (IOException e) {
             throw new ContentParsingException("Failed to read file", e);
         }

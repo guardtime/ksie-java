@@ -23,11 +23,11 @@ public class SignatureHandlerTest extends AbstractContentHandlerTest {
     private SignatureFactoryType mockFactoryType;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         super.setUp();
         when(mockFactoryType.getSignatureFileExtension()).thenReturn("ksig");
         when(mockSignatureFactory.getSignatureFactoryType()).thenReturn(mockFactoryType);
-        handler = new SignatureHandler(mockSignatureFactory, mockStore);
+        handler = new SignatureHandler(mockSignatureFactory, store);
     }
 
     @Test

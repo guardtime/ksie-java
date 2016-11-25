@@ -4,7 +4,6 @@ import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder
 import com.guardtime.container.packaging.zip.parsing.ParsingStore;
 import com.guardtime.ksi.util.Util;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -26,8 +25,6 @@ public class MimeTypeHandler extends ContentHandler<byte[]> {
     protected byte[] getEntry(String name) throws ContentParsingException {
         try (InputStream input = fetchStreamFromEntries(name)) {
             return Util.toByteArray(input);
-        } catch (FileNotFoundException e) {
-            throw new ContentParsingException("Failed to locate requested file in filesystem", e);
         } catch (IOException e) {
             throw new ContentParsingException("Failed to read from file", e);
         }

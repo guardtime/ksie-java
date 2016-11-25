@@ -36,8 +36,6 @@ public class DocumentsManifestHandler extends ContentHandler<DocumentsManifest> 
             return manifestFactory.readDocumentsManifest(input);
         } catch (InvalidManifestException e) {
             throw new ContentParsingException("Failed to parse content of datamanifest file", e);
-        } catch (FileNotFoundException e) {
-            throw new ContentParsingException("Failed to locate requested file in filesystem", e);
         } catch (IOException e) {
             throw new ContentParsingException("Failed to read file", e);
         }

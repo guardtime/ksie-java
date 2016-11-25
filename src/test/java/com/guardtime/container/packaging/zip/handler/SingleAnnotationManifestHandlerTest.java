@@ -13,7 +13,7 @@ public class SingleAnnotationManifestHandlerTest extends AbstractContentHandlerT
 
     @Before
     public void setUpHandler() {
-        handler = new SingleAnnotationManifestHandler(mockManifestFactory, mockStore);
+        handler = new SingleAnnotationManifestHandler(mockManifestFactory, store);
     }
 
     @Test

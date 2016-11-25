@@ -13,7 +13,7 @@ public class DocumentsManifestHandlerTest extends AbstractContentHandlerTest {
 
     @Before
     public void setUpHandler() {
-        handler = new DocumentsManifestHandler(mockManifestFactory, mockStore);
+        handler = new DocumentsManifestHandler(mockManifestFactory, store);
     }
 
     @Test

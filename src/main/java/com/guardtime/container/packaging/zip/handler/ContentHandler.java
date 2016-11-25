@@ -1,9 +1,11 @@
 package com.guardtime.container.packaging.zip.handler;
 
+import com.guardtime.container.document.StreamContainerDocument;
+import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.packaging.zip.parsing.ParsingStore;
 import com.guardtime.container.packaging.zip.parsing.ParsingStoreException;
-import com.guardtime.container.util.Pair;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +16,8 @@ import java.util.TreeSet;
  * Helper class for reading specific type of zip file entry. To check if zip entry can be used by current handler use
  * the {@link ContentHandler#isSupported(String)} method.
  *
- * @param <T> type of the entry
+ * @param <T>
+ *         type of the entry
  */
 public abstract class ContentHandler<T> {
 
@@ -44,10 +47,14 @@ public abstract class ContentHandler<T> {
         return entries.getStoredNames();
     }
 
-    public List<Pair<String, InputStream>> getUnrequestedFiles() throws ParsingStoreException {
-        List<Pair<String, InputStream>> returnable = new LinkedList<>();
+    public List<UnknownDocument> getUnrequestedFiles() throws ParsingStoreException {
+        List<UnknownDocument> returnable = new LinkedList<>();
         for (String name : unrequestedEntries) {
-            returnable.add(Pair.of(name, entries.get(name)));
+            try (InputStream inputStream = entries.get(name)) {
+                returnable.add(new StreamContainerDocument(inputStream, "unknown", name));
+            } catch (IOException e) {
+                throw new ParsingStoreException("Failed to access stream!", e);
+            }
         }
         return returnable;
     }

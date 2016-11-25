@@ -1,15 +1,16 @@
 package com.guardtime.container.packaging.zip.handler;
 
+import com.guardtime.container.document.StreamContainerDocument;
+import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.packaging.zip.parsing.ParsingStore;
-import com.guardtime.container.util.Util;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * This content holders is used for any file. Use as the last place to catch any unfiltered files.
  */
-public class UnknownFileHandler extends ContentHandler<File> {
+public class UnknownFileHandler extends ContentHandler<UnknownDocument> {
 
     public UnknownFileHandler(ParsingStore store) {
         super(store);
@@ -21,13 +22,11 @@ public class UnknownFileHandler extends ContentHandler<File> {
     }
 
     @Override
-    protected File getEntry(String name) throws ContentParsingException {
-        try {
-            File tmpFile = Util.createTempFile();
-            Util.copyToTempFile(fetchStreamFromEntries(name), tmpFile);
-            return tmpFile;
+    protected UnknownDocument getEntry(String name) throws ContentParsingException {
+        try (InputStream inputStream = fetchStreamFromEntries(name)) {
+            return new StreamContainerDocument(inputStream, "unknown", name);
         } catch (IOException e) {
-            throw new ContentParsingException("Failed to read unknown file from stream.", e);
+            throw new ContentParsingException("Failed to parse unknown file.", e);
         }
     }
 

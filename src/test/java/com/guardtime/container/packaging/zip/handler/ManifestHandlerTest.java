@@ -13,7 +13,7 @@ public class ManifestHandlerTest extends AbstractContentHandlerTest {
 
     @Before
     public void setUpHandler() {
-        handler = new ManifestHandler(mockManifestFactory, mockStore);
+        handler = new ManifestHandler(mockManifestFactory, store);
     }
 
     @Test

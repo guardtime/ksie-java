@@ -11,7 +11,7 @@ public class UnknownFileHandlerTest extends AbstractContentHandlerTest {
 
     @Before
     public void setUpHandler() {
-        handler = new UnknownFileHandler(mockStore);
+        handler = new UnknownFileHandler(store);
     }
 
     @Test
