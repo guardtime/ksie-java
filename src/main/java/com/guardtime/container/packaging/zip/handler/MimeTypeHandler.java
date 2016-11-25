@@ -1,6 +1,6 @@
 package com.guardtime.container.packaging.zip.handler;
 
-import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
+import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 import com.guardtime.ksi.util.Util;
 
 import java.io.File;
@@ -18,7 +18,7 @@ public class MimeTypeHandler extends ContentHandler<byte[]> {
 
     @Override
     public boolean isSupported(String name) {
-        return name.equals(ZipContainerPackagingFactory.MIME_TYPE_ENTRY_NAME);
+        return name.equals(ZipContainerPackagingFactoryBuilder.MIME_TYPE_ENTRY_NAME);
     }
 
     @Override

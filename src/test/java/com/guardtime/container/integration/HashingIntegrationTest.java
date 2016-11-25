@@ -12,8 +12,9 @@ import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
+import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
+import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.KSISignature;
@@ -149,9 +150,12 @@ public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationT
         builder.build();
     }
 
-    private ZipContainerPackagingFactory getContainerPackagingFactory(HashAlgorithmProvider provider) throws Exception {
+    private ContainerPackagingFactory getContainerPackagingFactory(HashAlgorithmProvider provider) throws Exception {
         ContainerManifestFactory containerManifestFactory = new TlvContainerManifestFactory(provider);
-        return new ZipContainerPackagingFactory(signatureFactory, containerManifestFactory);
+        return new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(signatureFactory).
+                withManifestFactory(containerManifestFactory).
+                build();
     }
 
     private void setUpContainer(HashAlgorithmProvider provider) throws Exception {

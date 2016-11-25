@@ -71,7 +71,7 @@ class ZipContainerReader {
     }
 
     ZipContainer read(InputStream input) throws IOException, InvalidPackageException {
-        try(ZipInputStream zipInput = new ZipInputStream(input)) {
+        try (ZipInputStream zipInput = new ZipInputStream(input)) {
             ZipEntry entry;
             while ((entry = zipInput.getNextEntry()) != null) {
                 if (entry.isDirectory()) {
@@ -130,7 +130,7 @@ class ZipContainerReader {
 
     private MimeType getMimeType() {
         try {
-            String uri = ZipContainerPackagingFactory.MIME_TYPE_ENTRY_NAME;
+            String uri = ZipContainerPackagingFactoryBuilder.MIME_TYPE_ENTRY_NAME;
             byte[] content = mimeTypeHandler.get(uri);
             return new MimeTypeEntry(uri, content);
         } catch (ContentParsingException e) {

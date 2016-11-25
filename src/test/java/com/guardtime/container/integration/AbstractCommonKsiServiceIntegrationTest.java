@@ -1,6 +1,10 @@
 package com.guardtime.container.integration;
 
-import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
+import com.guardtime.container.AbstractContainerTest;
+import com.guardtime.container.manifest.ContainerManifestFactory;
+import com.guardtime.container.packaging.ContainerPackagingFactory;
+import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
+import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.ksi.KsiSignatureFactory;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.KSIBuilder;
@@ -8,6 +12,7 @@ import com.guardtime.ksi.service.client.KSIServiceCredentials;
 import com.guardtime.ksi.service.client.http.HttpClientSettings;
 import com.guardtime.ksi.service.http.simple.SimpleHttpClient;
 import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
+
 import org.junit.Before;
 
 import java.io.File;
@@ -17,7 +22,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
-public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCommonIntegrationTest {
+public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractContainerTest {
 
     private static final String TEST_SIGNING_SERVICE;
     private static final String TEST_EXTENDING_SERVICE;
@@ -38,8 +43,9 @@ public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCo
         }
     }
 
-
     protected KSI ksi;
+    protected ContainerPackagingFactory packagingFactory;
+    protected SignatureFactory signatureFactory;
 
     @Before
     public void setUp() throws Exception {
@@ -57,7 +63,7 @@ public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCo
                 .setPublicationsFileTrustedCertSelector(new X509CertificateSubjectRdnSelector("E=publications@guardtime.com"))
                 .build();
         signatureFactory = new KsiSignatureFactory(ksi);
-        packagingFactory = new ZipContainerPackagingFactory(signatureFactory, manifestFactory);
+        packagingFactory = new ZipContainerPackagingFactoryBuilder().withSignatureFactory(signatureFactory).build();
 
     }
 }
