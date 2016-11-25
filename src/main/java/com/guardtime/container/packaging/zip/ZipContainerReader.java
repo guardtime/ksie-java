@@ -16,8 +16,8 @@ import com.guardtime.container.packaging.zip.handler.MimeTypeHandler;
 import com.guardtime.container.packaging.zip.handler.SignatureHandler;
 import com.guardtime.container.packaging.zip.handler.SingleAnnotationManifestHandler;
 import com.guardtime.container.packaging.zip.handler.UnknownFileHandler;
-import com.guardtime.container.packaging.zip.parsing.ParsingStore;
-import com.guardtime.container.packaging.zip.parsing.ParsingStoreException;
+import com.guardtime.container.packaging.parsing.ParsingStore;
+import com.guardtime.container.packaging.parsing.ParsingStoreException;
 import com.guardtime.container.signature.SignatureFactory;
 
 import org.slf4j.Logger;

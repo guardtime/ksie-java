@@ -3,7 +3,7 @@ package com.guardtime.container.packaging.zip.handler;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
-import com.guardtime.container.packaging.zip.parsing.ParsingStore;
+import com.guardtime.container.packaging.parsing.ParsingStore;
 
 import java.io.IOException;
 import java.io.InputStream;

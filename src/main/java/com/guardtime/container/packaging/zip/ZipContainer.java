@@ -6,7 +6,7 @@ import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.packaging.zip.parsing.ParsingStore;
+import com.guardtime.container.packaging.parsing.ParsingStore;
 import com.guardtime.ksi.util.Util;
 
 import java.io.BufferedOutputStream;

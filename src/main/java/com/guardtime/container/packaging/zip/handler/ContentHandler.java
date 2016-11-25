@@ -2,8 +2,8 @@ package com.guardtime.container.packaging.zip.handler;
 
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.document.UnknownDocument;
-import com.guardtime.container.packaging.zip.parsing.ParsingStore;
-import com.guardtime.container.packaging.zip.parsing.ParsingStoreException;
+import com.guardtime.container.packaging.parsing.ParsingStore;
+import com.guardtime.container.packaging.parsing.ParsingStoreException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,17 +21,17 @@ import java.util.TreeSet;
  */
 public abstract class ContentHandler<T> {
 
-    protected final ParsingStore entries;
+    protected final ParsingStore parsingStore;
     private Set<String> unrequestedEntries = new TreeSet<>();
 
-    protected ContentHandler(ParsingStore entries) {
-        this.entries = entries;
+    protected ContentHandler(ParsingStore store) {
+        this.parsingStore = store;
     }
 
     public abstract boolean isSupported(String name);
 
     public void add(String name, InputStream stream) throws ParsingStoreException {
-        entries.store(name, stream);
+        parsingStore.store(name, stream);
         unrequestedEntries.add(name);
     }
 
@@ -44,13 +44,13 @@ public abstract class ContentHandler<T> {
     protected abstract T getEntry(String name) throws ContentParsingException;
 
     public Set<String> getNames() {
-        return entries.getStoredNames();
+        return parsingStore.getStoredNames();
     }
 
     public List<UnknownDocument> getUnrequestedFiles() throws ParsingStoreException {
         List<UnknownDocument> returnable = new LinkedList<>();
         for (String name : unrequestedEntries) {
-            try (InputStream inputStream = entries.get(name)) {
+            try (InputStream inputStream = parsingStore.get(name)) {
                 returnable.add(new StreamContainerDocument(inputStream, "unknown", name));
             } catch (IOException e) {
                 throw new ParsingStoreException("Failed to access stream!", e);
@@ -69,9 +69,9 @@ public abstract class ContentHandler<T> {
     }
 
     protected InputStream fetchStreamFromEntries(String name) throws ContentParsingException {
-        String exceptionMessage = "Failed to fetch file '" + name + "' from entries.";
+        String exceptionMessage = "Failed to fetch file '" + name + "' from parsingStore.";
         try {
-            InputStream inputStream = entries.get(name);
+            InputStream inputStream = parsingStore.get(name);
             if (inputStream == null) throw new ContentParsingException(exceptionMessage);
             return inputStream;
         } catch (ParsingStoreException e) {

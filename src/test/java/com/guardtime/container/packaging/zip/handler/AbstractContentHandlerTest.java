@@ -3,8 +3,8 @@ package com.guardtime.container.packaging.zip.handler;
 import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.ManifestFactoryType;
-import com.guardtime.container.packaging.zip.parsing.ParsingStore;
-import com.guardtime.container.packaging.zip.parsing.TemporaryFileBasedParsingStoreFactory;
+import com.guardtime.container.packaging.parsing.ParsingStore;
+import com.guardtime.container.packaging.parsing.TemporaryFileBasedParsingStoreFactory;
 
 import org.junit.Before;
 import org.junit.Test;

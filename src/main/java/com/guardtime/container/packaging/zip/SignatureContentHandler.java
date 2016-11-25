@@ -2,10 +2,10 @@ package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
-import com.guardtime.container.annotation.FileContainerAnnotation;
-import com.guardtime.container.annotation.StreamContainerAnnotation;
+import com.guardtime.container.annotation.ParsedContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.EmptyContainerDocument;
+import com.guardtime.container.document.ParsedContianerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.manifest.AnnotationDataReference;
 import com.guardtime.container.manifest.AnnotationsManifest;
@@ -13,6 +13,7 @@ import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
+import com.guardtime.container.packaging.parsing.ParsedStreamProvider;
 import com.guardtime.container.packaging.zip.handler.AnnotationContentHandler;
 import com.guardtime.container.packaging.zip.handler.AnnotationsManifestHandler;
 import com.guardtime.container.packaging.zip.handler.ContentParsingException;
@@ -27,7 +28,6 @@ import com.guardtime.container.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -132,8 +132,8 @@ class SignatureContentHandler {
             if (invalidReference(reference)) return null;
             String documentUri = reference.getUri();
             try {
-                InputStream stream = documentHandler.get(documentUri);
-                return new StreamContainerDocument(stream, reference.getMimeType(), documentUri);
+                ParsedStreamProvider streamProvider = documentHandler.get(documentUri);
+                return new ParsedContianerDocument(streamProvider, reference.getMimeType(), documentUri);
             } catch (ContentParsingException e) {
                 // either removed or was never present in the first place, verifier will decide
                 return new EmptyContainerDocument(documentUri, reference.getMimeType(), reference.getHashList());
@@ -178,8 +178,8 @@ class SignatureContentHandler {
                     return null;
                 }
                 AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
-                InputStream annotationStream = annotationContentHandler.get(annotationDataReference.getUri());
-                ContainerAnnotation annotation = new StreamContainerAnnotation(annotationStream, annotationDataReference.getDomain(), type);
+                ParsedStreamProvider annotationStreamProvider = annotationContentHandler.get(annotationDataReference.getUri());
+                ContainerAnnotation annotation = new ParsedContainerAnnotation(annotationStreamProvider, annotationDataReference.getDomain(), type);
                 return Pair.of(annotationDataReference.getUri(), annotation);
             } catch (ContentParsingException e) {
                 LOGGER.info("Failed to parse annotation for '{}'. Reason: '{}'", manifestReference.getUri(), e.getMessage());

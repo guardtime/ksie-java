@@ -1,18 +1,15 @@
 package com.guardtime.container.packaging.zip.handler;
 
-import com.guardtime.container.packaging.zip.parsing.ParsingStore;
-import com.guardtime.container.util.Util;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import com.guardtime.container.packaging.parsing.ParsedStreamProvider;
+import com.guardtime.container.packaging.parsing.ParsingStore;
+import com.guardtime.container.packaging.parsing.ParsingStoreException;
 
 import static com.guardtime.container.packaging.EntryNameProvider.ANNOTATION_DATA_FORMAT;
 
 /**
  * This content holders is used for annotations inside the container.
  */
-public class AnnotationContentHandler extends ContentHandler<InputStream> {
+public class AnnotationContentHandler extends ContentHandler<ParsedStreamProvider> {
 
     public AnnotationContentHandler(ParsingStore store) {
         super(store);
@@ -26,8 +23,12 @@ public class AnnotationContentHandler extends ContentHandler<InputStream> {
     }
 
     @Override
-    protected InputStream getEntry(String name) throws ContentParsingException {
-        return fetchStreamFromEntries(name);
+    protected ParsedStreamProvider getEntry(String name) throws ContentParsingException {
+        try {
+            return parsingStore.getParsedStreamProvider(name);
+        } catch (ParsingStoreException e) {
+            throw new ContentParsingException("Failed to get annotation content", e);
+        }
     }
 
 }

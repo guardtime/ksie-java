@@ -9,7 +9,7 @@ import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.packaging.zip.parsing.TemporaryFileBasedParsingStoreFactory;
+import com.guardtime.container.packaging.parsing.TemporaryFileBasedParsingStoreFactory;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.ksi.KsiSignatureFactory;
 import com.guardtime.ksi.KSI;

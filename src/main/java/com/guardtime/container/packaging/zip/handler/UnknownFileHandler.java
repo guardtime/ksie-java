@@ -2,7 +2,7 @@ package com.guardtime.container.packaging.zip.handler;
 
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.document.UnknownDocument;
-import com.guardtime.container.packaging.zip.parsing.ParsingStore;
+import com.guardtime.container.packaging.parsing.ParsingStore;
 
 import java.io.IOException;
 import java.io.InputStream;

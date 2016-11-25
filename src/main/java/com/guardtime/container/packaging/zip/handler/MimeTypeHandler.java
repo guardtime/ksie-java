@@ -1,7 +1,7 @@
 package com.guardtime.container.packaging.zip.handler;
 
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
-import com.guardtime.container.packaging.zip.parsing.ParsingStore;
+import com.guardtime.container.packaging.parsing.ParsingStore;
 import com.guardtime.ksi.util.Util;
 
 import java.io.IOException;

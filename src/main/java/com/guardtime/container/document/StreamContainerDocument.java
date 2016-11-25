@@ -60,7 +60,7 @@ public class StreamContainerDocument implements UnknownDocument {
 
     @Override
     public boolean isWritable() {
-        return true;
+        return !closed;
     }
 
     @Override
@@ -110,7 +110,7 @@ public class StreamContainerDocument implements UnknownDocument {
     }
 
     private void checkClosed() throws IOException {
-        if(closed) {
+        if (closed) {
             throw new IOException("Can't access closed document!");
         }
     }
