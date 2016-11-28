@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -46,24 +47,18 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
 
         @Override
         public Set<String> getStoredNames() {
-            return store.keySet();
+            return Collections.unmodifiableSet(store.keySet());
         }
 
         @Override
         public InputStream get(String name) throws ParsingStoreException {
             checkClosed();
             try {
-                File file = store.get(name);
                 checkExistence(name);
+                File file = store.get(name);
                 return Files.newInputStream(file.toPath());
             } catch (IOException e) {
                 throw new ParsingStoreException("Failed to retrieve stream for element '" + name + "'", e);
-            }
-        }
-
-        private void checkExistence(String name) throws ParsingStoreException {
-            if(!store.containsKey(name)) {
-                throw new ParsingStoreException("No value matching '" + name + "' in store!");
             }
         }
 
@@ -80,6 +75,12 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
                 this.closed = true;
             } catch (IOException e) {
                 throw new ParsingStoreException("Failed to close all stored data!", e);
+            }
+        }
+
+        private void checkExistence(String name) throws ParsingStoreException {
+            if (!store.containsKey(name)) {
+                throw new ParsingStoreException("No value matching '" + name + "' in store!");
             }
         }
 
