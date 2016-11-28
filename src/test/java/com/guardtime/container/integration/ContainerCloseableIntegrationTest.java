@@ -159,7 +159,7 @@ public class ContainerCloseableIntegrationTest extends AbstractCommonKsiServiceI
         try (
                 ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(new byte[3]), "qwerty", "qwert.file");
                 ContainerAnnotation annotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "qwerty file", "qwerty.domain.com");
-                Container container = getContainer(CONTAINER_WITH_MULTIPLE_ANNOTATIONS);
+                Container container = getContainer(CONTAINER_WITH_NON_REMOVABLE_ANNOTATION)
         ) {
             List<String> tempFiles = getKsieTempFiles();
             //One KSIE directory for container and one KSIE...tmp file for annotation.
