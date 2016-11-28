@@ -10,6 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Keeps parsed data in memory.
+ * NB! There is no defence against too large data. Use with care!
+ */
 public class MemoryBasedParsingStoreFactory implements ParsingStoreFactory {
 
     @Override
@@ -36,47 +40,18 @@ public class MemoryBasedParsingStoreFactory implements ParsingStoreFactory {
         }
 
         @Override
-        public InputStream get(String name) throws ParsingStoreException {
-            checkExistence(name);
-            return new ByteArrayInputStream(store.get(name));
-        }
-
-        @Override
-        public ParsedStreamProvider getParsedStreamProvider(String name) throws ParsingStoreException {
-            checkExistence(name);
-            return new MemoryBasedParsedStreamProvider(name, this);
+        public InputStream get(String name) {
+            byte[] bytes = store.get(name);
+            if(bytes == null) {
+                return null;
+            }
+            return new ByteArrayInputStream(bytes);
         }
 
         @Override
         public void close() throws Exception {
             this.store = new HashMap<>();
         }
-
-        private void checkExistence(String name) throws ParsingStoreException {
-            if (!store.containsKey(name)) {
-                throw new ParsingStoreException("No value matching '" + name + "' in store!");
-            }
-        }
     }
 
-    private class MemoryBasedParsedStreamProvider implements ParsedStreamProvider {
-
-        private final String name;
-        private final ParsingStore parsingStore;
-
-        MemoryBasedParsedStreamProvider(String name, ParsingStore parsingStore) {
-            this.name = name;
-            this.parsingStore = parsingStore;
-        }
-
-        @Override
-        public InputStream getNewStream() throws ParsingStoreException {
-            return parsingStore.get(name);
-        }
-
-        @Override
-        public void close() throws Exception {
-            // remove from store?
-        }
-    }
 }

@@ -3,18 +3,22 @@ package com.guardtime.container.packaging.parsing;
 import java.io.InputStream;
 import java.util.Set;
 
+/**
+ * Data store that is meant to keep data from parsed in {@link com.guardtime.container.packaging.Container}
+ */
 public interface ParsingStore extends AutoCloseable {
 
-    void store(String name, InputStream stream) throws ParsingStoreException;
+    /**
+     * Adds data from {@param stream} into store with {@param key}
+     * @throws ParsingStoreException when reading the stream fails.
+     */
+    void store(String key, InputStream stream) throws ParsingStoreException;
 
     Set<String> getStoredNames();
 
-    InputStream get(String name) throws ParsingStoreException;
-
-    ParsedStreamProvider getParsedStreamProvider(String name) throws ParsingStoreException;
-
-//    void remove(String name) throws ParsingStoreException;
-//
-//    void remove(InputStream stream) throws ParsingStoreException;
+    /**
+     * Produces an {@link InputStream} of the data stored with the {@param key}
+     */
+    InputStream get(String key);
 
 }

@@ -1,5 +1,6 @@
 package com.guardtime.container.document;
 
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -16,7 +17,7 @@ import static com.guardtime.container.util.Util.notNull;
 /**
  * Document that is based on a {@link InputStream}.
  */
-public class StreamContainerDocument implements UnknownDocument {
+public class StreamContainerDocument implements ContainerDocument {
 
     private final File tempFile;
     private FileContainerDocument containerDocument;
@@ -47,13 +48,13 @@ public class StreamContainerDocument implements UnknownDocument {
     }
 
     @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
+    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException, DataHashException {
         checkClosed();
         return containerDocument.getDataHash(algorithm);
     }
 
     @Override
-    public List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws IOException {
+    public List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws IOException, DataHashException {
         checkClosed();
         return containerDocument.getDataHashList(algorithmList);
     }
@@ -78,7 +79,6 @@ public class StreamContainerDocument implements UnknownDocument {
         } catch (IOException e) {
             throw new IllegalArgumentException("Can not copy input stream", e);
         }
-
     }
 
     @Override
@@ -98,7 +98,7 @@ public class StreamContainerDocument implements UnknownDocument {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() throws Exception {
         containerDocument.close();
         Files.deleteIfExists(tempFile.toPath());
         this.closed = true;
@@ -109,18 +109,9 @@ public class StreamContainerDocument implements UnknownDocument {
         close();
     }
 
-    private void checkClosed() throws IOException {
+    private void checkClosed() {
         if (closed) {
-            throw new IOException("Can't access closed document!");
-        }
-    }
-
-    @Override
-    public UnknownDocument clone() {
-        try (InputStream inputStream = getInputStream()) {
-            return new StreamContainerDocument(inputStream, getMimeType(), getFileName());
-        } catch (IOException e) {
-            return null;
+            throw new IllegalStateException("Can't access closed document!");
         }
     }
 }

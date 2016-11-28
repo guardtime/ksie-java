@@ -1,11 +1,10 @@
 package com.guardtime.container.packaging.zip.handler;
 
-import com.guardtime.container.document.StreamContainerDocument;
+import com.guardtime.container.document.ParsedContainerDocument;
 import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.packaging.parsing.ParsingStore;
 import com.guardtime.container.packaging.parsing.ParsingStoreException;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,8 +15,7 @@ import java.util.TreeSet;
  * Helper class for reading specific type of zip file entry. To check if zip entry can be used by current handler use
  * the {@link ContentHandler#isSupported(String)} method.
  *
- * @param <T>
- *         type of the entry
+ * @param <T> type of the entry
  */
 public abstract class ContentHandler<T> {
 
@@ -50,11 +48,7 @@ public abstract class ContentHandler<T> {
     public List<UnknownDocument> getUnrequestedFiles() throws ParsingStoreException {
         List<UnknownDocument> returnable = new LinkedList<>();
         for (String name : unrequestedEntries) {
-            try (InputStream inputStream = parsingStore.get(name)) {
-                returnable.add(new StreamContainerDocument(inputStream, "unknown", name));
-            } catch (IOException e) {
-                throw new ParsingStoreException("Failed to access stream!", e);
-            }
+            returnable.add(new ParsedContainerDocument(parsingStore, name, "unknown", name));
         }
         return returnable;
     }
@@ -69,14 +63,9 @@ public abstract class ContentHandler<T> {
     }
 
     protected InputStream fetchStreamFromEntries(String name) throws ContentParsingException {
-        String exceptionMessage = "Failed to fetch file '" + name + "' from parsingStore.";
-        try {
             InputStream inputStream = parsingStore.get(name);
-            if (inputStream == null) throw new ContentParsingException(exceptionMessage);
+            if (inputStream == null) throw new ContentParsingException("Failed to fetch file '" + name + "' from parsingStore.");
             return inputStream;
-        } catch (ParsingStoreException e) {
-            throw new ContentParsingException(exceptionMessage, e);
-        }
     }
 
     private void markEntryRequested(String name) {

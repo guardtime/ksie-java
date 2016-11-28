@@ -5,6 +5,8 @@ import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.packaging.parsing.ParsingStore;
+import com.guardtime.container.packaging.parsing.ParsingStoreException;
 import com.guardtime.container.packaging.zip.handler.AnnotationContentHandler;
 import com.guardtime.container.packaging.zip.handler.AnnotationsManifestHandler;
 import com.guardtime.container.packaging.zip.handler.ContentHandler;
@@ -16,9 +18,8 @@ import com.guardtime.container.packaging.zip.handler.MimeTypeHandler;
 import com.guardtime.container.packaging.zip.handler.SignatureHandler;
 import com.guardtime.container.packaging.zip.handler.SingleAnnotationManifestHandler;
 import com.guardtime.container.packaging.zip.handler.UnknownFileHandler;
-import com.guardtime.container.packaging.parsing.ParsingStore;
-import com.guardtime.container.packaging.parsing.ParsingStoreException;
 import com.guardtime.container.signature.SignatureFactory;
+import com.guardtime.container.util.Util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,7 @@ class ZipContainerReader {
     private ContentHandler[] handlers;
 
     ZipContainerReader(ContainerManifestFactory manifestFactory, SignatureFactory signatureFactory, ParsingStore store) throws IOException {
+        Util.notNull(store, "Parsing store");
         this.parsingStore = store;
         this.documentHandler = new DocumentContentHandler(store);
         this.annotationContentHandler = new AnnotationContentHandler(store);

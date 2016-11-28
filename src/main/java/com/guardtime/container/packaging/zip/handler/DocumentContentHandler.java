@@ -1,16 +1,12 @@
 package com.guardtime.container.packaging.zip.handler;
 
-import com.guardtime.container.packaging.parsing.ParsedStreamProvider;
-import com.guardtime.container.packaging.parsing.ParsingStoreException;
-import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 import com.guardtime.container.packaging.parsing.ParsingStore;
-
-import java.io.InputStream;
+import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 
 /**
  * This content holders is used for documents inside the container.
  */
-public class DocumentContentHandler extends ContentHandler<ParsedStreamProvider> {
+public class DocumentContentHandler extends ContentHandler<ParsingStore> {
 
     public DocumentContentHandler(ParsingStore store) {
         super(store);
@@ -30,12 +26,11 @@ public class DocumentContentHandler extends ContentHandler<ParsedStreamProvider>
     }
 
     @Override
-    protected ParsedStreamProvider getEntry(String name) throws ContentParsingException {
-        try {
-            return parsingStore.getParsedStreamProvider(name);
-        } catch (ParsingStoreException e) {
-            throw new ContentParsingException("Failed to get document content", e);
+    protected ParsingStore getEntry(String name) throws ContentParsingException {
+        if(parsingStore.get(name) == null) {
+            throw new ContentParsingException("No data stored for entry '" + name + "'");
         }
+        return parsingStore;
     }
 
 }

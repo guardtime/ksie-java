@@ -34,7 +34,7 @@ public interface ContainerDocument extends MultiHashElement, AutoCloseable {
     /**
      * Returns a List of {@link DataHash}es for provided {@link HashAlgorithm}s.
      */
-    List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws IOException;
+    List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws IOException, DataHashException;
 
     /**
      * Returns true for any document that's InputSteam can be accessed and data extracted from it.

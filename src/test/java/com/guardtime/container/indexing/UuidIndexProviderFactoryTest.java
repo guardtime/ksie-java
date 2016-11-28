@@ -6,6 +6,7 @@ import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 
 import org.junit.Test;
+
 import java.util.Arrays;
 
 import static org.junit.Assert.assertNotEquals;

@@ -12,6 +12,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Uses temporary files in system temp folder for maintaining data of parsed in {@link com.guardtime.container.packaging.Container}
+ * NB! Does not provide protection against malicious file modification in temp folder. Use with care!
+ */
 public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactory {
 
     @Override
@@ -19,7 +23,7 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
         try {
             return new TemporaryFileBasedParsingStore();
         } catch (IOException e) {
-            throw new ParsingStoreException("Failed to create store!", e);
+            throw new ParsingStoreException("Failed to allocate store!", e);
         }
     }
 
@@ -51,21 +55,17 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
         }
 
         @Override
-        public InputStream get(String name) throws ParsingStoreException {
+        public InputStream get(String name) {
             checkClosed();
             try {
-                checkExistence(name);
                 File file = store.get(name);
+                if(file == null) {
+                    return null;
+                }
                 return Files.newInputStream(file.toPath());
             } catch (IOException e) {
-                throw new ParsingStoreException("Failed to retrieve stream for element '" + name + "'", e);
+                return null;
             }
-        }
-
-        @Override
-        public ParsedStreamProvider getParsedStreamProvider(String name) throws ParsingStoreException {
-            checkExistence(name);
-            return new TemporatyFileBasedParsedStreamProvider(this, name);
         }
 
         @Override
@@ -78,36 +78,10 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
             }
         }
 
-        private void checkExistence(String name) throws ParsingStoreException {
-            if (!store.containsKey(name)) {
-                throw new ParsingStoreException("No value matching '" + name + "' in store!");
-            }
-        }
-
-        private void checkClosed() throws ParsingStoreException {
+        private void checkClosed() {
             if (closed) {
-                throw new ParsingStoreException("Can't access a closed store!");
+                throw new IllegalStateException("Can't access a closed store!");
             }
-        }
-    }
-
-    private class TemporatyFileBasedParsedStreamProvider implements ParsedStreamProvider {
-        private final ParsingStore parsingStore;
-        private final String key;
-
-        public TemporatyFileBasedParsedStreamProvider(ParsingStore parsingStore, String name) {
-            this.parsingStore = parsingStore;
-            this.key = name;
-        }
-
-        @Override
-        public InputStream getNewStream() throws ParsingStoreException {
-            return parsingStore.get(key);
-        }
-
-        @Override
-        public void close() throws Exception {
-            // Nothing to do here at the moment
         }
     }
 }

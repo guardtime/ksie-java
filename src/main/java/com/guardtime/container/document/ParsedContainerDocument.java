@@ -1,4 +1,4 @@
-package com.guardtime.container.annotation;
+package com.guardtime.container.document;
 
 import com.guardtime.container.packaging.parsing.ParsingStore;
 
@@ -8,16 +8,16 @@ import java.io.InputStream;
 import static com.guardtime.container.util.Util.notNull;
 
 /**
- * Represents a {@link ContainerAnnotation} that has been parsed in. Uses a {@link ParsingStore} from where to access the data of
- * the {@link ContainerAnnotation}
+ * Represents a {@link ContainerDocument} that has been parsed in. Uses a {@link ParsingStore} from where to access the data of
+ * the {@link ContainerDocument}
  */
-public class ParsedContainerAnnotation extends AbstractContainerAnnotation {
+public class ParsedContainerDocument extends AbstractContainerDocument implements UnknownDocument {
 
     private final ParsingStore parsingStore;
     private final String key;
 
-    public ParsedContainerAnnotation(ParsingStore store, String key, String domain, ContainerAnnotationType type) {
-        super(domain, type);
+    public ParsedContainerDocument(ParsingStore store, String key, String mimeType, String fileName) {
+        super(mimeType, fileName);
         notNull(store, "Parsing store");
         notNull(key, "Parsing store key");
         this.parsingStore = store;
@@ -32,5 +32,4 @@ public class ParsedContainerAnnotation extends AbstractContainerAnnotation {
         }
         return inputStream;
     }
-
 }

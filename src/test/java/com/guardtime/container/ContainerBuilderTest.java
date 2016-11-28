@@ -57,7 +57,9 @@ public class ContainerBuilderTest extends AbstractContainerTest {
             builder.withDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), TEST_FILE_NAME_TEST_DOC, MIME_TYPE_APPLICATION_TXT);
             assertEquals(2, builder.getDocuments().size());
 
-            builder.withDocument(Mockito.mock(File.class), "application/binary");
+            File mockFile = Mockito.mock(File.class);
+            when(mockFile.getName()).thenReturn("SomeName.ext");
+            builder.withDocument(mockFile, "application/binary");
             assertEquals(3, builder.getDocuments().size());
 
             closeAll(builder.getDocuments());

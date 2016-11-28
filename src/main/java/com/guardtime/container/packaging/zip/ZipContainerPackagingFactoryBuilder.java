@@ -2,6 +2,7 @@ package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.document.ParsedContainerDocument;
 import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
@@ -21,6 +22,7 @@ import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.EntryNameProvider;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.packaging.parsing.ParsingStore;
 import com.guardtime.container.packaging.parsing.ParsingStoreException;
 import com.guardtime.container.packaging.parsing.ParsingStoreFactory;
 import com.guardtime.container.packaging.parsing.TemporaryFileBasedParsingStoreFactory;
@@ -77,8 +79,8 @@ public class ZipContainerPackagingFactoryBuilder {
         return this;
     }
 
-    public ZipContainerPackagingFactoryBuilder withParsingStoreFactory(ParsingStoreFactory storeFactory) {
-        this.parsingStoreFactory = storeFactory;
+    public ZipContainerPackagingFactoryBuilder withParsingStoreFactory(ParsingStoreFactory factory) {
+        this.parsingStoreFactory = factory;
         return this;
     }
 
@@ -94,7 +96,11 @@ public class ZipContainerPackagingFactoryBuilder {
 
     public ContainerPackagingFactory<ZipContainer> build() {
         Util.notNull(signatureFactory, "Signature factory");
-        return new ZipContainerPackagingFactory(signatureFactory, manifestFactory, indexProviderFactory, disableInternalVerification, parsingStoreFactory);
+        return new ZipContainerPackagingFactory(signatureFactory, manifestFactory, indexProviderFactory, disableInternalVerification);
+    }
+
+    private ParsingStore getParsingStore() throws ParsingStoreException {
+        return parsingStoreFactory.build();
     }
 
 
@@ -105,18 +111,15 @@ public class ZipContainerPackagingFactoryBuilder {
         private final ContainerManifestFactory manifestFactory;
         private final IndexProviderFactory indexProviderFactory;
         private final boolean disableVerification;
-        private final ParsingStoreFactory parsingStoreFactory;
 
-        private ZipContainerPackagingFactory(SignatureFactory signatureFactory, ContainerManifestFactory manifestFactory, IndexProviderFactory indexProviderFactory, boolean disableVerification, ParsingStoreFactory storeFactory) {
+        private ZipContainerPackagingFactory(SignatureFactory signatureFactory, ContainerManifestFactory manifestFactory, IndexProviderFactory indexProviderFactory, boolean disableVerification) {
             Util.notNull(signatureFactory, "Signature factory");
             Util.notNull(manifestFactory, "Manifest factory");
             Util.notNull(indexProviderFactory, "Index provider factory");
-            Util.notNull(storeFactory, "Parsing store factory");
             this.signatureFactory = signatureFactory;
             this.manifestFactory = manifestFactory;
             this.indexProviderFactory = indexProviderFactory;
             this.disableVerification = disableVerification;
-            this.parsingStoreFactory = storeFactory;
             logger.info("Zip container factory initialized");
         }
 
@@ -124,7 +127,7 @@ public class ZipContainerPackagingFactoryBuilder {
         public ZipContainer read(InputStream stream) throws InvalidPackageException {
             Util.notNull(stream, "Input stream");
             try {
-                ZipContainerReader reader = new ZipContainerReader(this.manifestFactory, this.signatureFactory, this.parsingStoreFactory.build());
+                ZipContainerReader reader = new ZipContainerReader(this.manifestFactory, this.signatureFactory, getParsingStore());
                 return reader.read(stream);
             } catch (IOException e) {
                 throw new InvalidPackageException("Failed to parse InputStream", e);
@@ -173,7 +176,8 @@ public class ZipContainerPackagingFactoryBuilder {
                 ZipSignatureContent signatureContent = signer.sign();
                 List<ZipSignatureContent> contents = new LinkedList<>(existingZipContainer.getSignatureContents());
                 contents.add(signatureContent);
-                ZipContainer zipContainer = new ZipContainer(contents, getCopies(existingContainer.getUnknownFiles()), existingContainer.getMimeType());
+                ParsingStore store = getParsingStore();
+                ZipContainer zipContainer = new ZipContainer(contents, getCopies(existingContainer.getUnknownFiles(), store), existingContainer.getMimeType(), store);
                 verifyContainer(zipContainer);
                 return zipContainer;
             } catch (IOException | InvalidManifestException e) {
@@ -182,13 +186,17 @@ public class ZipContainerPackagingFactoryBuilder {
                 throw new InvalidPackageException("Failed to sign ZipContainer!", e);
             } catch (IndexingException e) {
                 throw new InvalidPackageException("Failed to extract signature indexes from existing Container!", e);
+            } catch (ParsingStoreException e) {
+                throw new InvalidPackageException("Failed to create private store!", e);
             }
         }
 
-        private List<UnknownDocument> getCopies(List<UnknownDocument> existingList) {
+        private List<UnknownDocument> getCopies(List<UnknownDocument> existingList, ParsingStore store) throws IOException, ParsingStoreException {
             List<UnknownDocument> newList = new LinkedList<>();
             for (UnknownDocument doc : existingList) {
-                newList.add(doc.clone());
+                InputStream inputStream = doc.getInputStream();
+                store.store(doc.getFileName(), inputStream);
+                newList.add(new ParsedContainerDocument(store, doc.getFileName(), doc.getMimeType(), doc.getFileName()));
             }
             return newList;
         }
