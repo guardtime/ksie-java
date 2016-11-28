@@ -12,14 +12,21 @@ import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.unisignature.verifier.PolicyVerificationResult;
 import com.guardtime.ksi.unisignature.verifier.VerificationErrorCode;
 import com.guardtime.ksi.unisignature.verifier.VerificationResultCode;
-import com.guardtime.ksi.unisignature.verifier.policies.*;
+import com.guardtime.ksi.unisignature.verifier.policies.CalendarBasedVerificationPolicy;
+import com.guardtime.ksi.unisignature.verifier.policies.InternalVerificationPolicy;
+import com.guardtime.ksi.unisignature.verifier.policies.KeyBasedVerificationPolicy;
+import com.guardtime.ksi.unisignature.verifier.policies.Policy;
+import com.guardtime.ksi.unisignature.verifier.policies.PublicationsFileBasedVerificationPolicy;
+import com.guardtime.ksi.unisignature.verifier.policies.UserProvidedPublicationBasedVerificationPolicy;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.FileInputStream;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
 
@@ -33,12 +40,6 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
                 packagingFactory
         );
         this.verifier = new ContainerVerifier(defaultPolicy);
-    }
-
-    private Container getContainer(String filePath) throws Exception {
-        try (FileInputStream fis = new FileInputStream(loadFile(filePath))) {
-            return packagingFactory.read(fis);
-        }
     }
 
     @Test

@@ -40,6 +40,8 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
         this.packagingFactoryWithUuid = new ZipContainerPackagingFactory(signatureFactory, manifestFactory, new UuidIndexProviderFactory(), false);
     }
 
+    //TODO: create container using empty container document and add document to container afterwards -> read in the container and verify.
+
     @Test
     public void testCreateContainer() throws Exception {
         try (

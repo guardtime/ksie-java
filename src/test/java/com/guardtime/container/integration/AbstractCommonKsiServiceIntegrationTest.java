@@ -1,6 +1,11 @@
 package com.guardtime.container.integration;
 
+import com.guardtime.container.AbstractContainerTest;
+import com.guardtime.container.manifest.ContainerManifestFactory;
+import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
+import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
+import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.ksi.KsiSignatureFactory;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.KSIBuilder;
@@ -17,12 +22,16 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
-public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCommonIntegrationTest {
+public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractContainerTest {
 
+    protected ContainerManifestFactory manifestFactory = new TlvContainerManifestFactory();
+    protected SignatureFactory signatureFactory;
+    protected ZipContainerPackagingFactory packagingFactory;
+
+    private static final KSIServiceCredentials KSI_SERVICE_CREDENTIALS;
     private static final String TEST_SIGNING_SERVICE;
     private static final String TEST_EXTENDING_SERVICE;
     private static final String GUARDTIME_PUBLICATIONS_FILE;
-    private static final KSIServiceCredentials KSI_SERVICE_CREDENTIALS;
 
     static {
         try {
@@ -59,5 +68,17 @@ public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCo
         signatureFactory = new KsiSignatureFactory(ksi);
         packagingFactory = new ZipContainerPackagingFactory(signatureFactory, manifestFactory);
 
+    }
+
+    Container getContainer() throws Exception {
+        return getContainer(CONTAINER_WITH_ONE_DOCUMENT);
+    }
+
+    Container getContainer(String container) throws Exception {
+        URL url = Thread.currentThread().getContextClassLoader().getResource(container);
+        File file = new File(url.toURI());
+        try (FileInputStream input = new FileInputStream(file)) {
+            return packagingFactory.read(input);
+        }
     }
 }
