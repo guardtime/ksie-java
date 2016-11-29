@@ -6,6 +6,7 @@ import com.guardtime.container.packaging.parsing.ParsingStore;
 import com.guardtime.container.packaging.parsing.ParsingStoreException;
 
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +21,7 @@ import java.util.TreeSet;
 public abstract class ContentHandler<T> {
 
     protected final ParsingStore parsingStore;
+    private Set<String> requestedEntries = new TreeSet<>();
     private Set<String> unrequestedEntries = new TreeSet<>();
 
     protected ContentHandler(ParsingStore store) {
@@ -42,7 +44,9 @@ public abstract class ContentHandler<T> {
     protected abstract T getEntry(String name) throws ContentParsingException;
 
     public Set<String> getNames() {
-        return parsingStore.getStoredNames();
+        Set<String> names = new HashSet<>(unrequestedEntries);
+        names.addAll(requestedEntries);
+        return names;
     }
 
     public List<UnknownDocument> getUnrequestedFiles() throws ParsingStoreException {
@@ -69,6 +73,7 @@ public abstract class ContentHandler<T> {
     }
 
     private void markEntryRequested(String name) {
+        requestedEntries.add(name);
         unrequestedEntries.remove(name);
     }
 }

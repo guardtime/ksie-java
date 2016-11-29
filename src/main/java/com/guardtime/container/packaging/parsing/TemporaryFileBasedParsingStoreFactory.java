@@ -81,7 +81,7 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
         @Override
         public void remove(String key) {
             File f = store.remove(key);
-            if(f != null) {
+            if (f != null) {
                 try {
                     Files.deleteIfExists(f.toPath());
                 } catch (IOException e) {

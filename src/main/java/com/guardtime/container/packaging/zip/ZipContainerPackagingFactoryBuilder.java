@@ -206,6 +206,11 @@ public class ZipContainerPackagingFactoryBuilder {
             }
             ContainerVerifierResult result = new ContainerVerifier(new InternalVerificationPolicy(this)).verify(zipContainer);
             if (!result.getVerificationResult().equals(VerificationResult.OK)) {
+                try {
+                    zipContainer.close();
+                } catch (Exception e) {
+                    logger.warn("Failed to clean up after created container that did not pass internal verification.", e);
+                }
                 throw new InvalidPackageException("Created Container does not pass internal verification");
             }
         }

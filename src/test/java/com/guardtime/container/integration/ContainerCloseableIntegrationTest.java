@@ -2,6 +2,7 @@ package com.guardtime.container.integration;
 
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
+import com.guardtime.container.packaging.parsing.TemporaryFileBasedParsingStoreFactory;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.ksi.KsiSignatureFactory;
@@ -50,7 +51,10 @@ public class ContainerCloseableIntegrationTest {
         when(mockKsi.sign(Mockito.any(DataHash.class))).thenReturn(Mockito.mock(KSISignature.class));
         when(mockKsi.extend(Mockito.any(KSISignature.class))).thenReturn(Mockito.mock(KSISignature.class));
         SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
-        packagingFactory = new ZipContainerPackagingFactoryBuilder().withSignatureFactory(signatureFactory).build();
+        packagingFactory = new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(signatureFactory).
+                withParsingStoreFactory(new TemporaryFileBasedParsingStoreFactory()).
+                build();
     }
 
     @Test
