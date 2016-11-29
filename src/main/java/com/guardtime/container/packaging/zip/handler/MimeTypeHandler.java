@@ -24,7 +24,9 @@ public class MimeTypeHandler extends ContentHandler<byte[]> {
     @Override
     protected byte[] getEntry(String name) throws ContentParsingException {
         try (InputStream input = fetchStreamFromEntries(name)) {
-            return Util.toByteArray(input);
+            byte[] bytes = Util.toByteArray(input);
+            parsingStore.remove(name);
+            return bytes;
         } catch (IOException e) {
             throw new ContentParsingException("Failed to read from file", e);
         }

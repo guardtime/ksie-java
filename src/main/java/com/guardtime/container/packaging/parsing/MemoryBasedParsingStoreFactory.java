@@ -5,8 +5,8 @@ import com.guardtime.ksi.util.Util;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,7 +17,7 @@ import java.util.Set;
 public class MemoryBasedParsingStoreFactory implements ParsingStoreFactory {
 
     @Override
-    public ParsingStore build() throws ParsingStoreException {
+    public ParsingStore create() throws ParsingStoreException {
         return new MemoryBasedParsingStore();
     }
 
@@ -36,16 +36,25 @@ public class MemoryBasedParsingStoreFactory implements ParsingStoreFactory {
 
         @Override
         public Set<String> getStoredNames() {
-            return Collections.unmodifiableSet(store.keySet());
+            return new HashSet<>(store.keySet());
         }
 
         @Override
         public InputStream get(String name) {
-            byte[] bytes = store.get(name);
-            if(bytes == null) {
+            if (!contains(name)) {
                 return null;
             }
-            return new ByteArrayInputStream(bytes);
+            return new ByteArrayInputStream(store.get(name));
+        }
+
+        @Override
+        public boolean contains(String key) {
+            return store.containsKey(key);
+        }
+
+        @Override
+        public void remove(String key) {
+            store.remove(key);
         }
 
         @Override

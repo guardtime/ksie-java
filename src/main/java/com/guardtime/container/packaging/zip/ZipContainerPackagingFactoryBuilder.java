@@ -100,7 +100,7 @@ public class ZipContainerPackagingFactoryBuilder {
     }
 
     private ParsingStore getParsingStore() throws ParsingStoreException {
-        return parsingStoreFactory.build();
+        return parsingStoreFactory.create();
     }
 
 

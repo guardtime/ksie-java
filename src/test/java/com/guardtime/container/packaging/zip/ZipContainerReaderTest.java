@@ -45,7 +45,7 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
         when(mockKsi.sign(Mockito.any(DataHash.class))).thenReturn(Mockito.mock(KSISignature.class));
         when(mockKsi.extend(Mockito.any(KSISignature.class))).thenReturn(Mockito.mock(KSISignature.class));
         SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
-        this.reader = new ZipContainerReader(manifestFactory, signatureFactory, new TemporaryFileBasedParsingStoreFactory().build());
+        this.reader = new ZipContainerReader(manifestFactory, signatureFactory, new TemporaryFileBasedParsingStoreFactory().create());
     }
 
     @After

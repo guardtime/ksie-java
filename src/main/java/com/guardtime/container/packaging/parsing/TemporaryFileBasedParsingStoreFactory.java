@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,7 +19,7 @@ import java.util.Set;
 public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactory {
 
     @Override
-    public ParsingStore build() throws ParsingStoreException {
+    public ParsingStore create() throws ParsingStoreException {
         try {
             return new TemporaryFileBasedParsingStore();
         } catch (IOException e) {
@@ -51,17 +51,17 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
 
         @Override
         public Set<String> getStoredNames() {
-            return Collections.unmodifiableSet(store.keySet());
+            return new HashSet<>(store.keySet());
         }
 
         @Override
         public InputStream get(String name) {
             checkClosed();
+            if (!contains(name)) {
+                return null;
+            }
             try {
                 File file = store.get(name);
-                if(file == null) {
-                    return null;
-                }
                 return Files.newInputStream(file.toPath());
             } catch (IOException e) {
                 return null;
@@ -69,9 +69,19 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
         }
 
         @Override
+        public boolean contains(String key) {
+            return store.containsKey(key);
+        }
+
+        @Override
+        public void remove(String key) {
+            store.remove(key);
+        }
+
+        @Override
         public void close() throws ParsingStoreException {
             try {
-                for(File f : store.values()) {
+                for (File f : store.values()) {
                     Files.deleteIfExists(f.toPath());
                 }
                 Util.deleteFileOrDirectory(tempDir);

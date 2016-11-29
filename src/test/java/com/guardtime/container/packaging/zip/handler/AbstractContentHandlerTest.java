@@ -39,7 +39,7 @@ public abstract class AbstractContentHandlerTest {
         MockitoAnnotations.initMocks(this);
         when(mockManifestFactoryType.getManifestFileExtension()).thenReturn("tlv");
         when(mockManifestFactory.getManifestFactoryType()).thenReturn(mockManifestFactoryType);
-        this.store = new TemporaryFileBasedParsingStoreFactory().build();
+        this.store = new TemporaryFileBasedParsingStoreFactory().create();
     }
 
     @Test

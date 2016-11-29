@@ -32,4 +32,9 @@ public class ParsedContainerDocument extends AbstractContainerDocument implement
         }
         return inputStream;
     }
+
+    @Override
+    public void close() throws Exception {
+        parsingStore.remove(key);
+    }
 }

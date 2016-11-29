@@ -21,4 +21,8 @@ public interface ParsingStore extends AutoCloseable {
      */
     InputStream get(String key);
 
+    boolean contains(String key);
+
+    void remove(String key);
+
 }

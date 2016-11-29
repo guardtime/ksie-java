@@ -33,4 +33,8 @@ public class ParsedContainerAnnotation extends AbstractContainerAnnotation {
         return inputStream;
     }
 
+    @Override
+    public void close() throws Exception {
+        parsingStore.remove(key);
+    }
 }

@@ -32,7 +32,9 @@ public class SingleAnnotationManifestHandler extends ContentHandler<SingleAnnota
     @Override
     protected SingleAnnotationManifest getEntry(String name) throws ContentParsingException {
         try (InputStream input = fetchStreamFromEntries(name)) {
-            return manifestFactory.readSingleAnnotationManifest(input);
+            SingleAnnotationManifest singleAnnotationManifest = manifestFactory.readSingleAnnotationManifest(input);
+            parsingStore.remove(name);
+            return singleAnnotationManifest;
         } catch (InvalidManifestException e) {
             throw new ContentParsingException("Failed to parse content of annotation manifest file", e);
         } catch (IOException e) {

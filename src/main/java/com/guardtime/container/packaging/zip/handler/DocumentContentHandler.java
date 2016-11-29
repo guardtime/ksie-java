@@ -27,7 +27,7 @@ public class DocumentContentHandler extends ContentHandler<ParsingStore> {
 
     @Override
     protected ParsingStore getEntry(String name) throws ContentParsingException {
-        if(parsingStore.get(name) == null) {
+        if(!parsingStore.contains(name)) {
             throw new ContentParsingException("No data stored for entry '" + name + "'");
         }
         return parsingStore;
