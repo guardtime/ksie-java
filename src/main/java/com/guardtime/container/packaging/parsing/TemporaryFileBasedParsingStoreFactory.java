@@ -71,6 +71,9 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
         @Override
         public void close() throws ParsingStoreException {
             try {
+                for(File f : store.values()) {
+                    Files.deleteIfExists(f.toPath());
+                }
                 Util.deleteFileOrDirectory(tempDir);
                 this.closed = true;
             } catch (IOException e) {
