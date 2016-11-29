@@ -4,6 +4,9 @@ import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -11,6 +14,8 @@ import static com.guardtime.container.util.Util.notNull;
 import static com.guardtime.ksi.util.Util.toByteArray;
 
 public abstract class AbstractContainerAnnotation implements ContainerAnnotation {
+    protected static final Logger logger = LoggerFactory.getLogger(ContainerAnnotation.class);
+
     protected final String domain;
     protected final ContainerAnnotationType type;
     private DataHash dataHash;
@@ -56,11 +61,12 @@ public abstract class AbstractContainerAnnotation implements ContainerAnnotation
                 ", content=\'" + getContent() + "\'}";
     }
 
-    protected String getContent() {
+    private String getContent() {
         try (InputStream inputStream = getInputStream()) {
             byte[] bytes = toByteArray(inputStream);
             return new String(bytes);
         } catch (IOException e) {
+            logger.warn("Failed to get content of annotation.", e);
             return "";
         }
     }

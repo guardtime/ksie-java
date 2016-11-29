@@ -28,7 +28,7 @@ public class ParsedContainerDocument extends AbstractContainerDocument implement
     public InputStream getInputStream() throws IOException {
         InputStream inputStream = parsingStore.get(key);
         if (inputStream == null) {
-            throw new IOException("Failed to acquire stream");
+            throw new IOException("Failed to acquire input stream from parsing store for key '" + key + "'");
         }
         return inputStream;
     }

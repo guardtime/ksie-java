@@ -95,7 +95,6 @@ public class ZipContainerPackagingFactoryBuilder {
     }
 
     public ContainerPackagingFactory<ZipContainer> build() {
-        Util.notNull(signatureFactory, "Signature factory");
         return new ZipContainerPackagingFactory(signatureFactory, manifestFactory, indexProviderFactory, disableInternalVerification, parsingStoreFactory);
     }
 

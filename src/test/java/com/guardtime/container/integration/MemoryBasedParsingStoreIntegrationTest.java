@@ -30,7 +30,7 @@ public class MemoryBasedParsingStoreIntegrationTest extends AbstractCommonKsiSer
     @Test
     public void testNoTempFilesUsedForParsing() throws Exception {
         int ksieTempFilesCount = getTempFilesCount();
-        File f = loadFile(CONTAINER_WITH_ONE_DOCUMENT);
+        File f = loadFile(CONTAINER_WITH_MIXED_INDEX_TYPES_IN_CONTENTS);
         try (Container c = packagingFactory.read(new FileInputStream(f))) {
             assertNotNull(c);
             assertEquals(ksieTempFilesCount, getTempFilesCount());

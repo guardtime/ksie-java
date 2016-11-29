@@ -95,6 +95,35 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
         new ZipContainerPackagingFactoryBuilder().withSignatureFactory(null).build();
     }
 
+    @Test
+    public void testCreatePackagingFactoryWithoutParsingStoreFactory_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Parsing store factory must be present");
+        new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                withParsingStoreFactory(null).
+                build();
+    }
+
+    @Test
+    public void testCreatePackagingFactoryWithoutManifestFactory_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Manifest factory must be present");
+        new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                withManifestFactory(null).
+                build();
+    }
+
+    @Test
+    public void testCreatePackagingFactoryWithoutIndexProviderFactory_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Index provider factory must be present");
+        new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                withIndexProviderFactory(null).
+                build();
+    }
 
     @Test
     public void testCreatePackagingFactoryWithoutDocuments_ThrowsIllegalArgumentException() throws Exception {

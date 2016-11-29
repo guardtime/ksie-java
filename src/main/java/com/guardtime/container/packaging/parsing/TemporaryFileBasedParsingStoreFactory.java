@@ -2,6 +2,9 @@ package com.guardtime.container.packaging.parsing;
 
 import com.guardtime.container.util.Util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +20,8 @@ import java.util.Set;
  * NB! Does not provide protection against malicious file modification in temp folder. Use with care!
  */
 public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactory {
+
+    private static final Logger logger = LoggerFactory.getLogger(TemporaryFileBasedParsingStore.class);
 
     @Override
     public ParsingStore create() throws ParsingStoreException {
@@ -64,7 +69,7 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
                 File file = store.get(name);
                 return Files.newInputStream(file.toPath());
             } catch (IOException e) {
-                return null;
+                throw new IllegalStateException("Store has been corrupted! Expected to find file at '" + store.get(name).toPath() + "' for key '" + name + "'", e);
             }
         }
 
@@ -75,7 +80,14 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
 
         @Override
         public void remove(String key) {
-            store.remove(key);
+            File f = store.remove(key);
+            if(f != null) {
+                try {
+                    Files.deleteIfExists(f.toPath());
+                } catch (IOException e) {
+                    logger.warn("Could not delete temporary file for key '{}'", key, e);
+                }
+            }
         }
 
         @Override
@@ -85,9 +97,10 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
                     Files.deleteIfExists(f.toPath());
                 }
                 Util.deleteFileOrDirectory(tempDir);
+                store.clear();
                 this.closed = true;
             } catch (IOException e) {
-                throw new ParsingStoreException("Failed to close all stored data!", e);
+                throw new ParsingStoreException("Failed to clean up all stored data!", e);
             }
         }
 
