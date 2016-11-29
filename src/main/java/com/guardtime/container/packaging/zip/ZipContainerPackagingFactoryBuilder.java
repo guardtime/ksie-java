@@ -96,11 +96,7 @@ public class ZipContainerPackagingFactoryBuilder {
 
     public ContainerPackagingFactory<ZipContainer> build() {
         Util.notNull(signatureFactory, "Signature factory");
-        return new ZipContainerPackagingFactory(signatureFactory, manifestFactory, indexProviderFactory, disableInternalVerification);
-    }
-
-    private ParsingStore getParsingStore() throws ParsingStoreException {
-        return parsingStoreFactory.create();
+        return new ZipContainerPackagingFactory(signatureFactory, manifestFactory, indexProviderFactory, disableInternalVerification, parsingStoreFactory);
     }
 
 
@@ -111,15 +107,18 @@ public class ZipContainerPackagingFactoryBuilder {
         private final ContainerManifestFactory manifestFactory;
         private final IndexProviderFactory indexProviderFactory;
         private final boolean disableVerification;
+        private final ParsingStoreFactory parsingStoreFactory;
 
-        private ZipContainerPackagingFactory(SignatureFactory signatureFactory, ContainerManifestFactory manifestFactory, IndexProviderFactory indexProviderFactory, boolean disableVerification) {
+        private ZipContainerPackagingFactory(SignatureFactory signatureFactory, ContainerManifestFactory manifestFactory, IndexProviderFactory indexProviderFactory, boolean disableVerification, ParsingStoreFactory parsingStoreFactory) {
             Util.notNull(signatureFactory, "Signature factory");
             Util.notNull(manifestFactory, "Manifest factory");
             Util.notNull(indexProviderFactory, "Index provider factory");
+            Util.notNull(parsingStoreFactory, "Parsing store factory");
             this.signatureFactory = signatureFactory;
             this.manifestFactory = manifestFactory;
             this.indexProviderFactory = indexProviderFactory;
             this.disableVerification = disableVerification;
+            this.parsingStoreFactory = parsingStoreFactory;
             logger.info("Zip container factory initialized");
         }
 
@@ -127,7 +126,7 @@ public class ZipContainerPackagingFactoryBuilder {
         public ZipContainer read(InputStream stream) throws InvalidPackageException {
             Util.notNull(stream, "Input stream");
             try {
-                ZipContainerReader reader = new ZipContainerReader(this.manifestFactory, this.signatureFactory, getParsingStore());
+                ZipContainerReader reader = new ZipContainerReader(manifestFactory, signatureFactory, getParsingStore());
                 return reader.read(stream);
             } catch (IOException e) {
                 throw new InvalidPackageException("Failed to parse InputStream", e);
@@ -221,6 +220,10 @@ public class ZipContainerPackagingFactoryBuilder {
             if (documentNameList.size() > new HashSet<>(documentNameList).size()) {
                 throw new IllegalArgumentException("Multiple documents with same name found!");
             }
+        }
+
+        private ParsingStore getParsingStore() throws ParsingStoreException {
+            return parsingStoreFactory.create();
         }
 
         class ContentSigner {
