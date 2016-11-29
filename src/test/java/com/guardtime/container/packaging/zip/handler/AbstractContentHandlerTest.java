@@ -62,7 +62,9 @@ public abstract class AbstractContentHandlerTest {
         UnknownDocument doc = (UnknownDocument) unrequested.get(0);
         assertFalse(doc.getFileName().equals(requestedFileName));
         assertTrue(doc.getFileName().equals(unrequestedFileName));
-        Arrays.equals(unrequestedStreamContent.getBytes(), toByteArray(doc.getInputStream()));
+        try(InputStream inputStream = doc.getInputStream()) {
+            Arrays.equals(unrequestedStreamContent.getBytes(), toByteArray(inputStream));
+        }
     }
 
     @Test

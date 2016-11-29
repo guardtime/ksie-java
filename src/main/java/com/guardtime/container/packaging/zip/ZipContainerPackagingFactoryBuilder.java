@@ -194,9 +194,10 @@ public class ZipContainerPackagingFactoryBuilder {
         private List<UnknownDocument> getCopies(List<UnknownDocument> existingList, ParsingStore store) throws IOException, ParsingStoreException {
             List<UnknownDocument> newList = new LinkedList<>();
             for (UnknownDocument doc : existingList) {
-                InputStream inputStream = doc.getInputStream();
-                store.store(doc.getFileName(), inputStream);
-                newList.add(new ParsedContainerDocument(store, doc.getFileName(), doc.getMimeType(), doc.getFileName()));
+                try (InputStream inputStream = doc.getInputStream()) {
+                    store.store(doc.getFileName(), inputStream);
+                    newList.add(new ParsedContainerDocument(store, doc.getFileName(), doc.getMimeType(), doc.getFileName()));
+                }
             }
             return newList;
         }
