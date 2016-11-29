@@ -158,7 +158,7 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
                         Collections.singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(documentContent).getHash()));
                 ContainerAnnotation annotation = new StringContainerAnnotation(
                         ContainerAnnotationType.NON_REMOVABLE,
-                        "that document is not with container, created with empty container document and document itself can be added later on if needed.",
+                        "Document is not with container. Container was created created with empty container document. Document itself can be added later on if needed.",
                         "com.guardtime.com");
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ) {
