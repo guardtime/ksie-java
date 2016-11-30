@@ -148,6 +148,13 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
 
     @Test
     public void testCreateContainerUsingEmptyContainerDocumentAndAddDocumentLater() throws Exception {
+        VerificationPolicy verificationPolicy = new DefaultVerificationPolicy(
+                defaultRuleStateProvider,
+                new KsiSignatureVerifier(ksi, new InternalVerificationPolicy()),
+                packagingFactory
+        );
+        ContainerVerifier containerVerifier = new ContainerVerifier(verificationPolicy);
+
         String documentName = "Document1.txt";
         byte[] documentContent = "This is document's content.".getBytes();
         Pair<byte[], String> documents = Pair.of(documentContent, documentName);
@@ -168,7 +175,7 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
             byte[] zipBytes = addDocumentsToExistingContainer_SkipDuplicate(bos.toByteArray(), Collections.singletonList(documents));
 
             try (Container readin = packagingFactory.read(new ByteArrayInputStream(zipBytes))) {
-                ContainerVerifierResult results = verifier.verify(readin);
+                ContainerVerifierResult results = containerVerifier.verify(readin);
                 assertTrue(results.getVerificationResult().equals(VerificationResult.OK));
             }
         }
