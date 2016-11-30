@@ -32,7 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class HashingIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
+public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
 
     private static final String CONTAINER_ANNOTATION_TYPE_DOMAIN = "Some kind of domain";
     private static final String CONTAINER_ANNOTATION_CONTENT = "StringContainerAnnotationTypeIsFullyRemovable";

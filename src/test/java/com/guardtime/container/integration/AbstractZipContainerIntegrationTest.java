@@ -6,14 +6,10 @@ import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
-import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
-import com.guardtime.container.indexing.UuidIndexProviderFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -28,24 +24,9 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
-
-    private ContainerPackagingFactory packagingFactoryWithIncIndex;
-    private ContainerPackagingFactory packagingFactoryWithUuid;
-
-    @Before
-    public void setUpPackagingFactories() {
-
-
-        this.packagingFactoryWithIncIndex = new ZipContainerPackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withIndexProviderFactory(new IncrementingIndexProviderFactory())
-                .build();
-        this.packagingFactoryWithUuid = new ZipContainerPackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withIndexProviderFactory(new UuidIndexProviderFactory())
-                .build();
-    }
+public abstract class AbstractZipContainerIntegrationTest extends AbstractCommonIntegrationTest {
+    ContainerPackagingFactory packagingFactoryWithIncIndex;
+    ContainerPackagingFactory packagingFactoryWithUuid;
 
     @Test
     public void testCreateContainer() throws Exception {

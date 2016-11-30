@@ -32,7 +32,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractContainerTest {
+public abstract class AbstractCommonIntegrationTest extends AbstractContainerTest {
 
     protected ContainerPackagingFactory packagingFactory;
     protected SignatureFactory signatureFactory;

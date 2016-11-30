@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
+public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     private ContainerVerifier verifier;
 

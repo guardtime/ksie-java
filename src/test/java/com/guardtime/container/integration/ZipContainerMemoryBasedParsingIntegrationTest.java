@@ -1,7 +1,10 @@
 package com.guardtime.container.integration;
 
+import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
+import com.guardtime.container.indexing.UuidIndexProviderFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.parsing.MemoryBasedParsingStoreFactory;
+import com.guardtime.container.packaging.parsing.ParsingStoreFactory;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 import com.guardtime.container.util.Util;
 
@@ -16,15 +19,33 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class MemoryBasedParsingStoreIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
+public class ZipContainerMemoryBasedParsingIntegrationTest extends AbstractZipContainerIntegrationTest {
+
+    private static final ParsingStoreFactory parsingStoreFactory = new MemoryBasedParsingStoreFactory();
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        packagingFactory = new ZipContainerPackagingFactoryBuilder().
+        setUpPackagingFactories();
+    }
+
+    private void setUpPackagingFactories() {
+
+        this.packagingFactory = new ZipContainerPackagingFactoryBuilder().
+                withParsingStoreFactory(parsingStoreFactory).
+                withSignatureFactory(signatureFactory)
+                .build();
+
+        this.packagingFactoryWithIncIndex = new ZipContainerPackagingFactoryBuilder().
                 withSignatureFactory(signatureFactory).
-                withParsingStoreFactory(new MemoryBasedParsingStoreFactory()).
-                build();
+                withIndexProviderFactory(new IncrementingIndexProviderFactory()).
+                withParsingStoreFactory(parsingStoreFactory)
+                .build();
+        this.packagingFactoryWithUuid = new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(signatureFactory).
+                withIndexProviderFactory(new UuidIndexProviderFactory()).
+                withParsingStoreFactory(parsingStoreFactory)
+                .build();
     }
 
     @Test
@@ -54,5 +75,4 @@ public class MemoryBasedParsingStoreIntegrationTest extends AbstractCommonKsiSer
     private boolean isTempFile(String s) {
         return s.startsWith(Util.TEMP_DIR_PREFIX) || s.startsWith(Util.TEMP_FILE_PREFIX);
     }
-
 }
