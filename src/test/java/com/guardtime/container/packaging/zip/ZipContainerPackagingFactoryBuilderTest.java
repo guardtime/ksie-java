@@ -46,12 +46,13 @@ import static org.mockito.Mockito.when;
 public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTest {
     private static final DataHash nullDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
     private List<ContainerAnnotation> containerAnnotationList = new ArrayList<>();
-    private List<ContainerDocument> containerDocumentList = Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT);
+    private List<ContainerDocument> containerDocumentList = new ArrayList<>();
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
         containerAnnotationList.add(new StringContainerAnnotation(ContainerAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME));
+        containerDocumentList.add(TEST_DOCUMENT_HELLO_TEXT);
     }
 
     @After

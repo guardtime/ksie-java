@@ -1,6 +1,12 @@
 package com.guardtime.container.integration;
 
+import com.guardtime.container.annotation.ContainerAnnotation;
+import com.guardtime.container.annotation.ContainerAnnotationType;
+import com.guardtime.container.annotation.StringContainerAnnotation;
+import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.document.EmptyContainerDocument;
 import com.guardtime.container.packaging.Container;
+import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.ContainerVerifier;
 import com.guardtime.container.verification.policy.DefaultVerificationPolicy;
 import com.guardtime.container.verification.policy.VerificationPolicy;
@@ -8,6 +14,8 @@ import com.guardtime.container.verification.result.ContainerVerifierResult;
 import com.guardtime.container.verification.result.SignatureResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.signature.ksi.KsiSignatureVerifier;
+import com.guardtime.ksi.hashing.DataHasher;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.unisignature.verifier.PolicyVerificationResult;
 import com.guardtime.ksi.unisignature.verifier.VerificationErrorCode;
@@ -22,7 +30,9 @@ import com.guardtime.ksi.unisignature.verifier.policies.UserProvidedPublicationB
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -41,12 +51,6 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
                 packagingFactory
         );
         this.verifier = new ContainerVerifier(defaultPolicy);
-    }
-
-    private Container getContainer(String filePath) throws Exception {
-        try (FileInputStream fis = new FileInputStream(loadFile(filePath))) {
-            return packagingFactory.read(fis);
-        }
     }
 
     @Test
@@ -139,6 +143,34 @@ public class VerificationKsiServiceIntegrationTest extends AbstractCommonKsiServ
             assertNotNull(signatureResult);
             assertEquals(VerificationResult.OK, signatureResult.getSimplifiedResult());
             assertNotNull(signatureResult.getFullResult());
+        }
+    }
+
+    @Test
+    public void testCreateContainerUsingEmptyContainerDocumentAndAddDocumentLater() throws Exception {
+        String documentName = "Document1.txt";
+        byte[] documentContent = "This is document's content.".getBytes();
+        Pair<byte[], String> documents = Pair.of(documentContent, documentName);
+        try (
+                ContainerDocument document = new EmptyContainerDocument(
+                        documentName,
+                        "txt",
+                        Collections.singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(documentContent).getHash()));
+                ContainerAnnotation annotation = new StringContainerAnnotation(
+                        ContainerAnnotationType.NON_REMOVABLE,
+                        "Document is not with container. Container was created created with empty container document. Document itself can be added later on if needed.",
+                        "com.guardtime.com");
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ) {
+            try (Container container = packagingFactory.create(Collections.singletonList(document), Collections.singletonList(annotation))) {
+                container.writeTo(bos);
+            }
+            byte[] zipBytes = addDocumentsToExistingContainer_SkipDuplicate(bos.toByteArray(), Collections.singletonList(documents));
+
+            try (Container readin = packagingFactory.read(new ByteArrayInputStream(zipBytes))) {
+                ContainerVerifierResult results = verifier.verify(readin);
+                assertTrue(results.getVerificationResult().equals(VerificationResult.OK));
+            }
         }
     }
 

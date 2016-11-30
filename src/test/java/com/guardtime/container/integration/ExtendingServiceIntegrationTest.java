@@ -16,8 +16,6 @@ import com.guardtime.ksi.unisignature.KSISignature;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
@@ -100,11 +98,6 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceInt
             extender.extend(container);
             assertSignaturesExtendedStatus(container, extendedStatusAfterExtending);
         }
-    }
-
-    private Container getContainer(String path) throws Exception {
-        InputStream input = new FileInputStream(loadFile(path));
-        return packagingFactory.read(input);
     }
 
     private void assertSignaturesExtendedStatus(Container container, boolean status) {
