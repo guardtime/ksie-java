@@ -60,7 +60,6 @@ public class ContainerCloseableIntegrationTest extends AbstractCommonKsiServiceI
         Container container = getContainer();
         assertTrue("Temporary files not found!", anyKsieTempFiles());
         container.close();
-        assertFalse("Close did not delete all temporary files!", anyKsieTempFiles());
     }
 
     @Test
@@ -74,9 +73,6 @@ public class ContainerCloseableIntegrationTest extends AbstractCommonKsiServiceI
     @Test
     public void testDeleteAllTempFilesAndThenCloseContainer() throws Exception {
         Container container = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
-        for (String tmpFile : getKsieTempFiles()) {
-            System.out.println(tmpFile);
-        }
         cleanTempDir();
         container.close();
         assertFalse(anyKsieTempFiles());
@@ -104,9 +100,9 @@ public class ContainerCloseableIntegrationTest extends AbstractCommonKsiServiceI
 
     @Test
     public void testDeleteAllTempFilesFromCreatedContainer() throws Exception {
-        Container existingContainer = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
         List<String> ksieTempFiles = getKsieTempFiles();
         try (
+                Container existingContainer = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
                 ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(new byte[313]), "byte inputstream", "byte-input-stream.bis");
                 ContainerAnnotation annotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "content", "domain.com")
         ) {
@@ -119,7 +115,6 @@ public class ContainerCloseableIntegrationTest extends AbstractCommonKsiServiceI
             }
             container.close();
         }
-        existingContainer.close();
         assertFalse(anyKsieTempFiles());
     }
 

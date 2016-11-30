@@ -106,7 +106,6 @@ public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCo
                 if (!filesInZip.contains(pair.getRight())) {
                     try (InputStream in = new ByteArrayInputStream((byte[]) pair.getLeft())) {
                         writeFromInputToZipOutput(out, in, (String) pair.getRight());
-                        out.closeEntry();
                     }
                 }
             }
@@ -114,8 +113,12 @@ public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCo
         return bos.toByteArray();
     }
 
+    /*
+    Closes ZipOutputStream entry.
+     */
     private void writeFromInputToZipOutput(ZipOutputStream out, InputStream in, String fileName) throws IOException {
         out.putNextEntry(new ZipEntry(fileName));
         Util.copyData(in, out);
+        out.closeEntry();
     }
 }
