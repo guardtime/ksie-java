@@ -16,7 +16,6 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
@@ -126,8 +125,8 @@ public class ContainerCloseableIntegrationTest extends AbstractCommonKsiServiceI
 
     @Test
     public void testWriteClosedContainer() throws Exception {
-        expectedException.expect(FileNotFoundException.class);
-        expectedException.expectMessage("The system cannot find the path specified");
+        expectedException.expect(IOException.class);
+        expectedException.expectMessage("Can't write closed object!");
         Container container = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
         container.close();
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
@@ -138,8 +137,8 @@ public class ContainerCloseableIntegrationTest extends AbstractCommonKsiServiceI
 
     @Test
     public void testWriteContainerWithTempFileRemoved() throws Exception {
-        expectedException.expect(FileNotFoundException.class);
-        expectedException.expectMessage("The system cannot find the file specified");
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("Store has been corrupted! Expected to find file");
         try (
                 Container container = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
                 ByteArrayOutputStream bos = new ByteArrayOutputStream()

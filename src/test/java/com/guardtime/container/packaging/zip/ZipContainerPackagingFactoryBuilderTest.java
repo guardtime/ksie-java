@@ -9,6 +9,7 @@ import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
+import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
@@ -42,7 +43,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
+public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTest {
     private static final DataHash nullDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
     private List<ContainerAnnotation> containerAnnotationList = new ArrayList<>();
     private List<ContainerDocument> containerDocumentList = new ArrayList<>();
@@ -66,7 +67,10 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
 
     private ZipContainer createInternallyValidContainer(List<ContainerDocument> documents, List<ContainerAnnotation> annotations, Container existingContainer) throws Exception {
         TlvContainerManifestFactory manifestFactorySpy = spy(new TlvContainerManifestFactory());
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, manifestFactorySpy);
+        ContainerPackagingFactory<ZipContainer> packagingFactory = new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                withManifestFactory(manifestFactorySpy).
+                build();
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
@@ -89,16 +93,38 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
     public void testCreatePackagingFactoryWithoutSignatureFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Signature factory must be present");
-        new ZipContainerPackagingFactory(null, mockedManifestFactory);
+        new ZipContainerPackagingFactoryBuilder().withSignatureFactory(null).build();
+    }
+
+    @Test
+    public void testCreatePackagingFactoryWithoutParsingStoreFactory_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Parsing store factory must be present");
+        new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                withParsingStoreFactory(null).
+                build();
     }
 
     @Test
     public void testCreatePackagingFactoryWithoutManifestFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Manifest factory must be present");
-        new ZipContainerPackagingFactory(mockedSignatureFactory, null);
+        new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                withManifestFactory(null).
+                build();
     }
 
+    @Test
+    public void testCreatePackagingFactoryWithoutIndexProviderFactory_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Index provider factory must be present");
+        new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                withIndexProviderFactory(null).
+                build();
+    }
 
     @Test
     public void testCreatePackagingFactoryWithoutDocuments_ThrowsIllegalArgumentException() throws Exception {
@@ -196,7 +222,7 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
     public void testCreateVerifiesInvalidContainer_NOK() throws Exception {
         expectedException.expect(InvalidPackageException.class);
         expectedException.expectMessage("Created Container does not pass internal verification");
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory());
+        ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().withSignatureFactory(mockedSignatureFactory).build();
         packagingFactory.create(containerDocumentList, containerAnnotationList);
     }
 
@@ -215,7 +241,7 @@ public class ZipContainerPackagingFactoryTest extends AbstractContainerTest {
     public void testCreateWithExistingContainerVerifiesInvalidContainer_NOK() throws Exception {
         expectedException.expect(InvalidPackageException.class);
         expectedException.expectMessage("Created Container does not pass internal verification");
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory());
+        ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().withSignatureFactory(mockedSignatureFactory).build();
         Container mockContainer = Mockito.mock(ZipContainer.class);
         when(mockContainer.getMimeType()).thenReturn(new MimeTypeEntry("MIMETYPE", "Ploomimoos".getBytes()));
         packagingFactory.create(mockContainer, containerDocumentList, containerAnnotationList);

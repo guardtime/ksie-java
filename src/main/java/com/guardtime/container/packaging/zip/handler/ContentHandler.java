@@ -1,13 +1,15 @@
 package com.guardtime.container.packaging.zip.handler;
 
-import com.guardtime.container.util.Pair;
+import com.guardtime.container.document.ParsedContainerDocument;
+import com.guardtime.container.document.UnknownDocument;
+import com.guardtime.container.packaging.parsing.ParsingStore;
+import com.guardtime.container.packaging.parsing.ParsingStoreException;
 
-import java.io.File;
+import java.io.InputStream;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
@@ -18,13 +20,18 @@ import java.util.TreeSet;
  */
 public abstract class ContentHandler<T> {
 
-    protected Map<String, File> entries = new TreeMap<>();
+    protected final ParsingStore parsingStore;
+    private Set<String> requestedEntries = new TreeSet<>();
     private Set<String> unrequestedEntries = new TreeSet<>();
+
+    protected ContentHandler(ParsingStore store) {
+        this.parsingStore = store;
+    }
 
     public abstract boolean isSupported(String name);
 
-    public void add(String name, File file) {
-        entries.put(name, file);
+    public void add(String name, InputStream stream) throws ParsingStoreException {
+        parsingStore.store(name, stream);
         unrequestedEntries.add(name);
     }
 
@@ -37,13 +44,15 @@ public abstract class ContentHandler<T> {
     protected abstract T getEntry(String name) throws ContentParsingException;
 
     public Set<String> getNames() {
-        return entries.keySet();
+        Set<String> names = new HashSet<>(unrequestedEntries);
+        names.addAll(requestedEntries);
+        return names;
     }
 
-    public List<Pair<String, File>> getUnrequestedFiles() {
-        List<Pair<String, File>> returnable = new LinkedList<>();
+    public List<UnknownDocument> getUnrequestedFiles() throws ParsingStoreException {
+        List<UnknownDocument> returnable = new LinkedList<>();
         for (String name : unrequestedEntries) {
-            returnable.add(Pair.of(name, entries.get(name)));
+            returnable.add(new ParsedContainerDocument(parsingStore, name, "unknown", name));
         }
         return returnable;
     }
@@ -57,13 +66,14 @@ public abstract class ContentHandler<T> {
         return str.substring(startingIndex).matches(regex);
     }
 
-    protected File fetchFileFromEntries(String name) throws ContentParsingException {
-        File file = entries.get(name);
-        if (file == null) throw new ContentParsingException("Failed to fetch file '" + name + "' from entries.");
-        return file;
+    protected InputStream fetchStreamFromEntries(String name) throws ContentParsingException {
+            InputStream inputStream = parsingStore.get(name);
+            if (inputStream == null) throw new ContentParsingException("Failed to fetch file '" + name + "' from parsingStore.");
+            return inputStream;
     }
 
     private void markEntryRequested(String name) {
+        requestedEntries.add(name);
         unrequestedEntries.remove(name);
     }
 }

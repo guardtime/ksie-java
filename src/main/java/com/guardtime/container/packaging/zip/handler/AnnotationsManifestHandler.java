@@ -3,15 +3,12 @@ package com.guardtime.container.packaging.zip.handler;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.InvalidManifestException;
+import com.guardtime.container.packaging.parsing.ParsingStore;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 
 import static com.guardtime.container.packaging.EntryNameProvider.ANNOTATIONS_MANIFEST_FORMAT;
-import static java.nio.file.StandardOpenOption.DELETE_ON_CLOSE;
 
 /**
  * This content holders is used for annotations manifests inside the container.
@@ -20,7 +17,8 @@ public class AnnotationsManifestHandler extends ContentHandler<AnnotationsManife
 
     private final ContainerManifestFactory manifestFactory;
 
-    public AnnotationsManifestHandler(ContainerManifestFactory manifestFactory) {
+    public AnnotationsManifestHandler(ContainerManifestFactory manifestFactory, ParsingStore store) {
+        super(store);
         this.manifestFactory = manifestFactory;
     }
 
@@ -33,13 +31,12 @@ public class AnnotationsManifestHandler extends ContentHandler<AnnotationsManife
 
     @Override
     protected AnnotationsManifest getEntry(String name) throws ContentParsingException {
-        File file = fetchFileFromEntries(name);
-        try (InputStream input = Files.newInputStream(file.toPath(), DELETE_ON_CLOSE)) {
-            return manifestFactory.readAnnotationsManifest(input);
+        try (InputStream input = fetchStreamFromEntries(name)) {
+            AnnotationsManifest annotationsManifest = manifestFactory.readAnnotationsManifest(input);
+            parsingStore.remove(name);
+            return annotationsManifest;
         } catch (InvalidManifestException e) {
             throw new ContentParsingException("Failed to parse content of annotmanifest file", e);
-        } catch (FileNotFoundException e) {
-            throw new ContentParsingException("Failed to locate requested file in filesystem", e);
         } catch (IOException e) {
             throw new ContentParsingException("Failed to read file", e);
         }

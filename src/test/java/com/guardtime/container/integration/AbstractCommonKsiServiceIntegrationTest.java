@@ -1,10 +1,9 @@
 package com.guardtime.container.integration;
 
 import com.guardtime.container.AbstractContainerTest;
-import com.guardtime.container.manifest.ContainerManifestFactory;
-import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
-import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
+import com.guardtime.container.packaging.ContainerPackagingFactory;
+import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.ksi.KsiSignatureFactory;
 import com.guardtime.container.util.Pair;
@@ -14,6 +13,8 @@ import com.guardtime.ksi.service.client.KSIServiceCredentials;
 import com.guardtime.ksi.service.client.http.HttpClientSettings;
 import com.guardtime.ksi.service.http.simple.SimpleHttpClient;
 import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
+import com.guardtime.ksi.util.Util;
+
 import org.junit.Before;
 
 import java.io.ByteArrayInputStream;
@@ -33,13 +34,14 @@ import java.util.zip.ZipOutputStream;
 
 public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractContainerTest {
 
-    protected ContainerManifestFactory manifestFactory = new TlvContainerManifestFactory();
+    protected ContainerPackagingFactory packagingFactory;
     protected SignatureFactory signatureFactory;
-    protected ZipContainerPackagingFactory packagingFactory;
+    protected KSI ksi;
 
     private static final KSIServiceCredentials KSI_SERVICE_CREDENTIALS;
     private static final String TEST_SIGNING_SERVICE;
     private static final String TEST_EXTENDING_SERVICE;
+
     private static final String GUARDTIME_PUBLICATIONS_FILE;
 
     static {
@@ -55,9 +57,6 @@ public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCo
             throw new RuntimeException(e);
         }
     }
-
-
-    protected KSI ksi;
 
     @Before
     public void setUp() throws Exception {
@@ -75,7 +74,7 @@ public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCo
                 .setPublicationsFileTrustedCertSelector(new X509CertificateSubjectRdnSelector("E=publications@guardtime.com"))
                 .build();
         signatureFactory = new KsiSignatureFactory(ksi);
-        packagingFactory = new ZipContainerPackagingFactory(signatureFactory, manifestFactory);
+        packagingFactory = new ZipContainerPackagingFactoryBuilder().withSignatureFactory(signatureFactory).build();
 
     }
 
@@ -92,23 +91,21 @@ public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCo
     }
 
     byte[] addDocumentsToExistingContainer_SkipDuplicate(byte[] zipFile, List<Pair<byte[], String>> files) throws IOException {
-        byte[] buf = new byte[1024];
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try (
                 ZipInputStream zin = new ZipInputStream(new ByteArrayInputStream(zipFile));
                 ZipOutputStream out = new ZipOutputStream(bos)
         ) {
-            ZipEntry entry = zin.getNextEntry();
+            ZipEntry entry;
             List<String> filesInZip = new LinkedList<>();
-            while (entry != null) {
+            while ((entry = zin.getNextEntry()) != null) {
                 filesInZip.add(entry.getName());
-                writeFromInputToZipOutput(buf, out, zin, entry.getName());
-                entry = zin.getNextEntry();
+                writeFromInputToZipOutput(out, zin, entry.getName());
             }
             for (Pair pair : files) {
                 if (!filesInZip.contains(pair.getRight())) {
                     try (InputStream in = new ByteArrayInputStream((byte[]) pair.getLeft())) {
-                        writeFromInputToZipOutput(buf, out, in, (String) pair.getRight());
+                        writeFromInputToZipOutput(out, in, (String) pair.getRight());
                         out.closeEntry();
                     }
                 }
@@ -117,11 +114,8 @@ public abstract class AbstractCommonKsiServiceIntegrationTest extends AbstractCo
         return bos.toByteArray();
     }
 
-    private void writeFromInputToZipOutput(byte[] buf, ZipOutputStream out, InputStream in, String fileName) throws IOException {
+    private void writeFromInputToZipOutput(ZipOutputStream out, InputStream in, String fileName) throws IOException {
         out.putNextEntry(new ZipEntry(fileName));
-        int len;
-        while ((len = in.read(buf)) > 0) {
-            out.write(buf, 0, len);
-        }
+        Util.copyData(in, out);
     }
 }

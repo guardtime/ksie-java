@@ -1,5 +1,6 @@
 package com.guardtime.container.document;
 
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -20,6 +21,7 @@ public class StreamContainerDocument implements ContainerDocument {
 
     private final File tempFile;
     private FileContainerDocument containerDocument;
+    private boolean closed;
 
     public StreamContainerDocument(InputStream input, String mimeType, String fileName) {
         notNull(input, "Input stream");
@@ -41,22 +43,25 @@ public class StreamContainerDocument implements ContainerDocument {
 
     @Override
     public InputStream getInputStream() throws IOException {
+        checkClosed();
         return containerDocument.getInputStream();
     }
 
     @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
+    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException, DataHashException {
+        checkClosed();
         return containerDocument.getDataHash(algorithm);
     }
 
     @Override
-    public List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws IOException {
+    public List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws IOException, DataHashException {
+        checkClosed();
         return containerDocument.getDataHashList(algorithmList);
     }
 
     @Override
     public boolean isWritable() {
-        return true;
+        return !closed;
     }
 
     @Override
@@ -74,7 +79,6 @@ public class StreamContainerDocument implements ContainerDocument {
         } catch (IOException e) {
             throw new IllegalArgumentException("Can not copy input stream", e);
         }
-
     }
 
     @Override
@@ -94,13 +98,20 @@ public class StreamContainerDocument implements ContainerDocument {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() throws Exception {
         containerDocument.close();
         Files.deleteIfExists(tempFile.toPath());
+        this.closed = true;
     }
 
     @Override
     protected void finalize() throws Throwable {
         close();
+    }
+
+    private void checkClosed() {
+        if (closed) {
+            throw new IllegalStateException("Can't access closed document!");
+        }
     }
 }

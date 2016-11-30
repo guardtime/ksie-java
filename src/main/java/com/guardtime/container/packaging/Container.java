@@ -1,8 +1,7 @@
 package com.guardtime.container.packaging;
 
-import com.guardtime.container.util.Pair;
+import com.guardtime.container.document.UnknownDocument;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -28,10 +27,9 @@ public interface Container extends AutoCloseable {
     MimeType getMimeType();
 
     /**
-     * Returns List of all {@link File} that were not associated with any structure elements or signatures but were
+     * Returns List of all {@link UnknownDocument} that were not associated with any structure elements or signatures but were
      * contained in the {@link Container}
      */
-    //TODO: Replace File with InputStream or similar more abstract concept as to not limit the container to be File based
-    List<Pair<String, File>> getUnknownFiles();
+    List<UnknownDocument> getUnknownFiles();
 
 }

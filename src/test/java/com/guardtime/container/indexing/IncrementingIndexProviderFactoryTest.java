@@ -1,9 +1,9 @@
 package com.guardtime.container.indexing;
 
 import com.guardtime.container.AbstractContainerTest;
-import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
-import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
+import com.guardtime.container.packaging.ContainerPackagingFactory;
+import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,7 +19,10 @@ public class IncrementingIndexProviderFactoryTest extends AbstractContainerTest 
 
     @Test
     public void testCreateWithValidContainer() throws Exception {
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, new TlvContainerManifestFactory(), new IncrementingIndexProviderFactory(), true);
+        ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                disableInternalVerification().
+                build();
         try (Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(STRING_CONTAINER_ANNOTATION))) {
             IndexProvider indexProvider = indexProviderFactory.create(container);
             Assert.assertEquals("2", indexProvider.getNextSignatureIndex());
@@ -31,7 +34,12 @@ public class IncrementingIndexProviderFactoryTest extends AbstractContainerTest 
         expectedException.expect(IndexingException.class);
         expectedException.expectMessage("Not an integer based index");
 
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, new UuidIndexProviderFactory(), true);
+        ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                withManifestFactory(mockedManifestFactory).
+                withIndexProviderFactory(new UuidIndexProviderFactory()).
+                disableInternalVerification().
+                build();
         try (Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(STRING_CONTAINER_ANNOTATION))) {
             indexProviderFactory.create(container);
         }
