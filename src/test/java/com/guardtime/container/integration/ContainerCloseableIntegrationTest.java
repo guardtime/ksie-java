@@ -206,7 +206,6 @@ public class ContainerCloseableIntegrationTest extends AbstractCommonKsiServiceI
     }
 
     private boolean isTempFile(File s) {
-        String[] items = (s.toString().replace("\\", "\\\\")).split("\\\\");
-        return items[items.length-1].startsWith(Util.TEMP_DIR_PREFIX) || items[items.length-1].startsWith(Util.TEMP_FILE_PREFIX);
+        return s.getName().startsWith(Util.TEMP_DIR_PREFIX) || s.getName().startsWith(Util.TEMP_FILE_PREFIX);
     }
 }
