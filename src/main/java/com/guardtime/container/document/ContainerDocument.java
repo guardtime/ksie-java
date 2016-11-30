@@ -32,7 +32,8 @@ public interface ContainerDocument extends MultiHashElement, AutoCloseable {
     DataHash getDataHash(HashAlgorithm algorithm) throws IOException, DataHashException;
 
     /**
-     * Returns a List of {@link DataHash}es for provided {@link HashAlgorithm}s.
+     * Will return as many {@link DataHash}es as it can for provided {@link HashAlgorithm}s.
+     * If no {@link DataHash}es can be generated then a {@link DataHashException} will be thrown.
      */
     List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws IOException, DataHashException;
 

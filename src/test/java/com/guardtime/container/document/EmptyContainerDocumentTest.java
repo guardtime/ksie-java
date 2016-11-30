@@ -1,6 +1,7 @@
 package com.guardtime.container.document;
 
 import com.guardtime.container.AbstractContainerTest;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -11,6 +12,7 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -41,7 +43,7 @@ public class EmptyContainerDocumentTest extends AbstractContainerTest {
 
     @Test
     public void testGetInputStream() throws Exception {
-        try(InputStream inputStream = document.getInputStream()) {
+        try (InputStream inputStream = document.getInputStream()) {
             assertNull(inputStream);
         }
     }
@@ -77,5 +79,21 @@ public class EmptyContainerDocumentTest extends AbstractContainerTest {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Data hash list must be present");
         new EmptyContainerDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, null);
+    }
+
+    @Test
+    public void testGetDataHashList() throws Exception {
+        List<DataHash> hashes = Arrays.asList(hash);
+        ContainerDocument doc = new EmptyContainerDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, hashes);
+        assertEquals(hashes, doc.getDataHashList(Arrays.asList(hash.getAlgorithm())));
+    }
+
+    @Test
+    public void testGetDataHashListForNotPresentAlgorithm() throws Exception {
+        expectedException.expect(DataHashException.class);
+        expectedException.expectMessage("Could not find any pre-generated hashes for requested algorithms!");
+        List<DataHash> hashes = Arrays.asList(Util.hash(new ByteArrayInputStream("".getBytes()), HashAlgorithm.SHA2_256));
+        ContainerDocument doc = new EmptyContainerDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, hashes);
+        doc.getDataHashList(Arrays.asList(HashAlgorithm.RIPEMD_160));
     }
 }
