@@ -6,7 +6,7 @@ import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
+import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -57,7 +57,9 @@ public class ContainerBuilderTest extends AbstractContainerTest {
             builder.withDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), TEST_FILE_NAME_TEST_DOC, MIME_TYPE_APPLICATION_TXT);
             assertEquals(2, builder.getDocuments().size());
 
-            builder.withDocument(Mockito.mock(File.class), "application/binary");
+            File mockFile = Mockito.mock(File.class);
+            when(mockFile.getName()).thenReturn("SomeName.ext");
+            builder.withDocument(mockFile, "application/binary");
             assertEquals(3, builder.getDocuments().size());
 
             closeAll(builder.getDocuments());
@@ -85,7 +87,12 @@ public class ContainerBuilderTest extends AbstractContainerTest {
 
     @Test
     public void testCreateWithExistingContainer() throws Exception {
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, new IncrementingIndexProviderFactory(), true);
+        ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                withManifestFactory(mockedManifestFactory).
+                withIndexProviderFactory(new IncrementingIndexProviderFactory()).
+                disableInternalVerification().
+                build();
         // build initial container
         ContainerBuilder builder = new ContainerBuilder(packagingFactory);
         builder.withDocument(TEST_DOCUMENT_HELLO_PDF);
@@ -124,7 +131,12 @@ public class ContainerBuilderTest extends AbstractContainerTest {
                 ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
                 ContainerDocument streamContainerDocument = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-HAHA".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
         ) {
-            ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, new IncrementingIndexProviderFactory(), true);
+            ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
+                    withSignatureFactory(mockedSignatureFactory).
+                    withManifestFactory(mockedManifestFactory).
+                    withIndexProviderFactory(new IncrementingIndexProviderFactory()).
+                    disableInternalVerification().
+                    build();
             // build initial container
             ContainerBuilder builder = new ContainerBuilder(packagingFactory);
             builder.withDocument(document);
@@ -140,7 +152,12 @@ public class ContainerBuilderTest extends AbstractContainerTest {
 
     @Test
     public void testCreateNewContainerUsingExistingContainerAndExistingDocument() throws Exception {
-        ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(mockedSignatureFactory, mockedManifestFactory, new IncrementingIndexProviderFactory(), true);
+        ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                withManifestFactory(mockedManifestFactory).
+                withIndexProviderFactory(new IncrementingIndexProviderFactory()).
+                disableInternalVerification().
+                build();
         // build initial container
         ContainerBuilder builder = new ContainerBuilder(packagingFactory);
         builder.withDocument(TEST_DOCUMENT_HELLO_PDF);

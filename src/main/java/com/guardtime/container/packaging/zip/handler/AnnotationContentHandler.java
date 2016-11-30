@@ -1,13 +1,17 @@
 package com.guardtime.container.packaging.zip.handler;
 
-import java.io.File;
+import com.guardtime.container.packaging.parsing.ParsingStore;
 
 import static com.guardtime.container.packaging.EntryNameProvider.ANNOTATION_DATA_FORMAT;
 
 /**
  * This content holders is used for annotations inside the container.
  */
-public class AnnotationContentHandler extends ContentHandler<File> {
+public class AnnotationContentHandler extends ContentHandler<ParsingStore> {
+
+    public AnnotationContentHandler(ParsingStore store) {
+        super(store);
+    }
 
     @Override
     public boolean isSupported(String name) {
@@ -17,8 +21,11 @@ public class AnnotationContentHandler extends ContentHandler<File> {
     }
 
     @Override
-    protected File getEntry(String name) throws ContentParsingException {
-        return fetchFileFromEntries(name);
+    protected ParsingStore getEntry(String name) throws ContentParsingException {
+        if(!parsingStore.contains(name)) {
+            throw new ContentParsingException("No data stored for entry '" + name + "'");
+        }
+        return parsingStore;
     }
 
 }

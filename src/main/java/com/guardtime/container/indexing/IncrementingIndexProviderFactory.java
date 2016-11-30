@@ -4,8 +4,6 @@ import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
 
-import org.mockito.internal.util.collections.Sets;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,11 +23,12 @@ public class IncrementingIndexProviderFactory implements IndexProviderFactory {
         int maxIndex = 0;
         int maxAnnotationIndex = 0;
         for (SignatureContent content : container.getSignatureContents()) {
-            Set<String> manifestUriSet = Sets.newSet(
-                    content.getManifest().getLeft(),
-                    content.getDocumentsManifest().getLeft(),
-                    content.getAnnotationsManifest().getLeft()
-            );
+            Set<String> manifestUriSet = new HashSet<>();
+            {
+                manifestUriSet.add(content.getManifest().getLeft());
+                manifestUriSet.add(content.getDocumentsManifest().getLeft());
+                manifestUriSet.add(content.getAnnotationsManifest().getLeft());
+            }
             Manifest manifest = content.getManifest().getRight();
             if (manifest != null && manifest.getSignatureReference() != null) {
                 manifestUriSet.add(manifest.getSignatureReference().getUri());

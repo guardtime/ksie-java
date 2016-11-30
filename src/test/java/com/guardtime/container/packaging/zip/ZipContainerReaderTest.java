@@ -9,6 +9,7 @@ import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.packaging.parsing.TemporaryFileBasedParsingStoreFactory;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.ksi.KsiSignatureFactory;
 import com.guardtime.ksi.KSI;
@@ -44,7 +45,7 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
         when(mockKsi.sign(Mockito.any(DataHash.class))).thenReturn(Mockito.mock(KSISignature.class));
         when(mockKsi.extend(Mockito.any(KSISignature.class))).thenReturn(Mockito.mock(KSISignature.class));
         SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
-        this.reader = new ZipContainerReader(manifestFactory, signatureFactory);
+        this.reader = new ZipContainerReader(manifestFactory, signatureFactory, new TemporaryFileBasedParsingStoreFactory().create());
     }
 
     @After

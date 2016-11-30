@@ -7,11 +7,17 @@ import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.indexing.IndexProviderFactory;
-import com.guardtime.container.manifest.*;
+import com.guardtime.container.manifest.AnnotationsManifest;
+import com.guardtime.container.manifest.ContainerManifestFactory;
+import com.guardtime.container.manifest.DocumentsManifest;
+import com.guardtime.container.manifest.Manifest;
+import com.guardtime.container.manifest.ManifestFactoryType;
+import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.SignatureFactoryType;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.rule.state.DefaultRuleStateProvider;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;

@@ -9,8 +9,9 @@ import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.container.indexing.UuidIndexProviderFactory;
 import com.guardtime.container.packaging.Container;
+import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
+import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -29,15 +30,21 @@ import static org.junit.Assert.assertNotNull;
 
 public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
 
-    private ZipContainerPackagingFactory packagingFactoryWithIncIndex;
-    private ZipContainerPackagingFactory packagingFactoryWithUuid;
+    private ContainerPackagingFactory packagingFactoryWithIncIndex;
+    private ContainerPackagingFactory packagingFactoryWithUuid;
 
     @Before
     public void setUpPackagingFactories() {
 
 
-        this.packagingFactoryWithIncIndex = new ZipContainerPackagingFactory(signatureFactory, manifestFactory,  new IncrementingIndexProviderFactory(), false);
-        this.packagingFactoryWithUuid = new ZipContainerPackagingFactory(signatureFactory, manifestFactory, new UuidIndexProviderFactory(), false);
+        this.packagingFactoryWithIncIndex = new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(signatureFactory).
+                withIndexProviderFactory(new IncrementingIndexProviderFactory())
+                .build();
+        this.packagingFactoryWithUuid = new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(signatureFactory).
+                withIndexProviderFactory(new UuidIndexProviderFactory())
+                .build();
     }
 
     @Test
@@ -311,7 +318,7 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
     /*
     Created container will be closed.
      */
-    private void writeContainerToAndReadFromStream(Container container, ZipContainerPackagingFactory packagingFactory) throws Exception {
+    private void writeContainerToAndReadFromStream(Container container, ContainerPackagingFactory packagingFactory) throws Exception {
         assertNotNull(container);
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             container.writeTo(bos);
