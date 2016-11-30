@@ -47,7 +47,15 @@ public abstract class AbstractContainerDocument implements ContainerDocument {
     public List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws IOException, DataHashException {
         List<DataHash> hashList = new ArrayList<>();
         for (HashAlgorithm algorithm : algorithmList) {
-            hashList.add(getDataHash(algorithm));
+            try {
+                hashList.add(getDataHash(algorithm));
+            } catch (DataHashException e) {
+                // ignore as we don't care about single failure but rather the whole failure
+            }
+        }
+
+        if (hashList.isEmpty()) {
+            throw new DataHashException("Could not find any pre-generated hashes for requested algorithms! Algorithms requested: " + algorithmList);
         }
         return hashList;
     }
