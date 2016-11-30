@@ -80,7 +80,7 @@ public class ContainerCloseableIntegrationTest extends AbstractCommonKsiServiceI
 
     @Test
     public void testDeleteAllTempFilesFromExistingContainer() throws Exception {
-        Container existingContainer = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);;
+        Container existingContainer = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
         List<File> ksieTempFiles = getKsieTempFiles();
         try (
                 ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(new byte[313]), "byte inputstream", "byte-input-stream.bis");
@@ -162,9 +162,9 @@ public class ContainerCloseableIntegrationTest extends AbstractCommonKsiServiceI
             assertTrue("Temp dir contains more than one KSIE temporary files, test system is not clean.",tempFiles.size() == 2);
             for (File tmp : tempFiles) {
                 if (tmp.isDirectory()){
-                    String[] files = tmp.list();
-                    for (String file : files) {
-                        try (PrintWriter out = new PrintWriter(tmp + "\\" + file)) {
+                    File[] files = tmp.listFiles();
+                    for (File file : files) {
+                        try (PrintWriter out = new PrintWriter(file)) {
                             out.write("This is new content for temp file.");
                         }
                     }
