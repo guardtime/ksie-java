@@ -48,7 +48,7 @@ public class StreamContainerDocument implements ContainerDocument {
     }
 
     @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException, DataHashException {
+    public DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException {
         checkClosed();
         return containerDocument.getDataHash(algorithm);
     }

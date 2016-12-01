@@ -12,7 +12,6 @@ import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.container.verification.rule.state.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -46,7 +45,7 @@ public class TrustedHashListIntegrityRule extends AbstractRule<Pair<MultiHashEle
                     return failureVerificationResult;
                 }
             }
-        } catch (IOException | DataHashException e) {
+        } catch (DataHashException e) {
             LOGGER.info("Failed to verify hash match.", e);
             return failureVerificationResult;
         }

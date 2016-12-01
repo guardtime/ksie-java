@@ -37,9 +37,11 @@ public abstract class AbstractContainerDocument implements ContainerDocument {
     }
 
     @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException, DataHashException {
+    public DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException {
         try (InputStream inputStream = getInputStream()) {
             return Util.hash(inputStream, algorithm);
+        } catch (IOException e) {
+            throw new DataHashException("Failed to access data to generate hash.", e);
         }
     }
 
@@ -84,7 +86,7 @@ public abstract class AbstractContainerDocument implements ContainerDocument {
             if (fileName != null ? !fileName.equals(that.fileName) : that.fileName != null) return false;
             if (mimeType != null ? !mimeType.equals(that.mimeType) : that.mimeType != null) return false;
             return this.getDataHash(HASH_ALGORITHM).equals(that.getDataHash(HASH_ALGORITHM));
-        } catch (IOException | DataHashException e) {
+        } catch (DataHashException e) {
             return false;
         }
     }
@@ -94,7 +96,7 @@ public abstract class AbstractContainerDocument implements ContainerDocument {
         int result;
         try {
             result = getDataHash(HASH_ALGORITHM).hashCode();
-        } catch (IOException | DataHashException e) {
+        } catch (DataHashException e) {
             result = 0;
         }
         result = 31 * result + (mimeType != null ? mimeType.hashCode() : 0);

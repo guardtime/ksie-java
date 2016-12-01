@@ -4,6 +4,7 @@ import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.manifest.Manifest;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVInputStream;
@@ -30,7 +31,7 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
             this.documentsManifestReference = new TlvDocumentsManifestReference(documentsManifest.getRight(), documentsManifest.getLeft(), algorithmProvider);
             this.signatureReference = new TlvSignatureReference(signatureReference.getLeft(), signatureReference.getRight());
             this.annotationsManifestReference = new TlvAnnotationsManifestReference(annotationsManifest.getLeft(), annotationsManifest.getRight(), algorithmProvider);
-        } catch (TLVParserException | IOException e) {
+        } catch (TLVParserException | DataHashException e) {
             throw new InvalidManifestException("Failed to generate file reference TLVElement", e);
         }
     }

@@ -1,9 +1,6 @@
 package com.guardtime.container.manifest;
 
 
-import com.guardtime.ksi.hashing.DataHash;
-import com.guardtime.ksi.hashing.HashAlgorithm;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -20,12 +17,5 @@ public interface DocumentsManifest extends MultiHashElement {
     InputStream getInputStream() throws IOException;
 
     List<? extends FileReference> getDocumentReferences();
-
-    /**
-     * Returns {@link DataHash} created based on the same data available from {@link #getInputStream()} for given algorithm.
-     * @param algorithm to be used for generating the hash.
-     * @throws IOException when the hash input data can't be accessed.
-     */
-    DataHash getDataHash(HashAlgorithm algorithm) throws IOException;
 
 }
