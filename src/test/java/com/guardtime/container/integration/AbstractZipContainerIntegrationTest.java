@@ -14,6 +14,7 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.parsing.ParsingStoreFactory;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -32,8 +33,22 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
     private ContainerPackagingFactory packagingFactoryWithIncIndex;
     private ContainerPackagingFactory packagingFactoryWithUuid;
     private ContainerPackagingFactory defaultPackagingFactory;
+    private ParsingStoreFactory parsingStoreFactory;
 
-    void setPackagingFactories(ParsingStoreFactory parsingStoreFactory) {
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        setPackagingFactories();
+    }
+
+    protected abstract ParsingStoreFactory getParsingStoreFactory();
+
+    ContainerPackagingFactory getDefaultPackagingFactory() {
+        return defaultPackagingFactory;
+    }
+
+    private void setPackagingFactories() {
+        parsingStoreFactory = getParsingStoreFactory();
         this.packagingFactoryWithIncIndex = new ZipContainerPackagingFactoryBuilder().
                 withSignatureFactory(signatureFactory).
                 withIndexProviderFactory(new IncrementingIndexProviderFactory()).

@@ -1,6 +1,7 @@
 package com.guardtime.container.integration;
 
 import com.guardtime.container.packaging.Container;
+import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.parsing.MemoryBasedParsingStoreFactory;
 import com.guardtime.container.packaging.parsing.ParsingStoreFactory;
 import com.guardtime.container.util.Util;
@@ -19,11 +20,17 @@ import static org.junit.Assert.assertNotNull;
 public class ZipContainerMemoryBasedParsingIntegrationTest extends AbstractZipContainerIntegrationTest {
 
     private static final ParsingStoreFactory parsingStoreFactory = new MemoryBasedParsingStoreFactory();
+    private ContainerPackagingFactory packagingFactory;
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        setPackagingFactories(parsingStoreFactory);
+        packagingFactory = getDefaultPackagingFactory();
+    }
+
+    @Override
+    protected ParsingStoreFactory getParsingStoreFactory() {
+        return parsingStoreFactory;
     }
 
     @Test
