@@ -5,6 +5,7 @@ import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class TestHashAlgorithmProvider implements HashAlgorithmProvider {
@@ -41,6 +42,16 @@ public class TestHashAlgorithmProvider implements HashAlgorithmProvider {
         this.annotationDataReferenceHashAlgorithm = annotationDataReferenceHashAlgorithm;
         this.signingHashAlgorithm = signingHashAlgorithm;
 
+    }
+
+    public TestHashAlgorithmProvider(HashAlgorithm fileReferenceHashAlgorithm,
+                                     HashAlgorithm documentReferenceHashAlgorithm,
+                                     HashAlgorithm annotationDataReferenceHashAlgorithm,
+                                     HashAlgorithm signingHashAlgorithm) throws Exception {
+        this.fileReferenceHashAlgorithms = Collections.singletonList(fileReferenceHashAlgorithm);
+        this.documentReferenceHashAlgorithms = Collections.singletonList(documentReferenceHashAlgorithm);
+        this.annotationDataReferenceHashAlgorithm = annotationDataReferenceHashAlgorithm;
+        this.signingHashAlgorithm = signingHashAlgorithm;
     }
 
     @Override

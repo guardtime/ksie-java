@@ -53,6 +53,64 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
+    public void testDocumentHashAlgorithmListIsEmpty_IllegalArgumentException() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Data hashes must not be empty");
+
+        HashAlgorithm hashingAlgorithm = HashAlgorithm.SHA2_256;
+        LinkedList<HashAlgorithm> list = new LinkedList<>();
+        HashAlgorithmProvider provider = new TestHashAlgorithmProvider(Collections.singletonList(hashingAlgorithm), list, hashingAlgorithm, hashingAlgorithm);
+        setUpContainer(provider);
+    }
+
+    @Test
+    public void testFileReferenceHashAlgorithmListIsEmpty_IllegalArgumentException() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Data hashes must not be empty");
+
+        HashAlgorithm hashingAlgorithm = HashAlgorithm.SHA2_256;
+        LinkedList<HashAlgorithm> list = new LinkedList<>();
+        HashAlgorithmProvider provider = new TestHashAlgorithmProvider(list, Collections.singletonList(hashingAlgorithm), hashingAlgorithm, hashingAlgorithm);
+        setUpContainer(provider);
+    }
+
+    @Test
+    public void testDocumentHashAlgorithmListIsNull_NullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Hash algorithm can not be null");
+        HashAlgorithm hashingAlgorithm = HashAlgorithm.SHA2_256;
+        HashAlgorithmProvider provider = new TestHashAlgorithmProvider(hashingAlgorithm, null, hashingAlgorithm, hashingAlgorithm);
+        setUpContainer(provider);
+    }
+
+    @Test
+    public void testFileReferenceHashAlgorithmListIsNull_NullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Hash algorithm can not be null");
+        HashAlgorithm hashingAlgorithm = HashAlgorithm.SHA2_256;
+        HashAlgorithmProvider provider = new TestHashAlgorithmProvider(null, hashingAlgorithm, hashingAlgorithm, hashingAlgorithm);
+        setUpContainer(provider);
+    }
+
+    @Test
+    public void testAnnotationDataReferenceAlgorithmIsNull_NullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Hash algorithm can not be null");
+        HashAlgorithm hashingAlgorithm = HashAlgorithm.SHA2_256;
+        HashAlgorithmProvider provider = new TestHashAlgorithmProvider(hashingAlgorithm, hashingAlgorithm, null, hashingAlgorithm);
+        setUpContainer(provider);
+    }
+
+    @Test
+    public void testSigningHashAlgorithmIsNull_NullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Hash algorithm can not be null");
+        HashAlgorithm hashingAlgorithm = HashAlgorithm.SHA2_256;
+        HashAlgorithmProvider provider = new TestHashAlgorithmProvider(hashingAlgorithm, hashingAlgorithm, hashingAlgorithm, null);
+        setUpContainer(provider);
+    }
+
+    @Test
     public void testCheckNonDefaultHashingAlgorithm() throws Exception {
         HashAlgorithm hashingAlgorithm = HashAlgorithm.SHA2_512;
         HashAlgorithmProvider provider = new TestHashAlgorithmProvider(hashingAlgorithm);
