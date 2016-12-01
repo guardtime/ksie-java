@@ -45,6 +45,7 @@ public abstract class AbstractContainerDocument implements ContainerDocument {
 
     @Override
     public List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws IOException, DataHashException {
+        Util.notNull(algorithmList, "Hash algorithm list");
         List<DataHash> hashList = new ArrayList<>();
         for (HashAlgorithm algorithm : algorithmList) {
             try {
