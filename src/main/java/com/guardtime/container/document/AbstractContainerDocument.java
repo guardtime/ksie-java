@@ -54,7 +54,7 @@ public abstract class AbstractContainerDocument implements ContainerDocument {
             }
         }
 
-        if (hashList.isEmpty()) {
+        if (!algorithmList.isEmpty() && hashList.isEmpty()) {
             throw new DataHashException("Could not find any pre-generated hashes for requested algorithms! Algorithms requested: " + algorithmList);
         }
         return hashList;
