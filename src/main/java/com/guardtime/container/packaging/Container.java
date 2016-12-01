@@ -35,7 +35,7 @@ public interface Container extends AutoCloseable {
     /**
      * Closes the container and all {@link com.guardtime.container.document.ContainerDocument}s and
      * {@link com.guardtime.container.annotation.ContainerAnnotation}s in the container.
-     * NB! Care as this will close {@link com.guardtime.container.document.ContainerDocument}s and
+     * NB! This will close {@link com.guardtime.container.document.ContainerDocument}s and
      * {@link com.guardtime.container.annotation.ContainerAnnotation}s added during creation as well.
      */
     @Override
