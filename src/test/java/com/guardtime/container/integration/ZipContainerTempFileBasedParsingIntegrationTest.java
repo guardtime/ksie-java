@@ -5,10 +5,8 @@ import com.guardtime.container.packaging.parsing.TemporaryFileBasedParsingStoreF
 
 public class ZipContainerTempFileBasedParsingIntegrationTest extends AbstractZipContainerIntegrationTest {
 
-    private static final ParsingStoreFactory parsingStoreFactory = new TemporaryFileBasedParsingStoreFactory();
-
     @Override
     protected ParsingStoreFactory getParsingStoreFactory() {
-        return parsingStoreFactory;
+        return new TemporaryFileBasedParsingStoreFactory();
     }
 }

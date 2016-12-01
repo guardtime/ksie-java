@@ -19,18 +19,17 @@ import static org.junit.Assert.assertNotNull;
 
 public class ZipContainerMemoryBasedParsingIntegrationTest extends AbstractZipContainerIntegrationTest {
 
-    private static final ParsingStoreFactory parsingStoreFactory = new MemoryBasedParsingStoreFactory();
     private ContainerPackagingFactory packagingFactory;
 
     @Before
-    public void setUp() throws Exception {
-        super.setUp();
+    public void setUpPackagingFactories() throws Exception {
+        super.setUpPackagingFactories();
         packagingFactory = getDefaultPackagingFactory();
     }
 
     @Override
-    protected ParsingStoreFactory getParsingStoreFactory() {
-        return parsingStoreFactory;
+    public ParsingStoreFactory getParsingStoreFactory() {
+        return new MemoryBasedParsingStoreFactory();
     }
 
     @Test

@@ -35,19 +35,15 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
     private ContainerPackagingFactory defaultPackagingFactory;
     private ParsingStoreFactory parsingStoreFactory;
 
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        setPackagingFactories();
-    }
 
     protected abstract ParsingStoreFactory getParsingStoreFactory();
 
-    ContainerPackagingFactory getDefaultPackagingFactory() {
+    protected ContainerPackagingFactory getDefaultPackagingFactory() {
         return defaultPackagingFactory;
     }
 
-    private void setPackagingFactories() {
+    @Before
+    public void setUpPackagingFactories() throws Exception {
         parsingStoreFactory = getParsingStoreFactory();
         this.packagingFactoryWithIncIndex = new ZipContainerPackagingFactoryBuilder().
                 withSignatureFactory(signatureFactory).
