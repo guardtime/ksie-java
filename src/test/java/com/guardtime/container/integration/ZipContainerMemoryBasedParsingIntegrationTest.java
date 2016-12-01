@@ -1,8 +1,9 @@
 package com.guardtime.container.integration;
 
 import com.guardtime.container.packaging.Container;
+import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.parsing.MemoryBasedParsingStoreFactory;
-import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
+import com.guardtime.container.packaging.parsing.ParsingStoreFactory;
 import com.guardtime.container.util.Util;
 
 import org.junit.Before;
@@ -16,15 +17,19 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class MemoryBasedParsingStoreIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
+public class ZipContainerMemoryBasedParsingIntegrationTest extends AbstractZipContainerIntegrationTest {
+
+    private ContainerPackagingFactory packagingFactory;
 
     @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        packagingFactory = new ZipContainerPackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withParsingStoreFactory(new MemoryBasedParsingStoreFactory()).
-                build();
+    public void setUpPackagingFactories() throws Exception {
+        super.setUpPackagingFactories();
+        packagingFactory = getDefaultPackagingFactory();
+    }
+
+    @Override
+    public ParsingStoreFactory getParsingStoreFactory() {
+        return new MemoryBasedParsingStoreFactory();
     }
 
     @Test
@@ -54,5 +59,4 @@ public class MemoryBasedParsingStoreIntegrationTest extends AbstractCommonKsiSer
     private boolean isTempFile(String s) {
         return s.startsWith(Util.TEMP_DIR_PREFIX) || s.startsWith(Util.TEMP_FILE_PREFIX);
     }
-
 }

@@ -22,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
-public class ExtendingServiceIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
+public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testExtendingWithKsiContainerSignatureExtender() throws Exception {

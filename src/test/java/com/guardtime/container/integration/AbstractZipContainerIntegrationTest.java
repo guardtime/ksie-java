@@ -11,6 +11,7 @@ import com.guardtime.container.indexing.UuidIndexProviderFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.packaging.parsing.ParsingStoreFactory;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 
 import org.junit.Before;
@@ -28,29 +29,43 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
-
+public abstract class AbstractZipContainerIntegrationTest extends AbstractCommonIntegrationTest {
     private ContainerPackagingFactory packagingFactoryWithIncIndex;
     private ContainerPackagingFactory packagingFactoryWithUuid;
+    private ContainerPackagingFactory defaultPackagingFactory;
+    private ParsingStoreFactory parsingStoreFactory;
+
+
+    protected abstract ParsingStoreFactory getParsingStoreFactory();
+
+    protected ContainerPackagingFactory getDefaultPackagingFactory() {
+        return defaultPackagingFactory;
+    }
 
     @Before
-    public void setUpPackagingFactories() {
-
-
+    public void setUpPackagingFactories() throws Exception {
+        parsingStoreFactory = getParsingStoreFactory();
         this.packagingFactoryWithIncIndex = new ZipContainerPackagingFactoryBuilder().
                 withSignatureFactory(signatureFactory).
-                withIndexProviderFactory(new IncrementingIndexProviderFactory())
-                .build();
+                withIndexProviderFactory(new IncrementingIndexProviderFactory()).
+                withParsingStoreFactory(parsingStoreFactory).
+                build();
         this.packagingFactoryWithUuid = new ZipContainerPackagingFactoryBuilder().
                 withSignatureFactory(signatureFactory).
-                withIndexProviderFactory(new UuidIndexProviderFactory())
-                .build();
+                withIndexProviderFactory(new UuidIndexProviderFactory()).
+                withParsingStoreFactory(parsingStoreFactory).
+                build();
+        this.defaultPackagingFactory = new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(signatureFactory).
+                withParsingStoreFactory(parsingStoreFactory).
+                build();
     }
+
 
     @Test
     public void testCreateContainer() throws Exception {
         try (
-                Container container = new ContainerBuilder(packagingFactory)
+                Container container = new ContainerBuilder(defaultPackagingFactory)
                         .withDocument(new ByteArrayInputStream("Test_Data".getBytes()), TEST_FILE_NAME_TEST_TXT, "application/txt")
                         .build()
         ) {
@@ -62,7 +77,7 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
     public void testReadContainer() throws Exception {
         try (
                 InputStream inputStream = new FileInputStream(loadFile(CONTAINER_WITH_ONE_DOCUMENT));
-                Container container = packagingFactory.read(inputStream)
+                Container container = defaultPackagingFactory.read(inputStream)
         ) {
             assertSingleContentsWithSingleDocument(container);
         }
@@ -72,7 +87,7 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
     public void testReadCreatedContainer() throws Exception {
         try (
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                Container container = new ContainerBuilder(packagingFactory)
+                Container container = new ContainerBuilder(defaultPackagingFactory)
                         .withDocument(new ByteArrayInputStream("Test_Data".getBytes()), TEST_FILE_NAME_TEST_TXT, "application/txt")
                         .build()
             ) {
@@ -80,7 +95,7 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
 
                 try (
                         InputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
-                        Container parsedInContainer = packagingFactory.read(inputStream)
+                        Container parsedInContainer = defaultPackagingFactory.read(inputStream)
                 ) {
                     assertSingleContentsWithSingleDocument(parsedInContainer);
             }
@@ -127,10 +142,10 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
     public void testReadContainerWithRandomIncrementingIndexesAndAddNewContent_OK() throws Exception {
         try (
                 FileInputStream stream = new FileInputStream(loadFile(CONTAINER_WITH_RANDOM_INCREMENTING_INDEXES));
-                Container existingContainer = packagingFactory.read(stream);
+                Container existingContainer = defaultPackagingFactory.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
                 ContainerDocument document = new StreamContainerDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc");
-                Container container = packagingFactory.create(existingContainer,
+                Container container = defaultPackagingFactory.create(existingContainer,
                         Collections.singletonList(document),
                         Collections.singletonList(STRING_CONTAINER_ANNOTATION))
         ) {
@@ -310,7 +325,7 @@ public class ZipContainerKsiServiceIntegrationTest extends AbstractCommonKsiServ
     Created container will be closed in the end.
      */
     private void createContainerWriteItToAndReadFromStream(String documentFileName) throws Exception {
-        try (Container container = packagingFactory.create(getContainerDocument(documentFileName), Collections.singletonList(STRING_CONTAINER_ANNOTATION))) {
+        try (Container container = defaultPackagingFactory.create(getContainerDocument(documentFileName), Collections.singletonList(STRING_CONTAINER_ANNOTATION))) {
             writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
         }
     }
