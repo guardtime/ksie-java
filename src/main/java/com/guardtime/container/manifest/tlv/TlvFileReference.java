@@ -1,6 +1,7 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.manifest.FileReference;
+import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
@@ -40,6 +41,7 @@ abstract class TlvFileReference extends TLVStructure implements FileReference {
     }
 
     public TlvFileReference(String uri, List<DataHash> dataHashList, String mimeType) throws TLVParserException {
+        Util.notEmpty(dataHashList, "Data hashes");
         this.uri = uri;
         this.hashList.addAll(dataHashList);
         this.mimeType = mimeType;
