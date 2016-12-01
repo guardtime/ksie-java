@@ -1,41 +1,44 @@
 package com.guardtime.container.integration;
 
+import com.guardtime.container.annotation.ContainerAnnotation;
+import com.guardtime.container.annotation.ContainerAnnotationType;
+import com.guardtime.container.annotation.StringContainerAnnotation;
+import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.packaging.Container;
-import com.guardtime.container.packaging.ContainerPackagingFactory;
-import com.guardtime.container.packaging.parsing.TemporaryFileBasedParsingStoreFactory;
-import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
-import com.guardtime.container.signature.SignatureFactory;
-import com.guardtime.container.signature.ksi.KsiSignatureFactory;
+import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.util.Util;
-import com.guardtime.ksi.KSI;
-import com.guardtime.ksi.hashing.DataHash;
-import com.guardtime.ksi.unisignature.KSISignature;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
 
-public class ContainerCloseableIntegrationTest {
+public class ContainerCloseableIntegrationTest extends AbstractCommonKsiServiceIntegrationTest {
     private Path tmpDir = Paths.get(System.getProperty("java.io.tmpdir"));
-    private ContainerPackagingFactory packagingFactory;
 
     @Before
-    public void cleanUpTempDir() throws Exception {
+    public void setUp() throws Exception {
+        super.setUp();
+        closeAll(containerElements);
+        cleanUpTempDir();
+    }
+
+    private void cleanUpTempDir() throws Exception {
         cleanTempDir();
         assertFalse("Unclean test system! There are some 'ksie' files in " + tmpDir, anyKsieTempFiles());
     }
@@ -43,18 +46,6 @@ public class ContainerCloseableIntegrationTest {
     @After
     public void assertCleanTempDir() {
         assertFalse("Close did not delete all temporary files!", anyKsieTempFiles());
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        KSI mockKsi = Mockito.mock(KSI.class);
-        when(mockKsi.sign(Mockito.any(DataHash.class))).thenReturn(Mockito.mock(KSISignature.class));
-        when(mockKsi.extend(Mockito.any(KSISignature.class))).thenReturn(Mockito.mock(KSISignature.class));
-        SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
-        packagingFactory = new ZipContainerPackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withParsingStoreFactory(new TemporaryFileBasedParsingStoreFactory()).
-                build();
     }
 
     @Test
@@ -69,7 +60,6 @@ public class ContainerCloseableIntegrationTest {
         Container container = getContainer();
         assertTrue("Temporary files not found!", anyKsieTempFiles());
         container.close();
-        assertFalse("Close did not delete all temporary files!", anyKsieTempFiles());
     }
 
     @Test
@@ -80,32 +70,134 @@ public class ContainerCloseableIntegrationTest {
         }
     }
 
-    private Container getContainer() throws Exception {
-        URL url = Thread.currentThread().getContextClassLoader().getResource("containers/container-one-document.ksie");
-        File file = new File(url.toURI());
-        FileInputStream input = new FileInputStream(file);
-        return packagingFactory.read(input);
+    @Test
+    public void testDeleteAllTempFilesAndThenCloseContainer() throws Exception {
+        Container container = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
+        cleanTempDir();
+        container.close();
+        assertFalse(anyKsieTempFiles());
+    }
+
+    @Test
+    public void testDeleteAllTempFilesFromExistingContainer() throws Exception {
+        Container existingContainer = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
+        List<File> ksieTempFiles = getKsieTempFiles();
+        try (
+                ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(new byte[313]), "byte inputstream", "byte-input-stream.bis");
+                ContainerAnnotation annotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "content", "domain.com");
+                Container container = packagingFactory.create(existingContainer, Collections.singletonList(document), Collections.singletonList(annotation));
+        ) {
+            for (File doc : ksieTempFiles) {
+                if (isTempFile(doc)) {
+                    Util.deleteFileOrDirectory(doc.toPath());
+                }
+            }
+            container.close();
+            assertFalse(anyKsieTempFiles());
+        } finally {
+            existingContainer.close();
+        }
+    }
+
+    @Test
+    public void testDeleteAllTempFilesFromCreatedContainer() throws Exception {
+        Container existingContainer = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
+        List<File> ksieTempFiles = getKsieTempFiles();
+        try (
+                ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(new byte[313]), "byte inputstream", "byte-input-stream.bis");
+                ContainerAnnotation annotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "content", "domain.com");
+                Container container = packagingFactory.create(existingContainer, Collections.singletonList(document), Collections.singletonList(annotation))
+        ) {
+            for (File doc : getKsieTempFiles()) {
+                if (isTempFile(doc) && !ksieTempFiles.contains(doc)) {
+                    Util.deleteFileOrDirectory(doc.toPath());
+                }
+            }
+            container.close();
+        } finally {
+            assertTrue(ksieTempFiles.equals(getKsieTempFiles()));
+            existingContainer.close();
+        }
+        assertFalse(anyKsieTempFiles());
+    }
+
+    @Test
+    public void testWriteClosedContainer() throws Exception {
+        expectedException.expect(IOException.class);
+        expectedException.expectMessage("Can't write closed object!");
+        Container container = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
+        container.close();
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            container.writeTo(bos);
+        }
+        assertFalse(anyKsieTempFiles());
+    }
+
+    @Test
+    public void testWriteContainerWithTempFileRemoved() throws Exception {
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("Store has been corrupted! Expected to find file");
+        try (
+                Container container = getContainer(CONTAINER_WITH_MULTIPLE_SIGNATURES);
+                ByteArrayOutputStream bos = new ByteArrayOutputStream()
+        ) {
+            List<File> tempFiles = getKsieTempFiles();
+            assertTrue(tempFiles.size() == 1);
+            Util.deleteFileOrDirectory(tempFiles.get(0).toPath());
+            container.writeTo(bos);
+        }
+    }
+
+    @Test
+    public void testCreateContainerFromExistingAndAlteredTempFile_ThrowsInvalidPackageException() throws Exception {
+        expectedException.expect(InvalidPackageException.class);
+        expectedException.expectMessage("Created Container does not pass internal verification");
+        try (
+                ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(new byte[3]), "qwerty", "qwert.file");
+                ContainerAnnotation annotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "qwerty file", "qwerty.domain.com");
+                Container container = getContainer(CONTAINER_WITH_NON_REMOVABLE_ANNOTATION)
+        ) {
+            List<File> tempFiles = getKsieTempFiles();
+            //One KSIE directory for container and one KSIE...tmp file for annotation.
+            assertTrue("Temp dir contains more than one KSIE temporary files, test system is not clean.",tempFiles.size() == 2);
+            for (File tmp : tempFiles) {
+                if (tmp.isDirectory()){
+                    File[] files = tmp.listFiles();
+                    for (File file : files) {
+                        try (PrintWriter out = new PrintWriter(file)) {
+                            out.write("This is new content for temp file.");
+                        }
+                    }
+                }
+            }
+            packagingFactory.create(container, Collections.singletonList(document), Collections.singletonList(annotation));
+        }
     }
 
     private boolean anyKsieTempFiles() {
-        for (String s : tempFiles()) {
-            if (isTempFile(s)) {
-                return true;
+        return !getKsieTempFiles().isEmpty();
+    }
+
+    private List<File> getKsieTempFiles() {
+        List<File> ksieTempFiles = new LinkedList<>();
+        for (File f : tempFiles()) {
+            if (isTempFile(f)) {
+                ksieTempFiles.add(f);
             }
         }
-        return false;
+        return ksieTempFiles;
     }
 
     private void cleanTempDir() throws IOException {
-        for (String s : tempFiles()) {
-            if (isTempFile(s)) {
-                Util.deleteFileOrDirectory(Paths.get(s));
+        for (File f : tempFiles()) {
+            if (isTempFile(f)) {
+                Util.deleteFileOrDirectory(f.toPath());
             }
         }
     }
 
-    private List<String> tempFiles() {
-        String[] list = tmpDir.toFile().list();
+    private List<File> tempFiles() {
+        File[] list = tmpDir.toFile().listFiles();
         if (list == null) {
             return new LinkedList<>();
         } else {
@@ -113,7 +205,7 @@ public class ContainerCloseableIntegrationTest {
         }
     }
 
-    private boolean isTempFile(String s) {
-        return s.startsWith(Util.TEMP_DIR_PREFIX) || s.startsWith(Util.TEMP_FILE_PREFIX);
+    private boolean isTempFile(File s) {
+        return s.getName().startsWith(Util.TEMP_DIR_PREFIX) || s.getName().startsWith(Util.TEMP_FILE_PREFIX);
     }
 }
