@@ -32,4 +32,12 @@ public interface Container extends AutoCloseable {
      */
     List<UnknownDocument> getUnknownFiles();
 
+    /**
+     * Closes the container and all {@link com.guardtime.container.document.ContainerDocument}s and
+     * {@link com.guardtime.container.annotation.ContainerAnnotation}s in the container.
+     * NB! This will close {@link com.guardtime.container.document.ContainerDocument}s and
+     * {@link com.guardtime.container.annotation.ContainerAnnotation}s added during creation as well.
+     */
+    @Override
+    void close() throws Exception;
 }
