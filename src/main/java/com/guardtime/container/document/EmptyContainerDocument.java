@@ -37,7 +37,7 @@ public class EmptyContainerDocument extends AbstractContainerDocument {
     }
 
     @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException, DataHashException {
+    public DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException {
         if (!dataHashMap.containsKey(algorithm)) {
             throw new DataHashException("Could not find pre-generated hash for algorithm '" + algorithm.getName() + "'");
         }

@@ -30,6 +30,7 @@ import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureException;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.SignatureFactoryType;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.ContainerVerifier;
@@ -145,7 +146,7 @@ public class ZipContainerPackagingFactoryBuilder {
                 ZipContainer zipContainer = new ZipContainer(signatureContent, mimeType);
                 verifyContainer(zipContainer);
                 return zipContainer;
-            } catch (IOException | InvalidManifestException e) {
+            } catch (DataHashException | InvalidManifestException e) {
                 throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
             } catch (SignatureException e) {
                 throw new InvalidPackageException("Failed to sign ZipContainer!", e);
@@ -178,7 +179,7 @@ public class ZipContainerPackagingFactoryBuilder {
                 ZipContainer zipContainer = new ZipContainer(contents, getCopies(existingContainer.getUnknownFiles(), store), existingContainer.getMimeType(), store);
                 verifyContainer(zipContainer);
                 return zipContainer;
-            } catch (IOException | InvalidManifestException e) {
+            } catch (IOException | DataHashException | InvalidManifestException e) {
                 throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
             } catch (SignatureException e) {
                 throw new InvalidPackageException("Failed to sign ZipContainer!", e);
@@ -249,7 +250,7 @@ public class ZipContainerPackagingFactoryBuilder {
                 this.nameProvider = new EntryNameProvider(manifestFileExtension, signatureFileExtension, indexProvider);
             }
 
-            public ZipSignatureContent sign() throws InvalidManifestException, SignatureException, IOException {
+            public ZipSignatureContent sign() throws InvalidManifestException, SignatureException, DataHashException {
                 ManifestFactoryType manifestFactoryType = manifestFactory.getManifestFactoryType();
                 SignatureFactoryType signatureFactoryType = signatureFactory.getSignatureFactoryType();
                 logger.info("'{}' is used to create and read container manifests", manifestFactoryType.getName());
@@ -277,7 +278,7 @@ public class ZipContainerPackagingFactoryBuilder {
                 return signatureContent;
             }
 
-            private DataHash getSignatureContentSigningHash(ZipSignatureContent signatureContent) throws IOException {
+            private DataHash getSignatureContentSigningHash(ZipSignatureContent signatureContent) throws DataHashException {
                 Manifest manifest = signatureContent.getManifest().getRight();
                 HashAlgorithmProvider algorithmProvider = manifestFactory.getHashAlgorithmProvider();
                 return manifest.getDataHash(algorithmProvider.getSigningHashAlgorithm());

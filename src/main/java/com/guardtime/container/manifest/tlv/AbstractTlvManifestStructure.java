@@ -1,6 +1,7 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.manifest.InvalidManifestException;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.hashing.DataHash;
@@ -133,9 +134,11 @@ abstract class AbstractTlvManifestStructure {
         return code;
     }
 
-    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
+    public DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException {
         try(InputStream inputStream = getInputStream()) {
             return Util.hash(inputStream, algorithm);
+        } catch (IOException e) {
+            throw new DataHashException("Failed to access data to generate hash", e);
         }
     }
 

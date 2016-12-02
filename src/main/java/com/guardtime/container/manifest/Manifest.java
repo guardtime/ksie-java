@@ -1,5 +1,6 @@
 package com.guardtime.container.manifest;
 
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
@@ -16,9 +17,9 @@ public interface Manifest {
     /**
      * Returns {@link DataHash} created based on the same data available from {@link #getInputStream()} for given algorithm.
      * @param algorithm to be used for generating the hash.
-     * @throws IOException when the hash input data can't be accessed.
+     * @throws DataHashException when the hash input data can't be accessed.
      */
-    DataHash getDataHash(HashAlgorithm algorithm) throws IOException;
+    DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException;
 
     /**
      * Returns InputStream containing this manifest.

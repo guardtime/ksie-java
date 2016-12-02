@@ -2,6 +2,7 @@ package com.guardtime.container.verification.rule.signature.ksi;
 
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.result.SignatureResult;
 import com.guardtime.container.verification.result.VerificationResult;
@@ -14,8 +15,6 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.verifier.policies.Policy;
-
-import java.io.IOException;
 
 public class KsiSignatureVerifier implements SignatureVerifier<KSISignature> {
 
@@ -50,7 +49,7 @@ public class KsiSignatureVerifier implements SignatureVerifier<KSISignature> {
                 ruleResult = VerificationResult.OK;
             }
             return new KsiSignatureResult(ksiVerificationResult, ruleResult, signature);
-        } catch (KSIException | IOException e) {
+        } catch (KSIException | DataHashException e) {
             throw new RuleTerminatingException("Failed to verify KSI signature.", e);
         }
     }

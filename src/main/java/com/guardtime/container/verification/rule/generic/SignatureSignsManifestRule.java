@@ -2,6 +2,7 @@ package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
@@ -10,8 +11,6 @@ import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.container.verification.rule.RuleType;
 import com.guardtime.container.verification.rule.state.RuleStateProvider;
 import com.guardtime.ksi.hashing.DataHash;
-
-import java.io.IOException;
 
 public class SignatureSignsManifestRule extends AbstractRule<SignatureContent> {
 
@@ -31,7 +30,7 @@ public class SignatureSignsManifestRule extends AbstractRule<SignatureContent> {
             if (realHash.equals(signedHash)) {
                 result = VerificationResult.OK;
             }
-        } catch (IOException e) {
+        } catch (DataHashException e) {
             throw new RuleTerminatingException("Failed to verify hash of manifest!", e);
         } finally {
             String manifestUri = verifiable.getManifest().getLeft();
