@@ -61,7 +61,7 @@ abstract class TlvFileReference extends TLVStructure implements FileReference {
     }
 
     protected static List<DataHash> generateHashes(MultiHashElement multiHashElement, List<HashAlgorithm> hashAlgorithms) throws DataHashException {
-        Util.notNull(hashAlgorithms, "Hash algorithms");
+        Util.notNull(hashAlgorithms, "Hash algorithm list");
         List<DataHash> hashList = new ArrayList<>();
         for (HashAlgorithm algorithm : hashAlgorithms) {
             hashList.add(multiHashElement.getDataHash(algorithm));
