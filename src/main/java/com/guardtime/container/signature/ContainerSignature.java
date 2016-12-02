@@ -1,5 +1,7 @@
 package com.guardtime.container.signature;
 
+import com.guardtime.ksi.hashing.DataHash;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -20,5 +22,15 @@ public interface ContainerSignature<O> {
      * Returns the underlying signature object.
      */
     O getSignature();
+
+    /**
+     * Returns the {@link DataHash} that is signed by the underlying signature.
+     */
+    DataHash getSignedDataHash();
+
+    /**
+     * Returns true if the underlying signature has been extended.
+     */
+    boolean isExtended();
 
 }

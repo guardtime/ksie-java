@@ -1,13 +1,16 @@
 package com.guardtime.container.packaging.zip.handler;
 
-import com.guardtime.container.packaging.zip.ZipContainerPackagingFactory;
-
-import java.io.File;
+import com.guardtime.container.packaging.parsing.ParsingStore;
+import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 
 /**
  * This content holders is used for documents inside the container.
  */
-public class DocumentContentHandler extends ContentHandler<File> {
+public class DocumentContentHandler extends ContentHandler<ParsingStore> {
+
+    public DocumentContentHandler(ParsingStore store) {
+        super(store);
+    }
 
     @Override
     public boolean isSupported(String name) {
@@ -19,12 +22,15 @@ public class DocumentContentHandler extends ContentHandler<File> {
     }
 
     private boolean matchesMimeTypeFile(String name) {
-        return name.equals(ZipContainerPackagingFactory.MIME_TYPE_ENTRY_NAME);
+        return name.equals(ZipContainerPackagingFactoryBuilder.MIME_TYPE_ENTRY_NAME);
     }
 
     @Override
-    protected File getEntry(String name) {
-        return entries.get(name);
+    protected ParsingStore getEntry(String name) throws ContentParsingException {
+        if(!parsingStore.contains(name)) {
+            throw new ContentParsingException("No data stored for entry '" + name + "'");
+        }
+        return parsingStore;
     }
 
 }

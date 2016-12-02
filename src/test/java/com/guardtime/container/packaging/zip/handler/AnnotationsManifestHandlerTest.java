@@ -8,13 +8,12 @@ import static org.junit.Assert.assertTrue;
 
 public class AnnotationsManifestHandlerTest extends AbstractContentHandlerTest {
 
-    private static final String VALID_ANNOTATIONS_MANIFEST_PATH = "/META-INF/annotmanifest1.tlv";
+    private static final String VALID_ANNOTATIONS_MANIFEST_PATH = "/META-INF/annotmanifest-1.tlv";
     private static final String INVALID_ANNOTATIONS_MANIFEST_PATH = "funky_music.mp3";
-    private AnnotationsManifestHandler handler;
 
     @Before
     public void setUpHandler() {
-        handler = new AnnotationsManifestHandler(mockManifestFactory);
+        handler = new AnnotationsManifestHandler(mockManifestFactory, store);
     }
 
     @Test

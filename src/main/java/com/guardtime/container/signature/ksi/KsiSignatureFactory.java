@@ -56,7 +56,7 @@ public class KsiSignatureFactory implements SignatureFactory {
         }
         KsiContainerSignature ksiContainerSignature = (KsiContainerSignature) containerSignature;
         KSISignature extendedSignature = (KSISignature) extender.getExtendedSignature(ksiContainerSignature.getSignature());
-        ksiContainerSignature.setSignature(extendedSignature);
+        ksiContainerSignature.setExtendedSignature(extendedSignature);
     }
 
     private boolean unsupportedContainerSignature(ContainerSignature containerSignature) {

@@ -1,40 +1,42 @@
 package com.guardtime.container.packaging.zip.handler;
 
-import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.InvalidManifestException;
+import com.guardtime.container.manifest.SingleAnnotationManifest;
+import com.guardtime.container.packaging.parsing.ParsingStore;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+
+import static com.guardtime.container.packaging.EntryNameProvider.SINGLE_ANNOTATION_MANIFEST_FORMAT;
 
 /**
  * This content holders is used for annotation manifests inside the container.
  */
-public class SingleAnnotationManifestHandler extends IndexedContentHandler<SingleAnnotationManifest> {
+public class SingleAnnotationManifestHandler extends ContentHandler<SingleAnnotationManifest> {
 
     private final ContainerManifestFactory manifestFactory;
 
-    public SingleAnnotationManifestHandler(ContainerManifestFactory manifestFactory) {
+    public SingleAnnotationManifestHandler(ContainerManifestFactory manifestFactory, ParsingStore store) {
+        super(store);
         this.manifestFactory = manifestFactory;
     }
 
     @Override
     public boolean isSupported(String name) {
+        String regex = String.format(SINGLE_ANNOTATION_MANIFEST_FORMAT, ".+", manifestFactory.getManifestFactoryType().getManifestFileExtension());
         return matchesSingleDirectory(name, "META-INF") &&
-                fileNameMatches(name, "annotation[0-9]+." + manifestFactory.getManifestFactoryType().getManifestFileExtension());
+                fileNameMatches(name, regex);
     }
 
     @Override
     protected SingleAnnotationManifest getEntry(String name) throws ContentParsingException {
-        File file = fetchFileFromEntries(name);
-        try (FileInputStream input = new FileInputStream(file)) {
-            return manifestFactory.readSingleAnnotationManifest(input);
+        try (InputStream input = fetchStreamFromEntries(name)) {
+            SingleAnnotationManifest singleAnnotationManifest = manifestFactory.readSingleAnnotationManifest(input);
+            parsingStore.remove(name);
+            return singleAnnotationManifest;
         } catch (InvalidManifestException e) {
             throw new ContentParsingException("Failed to parse content of annotation manifest file", e);
-        } catch (FileNotFoundException e) {
-            throw new ContentParsingException("Failed to locate requested file in filesystem", e);
         } catch (IOException e) {
             throw new ContentParsingException("Failed to read file", e);
         }

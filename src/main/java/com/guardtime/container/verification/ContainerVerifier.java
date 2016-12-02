@@ -2,21 +2,21 @@ package com.guardtime.container.verification;
 
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.util.Util;
-import com.guardtime.container.verification.result.ResultHolder;
-import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.policy.VerificationPolicy;
-import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.ContainerVerifierResult;
+import com.guardtime.container.verification.result.ResultHolder;
+import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.rule.ContainerRule;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 
-import java.util.LinkedList;
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class to verify {@link Container} based on a {@link VerificationPolicy}
  */
 public class ContainerVerifier {
+    private static final Logger logger = LoggerFactory.getLogger(ContainerVerifier.class);
 
     private VerificationPolicy policy;
 
@@ -34,14 +34,14 @@ public class ContainerVerifier {
      */
     public ContainerVerifierResult verify(Container container) {
         ResultHolder holder = new ResultHolder();
-        for(ContainerRule rule : policy.getContainerRules()) {
-            try {
+        try {
+            for (ContainerRule rule : policy.getContainerRules()) {
                 rule.verify(holder, container);
-            } catch (RuleTerminatingException e) {
-                break; // TODO: Might as well step this outside the for cycle as we intend to break anyway. Would be a nice place to just log down the termination reason.
             }
+        } catch (RuleTerminatingException e) {
+            logger.info("Container verification terminated! Reason: '{}'", e.getMessage());
         }
-        return new ContainerVerifierResult(container, holder.getResults());
+        return new ContainerVerifierResult(container, holder);
     }
 
 }

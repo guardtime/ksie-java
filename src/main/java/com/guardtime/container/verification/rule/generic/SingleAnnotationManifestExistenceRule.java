@@ -8,7 +8,11 @@ import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
-import com.guardtime.container.verification.rule.*;
+import com.guardtime.container.verification.rule.AbstractRule;
+import com.guardtime.container.verification.rule.RuleTerminatingException;
+import com.guardtime.container.verification.rule.RuleType;
+import com.guardtime.container.verification.rule.state.RuleState;
+import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
 import java.util.Map;
 
@@ -17,7 +21,7 @@ import java.util.Map;
  */
 public class SingleAnnotationManifestExistenceRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_EXISTS.name();
+    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_EXISTS.getName();
 
     public SingleAnnotationManifestExistenceRule(RuleStateProvider stateProvider) {
         super(stateProvider.getStateForRule(NAME));

@@ -1,14 +1,14 @@
 package com.guardtime.container.document;
 
-import com.guardtime.container.hash.HashAlgorithmProvider;
+import com.guardtime.container.util.DataHashException;
+import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.nio.file.Files;
 import java.util.List;
 
 import static com.guardtime.container.util.Util.createTempFile;
@@ -19,16 +19,15 @@ import static com.guardtime.container.util.Util.notNull;
  */
 public class StreamContainerDocument implements ContainerDocument {
 
-    private static final String TEMP_FILE_PREFIX = "bcc-";
-    private static final String TEMP_FILE_SUFFIX = ".dat";
-
+    private final File tempFile;
     private FileContainerDocument containerDocument;
+    private boolean closed;
 
     public StreamContainerDocument(InputStream input, String mimeType, String fileName) {
         notNull(input, "Input stream");
         notNull(mimeType, "MIME type");
         notNull(fileName, "File name");
-        File tempFile = copy(input);
+        this.tempFile = copy(input);
         this.containerDocument = new FileContainerDocument(tempFile, mimeType, fileName);
     }
 
@@ -44,22 +43,25 @@ public class StreamContainerDocument implements ContainerDocument {
 
     @Override
     public InputStream getInputStream() throws IOException {
+        checkClosed();
         return containerDocument.getInputStream();
     }
 
     @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
+    public DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException {
+        checkClosed();
         return containerDocument.getDataHash(algorithm);
     }
 
     @Override
-    public List<DataHash> getDataHashList(HashAlgorithmProvider algorithmProvider) throws IOException {
-        return containerDocument.getDataHashList(algorithmProvider);
+    public List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws IOException, DataHashException {
+        checkClosed();
+        return containerDocument.getDataHashList(algorithmList);
     }
 
     @Override
     public boolean isWritable() {
-        return true;
+        return !closed;
     }
 
     @Override
@@ -70,18 +72,46 @@ public class StreamContainerDocument implements ContainerDocument {
     }
 
     protected File copy(InputStream input) {
-        FileOutputStream output = null;
         try {
-            File tempFile = createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
-            output = new FileOutputStream(tempFile);
-            com.guardtime.ksi.util.Util.copyData(input, output);
+            File tempFile = createTempFile();
+            Util.copyToTempFile(input, tempFile);
             return tempFile;
         } catch (IOException e) {
             throw new IllegalArgumentException("Can not copy input stream", e);
-        } finally {
-            com.guardtime.ksi.util.Util.closeQuietly(output);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        StreamContainerDocument that = (StreamContainerDocument) o;
+
+        return containerDocument != null ? containerDocument.equals(that.containerDocument) : that.containerDocument == null;
 
     }
 
+    @Override
+    public int hashCode() {
+        return containerDocument != null ? containerDocument.hashCode() : 0;
+    }
+
+    @Override
+    public void close() throws Exception {
+        containerDocument.close();
+        Files.deleteIfExists(tempFile.toPath());
+        this.closed = true;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        close();
+    }
+
+    private void checkClosed() {
+        if (closed) {
+            throw new IllegalStateException("Can't access closed document!");
+        }
+    }
 }

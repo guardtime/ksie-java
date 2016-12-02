@@ -14,43 +14,35 @@ public interface ContainerPackagingFactory<C extends Container> {
     /**
      * Parses an {@link InputStream} to produce a {@link Container}.
      *
-     * @param input
-     *         An {@link InputStream} that contains a valid/parsable {@link Container}.
+     * @param input    An {@link InputStream} that contains a valid/parsable {@link Container}. This InputStream will be closed
+     *                 after reading.
      * @return An instance of {@link Container} based on the data from {@link InputStream}. Does not verify
-     * the container/signature(s).
-     * @throws InvalidPackageException
-     *         When the {@link InputStream} does not contain a parsable {@link Container}.
+     *         the container/signature(s).
+     * @throws InvalidPackageException   When the {@link InputStream} does not contain a parsable {@link Container}.
      */
     C read(InputStream input) throws InvalidPackageException;
 
     /**
      * Creates a {@link Container} with the input documents and annotations and a signature covering them.
      *
-     * @param files
-     *         List of {@link ContainerDocument} to be added and signed. Can NOT be null.
-     * @param annotations
-     *         List of {@link ContainerAnnotation} to be added and signed. Can be null.
-     * @return A new {@link Container} which contains the documents and annotations and a signature covering
-     * them.
-     * @throws InvalidPackageException
-     *         When the input data can not be processed or signing fails.
+     * @param files          List of {@link ContainerDocument} to be added and signed. Can NOT be null.
+     * @param annotations    List of {@link ContainerAnnotation} to be added and signed. Can be null.
+     * @return A new {@link Container} which contains the documents and annotations and a signature covering them.
+     * @throws InvalidPackageException  When the input data can not be processed or signing fails.
      */
     C create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException;
 
     /**
-     * Updates an existing {@link Container} to include a new set of documents, annotations and a signature
-     * for the added elements.
+     * Creates a {@link Container} that combines everything from the existing {@link Container} and the new set of
+     * documents, annotations and a signature for the added elements.
      *
-     * @param existingContainer
-     *         An instance of {@link Container} which already has {@link com.guardtime.container.signature.ContainerSignature}(s)
-     * @param files
-     *         List of {@link ContainerDocument} to be added and signed. Can NOT be null.
-     * @param annotations
-     *         List of {@link ContainerAnnotation} to be added and signed. Can be null.
-     * @return Updated {@link Container} which now contains the added documents and annotations and a
-     * signature to cover them.
-     * @throws InvalidPackageException
-     *         When the input data can not be processed or signing fails.
+     * @param existingContainer    An instance of {@link Container} which already has
+     *                             {@link com.guardtime.container.signature.ContainerSignature}(s)
+     * @param files                List of {@link ContainerDocument} to be added and signed. Can NOT be null.
+     * @param annotations          List of {@link ContainerAnnotation} to be added and signed. Can be null.
+     * @return A new {@link Container} which contains everything from {@param existingContainer} and the added documents
+     * and annotations and a signature to cover them.
+     * @throws InvalidPackageException When the input data can not be processed or signing fails.
      */
     C create(Container existingContainer, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException;
 

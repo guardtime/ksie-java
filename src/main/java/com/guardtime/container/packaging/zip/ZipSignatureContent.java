@@ -8,6 +8,7 @@ import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -99,7 +100,7 @@ class ZipSignatureContent implements SignatureContent {
         this.signature = signature;
     }
 
-    public DataHash getSignatureInputHash() throws IOException {
+    public DataHash getSignatureInputHash() throws DataHashException {
         return manifest.getRight().getDataHash(HashAlgorithm.SHA2_256);
     }
 
@@ -123,7 +124,9 @@ class ZipSignatureContent implements SignatureContent {
     private void writeAnnotations(ZipOutputStream output) throws IOException {
         for (String uri : annotations.keySet()) {
             ContainerAnnotation annotation = annotations.get(uri);
-            writeEntry(new ZipEntry(uri), annotation.getInputStream(), output);
+            try (InputStream inputStream = annotation.getInputStream()) {
+                writeEntry(new ZipEntry(uri), inputStream, output);
+            }
         }
     }
 
@@ -139,7 +142,9 @@ class ZipSignatureContent implements SignatureContent {
         for (String uri : documents.keySet()) {
             ContainerDocument document = documents.get(uri);
             if (document.isWritable()) {
-                writeEntry(new ZipEntry(uri), document.getInputStream(), zipOutputStream);
+                try (InputStream inputStream = document.getInputStream()) {
+                    writeEntry(new ZipEntry(uri), inputStream, zipOutputStream);
+                }
             }
         }
     }

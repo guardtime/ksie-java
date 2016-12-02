@@ -6,9 +6,9 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.container.verification.rule.RuleStateProvider;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
+import com.guardtime.container.verification.rule.state.RuleState;
+import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
 import java.util.List;
 
@@ -18,12 +18,12 @@ import java.util.List;
  */
 public class AnnotationsIntegrityRule extends AbstractRule<SignatureContent> {
 
-    private AnnotationsManifestExistenceRule annotationsManifestExistenceRule;
-    private AnnotationsManifestIntegrityRule annotationsManifestIntegrityRule;
-    private SingleAnnotationManifestExistenceRule singleAnnotationManifestExistenceRule;
-    private SingleAnnotationManifestIntegrityRule singleAnnotationManifestIntegrityRule;
-    private AnnotationDataExistenceRule annotationDataExistenceRule;
-    private AnnotationDataIntegrityRule annotationDataIntegrityRule;
+    private final AnnotationsManifestExistenceRule annotationsManifestExistenceRule;
+    private final AnnotationsManifestIntegrityRule annotationsManifestIntegrityRule;
+    private final SingleAnnotationManifestExistenceRule singleAnnotationManifestExistenceRule;
+    private final SingleAnnotationManifestIntegrityRule singleAnnotationManifestIntegrityRule;
+    private final AnnotationDataExistenceRule annotationDataExistenceRule;
+    private final AnnotationDataIntegrityRule annotationDataIntegrityRule;
 
     public AnnotationsIntegrityRule(RuleStateProvider stateProvider) {
         super(RuleState.FAIL);
@@ -49,8 +49,9 @@ public class AnnotationsIntegrityRule extends AbstractRule<SignatureContent> {
 
     private boolean processAnnotationsManifestVerification(ResultHolder holder, SignatureContent verifiable) {
         try {
-            annotationsManifestExistenceRule.verify(holder, verifiable);
-            annotationsManifestIntegrityRule.verify(holder, verifiable);
+            if (annotationsManifestExistenceRule.verify(holder, verifiable)) {
+                annotationsManifestIntegrityRule.verify(holder, verifiable);
+            }
         } catch (RuleTerminatingException e) {
             LOGGER.info("Halting verification chain for annotations manifest!, caused by '{}'", e.getMessage());
             return false;
@@ -65,14 +66,15 @@ public class AnnotationsIntegrityRule extends AbstractRule<SignatureContent> {
 
     private void processAnnotationVerification(ResultHolder holder, Pair<SignatureContent, FileReference> verifiable) {
         try {
-            singleAnnotationManifestExistenceRule.verify(holder, verifiable);
-            singleAnnotationManifestIntegrityRule.verify(holder, verifiable);
+            if (singleAnnotationManifestExistenceRule.verify(holder, verifiable)) {
+                singleAnnotationManifestIntegrityRule.verify(holder, verifiable);
 
-            annotationDataExistenceRule.verify(holder, verifiable);
-            annotationDataIntegrityRule.verify(holder, verifiable);
+                if (annotationDataExistenceRule.verify(holder, verifiable)) {
+                    annotationDataIntegrityRule.verify(holder, verifiable);
+                }
+            }
         } catch (RuleTerminatingException e) {
             LOGGER.info("Halting verification chain for annotation!, caused by '{}'", e.getMessage());
-            return;
         }
     }
 

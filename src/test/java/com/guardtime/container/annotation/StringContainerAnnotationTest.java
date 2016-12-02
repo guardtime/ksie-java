@@ -2,6 +2,7 @@ package com.guardtime.container.annotation;
 
 import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.ksi.hashing.HashAlgorithm;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -20,7 +21,7 @@ public class StringContainerAnnotationTest extends AbstractContainerTest {
     @Test
     public void testCreateStringAnnotationWithoutAnnotationType_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("Type must be present");
+        expectedException.expectMessage("Annotation type must be present");
         new StringContainerAnnotation(null, "Example Content", ANNOTATION_DOMAIN_COM_GUARDTIME);
     }
 

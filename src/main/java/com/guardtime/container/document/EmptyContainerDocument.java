@@ -1,6 +1,5 @@
 package com.guardtime.container.document;
 
-import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
@@ -8,33 +7,28 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a document in a container which doesn't store the document data in the container.
  */
-public class EmptyContainerDocument implements ContainerDocument {
-    private final String fileName;
-    private final String mimeType;
-    private final List<DataHash> hashList;
+public class EmptyContainerDocument extends AbstractContainerDocument {
+    private final Map<HashAlgorithm, DataHash> dataHashMap;
 
     public EmptyContainerDocument(String fileName, String mimeType, List<DataHash> hashes) {
-        Util.notNull(fileName, "File name");
-        Util.notNull(mimeType, "MIME type");
+        super(mimeType, fileName);
         Util.notEmpty(hashes, "Data hash list");
-        this.fileName = fileName;
-        this.mimeType = mimeType;
-        this.hashList = hashes;
+        this.dataHashMap = mapHashes(hashes);
     }
 
-    @Override
-    public String getFileName() {
-        return fileName;
-    }
-
-    @Override
-    public String getMimeType() {
-        return mimeType;
+    private Map<HashAlgorithm, DataHash> mapHashes(List<DataHash> hashList) {
+        Map<HashAlgorithm, DataHash> map = new HashMap<>();
+        for (DataHash hash : hashList) {
+            map.put(hash.getAlgorithm(), hash);
+        }
+        return map;
     }
 
     @Override
@@ -43,13 +37,11 @@ public class EmptyContainerDocument implements ContainerDocument {
     }
 
     @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException, DataHashException {
-        for (DataHash hash : hashList) {
-            if (hash.getAlgorithm().equals(algorithm)) {
-                return hash;
-            }
+    public DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException {
+        if (!dataHashMap.containsKey(algorithm)) {
+            throw new DataHashException("Could not find pre-generated hash for algorithm '" + algorithm.getName() + "'");
         }
-        throw new DataHashException("Could not find pre-generated hash for algorithm '" + algorithm.getName() + "'");
+        return dataHashMap.get(algorithm);
     }
 
     @Override
@@ -57,8 +49,4 @@ public class EmptyContainerDocument implements ContainerDocument {
         return false;
     }
 
-    @Override
-    public List<DataHash> getDataHashList(HashAlgorithmProvider algorithmProvider) {
-        return hashList;
-    }
 }

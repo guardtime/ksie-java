@@ -6,24 +6,24 @@ import com.guardtime.container.manifest.AnnotationDataReference;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.container.verification.rule.RuleStateProvider;
 import com.guardtime.container.verification.rule.RuleType;
+import com.guardtime.container.verification.rule.state.RuleState;
+import com.guardtime.container.verification.rule.state.RuleStateProvider;
 import com.guardtime.ksi.hashing.DataHash;
-
-import java.io.IOException;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 
 /**
  * This rule verifies that the annotation data has not been corrupted.
  */
 public class AnnotationDataIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_DATA.name();
+    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_DATA.getName();
 
     public AnnotationDataIntegrityRule(RuleStateProvider stateProvider) {
         super(stateProvider.getStateForRule(NAME));
@@ -44,11 +44,11 @@ public class AnnotationDataIntegrityRule extends AbstractRule<Pair<SignatureCont
         try {
             DataHash expectedHash = annotationDataReference.getHash();
             DataHash realHash = annotation.getDataHash(expectedHash.getAlgorithm());
-            if (expectedHash.equals(realHash)) {
+            if (expectedHash.getAlgorithm().getStatus() == HashAlgorithm.Status.NORMAL && expectedHash.equals(realHash)) {
                 verificationResult = VerificationResult.OK;
             }
             result = new GenericVerificationResult(verificationResult, this, annotationDataUri);
-        } catch (IOException e) {
+        } catch (DataHashException e) {
             LOGGER.info("Verifying annotation data failed!", e);
             result = new GenericVerificationResult(verificationResult, this, annotationDataUri, e);
         }

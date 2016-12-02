@@ -6,15 +6,14 @@ import org.junit.Test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class AnnotationContentHandlerTest {
+public class AnnotationContentHandlerTest extends AbstractContentHandlerTest {
 
-    private static final String VALID_ANNOTATION_PATH = "/META-INF/annotation1.dat";
+    private static final String VALID_ANNOTATION_PATH = "/META-INF/annotation-1.dat";
     private static final String INVALID_ANNOTATION_PATH = "funky_music.mp3";
-    private AnnotationContentHandler handler;
 
     @Before
-    public void setUp() {
-        handler = new AnnotationContentHandler();
+    public void setUpHandler() {
+        handler = new AnnotationContentHandler(store);
     }
 
     @Test

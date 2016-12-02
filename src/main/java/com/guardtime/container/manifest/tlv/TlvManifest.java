@@ -4,10 +4,8 @@ import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.manifest.Manifest;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Pair;
-import com.guardtime.container.util.Util;
-import com.guardtime.ksi.hashing.DataHash;
-import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVInputStream;
 import com.guardtime.ksi.tlv.TLVParserException;
@@ -33,7 +31,7 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
             this.documentsManifestReference = new TlvDocumentsManifestReference(documentsManifest.getRight(), documentsManifest.getLeft(), algorithmProvider);
             this.signatureReference = new TlvSignatureReference(signatureReference.getLeft(), signatureReference.getRight());
             this.annotationsManifestReference = new TlvAnnotationsManifestReference(annotationsManifest.getLeft(), annotationsManifest.getRight(), algorithmProvider);
-        } catch (TLVParserException | IOException e) {
+        } catch (TLVParserException | DataHashException e) {
             throw new InvalidManifestException("Failed to generate file reference TLVElement", e);
         }
     }
@@ -51,11 +49,6 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
         checkMandatoryElement(documentsManifestReference, "Documents manifest reference");
         checkMandatoryElement(signatureReference, "Signature reference");
         checkMandatoryElement(annotationsManifestReference, "Annotations manifest reference");
-    }
-
-    @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
-        return Util.hash(getInputStream(), algorithm);
     }
 
     public FileReference getDocumentsManifestReference() {

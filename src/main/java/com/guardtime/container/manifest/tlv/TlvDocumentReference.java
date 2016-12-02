@@ -17,7 +17,7 @@ class TlvDocumentReference extends TlvFileReference {
     }
 
     public TlvDocumentReference(ContainerDocument document, HashAlgorithmProvider algorithmProvider) throws TLVParserException, IOException, DataHashException {
-        super(document.getFileName(), document.getDataHashList(algorithmProvider), document.getMimeType());
+        super(document.getFileName(), document.getDataHashList(algorithmProvider.getDocumentReferenceHashAlgorithms()), document.getMimeType());
     }
 
     @Override

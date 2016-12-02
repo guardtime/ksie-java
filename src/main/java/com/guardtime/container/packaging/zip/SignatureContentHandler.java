@@ -2,18 +2,31 @@ package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
-import com.guardtime.container.annotation.FileContainerAnnotation;
+import com.guardtime.container.annotation.ParsedContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.EmptyContainerDocument;
-import com.guardtime.container.document.FileContainerDocument;
-import com.guardtime.container.manifest.*;
-import com.guardtime.container.packaging.zip.handler.*;
+import com.guardtime.container.document.ParsedContainerDocument;
+import com.guardtime.container.manifest.AnnotationDataReference;
+import com.guardtime.container.manifest.AnnotationsManifest;
+import com.guardtime.container.manifest.DocumentsManifest;
+import com.guardtime.container.manifest.FileReference;
+import com.guardtime.container.manifest.Manifest;
+import com.guardtime.container.manifest.SingleAnnotationManifest;
+import com.guardtime.container.packaging.parsing.ParsingStore;
+import com.guardtime.container.packaging.zip.handler.AnnotationContentHandler;
+import com.guardtime.container.packaging.zip.handler.AnnotationsManifestHandler;
+import com.guardtime.container.packaging.zip.handler.ContentParsingException;
+import com.guardtime.container.packaging.zip.handler.DocumentContentHandler;
+import com.guardtime.container.packaging.zip.handler.DocumentsManifestHandler;
+import com.guardtime.container.packaging.zip.handler.ManifestHandler;
+import com.guardtime.container.packaging.zip.handler.SignatureHandler;
+import com.guardtime.container.packaging.zip.handler.SingleAnnotationManifestHandler;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -108,35 +121,28 @@ class SignatureContentHandler {
         private void populateDocuments() {
             if (documentsManifest == null) return;
             for (FileReference reference : documentsManifest.getRight().getDocumentReferences()) {
-                try {
-                    ContainerDocument containerDocument = fetchDocumentFromHandler(reference);
-                    if (containerDocument != null) documents.add(containerDocument);
-                } catch (ContentParsingException e) {
-                    throw new RuntimeException("Programming bug! This should never happen. Investigate why DocumentContentHandler#getEntry() threw exception.", e);
-                }
+                ContainerDocument containerDocument = fetchDocumentFromHandler(reference);
+                if (containerDocument != null) documents.add(containerDocument);
             }
         }
 
-        private ContainerDocument fetchDocumentFromHandler(FileReference reference) throws ContentParsingException {
+        private ContainerDocument fetchDocumentFromHandler(FileReference reference) {
             if (invalidReference(reference)) return null;
             String documentUri = reference.getUri();
-            File file = documentHandler.get(documentUri);
-            if (file == null) {
+            try {
+                ParsingStore streamProvider = documentHandler.get(documentUri);
+                return new ParsedContainerDocument(streamProvider, documentUri, reference.getMimeType(), documentUri);
+            } catch (ContentParsingException e) {
                 // either removed or was never present in the first place, verifier will decide
                 return new EmptyContainerDocument(documentUri, reference.getMimeType(), reference.getHashList());
-            } else {
-                return new FileContainerDocument(file, reference.getMimeType(), documentUri);
             }
         }
 
         private boolean invalidReference(FileReference reference) {
-            if (reference.getUri() == null ||
+            return reference.getUri() == null ||
                     reference.getMimeType() == null ||
                     reference.getHashList() == null ||
-                    reference.getHashList().isEmpty()) {
-                return true;
-            }
-            return false;
+                    reference.getHashList().isEmpty();
         }
 
         private void populateAnnotationsWithManifests() {
@@ -170,9 +176,10 @@ class SignatureContentHandler {
                     return null;
                 }
                 AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
-                File annotationFile = annotationContentHandler.get(annotationDataReference.getUri());
-                ContainerAnnotation annotation = new FileContainerAnnotation(annotationFile, annotationDataReference.getDomain(), type);
-                return Pair.of(annotationDataReference.getUri(), annotation);
+                String uri = annotationDataReference.getUri();
+                ParsingStore annotationStreamProvider = annotationContentHandler.get(uri);
+                ContainerAnnotation annotation = new ParsedContainerAnnotation(annotationStreamProvider, uri, annotationDataReference.getDomain(), type);
+                return Pair.of(uri, annotation);
             } catch (ContentParsingException e) {
                 LOGGER.info("Failed to parse annotation for '{}'. Reason: '{}'", manifestReference.getUri(), e.getMessage());
                 return null;

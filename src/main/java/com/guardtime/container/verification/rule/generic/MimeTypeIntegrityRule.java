@@ -6,7 +6,11 @@ import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
-import com.guardtime.container.verification.rule.*;
+import com.guardtime.container.verification.rule.AbstractRule;
+import com.guardtime.container.verification.rule.ContainerRule;
+import com.guardtime.container.verification.rule.RuleTerminatingException;
+import com.guardtime.container.verification.rule.RuleType;
+import com.guardtime.container.verification.rule.state.RuleStateProvider;
 import com.guardtime.ksi.util.Util;
 
 import java.io.IOException;
@@ -17,7 +21,7 @@ import java.util.Arrays;
  * {@link ContainerPackagingFactory}.
  */
 public class MimeTypeIntegrityRule extends AbstractRule<Container> implements ContainerRule {
-    private static final String NAME = RuleType.KSIE_FORMAT.name();
+    private static final String NAME = RuleType.KSIE_FORMAT.getName();
     private final byte[] expectedContent;
 
     public MimeTypeIntegrityRule(RuleStateProvider provider, ContainerPackagingFactory packagingFactory) {

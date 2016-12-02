@@ -3,17 +3,18 @@ package com.guardtime.container.packaging.zip.handler;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder.MIME_TYPE_ENTRY_NAME;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class DocumentContentHandlerTest {
+public class DocumentContentHandlerTest extends AbstractContentHandlerTest {
 
     private static final String VALID_DOCUMENT_PATH = "important_document_is_important.doc";
-    private static final String INVALID_DOCUMENT_PATH = "/META-INF/manifest1.tlv";
-    private DocumentContentHandler handler;
+    private static final String INVALID_DOCUMENT_PATH = "/META-INF/manifest-1.tlv";
 
     @Before
-    public void setUp() {
-        handler = new DocumentContentHandler();
+    public void setUpHandler() {
+        handler = new DocumentContentHandler(store);
     }
 
     @Test
@@ -24,5 +25,10 @@ public class DocumentContentHandlerTest {
     @Test
     public void testIsSupportedDoesntValidateInvalidFile() throws Exception {
         assertFalse("Identified unsupported filename string.", handler.isSupported(INVALID_DOCUMENT_PATH));
+    }
+
+    @Test
+    public void testIsSupportedDoesNotValidateMimetypeFile() throws Exception {
+        assertFalse("Identified MIMETYPE filename string.", handler.isSupported(MIME_TYPE_ENTRY_NAME));
     }
 }

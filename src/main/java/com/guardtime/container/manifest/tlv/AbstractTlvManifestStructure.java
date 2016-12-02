@@ -1,14 +1,21 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.manifest.InvalidManifestException;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.exceptions.KSIException;
+import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVInputStream;
 import com.guardtime.ksi.tlv.TLVParserException;
 import com.guardtime.ksi.tlv.TLVStructure;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -98,9 +105,10 @@ abstract class AbstractTlvManifestStructure {
     }
 
     public InputStream getInputStream() throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        writeTo(bos);
-        return new ByteArrayInputStream(bos.toByteArray());
+        try(ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            writeTo(bos);
+            return new ByteArrayInputStream(bos.toByteArray());
+        }
     }
 
     @Override
@@ -124,6 +132,14 @@ abstract class AbstractTlvManifestStructure {
             code += element.hashCode();
         }
         return code;
+    }
+
+    public DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException {
+        try(InputStream inputStream = getInputStream()) {
+            return Util.hash(inputStream, algorithm);
+        } catch (IOException e) {
+            throw new DataHashException("Failed to access data to generate hash", e);
+        }
     }
 
 }

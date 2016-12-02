@@ -2,60 +2,44 @@ package com.guardtime.container.packaging.zip.handler;
 
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.ContainerManifestFactory;
-import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.InvalidManifestException;
-import com.guardtime.container.util.Util;
+import com.guardtime.container.packaging.parsing.ParsingStore;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+
+import static com.guardtime.container.packaging.EntryNameProvider.ANNOTATIONS_MANIFEST_FORMAT;
 
 /**
  * This content holders is used for annotations manifests inside the container.
  */
-public class AnnotationsManifestHandler extends IndexedContentHandler<AnnotationsManifest> {
+public class AnnotationsManifestHandler extends ContentHandler<AnnotationsManifest> {
 
     private final ContainerManifestFactory manifestFactory;
 
-    public AnnotationsManifestHandler(ContainerManifestFactory manifestFactory) {
+    public AnnotationsManifestHandler(ContainerManifestFactory manifestFactory, ParsingStore store) {
+        super(store);
         this.manifestFactory = manifestFactory;
     }
 
     @Override
     public boolean isSupported(String name) {
+        String regex = String.format(ANNOTATIONS_MANIFEST_FORMAT, ".+", manifestFactory.getManifestFactoryType().getManifestFileExtension());
         return matchesSingleDirectory(name, "META-INF") &&
-                fileNameMatches(name, "annotmanifest[0-9]+." + manifestFactory.getManifestFactoryType().getManifestFileExtension());
+                fileNameMatches(name, regex);
     }
 
     @Override
     protected AnnotationsManifest getEntry(String name) throws ContentParsingException {
-        File file = fetchFileFromEntries(name);
-        try (FileInputStream input = new FileInputStream(file)) {
-            return manifestFactory.readAnnotationsManifest(input);
+        try (InputStream input = fetchStreamFromEntries(name)) {
+            AnnotationsManifest annotationsManifest = manifestFactory.readAnnotationsManifest(input);
+            parsingStore.remove(name);
+            return annotationsManifest;
         } catch (InvalidManifestException e) {
             throw new ContentParsingException("Failed to parse content of annotmanifest file", e);
-        } catch (FileNotFoundException e) {
-            throw new ContentParsingException("Failed to locate requested file in filesystem", e);
         } catch (IOException e) {
             throw new ContentParsingException("Failed to read file", e);
         }
-    }
-
-    public int getMaxSingleAnnotationManifestIndex() {
-        int max = 0;
-        for (File file : entries.values()) {
-            try {
-                AnnotationsManifest annotationsManifest = manifestFactory.readAnnotationsManifest(new FileInputStream(file));
-                for (FileReference reference : annotationsManifest.getSingleAnnotationManifestReferences()) {
-                    int index = Util.extractIntegerFrom(reference.getUri());
-                    if (index > max) max = index;
-                }
-            } catch (Exception e) {
-                // We don't care about the manifests we can't access, ignore them
-            }
-        }
-        return max;
     }
 
 }

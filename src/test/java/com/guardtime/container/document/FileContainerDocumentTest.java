@@ -9,6 +9,7 @@ import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class FileContainerDocumentTest extends AbstractContainerTest {
 
@@ -38,6 +39,14 @@ public class FileContainerDocumentTest extends AbstractContainerTest {
     public void testOverrideDocumentName() throws Exception {
         FileContainerDocument fileDocument = new FileContainerDocument(loadFile(TEST_FILE_PATH_TEST_TXT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_DOC);
         assertEquals(TEST_FILE_NAME_TEST_DOC, fileDocument.getFileName());
+    }
+
+    @Test
+    public void testCloseDoesNotDeleteFile() throws Exception {
+        File file = loadFile(TEST_FILE_PATH_TEST_TXT);
+        FileContainerDocument fileDocument = new FileContainerDocument(file, MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_DOC);
+        fileDocument.close();
+        assertTrue(file.exists());
     }
 
 }

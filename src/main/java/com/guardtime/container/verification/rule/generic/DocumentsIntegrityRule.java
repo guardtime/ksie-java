@@ -6,9 +6,9 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.rule.AbstractRule;
-import com.guardtime.container.verification.rule.RuleState;
-import com.guardtime.container.verification.rule.RuleStateProvider;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
+import com.guardtime.container.verification.rule.state.RuleState;
+import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
 import java.util.List;
 
@@ -19,10 +19,10 @@ import java.util.List;
  */
 public class DocumentsIntegrityRule extends AbstractRule<SignatureContent> {
 
-    private DocumentsManifestExistenceRule documentsManifestExistenceRule;
-    private DocumentsManifestIntegrityRule documentsManifestIntegrityRule;
-    private DocumentExistenceRule documentExistenceRule;
-    private DocumentIntegrityRule documentIntegrityRule;
+    private final DocumentsManifestExistenceRule documentsManifestExistenceRule;
+    private final DocumentsManifestIntegrityRule documentsManifestIntegrityRule;
+    private final DocumentExistenceRule documentExistenceRule;
+    private final DocumentIntegrityRule documentIntegrityRule;
 
     public DocumentsIntegrityRule(RuleStateProvider stateProvider) {
         super(RuleState.FAIL);
@@ -44,8 +44,9 @@ public class DocumentsIntegrityRule extends AbstractRule<SignatureContent> {
 
     private boolean processDocumentsManifestVerification(ResultHolder holder, SignatureContent verifiable) {
         try {
-            documentsManifestExistenceRule.verify(holder, verifiable);
-            documentsManifestIntegrityRule.verify(holder, verifiable);
+            if (documentsManifestExistenceRule.verify(holder, verifiable)) {
+                documentsManifestIntegrityRule.verify(holder, verifiable);
+            }
         } catch (RuleTerminatingException e) {
             LOGGER.info("Halting DocumentsManifest verification chain! Caused by '{}'", e.getMessage());
             return false;
@@ -55,8 +56,9 @@ public class DocumentsIntegrityRule extends AbstractRule<SignatureContent> {
 
     private void processDocumentVerification(ResultHolder holder, Pair<FileReference, SignatureContent> verifiable) {
         try {
-            documentExistenceRule.verify(holder, verifiable);
-            documentIntegrityRule.verify(holder, verifiable);
+            if (documentExistenceRule.verify(holder, verifiable)) {
+                documentIntegrityRule.verify(holder, verifiable);
+            }
         } catch (RuleTerminatingException e) {
             LOGGER.info("Halting Document verification chain! Caused by '{}'", e.getMessage());
         }
