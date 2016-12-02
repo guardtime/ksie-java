@@ -25,13 +25,6 @@ public interface ContainerDocument extends MultiHashElement, AutoCloseable {
     InputStream getInputStream() throws IOException;
 
     /**
-     * Returns {@link DataHash} of document for given algorithm.
-     * @throws IOException when there is a problem accessing the InputStream.
-     * @throws DataHashException when the given algorithm can't be used for generating a hash.
-     */
-    DataHash getDataHash(HashAlgorithm algorithm) throws IOException, DataHashException;
-
-    /**
      * Will return as many {@link DataHash}es as it can for provided {@link HashAlgorithm}s.
      * If no {@link DataHash}es can be generated then a {@link DataHashException} will be thrown.
      */

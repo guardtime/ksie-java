@@ -6,6 +6,7 @@ import com.guardtime.container.manifest.AnnotationDataReference;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
@@ -16,8 +17,6 @@ import com.guardtime.container.verification.rule.state.RuleState;
 import com.guardtime.container.verification.rule.state.RuleStateProvider;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
-
-import java.io.IOException;
 
 /**
  * This rule verifies that the annotation data has not been corrupted.
@@ -49,7 +48,7 @@ public class AnnotationDataIntegrityRule extends AbstractRule<Pair<SignatureCont
                 verificationResult = VerificationResult.OK;
             }
             result = new GenericVerificationResult(verificationResult, this, annotationDataUri);
-        } catch (IOException e) {
+        } catch (DataHashException e) {
             LOGGER.info("Verifying annotation data failed!", e);
             result = new GenericVerificationResult(verificationResult, this, annotationDataUri, e);
         }

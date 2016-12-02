@@ -1,12 +1,16 @@
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.manifest.FileReference;
+import com.guardtime.container.manifest.MultiHashElement;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 import com.guardtime.ksi.tlv.TLVStructure;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,6 +60,15 @@ abstract class TlvFileReference extends TLVStructure implements FileReference {
                 .build();
     }
 
+    protected static List<DataHash> generateHashes(MultiHashElement multiHashElement, List<HashAlgorithm> hashAlgorithms) throws DataHashException {
+        Util.notNull(hashAlgorithms, "Hash algorithm list");
+        List<DataHash> hashList = new ArrayList<>();
+        for (HashAlgorithm algorithm : hashAlgorithms) {
+            hashList.add(multiHashElement.getDataHash(algorithm));
+        }
+        return hashList;
+    }
+
     public String getUri() {
         return uri;
     }
@@ -67,5 +80,4 @@ abstract class TlvFileReference extends TLVStructure implements FileReference {
     public List<DataHash> getHashList() {
         return hashList;
     }
-
 }

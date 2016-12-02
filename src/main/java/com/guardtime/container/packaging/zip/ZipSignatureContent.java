@@ -8,6 +8,7 @@ import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -99,7 +100,7 @@ class ZipSignatureContent implements SignatureContent {
         this.signature = signature;
     }
 
-    public DataHash getSignatureInputHash() throws IOException {
+    public DataHash getSignatureInputHash() throws DataHashException {
         return manifest.getRight().getDataHash(HashAlgorithm.SHA2_256);
     }
 

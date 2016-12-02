@@ -2,14 +2,9 @@ package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.manifest.AnnotationsManifest;
-import com.guardtime.ksi.hashing.DataHash;
-import com.guardtime.ksi.hashing.HashAlgorithm;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 class TlvAnnotationsManifestReference extends TlvFileReference {
 
@@ -20,8 +15,8 @@ class TlvAnnotationsManifestReference extends TlvFileReference {
         super(rootElement);
     }
 
-    public TlvAnnotationsManifestReference(String uri, AnnotationsManifest annotationsManifest, HashAlgorithmProvider algorithmProvider) throws TLVParserException, IOException {
-        super(uri, generateHashes(annotationsManifest, algorithmProvider), ANNOTATIONS_MANIFEST_TYPE);
+    public TlvAnnotationsManifestReference(String uri, AnnotationsManifest annotationsManifest, HashAlgorithmProvider algorithmProvider) throws TLVParserException, DataHashException {
+        super(uri, generateHashes(annotationsManifest, algorithmProvider.getFileReferenceHashAlgorithms()), ANNOTATIONS_MANIFEST_TYPE);
     }
 
     @Override
@@ -29,11 +24,4 @@ class TlvAnnotationsManifestReference extends TlvFileReference {
         return ANNOTATIONS_MANIFEST_REFERENCE;
     }
 
-    private static List<DataHash> generateHashes(AnnotationsManifest manifest, HashAlgorithmProvider algorithmProvider) throws IOException {
-        List<DataHash> hashList = new ArrayList<>();
-        for (HashAlgorithm algorithm : algorithmProvider.getFileReferenceHashAlgorithms()) {
-            hashList.add(manifest.getDataHash(algorithm));
-        }
-        return hashList;
-    }
 }

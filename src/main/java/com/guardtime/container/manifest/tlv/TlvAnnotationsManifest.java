@@ -5,6 +5,7 @@ import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.InvalidManifestException;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVInputStream;
@@ -31,7 +32,7 @@ class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements Ann
                 Pair<ContainerAnnotation, TlvSingleAnnotationManifest> pair = singleAnnotationManifests.get(uri);
                 this.singleAnnotationManifestReferences.add(new TlvSingleAnnotationManifestReference(uri, pair.getRight(), pair.getLeft().getAnnotationType(), algorithmProvider));
             }
-        } catch (TLVParserException | IOException e) {
+        } catch (TLVParserException | DataHashException e) {
             throw new InvalidManifestException("Failed to generate file reference TLVElement", e);
         }
     }

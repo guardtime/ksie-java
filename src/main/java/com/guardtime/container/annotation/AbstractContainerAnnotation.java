@@ -1,5 +1,6 @@
 package com.guardtime.container.annotation;
 
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -39,10 +40,12 @@ public abstract class AbstractContainerAnnotation implements ContainerAnnotation
     }
 
     @Override
-    public DataHash getDataHash(HashAlgorithm algorithm) throws IOException {
+    public DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException {
         if (dataHash == null || !dataHash.getAlgorithm().equals(algorithm)) {
             try (InputStream inputStream = getInputStream()) {
                 dataHash = Util.hash(inputStream, algorithm);
+            } catch (IOException e) {
+                throw new DataHashException("Failed to access data to generate hash.", e);
             }
         }
         return dataHash;

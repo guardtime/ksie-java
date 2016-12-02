@@ -3,13 +3,12 @@ package com.guardtime.container.manifest.tlv;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.manifest.AnnotationDataReference;
+import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 import com.guardtime.ksi.tlv.TLVStructure;
-
-import java.io.IOException;
 
 class TlvAnnotationDataReference extends TLVStructure implements AnnotationDataReference {
 
@@ -38,7 +37,7 @@ class TlvAnnotationDataReference extends TLVStructure implements AnnotationDataR
         }
     }
 
-    public TlvAnnotationDataReference(Pair<String, ContainerAnnotation> annotationPair, HashAlgorithmProvider algorithmProvider) throws TLVParserException, IOException {
+    public TlvAnnotationDataReference(Pair<String, ContainerAnnotation> annotationPair, HashAlgorithmProvider algorithmProvider) throws TLVParserException, DataHashException {
         ContainerAnnotation annotation = annotationPair.getRight();
         this.uri = annotationPair.getLeft();
         this.hash = annotation.getDataHash(algorithmProvider.getAnnotationDataReferenceHashAlgorithm());
