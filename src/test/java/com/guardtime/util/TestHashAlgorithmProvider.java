@@ -1,7 +1,6 @@
 package com.guardtime.util;
 
 import com.guardtime.container.hash.HashAlgorithmProvider;
-import com.guardtime.container.util.Util;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.util.Arrays;
@@ -21,7 +20,6 @@ public class TestHashAlgorithmProvider implements HashAlgorithmProvider {
     }
 
     public TestHashAlgorithmProvider(HashAlgorithm algorithm) throws Exception {
-        Util.notNull(algorithm, " Hashing algorithm");
         this.fileReferenceHashAlgorithms = Arrays.asList(algorithm);
         this.documentReferenceHashAlgorithms = Arrays.asList(algorithm);
         this.annotationDataReferenceHashAlgorithm = algorithm;
@@ -32,10 +30,6 @@ public class TestHashAlgorithmProvider implements HashAlgorithmProvider {
                                      List<HashAlgorithm> documentReferenceHashAlgorithms,
                                      HashAlgorithm annotationDataReferenceHashAlgorithm,
                                      HashAlgorithm signingHashAlgorithm) throws Exception {
-        Util.notNull(fileReferenceHashAlgorithms, "fileReferenceHashAlgorithms");
-        Util.notNull(documentReferenceHashAlgorithms, "documentReferenceHashAlgorithms");
-        Util.notNull(annotationDataReferenceHashAlgorithm, "annotationDataReferenceHashAlgorithm");
-        Util.notNull(signingHashAlgorithm, "signingHashAlgorithm");
         this.fileReferenceHashAlgorithms = fileReferenceHashAlgorithms;
         this.documentReferenceHashAlgorithms = documentReferenceHashAlgorithms;
         this.annotationDataReferenceHashAlgorithm = annotationDataReferenceHashAlgorithm;
