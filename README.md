@@ -6,11 +6,17 @@ The aim of this project is to implement a container format for associating data 
 
 * Java 1.7
 * Maven 3.x 
-* KSI Java SDK 4.2.32
+* KSI Java SDK 4.4.67
 
 # Usage
 
-For many activities you need to have composed a ContainerPackagingFactory which in most/all cases requires a ManifestFactory and a SignatureFactory.
+For many activities you need to have composed a ContainerPackagingFactory which requires a SignatureFactory.
+
+Optionally other specifiers can be set:
+* ContainerManifestFactory can be provided if the standard TLV based manifest factory is not desired.
+* IndexProviderFactory can be provided to indicate what signature index string should be used.
+* ParsingStoreFactory can be provided to indicate where parsed Container data will be stored during runtime.
+
 Here is an example of creating a packaging factory for ZIP based containers with TLV manifest structures and KSI based signatures, which will be the basis for the rest of the code examples:
 
 ```java
@@ -18,9 +24,8 @@ KSI ksi;
 /* Initialize KSI
 ...
 */
-ContainerManifestFactory manifestFactory = new TlvContainerManifestFactory();
 SignatureFactory signatureFactory = new KsiSignatureFactory(ksi);
-ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactory(signatureFactory, manifestFactory);
+ZipContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().withSignatureFactory(signatureFactory).build();
 ```
 ## Creating a container
 
@@ -57,7 +62,7 @@ It is suggested to always verify the parsed container before adding new document
 ## Adding new documents/annotations to existing container
 
 Both the ContainerBuilder and ContainerPackagingFactory allow for adding new documents and annotations to an existing container.
-The existing container will be expanded with the new documents/annotation and a signature covering them.
+The existing containers content will be copied to a new container and that will be expanded with the new documents/annotation and a signature covering them.
 
 With ContainerBuilder:
 
@@ -118,3 +123,10 @@ for(RuleVerificationResult ruleResult : result.getResults()) {
     ruleResult.getTestedElementPath();      // What element was tested for the result.
 }
 ```
+
+## Closing a container
+
+Container, ContainerDocument and ContainerAnnotation are derived from AutoCloseable since they may hold resources which need to be closed once they are no longer needed. 
+Therefore calling close() is highly recommended to avoid any data leaks.
+
+Calling close() on a Container will also close all ContainerDocument and ContainerAnnotation that it has references to.
