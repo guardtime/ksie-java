@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
 class SignatureContentHandler {
 
@@ -55,7 +56,7 @@ class SignatureContentHandler {
         this.signatureHandler = signatureHandler;
     }
 
-    public ZipSignatureContent get(String manifestPath) throws ContentParsingException {
+    public Pair<ZipSignatureContent, Vector<Throwable>> get(String manifestPath) throws ContentParsingException {
         SignatureContentGroup group = new SignatureContentGroup(manifestPath);
         ZipSignatureContent signatureContent = new ZipSignatureContent.Builder()
                 .withManifest(group.manifest)
@@ -67,11 +68,12 @@ class SignatureContentHandler {
                 .build();
 
         signatureContent.setSignature(group.signature);
-        return signatureContent;
+        return Pair.of(signatureContent, group.exceptions);
     }
 
     private class SignatureContentGroup {
 
+        Vector<Throwable> exceptions = new Vector<>();
         Pair<String, Manifest> manifest;
         Pair<String, DocumentsManifest> documentsManifest;
         Pair<String, AnnotationsManifest> annotationsManifest;
@@ -104,6 +106,7 @@ class SignatureContentHandler {
                 );
             } catch (ContentParsingException e) {
                 LOGGER.info("Manifest '{}' failed to parse. Reason: '{}'", annotationsManifestReference.getUri(), e.getMessage());
+                exceptions.add(e);
                 return null;
             }
         }
@@ -114,6 +117,7 @@ class SignatureContentHandler {
                 return Pair.of(documentsManifestReference.getUri(), documentsManifestHandler.get(documentsManifestReference.getUri()));
             } catch (ContentParsingException e) {
                 LOGGER.info("Manifest '{}' failed to parse. Reason: '{}'", documentsManifestReference.getUri(), e.getMessage());
+                exceptions.add(e);
                 return null;
             }
         }
@@ -164,6 +168,7 @@ class SignatureContentHandler {
                 return Pair.of(manifestReferenceUri, singleAnnotationManifest);
             } catch (ContentParsingException e) {
                 LOGGER.info("Failed to parse annotation manifest for '{}'. Reason: '{}'", manifestReference.getUri(), e.getMessage());
+                exceptions.add(e);
                 return null;
             }
         }
@@ -172,7 +177,9 @@ class SignatureContentHandler {
             try {
                 ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getMimeType());
                 if (type == null) {
-                    LOGGER.info("Failed to parse annotation for '{}'. Reason: Invalid annotation type: '{}'", manifestReference.getUri(), manifestReference.getMimeType());
+                    String message = String.format("Failed to parse annotation for '%s'. Reason: Invalid annotation type: '%s'", manifestReference.getUri(), manifestReference.getMimeType());
+                    LOGGER.info(message);
+                    exceptions.add(new ContentParsingException(message));
                     return null;
                 }
                 AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
@@ -182,6 +189,7 @@ class SignatureContentHandler {
                 return Pair.of(uri, annotation);
             } catch (ContentParsingException e) {
                 LOGGER.info("Failed to parse annotation for '{}'. Reason: '{}'", manifestReference.getUri(), e.getMessage());
+                exceptions.add(e);
                 return null;
             }
         }
@@ -192,6 +200,7 @@ class SignatureContentHandler {
                 signature = signatureHandler.get(signatureUri);
             } catch (ContentParsingException e) {
                 LOGGER.info("No valid signature in container at '{}'", signatureUri);
+                exceptions.add(e);
                 signature = null;
             }
         }

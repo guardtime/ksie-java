@@ -62,6 +62,7 @@ public class AbstractContainerTest {
     protected static final String CONTAINER_WITH_RANDOM_INCREMENTING_INDEXES = "containers/multi-content-random-incrementing-indexes.ksie";
     protected static final String CONTAINER_WITH_RANDOM_UUID_INDEXES = "containers/container-random-uuid-indexes.ksie";
     protected static final String CONTAINER_WITH_NON_REMOVABLE_ANNOTATION = "containers/container-with-non-removable-annotation.ksie";
+    protected static final String CONTAINER_WITH_MISSING_DOCUMENTS_MANIFEST = "containers/container-with-missing-datamanifest.ksie";
 
     protected static final String MIME_TYPE_APPLICATION_TXT = "application/txt";
     protected static final String MIME_TYPE_APPLICATION_PDF = "application/pdf";

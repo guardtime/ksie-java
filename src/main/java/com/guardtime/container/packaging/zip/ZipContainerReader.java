@@ -2,6 +2,7 @@ package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.manifest.ContainerManifestFactory;
+import com.guardtime.container.packaging.ContainerReadingException;
 import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.SignatureContent;
@@ -19,6 +20,7 @@ import com.guardtime.container.packaging.zip.handler.SignatureHandler;
 import com.guardtime.container.packaging.zip.handler.SingleAnnotationManifestHandler;
 import com.guardtime.container.packaging.zip.handler.UnknownFileHandler;
 import com.guardtime.container.signature.SignatureFactory;
+import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 
 import org.slf4j.Logger;
@@ -29,6 +31,7 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -73,7 +76,8 @@ class ZipContainerReader {
                 documentsManifestHandler, annotationsManifestHandler, singleAnnotationManifestHandler, signatureHandler);
     }
 
-    ZipContainer read(InputStream input) throws IOException, InvalidPackageException, ParsingStoreException {
+    ZipContainer read(InputStream input) throws IOException, ContainerReadingException {
+        ContainerReadingException readingException = new ContainerReadingException("Reading container encountered errors!");
         try (ZipInputStream zipInput = new ZipInputStream(input)) {
             ZipEntry entry;
             while ((entry = zipInput.getNextEntry()) != null) {
@@ -81,18 +85,27 @@ class ZipContainerReader {
                     LOGGER.trace("Skipping directory '{}'", entry.getName());
                     continue;
                 }
-                readEntry(zipInput, entry);
+                try {
+                    readEntry(zipInput, entry);
+                } catch (ParsingStoreException e) {
+                    readingException.addException(e);
+                }
             }
         }
-        List<ZipSignatureContent> contents = buildSignatures();
+        List<ZipSignatureContent> contents = buildSignatures(readingException);
         MimeType mimeType = getMimeType();
-        List<UnknownDocument> unknownFiles = getUnknownFiles();
+        List<UnknownDocument> unknownFiles = getUnknownFiles(readingException);
+        ZipContainer zipContainer = new ZipContainer(contents, unknownFiles, mimeType, parsingStore);
+        readingException.setContainer(zipContainer);
 
-        if (validMimeType(mimeType) && containsValidContents(contents)) {
-            return new ZipContainer(contents, unknownFiles, mimeType, parsingStore);
-        } else {
-            throw new InvalidPackageException("Parsed container was not valid");
+        if (!validMimeType(mimeType) || !containsValidContents(contents)) {
+            readingException.addException(new InvalidPackageException("Parsed container was not valid"));
         }
+
+        if(!readingException.getExceptions().isEmpty()) {
+            throw readingException;
+        }
+        return zipContainer;
     }
 
     private boolean containsValidContents(List<ZipSignatureContent> signatureContents) {
@@ -142,11 +155,19 @@ class ZipContainerReader {
         }
     }
 
-    private List<UnknownDocument> getUnknownFiles() throws ParsingStoreException {
+    private List<UnknownDocument> getUnknownFiles(ContainerReadingException readingException) {
         List<UnknownDocument> returnable = new LinkedList<>();
-        returnable.addAll(unknownFileHandler.getUnrequestedFiles());
+        try {
+            returnable.addAll(unknownFileHandler.getUnrequestedFiles());
+        } catch (ParsingStoreException e) {
+            readingException.addException(e);
+        }
         for (ContentHandler handler : handlers) {
-            returnable.addAll(handler.getUnrequestedFiles());
+            try {
+                returnable.addAll(handler.getUnrequestedFiles());
+            } catch (ParsingStoreException e) {
+                readingException.addException(e);
+            }
         }
         return returnable;
     }
@@ -163,14 +184,17 @@ class ZipContainerReader {
         unknownFileHandler.add(name, zipInput);
     }
 
-    private List<ZipSignatureContent> buildSignatures() {
+    private List<ZipSignatureContent> buildSignatures(ContainerReadingException readingException) {
         Set<String> parsedManifestUriSet = manifestHandler.getNames();
         List<ZipSignatureContent> signatures = new LinkedList<>();
         for (String manifestUri : parsedManifestUriSet) {
             try {
-                signatures.add(signatureContentHandler.get(manifestUri));
+                Pair<ZipSignatureContent, Vector<Throwable>> zipSignatureContentVectorPair = signatureContentHandler.get(manifestUri);
+                signatures.add(zipSignatureContentVectorPair.getLeft());
+                readingException.addExceptions(zipSignatureContentVectorPair.getRight());
             } catch (ContentParsingException e) {
                 LOGGER.info("Parsing SignatureContent failed for '{}'. Reason: '{}'", manifestUri, e.getMessage());
+                readingException.addException(e);
             }
         }
         return signatures;
