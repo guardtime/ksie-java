@@ -4,7 +4,6 @@ import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.ContainerReadingException;
-import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 import com.guardtime.container.signature.ContainerSignature;

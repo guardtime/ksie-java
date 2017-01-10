@@ -8,7 +8,6 @@ import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerReadingException;
-import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.parsing.TemporaryFileBasedParsingStoreFactory;
 import com.guardtime.container.signature.SignatureException;
@@ -26,7 +25,7 @@ import org.mockito.Mockito;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Vector;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -42,7 +41,7 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
 
     private ZipContainerReader reader;
     private Container container;
-    private Vector<Throwable> exceptions;
+    private List<Throwable> exceptions;
 
 
     @Before
@@ -73,9 +72,9 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
 
     private void assertExceptionsContainMessage(String message) {
         String found = "";
-        for(Throwable t : exceptions) {
+        for (Throwable t : exceptions) {
             found = t.getMessage();
-            if(found.equals(message)) {
+            if (found.equals(message)) {
                 break;
             }
         }
@@ -95,7 +94,7 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
     @Test
     public void testReadEmptyContainerFile_ThrowsInvalidPackageException() throws Exception {
         setUpContainer(EMPTY_CONTAINER);
-        assertEquals("Parsed container was not valid", exceptions.lastElement().getMessage());
+        assertExceptionsContainMessage("Parsed container was not valid");
         assertTrue(container.getSignatureContents().isEmpty());
     }
 

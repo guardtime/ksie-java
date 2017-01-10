@@ -27,9 +27,9 @@ import com.guardtime.container.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 
 class SignatureContentHandler {
 
@@ -56,7 +56,7 @@ class SignatureContentHandler {
         this.signatureHandler = signatureHandler;
     }
 
-    public Pair<ZipSignatureContent, Vector<Throwable>> get(String manifestPath) throws ContentParsingException {
+    public Pair<ZipSignatureContent, List<Throwable>> get(String manifestPath) throws ContentParsingException {
         SignatureContentGroup group = new SignatureContentGroup(manifestPath);
         ZipSignatureContent signatureContent = new ZipSignatureContent.Builder()
                 .withManifest(group.manifest)
@@ -73,7 +73,7 @@ class SignatureContentHandler {
 
     private class SignatureContentGroup {
 
-        Vector<Throwable> exceptions = new Vector<>();
+        List<Throwable> exceptions = new ArrayList<>();
         Pair<String, Manifest> manifest;
         Pair<String, DocumentsManifest> documentsManifest;
         Pair<String, AnnotationsManifest> annotationsManifest;

@@ -1,20 +1,18 @@
 package com.guardtime.container.packaging;
 
-import com.guardtime.container.packaging.Container;
-import com.guardtime.container.packaging.InvalidPackageException;
-
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Vector;
+import java.util.List;
 
 public class ContainerReadingException extends InvalidPackageException {
-    private final Vector<Throwable> exceptions = new Vector<>();
+    private final List<Throwable> exceptions = new ArrayList<>();
     private Container container;
 
     public ContainerReadingException(String message) {
         super(message);
     }
 
-    public Vector<Throwable> getExceptions() {
+    public List<Throwable> getExceptions() {
         return exceptions;
     }
 

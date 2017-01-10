@@ -102,7 +102,7 @@ class ZipContainerReader {
             readingException.addException(new InvalidPackageException("Parsed container was not valid"));
         }
 
-        if(!readingException.getExceptions().isEmpty()) {
+        if (!readingException.getExceptions().isEmpty()) {
             throw readingException;
         }
         return zipContainer;
