@@ -6,17 +6,21 @@ import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.EmptyContainerDocument;
 import com.guardtime.container.packaging.Container;
+import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.ContainerVerifier;
 import com.guardtime.container.verification.policy.DefaultVerificationPolicy;
 import com.guardtime.container.verification.policy.VerificationPolicy;
 import com.guardtime.container.verification.result.ContainerVerifierResult;
+import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.SignatureResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.signature.ksi.KsiSignatureVerifier;
+import com.guardtime.container.verification.rule.state.DefaultRuleStateProvider;
 import com.guardtime.ksi.hashing.DataHasher;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.publication.PublicationData;
+import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.verifier.PolicyVerificationResult;
 import com.guardtime.ksi.unisignature.verifier.VerificationErrorCode;
 import com.guardtime.ksi.unisignature.verifier.VerificationResultCode;
@@ -27,11 +31,14 @@ import com.guardtime.ksi.unisignature.verifier.policies.Policy;
 import com.guardtime.ksi.unisignature.verifier.policies.PublicationsFileBasedVerificationPolicy;
 import com.guardtime.ksi.unisignature.verifier.policies.UserProvidedPublicationBasedVerificationPolicy;
 
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -53,6 +60,111 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         this.verifier = new ContainerVerifier(defaultPolicy);
     }
 
+    public void readContainerAndSaveToFile() throws Exception {
+        //String containerUri = CONTAINER_WITH_MULTIPLE_SIGNATURES;
+        //String containerUri = CONTAINER_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED;
+
+        String target = "containers/container-invalid-datamanifest-in-single-annotation-manifest.ksie";
+
+        String outputContainerPath = "src" + File.separator + "test" + File.separator + "resources" + File.separator;
+        String outputContainer = outputContainerPath + target;
+
+        File outputPath = new File(outputContainerPath);
+
+        if (!outputPath.exists()) {
+            outputPath.mkdirs();
+        }
+//        try (OutputStream output = new FileOutputStream(outputContainer)){
+
+            Container container = getContainer(target);
+            ContainerVerifier verifier = new ContainerVerifier(new DefaultVerificationPolicy(new DefaultRuleStateProvider(), new KsiSignatureVerifier(ksi, new CalendarBasedVerificationPolicy()), packagingFactory));
+            ContainerVerifierResult result = verifier.verify(container);
+            System.out.println("Writing to '" + outputContainer + "'.");
+            SignatureContent signatureContent = container.getSignatureContents().get(0);
+            KSISignature signature = (KSISignature) signatureContent.getContainerSignature().getSignature();
+            signature.isExtended();
+//            container.writeTo(output);}
+    }
+
+    @Test
+    public void testVerifyContainerWithChangedDocument() throws Exception {
+        Container container = getContainer(CONTAINER_WITH_CHANGED_DOCUMENT);
+        ContainerVerifierResult results = verifier.verify(container);
+        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+        verifyFailingRule(results, "KSIE_VERIFY_DATA_HASH", "test.txt", "Hash mismatch");
+    }
+
+    @Test
+    public void testVerifyContainerWithChangedSignature() throws Exception {
+        Container container = getContainer(CONTAINER_WITH_MISSING_SIGNATURE);
+        ContainerVerifierResult results = verifier.verify(container);
+        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+        verifyFailingRule(results, "KSIE_VERIFY_SIGNATURE_EXISTS", "META-INF/signature-1.ksi", "No signature in container for manifest!");
+    }
+
+    @Test
+    public void testVerifyContainerWithOnlyManifest() throws Exception {
+        Container container = getContainer(CONTAINER_WITH_CONTAINS_ONLY_MANIFEST);
+        ContainerVerifierResult results = verifier.verify(container);
+        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+        verifyFailingRule(results, "KSIE_FORMAT", "META-INF/signature-1.ksi", "No signature in container for manifest!");
+    }
+
+    @Test
+    public void testVerifyContainerWithChangedAnnotationData() throws Exception {
+        Container container = getContainer(CONTAINER_WITH_CHANGED_ANNOTATION_DATA);
+        ContainerVerifierResult results = verifier.verify(container);
+        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+    }
+
+    @Test
+    public void testVerifyContainerWithMimetypeContainingInvalidValue() throws Exception {
+        Container container = getContainer(CONTAINER_WITH_MIMETYPE_CONTAINS_INVALID_VALUE);
+        ContainerVerifierResult results = verifier.verify(container);
+        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+        verifyFailingRule(results, "KSIE_FORMAT", "mimetype", "Unsupported format.");
+    }
+
+    @Test
+    public void testVerifyContainerWithMimetypeContainingMoreThanNeeded() throws Exception {
+        Container container = getContainer(CONTAINER_WITH_MIMETYPE_CONTAINS_ADDITIONAL_VALUE);
+        ContainerVerifierResult results = verifier.verify(container);
+        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+        verifyFailingRule(results, "KSIE_FORMAT", "mimetype", "Unsupported format.");
+    }
+
+    @Test
+    public void testVerifyContainerWithChangedDatamanifestHashInManifest() throws Exception {
+        Container container = getContainer(CONTAINER_WITH_CHANGED_DATAMANIFEST_HASH_IN_MANIFEST);
+        ContainerVerifierResult results = verifier.verify(container);
+        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+        verifyFailingRule(results, "KSIE_VERIFY_DATA_MANIFEST", "META-INF/datamanifest-1.tlv", "Hash mismatch");
+    }
+
+    @Test
+    public void testVerifyContainerWithChangedAnnotationsManifestHashInManifest() throws Exception {
+        Container container = getContainer(CONTAINER_WITH_CHANGED_ANNOTATIONS_MANIFEST_HASH_IN_MANIFEST);
+        ContainerVerifierResult results = verifier.verify(container);
+        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+        verifyFailingRule(results, "KSIE_VERIFY_ANNOTATION_MANIFEST", "META-INF/annotmanifest-1.tlv", "Hash mismatch");
+    }
+
+    @Ignore //TODO: KSIE-72
+    @Test
+    public void testVerifyContainerWithChangedDatamanifestHashInAnnotationManifest() throws Exception {
+        Container container = getContainer(CONTAINER_WITH_CHANGED_DATAMANIFEST_HASH_IN_ANNOTATION_MANIFEST);
+        ContainerVerifierResult results = verifier.verify(container);
+        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+        verifyFailingRule(results, "KSIE_VERIFY_....", "META-INF/....", "");
+    }
+
+    @Test
+    public void testVerifyContainerWithChangedAnnotationManifestHashInAnnotationsManifest() throws Exception {
+        Container container = getContainer(CONTAINER_WITH_CHANGED_ANNOTATION_MANIFEST_HASH_IN_ANNOTATIONS_MANIFEST);
+        ContainerVerifierResult results = verifier.verify(container);
+        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+    }
+
     @Test
     public void testContainerWithInvalidSignature_VerificationFails() throws Exception {
         try (Container container = getContainer(CONTAINER_WITH_WRONG_SIGNATURE_FILE)) {
@@ -66,8 +178,8 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             assertNotNull(signatureVerificationFullResults);
             assertEquals(VerificationErrorCode.GEN_1, signatureVerificationFullResults.getErrorCode());
         }
-
     }
+
     @Test
     public void testUsingInternalVerification() throws Exception {
         Policy signatureVerificationPolicy = new InternalVerificationPolicy();
@@ -177,6 +289,16 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             try (Container readin = packagingFactory.read(new ByteArrayInputStream(zipBytes))) {
                 ContainerVerifierResult results = containerVerifier.verify(readin);
                 assertTrue(results.getVerificationResult().equals(VerificationResult.OK));
+            }
+        }
+    }
+
+    private void verifyFailingRule(ContainerVerifierResult results, String ruleName, String testedElement, String message) {
+        for (RuleVerificationResult result : results.getResults()) {
+            if (result.getRuleName().equals("KSIE_VERIFY_DATA_HASH") &&
+                    result.getTestedElementPath().equals("asd") &&
+                    result.getRuleErrorMessage().equals(message)){
+                Assert.assertEquals(VerificationResult.NOK, result.getVerificationResult());
             }
         }
     }
