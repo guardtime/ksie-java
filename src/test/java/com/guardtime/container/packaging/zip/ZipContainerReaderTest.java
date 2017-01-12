@@ -151,7 +151,7 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
 
     @Test
     public void testReadContainerFileWithBrokenSignatures() throws Exception {
-        setUpContainer(CONTAINER_WITH_BROKEN_SIGNATURE);
+        setUpContainer(CONTAINER_WITH_BROKEN_SIGNATURE_CONTENT);
         assertNotNull(container);
         assertFalse(container.getSignatureContents().isEmpty());
         assertFalse(container.getUnknownFiles().isEmpty());

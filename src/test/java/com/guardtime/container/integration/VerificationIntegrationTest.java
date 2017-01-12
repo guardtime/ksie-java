@@ -6,6 +6,7 @@ import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.EmptyContainerDocument;
 import com.guardtime.container.packaging.Container;
+import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.ContainerVerifier;
 import com.guardtime.container.verification.policy.DefaultVerificationPolicy;
@@ -15,6 +16,7 @@ import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.SignatureResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.signature.ksi.KsiSignatureVerifier;
+import com.guardtime.container.verification.rule.state.DefaultRuleStateProvider;
 import com.guardtime.ksi.hashing.DataHasher;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.publication.PublicationData;
@@ -35,6 +37,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.security.InvalidParameterException;
 import java.util.Collections;
 import java.util.List;
 
@@ -54,6 +57,27 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
                 packagingFactory
         );
         this.verifier = new ContainerVerifier(defaultPolicy);
+    }
+
+    @Test
+    public void testVerifyingContainerWithValidAndInvalidSignatures()throws Exception {
+        Container container = getContainer(CONTAINER_WITH_MULTI_CONTENT_ONE_SIGNATURE_IS_INVALID);
+        ContainerVerifier verifier = new ContainerVerifier(new DefaultVerificationPolicy(new DefaultRuleStateProvider(), new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy()), packagingFactory));
+        ContainerVerifierResult results = verifier.verify(container);
+        SignatureContent validContent = null;
+        SignatureContent invalidContent = null;
+        for (SignatureContent content : container.getSignatureContents()){
+            if (content.getManifest().getRight().getSignatureReference().getUri().equals("META-INF/signature-1.ksi")){
+                validContent = content;
+            } else if (content.getManifest().getRight().getSignatureReference().getUri().equals("META-INF/signature-01-02-03-04-05.ksi")) {
+                invalidContent = content;
+            } else {
+                throw new InvalidParameterException("Invalid container is provided for test.");
+            }
+        }
+        verifyFailingRule(results, "KSIE_VERIFY_MANIFEST", "META-INF/signature-01-02-03-04-05.ksi", "Signature mismatch.");
+        Assert.assertEquals(VerificationResult.OK, results.getSignatureResult(validContent).getSimplifiedResult());
+        Assert.assertEquals(VerificationResult.NOK, results.getSignatureResult(invalidContent).getSimplifiedResult());
     }
 
     @Test
@@ -85,6 +109,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         Container container = getContainer(CONTAINER_WITH_CHANGED_ANNOTATION_DATA);
         ContainerVerifierResult results = verifier.verify(container);
         Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+        verifyFailingRule(results, "KSIE_VERIFY_ANNOTATION_DATA", "META-INF/annotation-1.dat", "Annotation data hash mismatch.");
     }
 
     @Test
@@ -133,6 +158,15 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         Container container = getContainer(CONTAINER_WITH_CHANGED_ANNOTATION_MANIFEST_HASH_IN_ANNOTATIONS_MANIFEST);
         ContainerVerifierResult results = verifier.verify(container);
         Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+        verifyFailingRule(results, "KSIE_VERIFY_ANNOTATION", "META-INF/annotation-1.tlv", "Hash mismatch");
+    }
+
+    @Test
+    public void testVerifyContainerWithValidAndInvalidContent() throws Exception {
+        Container container = getContainer(CONTAINER_WITH_MULTI_CONTENT_ONE_IS_MISSING_DATAMANIFEST);
+        ContainerVerifierResult results = verifier.verify(container);
+        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+        verifyFailingRule(results, "KSIE_VERIFY_DATA_MANIFEST_EXISTS", "META-INF/datamanifest-654984984.tlv", "Datamanifest is not present in the container.");
     }
 
     @Test
@@ -265,10 +299,12 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     private void verifyFailingRule(ContainerVerifierResult results, String ruleName, String testedElement, String message) {
         for (RuleVerificationResult result : results.getResults()) {
-            if (result.getRuleName().equals("KSIE_VERIFY_DATA_HASH") &&
-                    result.getTestedElementPath().equals("asd") &&
+            if (result.getRuleName().equals(ruleName) &&
+                    result.getTestedElementPath().equals(testedElement) &&
                     result.getRuleErrorMessage().equals(message)){
                 Assert.assertEquals(VerificationResult.NOK, result.getVerificationResult());
+            } else {
+                Assert.assertEquals(VerificationResult.OK, result.getVerificationResult());
             }
         }
     }
