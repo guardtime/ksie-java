@@ -6,7 +6,6 @@ import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.EmptyContainerDocument;
 import com.guardtime.container.packaging.Container;
-import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.ContainerVerifier;
 import com.guardtime.container.verification.policy.DefaultVerificationPolicy;
@@ -16,11 +15,9 @@ import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.SignatureResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.signature.ksi.KsiSignatureVerifier;
-import com.guardtime.container.verification.rule.state.DefaultRuleStateProvider;
 import com.guardtime.ksi.hashing.DataHasher;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.publication.PublicationData;
-import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.verifier.PolicyVerificationResult;
 import com.guardtime.ksi.unisignature.verifier.VerificationErrorCode;
 import com.guardtime.ksi.unisignature.verifier.VerificationResultCode;
@@ -38,7 +35,6 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -58,32 +54,6 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
                 packagingFactory
         );
         this.verifier = new ContainerVerifier(defaultPolicy);
-    }
-
-    public void readContainerAndSaveToFile() throws Exception {
-        //String containerUri = CONTAINER_WITH_MULTIPLE_SIGNATURES;
-        //String containerUri = CONTAINER_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED;
-
-        String target = "containers/container-invalid-datamanifest-in-single-annotation-manifest.ksie";
-
-        String outputContainerPath = "src" + File.separator + "test" + File.separator + "resources" + File.separator;
-        String outputContainer = outputContainerPath + target;
-
-        File outputPath = new File(outputContainerPath);
-
-        if (!outputPath.exists()) {
-            outputPath.mkdirs();
-        }
-//        try (OutputStream output = new FileOutputStream(outputContainer)){
-
-            Container container = getContainer(target);
-            ContainerVerifier verifier = new ContainerVerifier(new DefaultVerificationPolicy(new DefaultRuleStateProvider(), new KsiSignatureVerifier(ksi, new CalendarBasedVerificationPolicy()), packagingFactory));
-            ContainerVerifierResult result = verifier.verify(container);
-            System.out.println("Writing to '" + outputContainer + "'.");
-            SignatureContent signatureContent = container.getSignatureContents().get(0);
-            KSISignature signature = (KSISignature) signatureContent.getContainerSignature().getSignature();
-            signature.isExtended();
-//            container.writeTo(output);}
     }
 
     @Test
