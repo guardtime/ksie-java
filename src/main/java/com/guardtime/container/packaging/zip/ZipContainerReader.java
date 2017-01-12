@@ -189,7 +189,7 @@ class ZipContainerReader {
         List<ZipSignatureContent> signatures = new LinkedList<>();
         for (String manifestUri : parsedManifestUriSet) {
             try {
-                Pair<ZipSignatureContent, Vector<Throwable>> zipSignatureContentVectorPair = signatureContentHandler.get(manifestUri);
+                Pair<ZipSignatureContent, List<Throwable>> zipSignatureContentVectorPair = signatureContentHandler.get(manifestUri);
                 signatures.add(zipSignatureContentVectorPair.getLeft());
                 readingException.addExceptions(zipSignatureContentVectorPair.getRight());
             } catch (ContentParsingException e) {
