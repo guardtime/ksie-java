@@ -200,7 +200,7 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
     }
 
     @Test
-    public void testCreateContainerWithMultipleDocumentsWithSameName() throws Exception {
+    public void testCreateContainerWithMultipleDocumentsWithSameName_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Multiple documents with same name found!");
 
@@ -248,7 +248,7 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
     }
 
     @Test
-    public void testCreateContainerWithExistingContainerWithDocumentsWithSameName() throws Exception {
+    public void testCreateContainerWithExistingContainerWithDocumentsWithSameName_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Multiple documents with same name found!");
         try (

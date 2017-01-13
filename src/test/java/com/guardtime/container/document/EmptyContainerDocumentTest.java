@@ -75,7 +75,7 @@ public class EmptyContainerDocumentTest extends AbstractContainerTest {
 
 
     @Test
-    public void testCreateEmptyDocumentWithoutDataHash_ThrowsIllegalArgumentException() throws Exception {
+    public void testCreateEmptyDocumentWithoutDataHash_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Data hash list must be present");
         new EmptyContainerDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, null);
