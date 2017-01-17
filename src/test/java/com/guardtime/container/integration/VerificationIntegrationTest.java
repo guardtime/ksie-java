@@ -61,112 +61,124 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testVerifyingContainerWithValidAndInvalidSignatures()throws Exception {
-        Container container = getContainer(CONTAINER_WITH_MULTI_CONTENT_ONE_SIGNATURE_IS_INVALID);
-        ContainerVerifier verifier = new ContainerVerifier(new DefaultVerificationPolicy(new DefaultRuleStateProvider(), new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy()), packagingFactory));
-        ContainerVerifierResult results = verifier.verify(container);
-        SignatureContent validContent = null;
-        SignatureContent invalidContent = null;
-        for (SignatureContent content : container.getSignatureContents()){
-            if (content.getManifest().getRight().getSignatureReference().getUri().equals("META-INF/signature-1.ksi")){
-                validContent = content;
-            } else if (content.getManifest().getRight().getSignatureReference().getUri().equals("META-INF/signature-01-02-03-04-05.ksi")) {
-                invalidContent = content;
-            } else {
-                throw new InvalidParameterException("Invalid container is provided for test.");
+        try (Container container = getContainer(CONTAINER_WITH_MULTI_CONTENT_ONE_SIGNATURE_IS_INVALID)) {
+            ContainerVerifier verifier = new ContainerVerifier(new DefaultVerificationPolicy(new DefaultRuleStateProvider(), new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy()), packagingFactory));
+            ContainerVerifierResult results = verifier.verify(container);
+            SignatureContent validContent = null;
+            SignatureContent invalidContent = null;
+            for (SignatureContent content : container.getSignatureContents()) {
+                if (content.getManifest().getRight().getSignatureReference().getUri().equals("META-INF/signature-1.ksi")) {
+                    validContent = content;
+                } else if (content.getManifest().getRight().getSignatureReference().getUri().equals("META-INF/signature-01-02-03-04-05.ksi")) {
+                    invalidContent = content;
+                } else {
+                    throw new InvalidParameterException("Invalid container is provided for test.");
+                }
             }
+            verifyFailingRule(results, "KSIE_VERIFY_MANIFEST", "META-INF/signature-01-02-03-04-05.ksi", "Signature mismatch.");
+            Assert.assertEquals(VerificationResult.OK, results.getSignatureResult(validContent).getSimplifiedResult());
+            Assert.assertEquals(VerificationResult.NOK, results.getSignatureResult(invalidContent).getSimplifiedResult());
         }
-        verifyFailingRule(results, "KSIE_VERIFY_MANIFEST", "META-INF/signature-01-02-03-04-05.ksi", "Signature mismatch.");
-        Assert.assertEquals(VerificationResult.OK, results.getSignatureResult(validContent).getSimplifiedResult());
-        Assert.assertEquals(VerificationResult.NOK, results.getSignatureResult(invalidContent).getSimplifiedResult());
     }
 
     @Test
     public void testVerifyContainerWithChangedDocument() throws Exception {
-        Container container = getContainer(CONTAINER_WITH_CHANGED_DOCUMENT);
-        ContainerVerifierResult results = verifier.verify(container);
-        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
-        verifyFailingRule(results, "KSIE_VERIFY_DATA_HASH", "test.txt", "Hash mismatch");
+        try (Container container = getContainer(CONTAINER_WITH_CHANGED_DOCUMENT)) {
+            ContainerVerifierResult results = verifier.verify(container);
+            Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+            verifyFailingRule(results, "KSIE_VERIFY_DATA_HASH", "test.txt", "Hash mismatch");
+        }
     }
 
     @Test
     public void testVerifyContainerWithChangedSignature() throws Exception {
-        Container container = getContainer(CONTAINER_WITH_MISSING_SIGNATURE);
-        ContainerVerifierResult results = verifier.verify(container);
-        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
-        verifyFailingRule(results, "KSIE_VERIFY_SIGNATURE_EXISTS", "META-INF/signature-1.ksi", "No signature in container for manifest!");
+        try (Container container = getContainer(CONTAINER_WITH_MISSING_SIGNATURE)) {
+            ContainerVerifierResult results = verifier.verify(container);
+            Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+            verifyFailingRule(results, "KSIE_VERIFY_SIGNATURE_EXISTS", "META-INF/signature-1.ksi", "No signature in container for manifest!");
+        }
     }
 
     @Test
     public void testVerifyContainerWithOnlyManifest() throws Exception {
-        Container container = getContainer(CONTAINER_WITH_CONTAINS_ONLY_MANIFEST);
-        ContainerVerifierResult results = verifier.verify(container);
-        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
-        verifyFailingRule(results, "KSIE_VERIFY_SIGNATURE_EXISTS", "META-INF/signature-1.ksi", "No signature in container for manifest!");
+        try (Container container = getContainer(CONTAINER_WITH_CONTAINS_ONLY_MANIFEST)) {
+            ContainerVerifierResult results = verifier.verify(container);
+            Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+            verifyFailingRule(results, "KSIE_VERIFY_SIGNATURE_EXISTS", "META-INF/signature-1.ksi", "No signature in container for manifest!");
+        }
     }
 
     @Test
     public void testVerifyContainerWithChangedAnnotationData() throws Exception {
-        Container container = getContainer(CONTAINER_WITH_CHANGED_ANNOTATION_DATA);
-        ContainerVerifierResult results = verifier.verify(container);
-        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
-        verifyFailingRule(results, "KSIE_VERIFY_ANNOTATION_DATA", "META-INF/annotation-1.dat", "Annotation data hash mismatch.");
+        try (Container container = getContainer(CONTAINER_WITH_CHANGED_ANNOTATION_DATA)) {
+            ContainerVerifierResult results = verifier.verify(container);
+            Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+            verifyFailingRule(results, "KSIE_VERIFY_ANNOTATION_DATA", "META-INF/annotation-1.dat", "Annotation data hash mismatch.");
+        }
     }
 
     @Test
     public void testVerifyContainerWithMimetypeContainingInvalidValue() throws Exception {
-        Container container = getContainer(CONTAINER_WITH_MIMETYPE_CONTAINS_INVALID_VALUE);
-        ContainerVerifierResult results = verifier.verify(container);
-        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
-        verifyFailingRule(results, "KSIE_FORMAT", "mimetype", "Unsupported format.");
+        try (Container container = getContainer(CONTAINER_WITH_MIMETYPE_CONTAINS_INVALID_VALUE)) {
+            ContainerVerifierResult results = verifier.verify(container);
+            Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+            verifyFailingRule(results, "KSIE_FORMAT", "mimetype", "Unsupported format.");
+        }
     }
 
     @Test
     public void testVerifyContainerWithMimetypeContainingMoreThanNeeded() throws Exception {
-        Container container = getContainer(CONTAINER_WITH_MIMETYPE_CONTAINS_ADDITIONAL_VALUE);
-        ContainerVerifierResult results = verifier.verify(container);
-        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
-        verifyFailingRule(results, "KSIE_FORMAT", "mimetype", "Unsupported format.");
+        try (Container container = getContainer(CONTAINER_WITH_MIMETYPE_CONTAINS_ADDITIONAL_VALUE)) {
+            ContainerVerifierResult results = verifier.verify(container);
+            Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+            verifyFailingRule(results, "KSIE_FORMAT", "mimetype", "Unsupported format.");
+        }
     }
 
     @Test
     public void testVerifyContainerWithChangedDatamanifestHashInManifest() throws Exception {
-        Container container = getContainer(CONTAINER_WITH_CHANGED_DATAMANIFEST_HASH_IN_MANIFEST);
-        ContainerVerifierResult results = verifier.verify(container);
-        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
-        verifyFailingRule(results, "KSIE_VERIFY_DATA_MANIFEST", "META-INF/datamanifest-1.tlv", "Hash mismatch");
+        try (Container container = getContainer(CONTAINER_WITH_CHANGED_DATAMANIFEST_HASH_IN_MANIFEST)) {
+            ContainerVerifierResult results = verifier.verify(container);
+            Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+            verifyFailingRule(results, "KSIE_VERIFY_DATA_MANIFEST", "META-INF/datamanifest-1.tlv", "Hash mismatch");
+        }
     }
 
     @Test
     public void testVerifyContainerWithChangedAnnotationsManifestHashInManifest() throws Exception {
-        Container container = getContainer(CONTAINER_WITH_CHANGED_ANNOTATIONS_MANIFEST_HASH_IN_MANIFEST);
-        ContainerVerifierResult results = verifier.verify(container);
-        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
-        verifyFailingRule(results, "KSIE_VERIFY_ANNOTATION_MANIFEST", "META-INF/annotmanifest-1.tlv", "Hash mismatch");
+        try (Container container = getContainer(CONTAINER_WITH_CHANGED_ANNOTATIONS_MANIFEST_HASH_IN_MANIFEST)) {
+            ContainerVerifierResult results = verifier.verify(container);
+            Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+            verifyFailingRule(results, "KSIE_VERIFY_ANNOTATION_MANIFEST", "META-INF/annotmanifest-1.tlv", "Hash mismatch");
+        }
     }
 
     @Ignore //TODO: KSIE-72
     @Test
     public void testVerifyContainerWithChangedDatamanifestHashInAnnotationManifest() throws Exception {
-        Container container = getContainer(CONTAINER_WITH_CHANGED_DATAMANIFEST_HASH_IN_ANNOTATION_MANIFEST);
-        ContainerVerifierResult results = verifier.verify(container);
-        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
-        verifyFailingRule(results, "KSIE_VERIFY_....", "META-INF/....", "");
+        try (Container container = getContainer(CONTAINER_WITH_CHANGED_DATAMANIFEST_HASH_IN_ANNOTATION_MANIFEST)) {
+            ContainerVerifierResult results = verifier.verify(container);
+            Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+            verifyFailingRule(results, "KSIE_VERIFY_....", "META-INF/....", "");
+        }
     }
 
     @Test
     public void testVerifyContainerWithChangedAnnotationManifestHashInAnnotationsManifest() throws Exception {
-        Container container = getContainer(CONTAINER_WITH_CHANGED_ANNOTATION_MANIFEST_HASH_IN_ANNOTATIONS_MANIFEST);
-        ContainerVerifierResult results = verifier.verify(container);
-        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
-        verifyFailingRule(results, "KSIE_VERIFY_ANNOTATION", "META-INF/annotation-1.tlv", "Hash mismatch");
+        try (Container container = getContainer(CONTAINER_WITH_CHANGED_ANNOTATION_MANIFEST_HASH_IN_ANNOTATIONS_MANIFEST)) {
+            ContainerVerifierResult results = verifier.verify(container);
+            Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+            verifyFailingRule(results, "KSIE_VERIFY_ANNOTATION", "META-INF/annotation-1.tlv", "Hash mismatch");
+        }
     }
 
     @Test
     public void testVerifyContainerWithValidAndInvalidContent() throws Exception {
-        Container container = getContainer(CONTAINER_WITH_MULTI_CONTENT_ONE_IS_MISSING_DATAMANIFEST);
-        ContainerVerifierResult results = verifier.verify(container);
-        Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
-        verifyFailingRule(results, "KSIE_VERIFY_DATA_MANIFEST_EXISTS", "META-INF/datamanifest-654984984.tlv", "Datamanifest is not present in the container.");
+        try (Container container = getContainer(CONTAINER_WITH_MULTI_CONTENT_ONE_IS_MISSING_DATAMANIFEST)) {
+            ContainerVerifierResult results = verifier.verify(container);
+            Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
+            verifyFailingRule(results, "KSIE_VERIFY_DATA_MANIFEST_EXISTS", "META-INF/datamanifest-654984984.tlv", "Datamanifest is not present in the container.");
+        }
     }
 
     @Test
