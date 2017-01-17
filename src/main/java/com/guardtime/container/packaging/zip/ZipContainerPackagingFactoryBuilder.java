@@ -141,7 +141,7 @@ public class ZipContainerPackagingFactoryBuilder {
             try {
                 verifyNoDuplicateDocumentNames(new HashSet<>(files));
                 ContentSigner signer = new ContentSigner(files, annotations, indexProviderFactory.create());
-                ZipSignatureContent signatureContent = signer.sign();
+                SignatureContent signatureContent = signer.sign();
                 MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
                 ZipContainer zipContainer = new ZipContainer(signatureContent, mimeType);
                 verifyContainer(zipContainer);
@@ -172,8 +172,8 @@ public class ZipContainerPackagingFactoryBuilder {
             try {
                 ZipContainer existingZipContainer = (ZipContainer) existingContainer;
                 ContentSigner signer = new ContentSigner(files, annotations, indexProviderFactory.create(existingContainer));
-                ZipSignatureContent signatureContent = signer.sign();
-                List<ZipSignatureContent> contents = new LinkedList<>(existingZipContainer.getSignatureContents());
+                SignatureContent signatureContent = signer.sign();
+                List<SignatureContent> contents = new LinkedList<>(existingZipContainer.getSignatureContents());
                 contents.add(signatureContent);
                 ParsingStore store = getParsingStore();
                 ZipContainer zipContainer = new ZipContainer(contents, getCopies(existingContainer.getUnknownFiles(), store), existingContainer.getMimeType(), store);
@@ -250,7 +250,7 @@ public class ZipContainerPackagingFactoryBuilder {
                 this.nameProvider = new EntryNameProvider(manifestFileExtension, signatureFileExtension, indexProvider);
             }
 
-            public ZipSignatureContent sign() throws InvalidManifestException, SignatureException, DataHashException {
+            public SignatureContent sign() throws InvalidManifestException, SignatureException, DataHashException {
                 ManifestFactoryType manifestFactoryType = manifestFactory.getManifestFactoryType();
                 SignatureFactoryType signatureFactoryType = signatureFactory.getSignatureFactoryType();
                 logger.info("'{}' is used to create and read container manifests", manifestFactoryType.getName());

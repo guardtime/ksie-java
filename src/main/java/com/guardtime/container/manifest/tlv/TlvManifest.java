@@ -4,6 +4,7 @@ import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.InvalidManifestException;
 import com.guardtime.container.manifest.Manifest;
+import com.guardtime.container.manifest.ManifestFactoryType;
 import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.tlv.TLVElement;
@@ -24,6 +25,7 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
     private TlvDocumentsManifestReference documentsManifestReference;
     private TlvSignatureReference signatureReference;
     private TlvAnnotationsManifestReference annotationsManifestReference;
+    private final ManifestFactoryType manifestFactoryType = TlvContainerManifestFactory.TLV_MANIFEST_FACTORY_TYPE;
 
     public TlvManifest(Pair<String, TlvDocumentsManifest> documentsManifest, Pair<String, TlvAnnotationsManifest> annotationsManifest, Pair<String, String> signatureReference, HashAlgorithmProvider algorithmProvider) throws InvalidManifestException {
         super(MAGIC);
@@ -63,6 +65,11 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
     @Override
     public com.guardtime.container.manifest.SignatureReference getSignatureReference() {
         return signatureReference;
+    }
+
+    @Override
+    public ManifestFactoryType getManifestFactoryType() {
+        return manifestFactoryType;
     }
 
     @Override

@@ -33,4 +33,5 @@ public interface Manifest {
 
     SignatureReference getSignatureReference();
 
+    ManifestFactoryType getManifestFactoryType();
 }

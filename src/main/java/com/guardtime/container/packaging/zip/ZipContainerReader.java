@@ -84,7 +84,7 @@ class ZipContainerReader {
                 readEntry(zipInput, entry);
             }
         }
-        List<ZipSignatureContent> contents = buildSignatures();
+        List<SignatureContent> contents = buildSignatures();
         MimeType mimeType = getMimeType();
         List<UnknownDocument> unknownFiles = getUnknownFiles();
 
@@ -95,7 +95,7 @@ class ZipContainerReader {
         }
     }
 
-    private boolean containsValidContents(List<ZipSignatureContent> signatureContents) {
+    private boolean containsValidContents(List<SignatureContent> signatureContents) {
         for (SignatureContent content : signatureContents) {
             if (containsManifest(content) ||
                     containsOrContainedDocuments(content) ||
@@ -163,9 +163,9 @@ class ZipContainerReader {
         unknownFileHandler.add(name, zipInput);
     }
 
-    private List<ZipSignatureContent> buildSignatures() {
+    private List<SignatureContent> buildSignatures() {
         Set<String> parsedManifestUriSet = manifestHandler.getNames();
-        List<ZipSignatureContent> signatures = new LinkedList<>();
+        List<SignatureContent> signatures = new LinkedList<>();
         for (String manifestUri : parsedManifestUriSet) {
             try {
                 signatures.add(signatureContentHandler.get(manifestUri));

@@ -4,6 +4,7 @@ import com.guardtime.container.document.UnknownDocument;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -14,13 +15,15 @@ public interface Container extends AutoCloseable {
     /**
      * Returns list of {@link SignatureContent} contained in this container.
      */
-    List<? extends SignatureContent> getSignatureContents();
+    List<SignatureContent> getSignatureContents();
 
     /**
      * Writes data to provided stream.
      *
-     * @param output    OutputStream to write to. This stream will be closed after writing data to it.
-     * @throws IOException When writing to the stream fails for any reason.
+     * @param output
+     *         OutputStream to write to. This stream will be closed after writing data to it.
+     * @throws IOException
+     *         When writing to the stream fails for any reason.
      */
     void writeTo(OutputStream output) throws IOException;
 
@@ -40,4 +43,25 @@ public interface Container extends AutoCloseable {
      */
     @Override
     void close() throws Exception;
+
+    /**
+     * Adds the {@link SignatureContent} to this {@link Container} with all {@link com.guardtime.container.document.ContainerDocument}s
+     * that don't clash with existing {@link com.guardtime.container.document.ContainerDocument} file names.
+     * @throws ContainerMergingException when the {@link SignatureContent} can not be added into the {@link Container} for any reason.
+     */
+    void add(SignatureContent content) throws ContainerMergingException;
+
+    /**
+     * Adds all {@link SignatureContent}s from input {@link Container} to this {@link Container} with all {@link com.guardtime.container.document.ContainerDocument}s
+     * that don't clash with existing {@link com.guardtime.container.document.ContainerDocument} file names.
+     * @throws ContainerMergingException when any {@link SignatureContent} can not be added into the {@link Container} for any reason.
+     */
+    void add(Container container) throws ContainerMergingException;
+
+    /**
+     * Adds all {@link SignatureContent}s to this {@link Container} with all {@link com.guardtime.container.document.ContainerDocument}s
+     * that don't clash with existing {@link com.guardtime.container.document.ContainerDocument} file names.
+     * @throws ContainerMergingException when any {@link SignatureContent} can not be added into the {@link Container} for any reason.
+     */
+    void addAll(Collection<SignatureContent> contents) throws ContainerMergingException;
 }
