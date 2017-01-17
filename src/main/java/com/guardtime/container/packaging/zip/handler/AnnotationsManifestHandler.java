@@ -36,9 +36,9 @@ public class AnnotationsManifestHandler extends ContentHandler<AnnotationsManife
             parsingStore.remove(name);
             return annotationsManifest;
         } catch (InvalidManifestException e) {
-            throw new ContentParsingException("Failed to parse content of annotmanifest file", e);
+            throw new ContentParsingException("Failed to parse content of '" + name + "'", e);
         } catch (IOException e) {
-            throw new ContentParsingException("Failed to read file", e);
+            throw new ContentParsingException("Failed to read content of '" + name + "'", e);
         }
     }
 

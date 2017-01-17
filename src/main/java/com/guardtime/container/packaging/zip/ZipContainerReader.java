@@ -31,7 +31,6 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -150,7 +149,7 @@ class ZipContainerReader {
             byte[] content = mimeTypeHandler.get(uri);
             return new MimeTypeEntry(uri, content);
         } catch (ContentParsingException e) {
-            LOGGER.info("Failed to parse MIME type. Reason: '{}", e.getMessage());
+            LOGGER.debug("Failed to parse MIME type. Reason: '{}", e.getMessage());
             return null;
         }
     }
@@ -176,7 +175,7 @@ class ZipContainerReader {
         String name = entry.getName();
         for (ContentHandler handler : handlers) {
             if (handler.isSupported(name)) {
-                LOGGER.info("Reading zip entry '{}'. Using handler '{}' ", name, handler.getClass().getName());
+                LOGGER.debug("Reading zip entry '{}'. Using handler '{}' ", name, handler.getClass().getName());
                 handler.add(name, zipInput);
                 return;
             }
@@ -193,7 +192,7 @@ class ZipContainerReader {
                 signatures.add(zipSignatureContentVectorPair.getLeft());
                 readingException.addExceptions(zipSignatureContentVectorPair.getRight());
             } catch (ContentParsingException e) {
-                LOGGER.info("Parsing SignatureContent failed for '{}'. Reason: '{}'", manifestUri, e.getMessage());
+                LOGGER.debug("Parsing SignatureContent failed for '{}'. Reason: '{}'", manifestUri, e.getMessage());
                 readingException.addException(e);
             }
         }

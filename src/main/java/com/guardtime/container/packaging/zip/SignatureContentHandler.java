@@ -24,16 +24,11 @@ import com.guardtime.container.packaging.zip.handler.SingleAnnotationManifestHan
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 class SignatureContentHandler {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SignatureContentHandler.class);
 
     private final DocumentContentHandler documentHandler;
     private final AnnotationContentHandler annotationContentHandler;
@@ -105,7 +100,6 @@ class SignatureContentHandler {
                         annotationsManifestHandler.get(annotationsManifestReference.getUri())
                 );
             } catch (ContentParsingException e) {
-                LOGGER.info("Manifest '{}' failed to parse. Reason: '{}'", annotationsManifestReference.getUri(), e.getMessage());
                 exceptions.add(e);
                 return null;
             }
@@ -116,7 +110,6 @@ class SignatureContentHandler {
             try {
                 return Pair.of(documentsManifestReference.getUri(), documentsManifestHandler.get(documentsManifestReference.getUri()));
             } catch (ContentParsingException e) {
-                LOGGER.info("Manifest '{}' failed to parse. Reason: '{}'", documentsManifestReference.getUri(), e.getMessage());
                 exceptions.add(e);
                 return null;
             }
@@ -167,7 +160,6 @@ class SignatureContentHandler {
                 SingleAnnotationManifest singleAnnotationManifest = singleAnnotationManifestHandler.get(manifestReferenceUri);
                 return Pair.of(manifestReferenceUri, singleAnnotationManifest);
             } catch (ContentParsingException e) {
-                LOGGER.info("Failed to parse annotation manifest for '{}'. Reason: '{}'", manifestReference.getUri(), e.getMessage());
                 exceptions.add(e);
                 return null;
             }
@@ -177,8 +169,11 @@ class SignatureContentHandler {
             try {
                 ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getMimeType());
                 if (type == null) {
-                    String message = String.format("Failed to parse annotation for '%s'. Reason: Invalid annotation type: '%s'", manifestReference.getUri(), manifestReference.getMimeType());
-                    LOGGER.info(message);
+                    String message = String.format(
+                            "Failed to parse annotation for '%s'. Reason: Invalid annotation type: '%s'",
+                            manifestReference.getUri(),
+                            manifestReference.getMimeType()
+                    );
                     exceptions.add(new ContentParsingException(message));
                     return null;
                 }
@@ -188,7 +183,6 @@ class SignatureContentHandler {
                 ContainerAnnotation annotation = new ParsedContainerAnnotation(annotationStreamProvider, uri, annotationDataReference.getDomain(), type);
                 return Pair.of(uri, annotation);
             } catch (ContentParsingException e) {
-                LOGGER.info("Failed to parse annotation for '{}'. Reason: '{}'", manifestReference.getUri(), e.getMessage());
                 exceptions.add(e);
                 return null;
             }
@@ -199,7 +193,6 @@ class SignatureContentHandler {
             try {
                 signature = signatureHandler.get(signatureUri);
             } catch (ContentParsingException e) {
-                LOGGER.info("No valid signature in container at '{}'", signatureUri);
                 exceptions.add(e);
                 signature = null;
             }

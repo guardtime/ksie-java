@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
 public class ZipContainerReaderTest extends AbstractContainerTest {
 
     @Mock
-    protected KSI mockKsi;
+    private KSI mockKsi;
 
     private ZipContainerReader reader;
     private Container container;
@@ -225,7 +225,19 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
     public void testReadInvalidSignature() throws Exception {
         when(mockKsi.read(any(InputStream.class))).thenThrow(SignatureException.class);
         setUpContainer(CONTAINER_WITH_BROKEN_SIGNATURE);
-        assertExceptionsContainMessage("Failed to parse content of signature file");
+        assertExceptionsContainMessage("Failed to parse content of 'META-INF/signature-1.ksi'");
+    }
+
+
+    @Test
+    public void testReadInvalidContainerProducesMultipleExceptions() throws Exception {
+        when(mockKsi.read(any(InputStream.class))).thenThrow(SignatureException.class);
+        setUpContainer(CONTAINER_WITH_BROKEN_SIGNATURE);
+        assertExceptionsContainMessage("Failed to parse content of 'META-INF/signature-1.ksi'");
+        assertExceptionsContainMessage("Failed to parse content of 'META-INF/signature-2.ksi'");
+        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotation-1.tlv' from parsingStore.");
+        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotation-2.tlv' from parsingStore.");
+        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotmanifest-2.tlv' from parsingStore.");
     }
 
 }
