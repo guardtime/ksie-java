@@ -14,7 +14,6 @@ import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.parsing.ParsingStore;
 import com.guardtime.container.signature.ContainerSignature;
-import com.guardtime.container.signature.SignatureFactoryType;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.util.Util;
 
@@ -22,6 +21,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -109,6 +109,20 @@ class ZipContainer implements Container {
             throw new ContainerMergingException("Incompatible Container provided for merging!");
         }
         addAll(container.getSignatureContents());
+        verifyUniqueUnknownFiles(container);
+        unknownFiles.addAll(container.getUnknownFiles());
+    }
+
+    private void verifyUniqueUnknownFiles(Container container) throws ContainerMergingException {
+        List<String> unknownDocumentPaths = new ArrayList<>();
+        for(UnknownDocument unknownDocument : unknownFiles) {
+            unknownDocumentPaths.add(unknownDocument.getFileName());
+        }
+        for(UnknownDocument unknownDocument : container.getUnknownFiles()) {
+            if(unknownDocumentPaths.contains(unknownDocument.getFileName())) {
+                throw new ContainerMergingException("There are clashing files in the Containers!");
+            }
+        }
     }
 
     @Override
@@ -121,7 +135,7 @@ class ZipContainer implements Container {
     @Override
     public void add(SignatureContent content) throws ContainerMergingException {
         verifyNewSignatureContentIsAcceptable(content);
-        verifyNameDuplicates(content);
+        verifyUniquePaths(content);
         signatureContents.add(content);
     }
 
@@ -222,7 +236,7 @@ class ZipContainer implements Container {
         }
     }
 
-    private void verifyNameDuplicates(SignatureContent content) throws ContainerMergingException {
+    private void verifyUniquePaths(SignatureContent content) throws ContainerMergingException {
         for(SignatureContent existingContent : signatureContents) {
             String newManifestPath = content.getManifest().getLeft();
             String newDocumentsManifestPath = content.getDocumentsManifest().getLeft();
