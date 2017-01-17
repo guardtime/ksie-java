@@ -10,6 +10,7 @@ import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.container.indexing.UuidIndexProviderFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
+import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.parsing.ParsingStoreFactory;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
@@ -61,6 +62,27 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
                 build();
     }
 
+    @Test
+    public void testReadContainerWithMissingManifest() throws Exception {
+        expectedException.expect(InvalidPackageException.class);
+        expectedException.expectMessage("Reading container encountered errors!");
+        try (Container ignored = getContainer(CONTAINER_WITH_MISSING_MANIFEST)) {}
+    }
+
+    @Test
+    public void testReadContainerWithMissingMimetype() throws Exception {
+        expectedException.expect(InvalidPackageException.class);
+        expectedException.expectMessage("Reading container encountered errors!");
+        try (Container ignored = getContainer(CONTAINER_WITH_MISSING_MIMETYPE)) {
+        }
+    }
+
+    @Test
+    public void testVerifyContainerWithEmptyMimetype() throws Exception {
+        expectedException.expect(InvalidPackageException.class);
+        expectedException.expectMessage("Reading container encountered errors!");
+        try (Container ignored = getContainer(CONTAINER_WITH_MIMETYPE_IS_EMPTY)) {}
+    }
 
     @Test
     public void testCreateContainer() throws Exception {
@@ -172,7 +194,7 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
     @Test
     public void testCreateContainerFromExistingWithDifferentIndexTypesInSameContent_OK() throws Exception {
         try (
-                FileInputStream stream = new FileInputStream(loadFile(CONTAINER_CONTENT_WITH_MIXED_INDEX_TYPES));
+                FileInputStream stream = new FileInputStream(loadFile(CONTAINER_WITH_MIXED_INDEX_TYPES));
                 Container existingContainer  = packagingFactoryWithUuid.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
                 ContainerDocument document = new StreamContainerDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc");

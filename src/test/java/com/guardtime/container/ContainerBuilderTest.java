@@ -110,7 +110,7 @@ public class ContainerBuilderTest extends AbstractContainerTest {
     }
 
     @Test
-    public void testCreateWithMultipleDocumentsWithSameFileName() throws Exception {
+    public void testCreateWithMultipleDocumentsWithSameFileName_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expectMessage("Document with name '" + TEST_FILE_NAME_TEST_TXT + "' already exists!");
         expectedException.expect(IllegalArgumentException.class);
         try (
@@ -125,8 +125,9 @@ public class ContainerBuilderTest extends AbstractContainerTest {
     }
 
     @Test
-    public void testCreateWithExistingContainerWithMultipleDocumentsWithSameFileName() throws Exception {
+    public void testCreateWithExistingContainerWithMultipleDocumentsWithSameFileName_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Multiple documents with same name found!");
         try (
                 ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
                 ContainerDocument streamContainerDocument = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-HAHA".getBytes()), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);

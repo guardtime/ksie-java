@@ -13,6 +13,7 @@ import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.publication.inmemory.PublicationsFilePublicationRecord;
 import com.guardtime.ksi.unisignature.KSISignature;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -23,6 +24,24 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTest {
+
+    @Ignore //TODO: KSIE-73
+    @Test
+    public void testExtendingContainerWithValidAndInvalidSignatures()throws Exception {
+        ExtendingPolicy policy = new KsiContainerSignatureExtendingPolicy(ksi);
+        ContainerSignatureExtender extender = new ContainerSignatureExtender(signatureFactory, policy);
+        try (Container container = getContainer(CONTAINER_WITH_MULTI_CONTENT_ONE_SIGNATURE_IS_INVALID)) {
+            assertSignaturesExtendedStatus(container, false);
+            extender.extend(container);
+            for (SignatureContent content : container.getSignatureContents()) {
+                if (content.getManifest().getRight().getSignatureReference().getUri().equals("META-INF/signature-1.ksi")) {
+                    assertEquals(true, ((KSISignature) content.getContainerSignature().getSignature()).isExtended());
+                } else if (content.getManifest().getRight().getSignatureReference().getUri().equals("META-INF/signature-01-02-03-04-05.ksi")) {
+                    assertEquals(false, ((KSISignature) content.getContainerSignature().getSignature()).isExtended());
+                }
+            }
+        }
+    }
 
     @Test
     public void testExtendingWithKsiContainerSignatureExtender() throws Exception {
