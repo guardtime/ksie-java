@@ -53,7 +53,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
-    public void testDocumentHashAlgorithmListIsEmpty_IllegalArgumentException() throws Exception {
+    public void testDocumentHashAlgorithmListIsEmpty_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Data hashes must not be empty");
 
@@ -64,7 +64,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
-    public void testFileReferenceHashAlgorithmListIsEmpty_IllegalArgumentException() throws Exception {
+    public void testFileReferenceHashAlgorithmListIsEmpty_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Data hashes must not be empty");
 
@@ -75,7 +75,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
-    public void testFileReferenceHashAlgorithmListContainsNullElement_IllegalArgumentException() throws Exception {
+    public void testFileReferenceHashAlgorithmListContainsNullElement_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Hash algorithm can not be null");
 
@@ -88,7 +88,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
-    public void testDocumentHashAlgorithmListContainsNullElement_IllegalArgumentException() throws Exception {
+    public void testDocumentHashAlgorithmListContainsNullElement_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Hash algorithm can not be null");
 
@@ -219,7 +219,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
-    public void testUsingNotImplementedHashingAlgorithm() throws Exception {
+    public void testUsingNotImplementedHashingAlgorithm_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Hash algorithm SHA3_512 is not implemented");
         HashAlgorithm hashAlgorithm = HashAlgorithm.SHA3_512;
@@ -231,7 +231,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
-     public void testUsingNotImplementedHashingAlgorithmInList() throws Exception {
+     public void testUsingNotImplementedHashingAlgorithmInList_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Hash algorithm SM3 is not implemented");
         List<HashAlgorithm> hashAlgorithmList = Arrays.asList(HashAlgorithm.SHA1, HashAlgorithm.SHA2_256, HashAlgorithm.SM3);
