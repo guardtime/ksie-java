@@ -17,7 +17,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.security.InvalidParameterException;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
@@ -39,8 +38,6 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
                     assertEquals(true, ((KSISignature) content.getContainerSignature().getSignature()).isExtended());
                 } else if (content.getManifest().getRight().getSignatureReference().getUri().equals("META-INF/signature-01-02-03-04-05.ksi")) {
                     assertEquals(false, ((KSISignature) content.getContainerSignature().getSignature()).isExtended());
-                } else {
-                    throw new InvalidParameterException("Invalid container is provided for test.");
                 }
             }
         }
