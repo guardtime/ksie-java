@@ -101,7 +101,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         Container container = getContainer(CONTAINER_WITH_CONTAINS_ONLY_MANIFEST);
         ContainerVerifierResult results = verifier.verify(container);
         Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
-        verifyFailingRule(results, "KSIE_FORMAT", "META-INF/signature-1.ksi", "No signature in container for manifest!");
+        verifyFailingRule(results, "KSIE_VERIFY_SIGNATURE_EXISTS", "META-INF/signature-1.ksi", "No signature in container for manifest!");
     }
 
     @Test
