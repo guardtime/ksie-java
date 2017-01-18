@@ -25,6 +25,8 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,6 +41,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -276,6 +279,19 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
             }
             assertEquals(1, documentPaths.size());
         }
+    }
+
+    @Test
+    public void testReadFromBadStream_ThrowsInvalidPackageException() throws Exception {
+        expectedException.expect(InvalidPackageException.class);
+        expectedException.expectMessage("Failed to parse InputStream");
+        ContainerPackagingFactory<ZipContainer> packagingFactory = new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                withManifestFactory(new TlvContainerManifestFactory()).
+                build();
+        InputStream inputStream = spy(new ByteArrayInputStream("".getBytes()));
+        doThrow(IOException.class).when(inputStream).close();
+        packagingFactory.read(inputStream);
     }
 
 }

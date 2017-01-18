@@ -3,7 +3,9 @@ package com.guardtime.container.integration;
 import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
+import com.guardtime.container.packaging.ContainerReadingException;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
+import com.guardtime.container.packaging.zip.handler.ContentParsingException;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.ksi.KsiSignatureFactory;
 import com.guardtime.container.util.Pair;
@@ -87,6 +89,14 @@ public abstract class AbstractCommonIntegrationTest extends AbstractContainerTes
         File file = new File(url.toURI());
         try (FileInputStream input = new FileInputStream(file)) {
             return packagingFactory.read(input);
+        }
+    }
+
+    Container getContainerIgnoreExceptions(String container) throws Exception {
+        try {
+            return getContainer(container);
+        } catch (ContainerReadingException e) {
+            return e.getContainer();
         }
     }
 

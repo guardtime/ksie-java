@@ -131,7 +131,7 @@ public class ZipContainerPackagingFactoryBuilder {
             } catch (IOException e) {
                 throw new InvalidPackageException("Failed to parse InputStream", e);
             } catch (ParsingStoreException e) {
-                throw new InvalidPackageException("Failed to store parsed container data", e);
+                throw new InvalidPackageException("Failed to create parsing store for container data", e);
             }
         }
 

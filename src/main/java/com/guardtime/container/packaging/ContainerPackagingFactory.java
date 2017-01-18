@@ -18,7 +18,9 @@ public interface ContainerPackagingFactory<C extends Container> {
      *                 after reading.
      * @return An instance of {@link Container} based on the data from {@link InputStream}. Does not verify
      *         the container/signature(s).
-     * @throws InvalidPackageException   When the {@link InputStream} does not contain a parsable {@link Container}.
+     * @throws InvalidPackageException      When the {@link InputStream} does not contain a parsable {@link Container}.
+     * @throws ContainerReadingException    When there were issues parsing some elements of the {@link Container}. The parsed
+     *         container and all encountered exceptions can be retrieved from this exception.
      */
     C read(InputStream input) throws InvalidPackageException;
 
