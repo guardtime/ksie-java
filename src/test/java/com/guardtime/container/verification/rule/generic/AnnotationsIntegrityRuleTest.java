@@ -3,6 +3,7 @@ package com.guardtime.container.verification.rule.generic;
 import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
+import com.guardtime.container.packaging.ContainerReadingException;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 import com.guardtime.container.signature.ContainerSignature;
@@ -62,12 +63,17 @@ public class AnnotationsIntegrityRuleTest extends AbstractContainerTest {
 
     private RuleVerificationResult getRuleVerificationResult(String path) throws Exception {
         InputStream input = new FileInputStream(loadFile(path));
-        try (Container container = packagingFactory.read(input)) {
-            SignatureContent content = container.getSignatureContents().get(0);
-            ResultHolder holder = new ResultHolder();
-            rule.verify(holder, content);
-            return selectMostImportantResult(holder.getResults());
+        Container container = null;
+        try {
+            container = packagingFactory.read(input);
+        } catch (ContainerReadingException e) {
+            container = e.getContainer();
         }
+        SignatureContent content = container.getSignatureContents().get(0);
+        ResultHolder holder = new ResultHolder();
+        rule.verify(holder, content);
+        container.close();
+        return selectMostImportantResult(holder.getResults());
     }
 
     private RuleVerificationResult selectMostImportantResult(List<RuleVerificationResult> results) {

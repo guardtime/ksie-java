@@ -46,10 +46,10 @@ public class AbstractContainerTest {
     protected static final String CONTAINER_WITH_NO_DOCUMENTS = "containers/container-no-documents.ksie";
     protected static final String CONTAINER_WITH_ONE_DOCUMENT = "containers/container-one-document.ksie";
     protected static final String CONTAINER_WITH_UNKNOWN_FILES = "containers/container-unknown-files.ksie";
-    protected static final String CONTAINER_WITH_MIXED_INDEX_TYPES = "containers/container-content-with-mixed-index-types.ksie";
     protected static final String CONTAINER_WITH_MULTIPLE_SIGNATURES = "containers/container-multiple-signatures.ksie";
     protected static final String CONTAINER_WITH_RANDOM_UUID_INDEXES = "containers/container-random-uuid-indexes.ksie";
     protected static final String CONTAINER_WITH_MULTIPLE_ANNOTATIONS = "containers/container-multiple-annotations.ksie";
+    protected static final String CONTAINER_WITH_MIXED_INDEX_TYPES = "containers/container-content-with-mixed-index-types.ksie";
     protected static final String CONTAINER_WITH_NON_REMOVABLE_ANNOTATION = "containers/container-with-non-removable-annotation.ksie";
     protected static final String CONTAINER_WITH_RANDOM_INCREMENTING_INDEXES = "containers/multi-content-random-incrementing-indexes.ksie";
     protected static final String CONTAINER_WITH_MIXED_INDEX_TYPES_IN_CONTENTS = "containers/container-contents-with-different-index-types.ksie";
@@ -65,7 +65,7 @@ public class AbstractContainerTest {
     protected static final String CONTAINER_WITH_MIMETYPE_IS_EMPTY = "containers/invalid/container-mimetype-is-empty.ksie";
     protected static final String CONTAINER_WITH_MISSING_ANNOTATION = "containers/invalid/container-missing-annotation.ksie";
     protected static final String CONTAINER_WITH_WRONG_SIGNATURE_FILE = "containers/invalid/container-wrong-signature-file.ksie";
-    protected static final String CONTAINER_WITH_CHANGED_SIGNATURE_FILE = "containers/invalid/container-invalid-signature-from-last-aggregation-hash-chain.ksie";
+    protected static final String CONTAINER_WITH_MISSING_DOCUMENTS_MANIFEST = "containers/container-with-missing-datamanifest.ksie";
     protected static final String CONTAINER_WITH_CONTAINS_ONLY_MANIFEST = "containers/invalid/container-contains-only-manifest.ksie";
     protected static final String CONTAINER_WITH_CHANGED_ANNOTATION_DATA = "containers/invalid/container-changed-annotation-data.ksie";
     protected static final String CONTAINER_WITH_MISSING_ANNOTATION_DATA = "containers/invalid/container-missing-annotation-data.ksie";
@@ -73,15 +73,16 @@ public class AbstractContainerTest {
     protected static final String CONTAINER_WITH_BROKEN_SIGNATURE_CONTENT = "containers/invalid/container-broken-signature-content.ksie";
     protected static final String CONTAINER_WITH_DOCUMENT_MISSING_MIMETYPE = "containers/invalid/container-document-missing-mimetype.ksie";
     protected static final String CONTAINER_WITH_NO_DOCUMENT_URI_IN_MANIFEST = "containers/invalid/container-no-document-uri-in-manifest.ksie";
-    protected static final String CONTAINER_WITH_MULTIPLE_EXTENDABLE_SIGNATURES = "containers/invalid/container-multiple-signatures-non-verifying.ksie";
     protected static final String CONTAINER_WITH_MIMETYPE_CONTAINS_INVALID_VALUE = "containers/invalid/container-mimetype-contains-invalid-value.ksie";
+    protected static final String CONTAINER_WITH_MULTIPLE_EXTENDABLE_SIGNATURES = "containers/invalid/container-multiple-signatures-non-verifying.ksie";
     protected static final String CONTAINER_WITH_MIMETYPE_CONTAINS_ADDITIONAL_VALUE = "containers/invalid/container-mimetype-contains-additional-value.ksie";
-    protected static final String CONTAINER_WITH_CHANGED_AND_EXTENDED_SIGNATURE_FILE = "containers/invalid/container-invalid-signature-from-last-aggregation-hash-chain-extended.ksie";
     protected static final String CONTAINER_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED = "containers/invalid/container-two-contents-one-manifest-removed.ksie";
+    protected static final String CONTAINER_WITH_CHANGED_SIGNATURE_FILE = "containers/invalid/container-invalid-signature-from-last-aggregation-hash-chain.ksie";
     protected static final String CONTAINER_WITH_CHANGED_DATAMANIFEST_HASH_IN_MANIFEST = "containers/invalid/container-changed-datamanifest-hash-in-manifest.ksie";
     protected static final String CONTAINER_WITH_MULTI_CONTENT_ONE_SIGNATURE_IS_INVALID = "containers/invalid/container-multi-content-one-signature-is-invalid.ksie";
     protected static final String CONTAINER_WITH_MULTI_CONTENT_ONE_IS_MISSING_DATAMANIFEST = "containers/invalid/multi-content-one-content-is-missing-datamanifest.ksie";
     protected static final String CONTAINER_WITH_CHANGED_ANNOTATIONS_MANIFEST_HASH_IN_MANIFEST = "containers/invalid/container-changed-annotations-manifest-hash-in-manifest.ksie";
+    protected static final String CONTAINER_WITH_CHANGED_AND_EXTENDED_SIGNATURE_FILE = "containers/invalid/container-invalid-signature-from-last-aggregation-hash-chain-extended.ksie";
     protected static final String CONTAINER_WITH_CHANGED_DATAMANIFEST_HASH_IN_ANNOTATION_MANIFEST = "containers/invalid/container-changed-datamanifest-hash-in-annotation-manifest.ksie";
     protected static final String CONTAINER_WITH_CHANGED_ANNOTATION_MANIFEST_HASH_IN_ANNOTATIONS_MANIFEST = "containers/invalid/container-changed-annotation-manifest-hash-in-annotations-manifest.ksie";
 

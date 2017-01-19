@@ -36,9 +36,9 @@ public class SingleAnnotationManifestHandler extends ContentHandler<SingleAnnota
             parsingStore.remove(name);
             return singleAnnotationManifest;
         } catch (InvalidManifestException e) {
-            throw new ContentParsingException("Failed to parse content of annotation manifest file", e);
+            throw new ContentParsingException("Failed to parse content of '" + name + "'", e);
         } catch (IOException e) {
-            throw new ContentParsingException("Failed to read file", e);
+            throw new ContentParsingException("Failed to read content of '" + name + "'", e);
         }
     }
 

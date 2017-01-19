@@ -7,9 +7,10 @@ import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
-import com.guardtime.container.packaging.InvalidPackageException;
+import com.guardtime.container.packaging.ContainerReadingException;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.parsing.TemporaryFileBasedParsingStoreFactory;
+import com.guardtime.container.signature.SignatureException;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.ksi.KsiSignatureFactory;
 import com.guardtime.ksi.KSI;
@@ -24,18 +25,23 @@ import org.mockito.Mockito;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 public class ZipContainerReaderTest extends AbstractContainerTest {
+
     @Mock
-    protected KSI mockKsi;
+    private KSI mockKsi;
 
     private ZipContainerReader reader;
     private Container container;
+    private List<Throwable> exceptions;
 
 
     @Before
@@ -58,7 +64,21 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
     private void setUpContainer(String containerPath) throws Exception {
         try (InputStream input = new FileInputStream(loadFile(containerPath))) {
             this.container = reader.read(input);
+        } catch (ContainerReadingException e) {
+            this.container = e.getContainer();
+            this.exceptions = e.getExceptions();
         }
+    }
+
+    private void assertExceptionsContainMessage(String message) {
+        String found = "";
+        for (Throwable t : exceptions) {
+            found = t.getMessage();
+            if (found.equals(message)) {
+                break;
+            }
+        }
+        assertEquals(message, found);
     }
 
     @Test
@@ -73,9 +93,9 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
 
     @Test
     public void testReadEmptyContainerFile_ThrowsInvalidPackageException() throws Exception {
-        expectedException.expect(InvalidPackageException.class);
-        expectedException.expectMessage("Parsed container was not valid");
         setUpContainer(EMPTY_CONTAINER);
+        assertExceptionsContainMessage("Parsed container was not valid");
+        assertTrue(container.getSignatureContents().isEmpty());
     }
 
     @Test
@@ -180,4 +200,44 @@ public class ZipContainerReaderTest extends AbstractContainerTest {
         assertTrue(signatureContent.getSingleAnnotationManifests().isEmpty());
         assertFalse(annotationsManifest.getSingleAnnotationManifestReferences().isEmpty());
     }
+
+    @Test
+    public void testReadInvalidDocumentsManifest() throws Exception {
+        setUpContainer(CONTAINER_WITH_MISSING_DOCUMENTS_MANIFEST);
+        assertFalse(exceptions.isEmpty());
+        assertExceptionsContainMessage("Failed to fetch file 'META-INF/datamanifest-4.tlv' from parsingStore.");
+    }
+
+    @Test
+    public void testReadInvalidAnnotationsManifest() throws Exception {
+        setUpContainer(CONTAINER_WITH_BROKEN_SIGNATURE_CONTENT);
+        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotmanifest-2.tlv' from parsingStore.");
+    }
+
+
+    @Test
+    public void testReadInvalidSingleAnnotationManifest() throws Exception {
+        setUpContainer(CONTAINER_WITH_MISSING_ANNOTATION);
+        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotation-1.tlv' from parsingStore.");
+    }
+
+    @Test
+    public void testReadInvalidSignature() throws Exception {
+        when(mockKsi.read(any(InputStream.class))).thenThrow(SignatureException.class);
+        setUpContainer(CONTAINER_WITH_BROKEN_SIGNATURE_CONTENT);
+        assertExceptionsContainMessage("Failed to parse content of 'META-INF/signature-1.ksi'");
+    }
+
+
+    @Test
+    public void testReadInvalidContainerProducesMultipleExceptions() throws Exception {
+        when(mockKsi.read(any(InputStream.class))).thenThrow(SignatureException.class);
+        setUpContainer(CONTAINER_WITH_BROKEN_SIGNATURE_CONTENT);
+        assertExceptionsContainMessage("Failed to parse content of 'META-INF/signature-1.ksi'");
+        assertExceptionsContainMessage("Failed to parse content of 'META-INF/signature-2.ksi'");
+        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotation-1.tlv' from parsingStore.");
+        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotation-2.tlv' from parsingStore.");
+        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotmanifest-2.tlv' from parsingStore.");
+    }
+
 }

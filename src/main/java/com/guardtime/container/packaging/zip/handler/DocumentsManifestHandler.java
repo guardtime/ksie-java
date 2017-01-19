@@ -36,9 +36,9 @@ public class DocumentsManifestHandler extends ContentHandler<DocumentsManifest> 
             parsingStore.remove(name);
             return documentsManifest;
         } catch (InvalidManifestException e) {
-            throw new ContentParsingException("Failed to parse content of datamanifest file", e);
+            throw new ContentParsingException("Failed to parse content of '" + name + "'", e);
         } catch (IOException e) {
-            throw new ContentParsingException("Failed to read file", e);
+            throw new ContentParsingException("Failed to read content of '" + name + "'", e);
         }
     }
 

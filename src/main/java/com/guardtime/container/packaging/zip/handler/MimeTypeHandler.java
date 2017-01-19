@@ -28,7 +28,7 @@ public class MimeTypeHandler extends ContentHandler<byte[]> {
             parsingStore.remove(name);
             return bytes;
         } catch (IOException e) {
-            throw new ContentParsingException("Failed to read from file", e);
+            throw new ContentParsingException("Failed to read content of '" + name + "'", e);
         }
     }
 }

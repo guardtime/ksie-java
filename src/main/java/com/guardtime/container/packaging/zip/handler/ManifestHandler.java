@@ -36,9 +36,9 @@ public class ManifestHandler extends ContentHandler<Manifest> {
             parsingStore.remove(name);
             return manifest;
         } catch (InvalidManifestException e) {
-            throw new ContentParsingException("Failed to parse content of manifest file", e);
+            throw new ContentParsingException("Failed to parse content of '" + name + "'", e);
         } catch (IOException e) {
-            throw new ContentParsingException("Failed to read file", e);
+            throw new ContentParsingException("Failed to read content of '" + name + "'", e);
         }
     }
 

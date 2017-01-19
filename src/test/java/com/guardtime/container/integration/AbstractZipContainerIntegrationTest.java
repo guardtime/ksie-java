@@ -65,14 +65,14 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
     @Test
     public void testReadContainerWithMissingManifest() throws Exception {
         expectedException.expect(InvalidPackageException.class);
-        expectedException.expectMessage("Parsed container was not valid");
+        expectedException.expectMessage("Reading container encountered errors!");
         try (Container ignored = getContainer(CONTAINER_WITH_MISSING_MANIFEST)) {}
     }
 
     @Test
     public void testReadContainerWithMissingMimetype() throws Exception {
         expectedException.expect(InvalidPackageException.class);
-        expectedException.expectMessage("Parsed container was not valid");
+        expectedException.expectMessage("Reading container encountered errors!");
         try (Container ignored = getContainer(CONTAINER_WITH_MISSING_MIMETYPE)) {
         }
     }
@@ -80,7 +80,7 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
     @Test
     public void testVerifyContainerWithEmptyMimetype() throws Exception {
         expectedException.expect(InvalidPackageException.class);
-        expectedException.expectMessage("Parsed container was not valid");
+        expectedException.expectMessage("Reading container encountered errors!");
         try (Container ignored = getContainer(CONTAINER_WITH_MIMETYPE_IS_EMPTY)) {}
     }
 

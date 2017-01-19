@@ -36,9 +36,9 @@ public class SignatureHandler extends ContentHandler<ContainerSignature> {
             parsingStore.remove(name);
             return read;
         } catch (SignatureException e) {
-            throw new ContentParsingException("Failed to parse content of signature file", e);
+            throw new ContentParsingException("Failed to parse content of '" + name + "'", e);
         } catch (IOException e) {
-            throw new ContentParsingException("Failed to read file", e);
+            throw new ContentParsingException("Failed to read content of '" + name + "'", e);
         }
     }
 
