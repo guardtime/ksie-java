@@ -25,7 +25,6 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
     private TlvDocumentsManifestReference documentsManifestReference;
     private TlvSignatureReference signatureReference;
     private TlvAnnotationsManifestReference annotationsManifestReference;
-    private final ManifestFactoryType manifestFactoryType = TlvContainerManifestFactory.TLV_MANIFEST_FACTORY_TYPE;
 
     public TlvManifest(Pair<String, TlvDocumentsManifest> documentsManifest, Pair<String, TlvAnnotationsManifest> annotationsManifest, Pair<String, String> signatureReference, HashAlgorithmProvider algorithmProvider) throws InvalidManifestException {
         super(MAGIC);
@@ -69,7 +68,7 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
 
     @Override
     public ManifestFactoryType getManifestFactoryType() {
-        return manifestFactoryType;
+        return TlvContainerManifestFactory.TLV_MANIFEST_FACTORY_TYPE;
     }
 
     @Override

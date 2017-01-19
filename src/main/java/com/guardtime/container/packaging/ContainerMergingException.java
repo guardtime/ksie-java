@@ -13,4 +13,5 @@ public class ContainerMergingException extends ContainerException {
     public ContainerMergingException(String message, Throwable throwable) {
         super(message, throwable);
     }
+
 }
