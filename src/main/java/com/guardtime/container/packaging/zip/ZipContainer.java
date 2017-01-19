@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -67,7 +68,7 @@ class ZipContainer implements Container {
         }
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(output))) {
             writeMimeTypeEntry(zipOutputStream);
-            writeSignatures(signatureContents, zipOutputStream);
+            writeSignatureContents(signatureContents, zipOutputStream);
             writeExcessFiles(zipOutputStream);
         }
     }
@@ -104,8 +105,15 @@ class ZipContainer implements Container {
     }
 
     @Override
+    public void add(SignatureContent content) throws ContainerMergingException {
+        verifyNewSignatureContentIsAcceptable(content);
+        verifyUniquePaths(content);
+        signatureContents.add(content);
+    }
+
+    @Override
     public void add(Container container) throws ContainerMergingException {
-        if(!container.getMimeType().equals(mimeType)) {
+        if(mimeTypesDiffer(container)) {
             throw new ContainerMergingException("Incompatible Container provided for merging!");
         }
         addAll(container.getSignatureContents());
@@ -113,15 +121,14 @@ class ZipContainer implements Container {
         unknownFiles.addAll(container.getUnknownFiles());
     }
 
-    private void verifyUniqueUnknownFiles(Container container) throws ContainerMergingException {
-        List<String> unknownDocumentPaths = new ArrayList<>();
-        for(UnknownDocument unknownDocument : unknownFiles) {
-            unknownDocumentPaths.add(unknownDocument.getFileName());
-        }
-        for(UnknownDocument unknownDocument : container.getUnknownFiles()) {
-            if(unknownDocumentPaths.contains(unknownDocument.getFileName())) {
-                throw new ContainerMergingException("There are clashing files in the Containers!");
-            }
+    private boolean mimeTypesDiffer(Container container) throws ContainerMergingException {
+        try {
+            return !Arrays.equals(
+                    Util.toByteArray(mimeType.getInputStream()),
+                    Util.toByteArray(container.getMimeType().getInputStream())
+            );
+        } catch (IOException e) {
+            throw new ContainerMergingException("Failed to verify container acceptability!", e);
         }
     }
 
@@ -133,23 +140,8 @@ class ZipContainer implements Container {
     }
 
     @Override
-    public void add(SignatureContent content) throws ContainerMergingException {
-        verifyNewSignatureContentIsAcceptable(content);
-        verifyUniquePaths(content);
-        signatureContents.add(content);
-    }
-
-    @Override
     protected void finalize() throws Throwable {
         close();
-    }
-
-    private void writeExcessFiles(ZipOutputStream zipOutputStream) throws IOException {
-        for (UnknownDocument file : unknownFiles) {
-            try (InputStream inputStream = file.getInputStream()) {
-                writeEntry(new ZipEntry(file.getFileName()), inputStream, zipOutputStream);
-            }
-        }
     }
 
     private void writeMimeTypeEntry(ZipOutputStream zipOutputStream) throws IOException {
@@ -164,7 +156,7 @@ class ZipContainer implements Container {
         writeEntry(mimeTypeEntry, mimeType.getInputStream(), zipOutputStream);
     }
 
-    private void writeSignatures(List<SignatureContent> signatureContents, ZipOutputStream output) throws IOException {
+    private void writeSignatureContents(List<SignatureContent> signatureContents, ZipOutputStream output) throws IOException {
         for (SignatureContent signatureContent : signatureContents) {
             Pair<String, Manifest> manifest = signatureContent.getManifest();
             Pair<String, DocumentsManifest> documentsManifest = signatureContent.getDocumentsManifest();
@@ -176,6 +168,14 @@ class ZipContainer implements Container {
             writeDocuments(signatureContent.getDocuments(), output);
             writeSingleAnnotationManifests(signatureContent.getSingleAnnotationManifests(), output);
             writeAnnotations(signatureContent.getAnnotations(), output);
+        }
+    }
+
+    private void writeExcessFiles(ZipOutputStream zipOutputStream) throws IOException {
+        for (UnknownDocument file : unknownFiles) {
+            try (InputStream inputStream = file.getInputStream()) {
+                writeEntry(new ZipEntry(file.getFileName()), inputStream, zipOutputStream);
+            }
         }
     }
 
@@ -265,8 +265,20 @@ class ZipContainer implements Container {
             // TODO: when we allow same document paths then refactor this to check that hashes match
             for(String documentPath: existingContent.getDocuments().keySet()) {
                 if(content.getDocuments().containsKey(documentPath)) {
-                    throw new ContainerMergingException("New SignatureContent has clashing name for SingleAnnotationManifest!");
+                    throw new ContainerMergingException("New SignatureContent has clashing name for ContainerDocument!");
                 }
+            }
+        }
+    }
+
+    private void verifyUniqueUnknownFiles(Container container) throws ContainerMergingException {
+        List<String> unknownDocumentPaths = new ArrayList<>();
+        for(UnknownDocument unknownDocument : unknownFiles) {
+            unknownDocumentPaths.add(unknownDocument.getFileName());
+        }
+        for(UnknownDocument unknownDocument : container.getUnknownFiles()) {
+            if(unknownDocumentPaths.contains(unknownDocument.getFileName())) {
+                throw new ContainerMergingException("There are clashing files in the Containers!");
             }
         }
     }

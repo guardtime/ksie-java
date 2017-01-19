@@ -57,7 +57,7 @@ class SignatureContentHandler {
 
     public ZipSignatureContent get(String manifestPath) throws ContentParsingException {
         SignatureContentGroup group = new SignatureContentGroup(manifestPath);
-        ZipSignatureContent signatureContent = new ZipSignatureContent.Builder()
+        ZipSignatureContent signatureContent = (ZipSignatureContent) new ZipSignatureContent.Builder()
                 .withManifest(group.manifest)
                 .withDocumentsManifest(group.documentsManifest)
                 .withAnnotationsManifest(group.annotationsManifest)

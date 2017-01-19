@@ -263,7 +263,7 @@ public class ZipContainerPackagingFactoryBuilder {
                 Manifest manifest = manifestFactory.createManifest(documentsManifest, annotationsManifestPair,
                         Pair.of(nameProvider.nextSignatureName(), signatureFactoryType.getSignatureMimeType()));
 
-                ZipSignatureContent signatureContent = new ZipSignatureContent.Builder()
+                ZipSignatureContent signatureContent = (ZipSignatureContent) new ZipSignatureContent.Builder()
                         .withDocuments(documents)
                         .withDocumentsManifest(documentsManifest)
                         .withAnnotations(annotationPairs)
