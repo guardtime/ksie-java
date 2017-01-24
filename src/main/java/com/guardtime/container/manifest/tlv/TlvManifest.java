@@ -14,13 +14,14 @@ import com.guardtime.ksi.tlv.TLVStructure;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 
 class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
 
-    private static final byte[] MAGIC = "KSIEMFST".getBytes();
+    private static final byte[] MAGIC = "KSIEMFST".getBytes(StandardCharsets.UTF_8);
 
     private TlvDocumentsManifestReference documentsManifestReference;
     private TlvSignatureReference signatureReference;

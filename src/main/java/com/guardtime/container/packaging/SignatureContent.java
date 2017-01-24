@@ -9,6 +9,7 @@ import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,19 +25,17 @@ public class SignatureContent {
     private final Pair<String, Manifest> manifest;
     private final Pair<String, AnnotationsManifest> annotationsManifest;
     private final Map<String, SingleAnnotationManifest> singleAnnotationManifestMap;
-    private Map<String, ContainerAnnotation> annotations;
-    protected ContainerSignature signature;
+    private final Map<String, ContainerAnnotation> annotations;
+    private ContainerSignature signature;
 
-    protected SignatureContent(List<ContainerDocument> documents,
-                               List<Pair<String, ContainerAnnotation>> annotations, Pair<String, DocumentsManifest> documentsManifest,
-                               Pair<String, AnnotationsManifest> annotationsManifest, Pair<String, Manifest> manifest,
-                               List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifestMap) {
-        this.documents = formatDocumentsListToMap(documents);
-        this.annotations = formatAnnotationsListToMap(annotations);
-        this.singleAnnotationManifestMap = formatSingleAnnotationManifestsListToMap(singleAnnotationManifestMap);
-        this.documentsManifest = documentsManifest;
-        this.annotationsManifest = annotationsManifest;
-        this.manifest = manifest;
+    protected SignatureContent(Builder builder) {
+        this.documents = formatDocumentsListToMap(builder.getDocuments());
+        this.annotations = formatAnnotationsListToMap(builder.getAnnotations());
+        this.singleAnnotationManifestMap = formatSingleAnnotationManifestsListToMap(builder.getSingleAnnotationManifestList());
+        this.documentsManifest = builder.getDocumentsManifest();
+        this.annotationsManifest = builder.getAnnotationsManifest();
+        this.manifest = builder.getManifest();
+        this.signature = builder.getSignature();
     }
 
     /**
@@ -45,7 +44,7 @@ public class SignatureContent {
      * @return Map containing the name and the document.
      */
     public Map<String, ContainerDocument> getDocuments() {
-        return documents;
+        return Collections.unmodifiableMap(documents);
     }
 
     /**
@@ -54,7 +53,7 @@ public class SignatureContent {
      * @return Map containing path and annotation where path is used for container management.
      */
     public Map<String, ContainerAnnotation> getAnnotations() {
-        return annotations;
+        return Collections.unmodifiableMap(annotations);
     }
 
     /**
@@ -78,9 +77,8 @@ public class SignatureContent {
     }
 
     public Map<String, SingleAnnotationManifest> getSingleAnnotationManifests() {
-        return singleAnnotationManifestMap;
+        return Collections.unmodifiableMap(singleAnnotationManifestMap);
     }
-
 
     private Map<String, SingleAnnotationManifest> formatSingleAnnotationManifestsListToMap(List<Pair<String, SingleAnnotationManifest>> annotationManifests) {
         Map<String, SingleAnnotationManifest> returnable = new HashMap<>();
@@ -108,12 +106,13 @@ public class SignatureContent {
 
     public static class Builder {
 
-        protected List<ContainerDocument> documents;
-        protected List<Pair<String, ContainerAnnotation>> annotations;
-        protected Pair<String, DocumentsManifest> documentsManifest;
-        protected Pair<String, AnnotationsManifest> annotationsManifest;
-        protected Pair<String, Manifest> manifest;
-        protected List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifests;
+        private List<ContainerDocument> documents;
+        private List<Pair<String, ContainerAnnotation>> annotations;
+        private Pair<String, DocumentsManifest> documentsManifest;
+        private Pair<String, AnnotationsManifest> annotationsManifest;
+        private Pair<String, Manifest> manifest;
+        private List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifests;
+        private ContainerSignature signature;
 
         public Builder withDocuments(List<ContainerDocument> documents) {
             this.documents = documents;
@@ -145,8 +144,41 @@ public class SignatureContent {
             return this;
         }
 
+        public Builder withSignature(ContainerSignature signature) {
+            this.signature = signature;
+            return this;
+        }
+
         public SignatureContent build() {
-            return new SignatureContent(documents, annotations, documentsManifest, annotationsManifest, manifest, singleAnnotationManifests);
+            return new SignatureContent(this);
+        }
+
+        public List<ContainerDocument> getDocuments() {
+            return documents;
+        }
+
+        public List<Pair<String,ContainerAnnotation>> getAnnotations() {
+            return annotations;
+        }
+
+        public List<Pair<String,SingleAnnotationManifest>> getSingleAnnotationManifestList() {
+            return singleAnnotationManifests;
+        }
+
+        public Pair<String,DocumentsManifest> getDocumentsManifest() {
+            return documentsManifest;
+        }
+
+        public Pair<String,AnnotationsManifest> getAnnotationsManifest() {
+            return annotationsManifest;
+        }
+
+        public Pair<String,Manifest> getManifest() {
+            return manifest;
+        }
+
+        public ContainerSignature getSignature() {
+            return signature;
         }
     }
 

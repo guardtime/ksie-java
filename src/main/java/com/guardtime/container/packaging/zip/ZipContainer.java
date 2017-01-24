@@ -21,13 +21,14 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 import java.util.zip.ZipEntry;
@@ -42,7 +43,7 @@ class ZipContainer implements Container {
     private List<UnknownDocument> unknownFiles = new LinkedList<>();
 
     public ZipContainer(SignatureContent signatureContent, MimeType mimeType) {
-        this(Collections.singletonList(signatureContent), new LinkedList<UnknownDocument>(), mimeType);
+        this(Collections.singletonList(signatureContent), Collections.<UnknownDocument>emptyList(), mimeType);
     }
 
     public ZipContainer(List<SignatureContent> signatureContents, List<UnknownDocument> unknownFiles, MimeType mimeType) {
@@ -113,35 +114,23 @@ class ZipContainer implements Container {
 
     @Override
     public void add(Container container) throws ContainerMergingException {
-        if(mimeTypesDiffer(container)) {
-            throw new ContainerMergingException("Incompatible Container provided for merging!");
-        }
-        addAll(container.getSignatureContents());
+        verifySameMimeType(container);  
         verifyUniqueUnknownFiles(container);
+        addAll(container.getSignatureContents());
         unknownFiles.addAll(container.getUnknownFiles());
-    }
-
-    private boolean mimeTypesDiffer(Container container) throws ContainerMergingException {
-        try {
-            return !Arrays.equals(
-                    Util.toByteArray(mimeType.getInputStream()),
-                    Util.toByteArray(container.getMimeType().getInputStream())
-            );
-        } catch (IOException e) {
-            throw new ContainerMergingException("Failed to verify container acceptability!", e);
-        }
     }
 
     @Override
     public void addAll(Collection<SignatureContent> contents) throws ContainerMergingException {
-        for (SignatureContent content: contents) {
-            add(content);
+        List<SignatureContent> original = new LinkedList<>(signatureContents);
+        try {
+            for (SignatureContent content : contents) {
+                add(content);
+            }
+        } catch (Exception e) {
+            this.signatureContents = original;
+            throw e;
         }
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        close();
     }
 
     private void writeMimeTypeEntry(ZipOutputStream zipOutputStream) throws IOException {
@@ -220,64 +209,116 @@ class ZipContainer implements Container {
         output.closeEntry();
     }
 
+    private void verifySameMimeType(Container container) throws ContainerMergingException {
+        try {
+            if (!Arrays.equals(
+                    Util.toByteArray(mimeType.getInputStream()),
+                    Util.toByteArray(container.getMimeType().getInputStream())
+            )) {
+                throw new ContainerMergingException("Incompatible Container provided for merging!");
+            }
+        } catch (IOException e) {
+            throw new ContainerMergingException("Failed to verify container acceptability!", e);
+        }
+    }
+
     private void verifyNewSignatureContentIsAcceptable(SignatureContent content) throws ContainerMergingException {
-        if(signatureContents.isEmpty()) {
+        if (signatureContents.isEmpty()) {
             return;
         }
         SignatureContent existingSignatureContent = signatureContents.get(0);
+        verifySameManifestType(content, existingSignatureContent);
+        verifySameSignatureType(content, existingSignatureContent);
+    }
+
+    private void verifySameManifestType(SignatureContent content, SignatureContent existingSignatureContent) throws ContainerMergingException {
         ManifestFactoryType manifestType = existingSignatureContent.getManifest().getRight().getManifestFactoryType();
-        String signatureType = existingSignatureContent.getManifest().getRight().getSignatureReference().getType();
         ManifestFactoryType newManifestFactoryType = content.getManifest().getRight().getManifestFactoryType();
-        String newSignatureType = content.getManifest().getRight().getSignatureReference().getType();
-        if(!manifestType.equals(newManifestFactoryType)) {
+        if (!manifestType.equals(newManifestFactoryType)) {
             throw new ContainerMergingException("New SignatureContent has different manifest type!");
-        } else if(!signatureType.equals(newSignatureType)) {
+        }
+    }
+
+    private void verifySameSignatureType(SignatureContent content, SignatureContent existingSignatureContent) throws ContainerMergingException {
+        String signatureType = existingSignatureContent.getManifest().getRight().getSignatureReference().getType();
+        String newSignatureType = content.getManifest().getRight().getSignatureReference().getType();
+        if (!signatureType.equals(newSignatureType)) {
             throw new ContainerMergingException("New SignatureContent has different signature type!");
         }
     }
 
     private void verifyUniquePaths(SignatureContent content) throws ContainerMergingException {
-        for(SignatureContent existingContent : signatureContents) {
-            String newManifestPath = content.getManifest().getLeft();
-            String newDocumentsManifestPath = content.getDocumentsManifest().getLeft();
-            String newAnnotationsManifestPath = content.getAnnotationsManifest().getLeft();
-            String newSignaturePath = content.getManifest().getRight().getSignatureReference().getUri();
+        for (SignatureContent existingContent : signatureContents) {
+            verifyNonClashingManifestPath(content, existingContent);
+            verifyNonClashingDocumentsManifestPath(content, existingContent);
+            verifyNonClashingAnnotationsManifestPath(content, existingContent);
+            verifyNonClashingSignaturePath(content, existingContent);
+            verifyNonClashingSignaleAnnotationManifestPaths(content, existingContent);
+            verifyNonClashingAnnotationPaths(content, existingContent);
+            verifyNonClashingContainerDocuments(content, existingContent);
+        }
+    }
 
-            if(existingContent.getManifest().getLeft().equals(newManifestPath)) {
-                throw new ContainerMergingException("New SignatureContent has clashing name for Manifest!");
-            } else if(existingContent.getDocumentsManifest().getLeft().equals(newDocumentsManifestPath)) {
-                throw new ContainerMergingException("New SignatureContent has clashing name for DocumentsManifest!");
-            } else if(existingContent.getAnnotationsManifest().getLeft().equals(newAnnotationsManifestPath)) {
-                throw new ContainerMergingException("New SignatureContent has clashing name for AnnotationsManifest!");
-            } else if(existingContent.getManifest().getRight().getSignatureReference().getUri().equals(newSignaturePath)) {
-                throw new ContainerMergingException("New SignatureContent has clashing name for signature!");
+    private void verifyNonClashingManifestPath(SignatureContent content, SignatureContent existingContent) throws ContainerMergingException {
+        String newManifestPath = content.getManifest().getLeft();
+        if (existingContent.getManifest().getLeft().equals(newManifestPath)) {
+            throw new ContainerMergingException("New SignatureContent has clashing name for Manifest!");
+        }
+    }
+
+    private void verifyNonClashingDocumentsManifestPath(SignatureContent content, SignatureContent existingContent) throws ContainerMergingException {
+        String newDocumentsManifestPath = content.getDocumentsManifest().getLeft();
+        if (existingContent.getDocumentsManifest().getLeft().equals(newDocumentsManifestPath)) {
+            throw new ContainerMergingException("New SignatureContent has clashing name for DocumentsManifest!");
+        }
+    }
+
+    private void verifyNonClashingAnnotationsManifestPath(SignatureContent content, SignatureContent existingContent) throws ContainerMergingException {
+        String newAnnotationsManifestPath = content.getAnnotationsManifest().getLeft();
+        if (existingContent.getAnnotationsManifest().getLeft().equals(newAnnotationsManifestPath)) {
+            throw new ContainerMergingException("New SignatureContent has clashing name for AnnotationsManifest!");
+        }
+    }
+
+    private void verifyNonClashingSignaturePath(SignatureContent content, SignatureContent existingContent) throws ContainerMergingException {
+        String newSignaturePath = content.getManifest().getRight().getSignatureReference().getUri();
+        if (existingContent.getManifest().getRight().getSignatureReference().getUri().equals(newSignaturePath)) {
+            throw new ContainerMergingException("New SignatureContent has clashing name for signature!");
+        }
+    }
+
+    private void verifyNonClashingSignaleAnnotationManifestPaths(SignatureContent content, SignatureContent existingContent) throws ContainerMergingException {
+        for (String singleAnnotationManifestPath : existingContent.getSingleAnnotationManifests().keySet()) {
+            if (content.getSingleAnnotationManifests().containsKey(singleAnnotationManifestPath)) {
+                throw new ContainerMergingException("New SignatureContent has clashing name for SingleAnnotationManifest!");
             }
-            for(String singleAnnotationManifestPath : existingContent.getSingleAnnotationManifests().keySet()) {
-                if(content.getSingleAnnotationManifests().containsKey(singleAnnotationManifestPath)) {
-                    throw new ContainerMergingException("New SignatureContent has clashing name for SingleAnnotationManifest!");
-                }
+        }
+    }
+
+    private void verifyNonClashingAnnotationPaths(SignatureContent content, SignatureContent existingContent) throws ContainerMergingException {
+        for (String annotationPath : existingContent.getAnnotations().keySet()) {
+            if (content.getAnnotations().containsKey(annotationPath)) {
+                throw new ContainerMergingException("New SignatureContent has clashing name for Annotation data!");
             }
-            for(String annotationPath: existingContent.getAnnotations().keySet()) {
-                if(content.getAnnotations().containsKey(annotationPath)) {
-                    throw new ContainerMergingException("New SignatureContent has clashing name for Annotation data!");
-                }
-            }
-            // TODO: when we allow same document paths then refactor this to check that hashes match
-            for(String documentPath: existingContent.getDocuments().keySet()) {
-                if(content.getDocuments().containsKey(documentPath)) {
-                    throw new ContainerMergingException("New SignatureContent has clashing name for ContainerDocument!");
-                }
+        }
+    }
+
+    private void verifyNonClashingContainerDocuments(SignatureContent content, SignatureContent existingContent) throws ContainerMergingException {
+        // TODO: when we allow same document paths then refactor this to check that hashes match
+        for (String documentPath : existingContent.getDocuments().keySet()) {
+            if (content.getDocuments().containsKey(documentPath)) {
+                throw new ContainerMergingException("New SignatureContent has clashing name for ContainerDocument!");
             }
         }
     }
 
     private void verifyUniqueUnknownFiles(Container container) throws ContainerMergingException {
-        List<String> unknownDocumentPaths = new ArrayList<>();
-        for(UnknownDocument unknownDocument : unknownFiles) {
+        Set<String> unknownDocumentPaths = new HashSet<>();
+        for (UnknownDocument unknownDocument : unknownFiles) {
             unknownDocumentPaths.add(unknownDocument.getFileName());
         }
-        for(UnknownDocument unknownDocument : container.getUnknownFiles()) {
-            if(unknownDocumentPaths.contains(unknownDocument.getFileName())) {
+        for (UnknownDocument unknownDocument : container.getUnknownFiles()) {
+            if (unknownDocumentPaths.contains(unknownDocument.getFileName())) {
                 throw new ContainerMergingException("There are clashing files in the Containers!");
             }
         }

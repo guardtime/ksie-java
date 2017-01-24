@@ -43,23 +43,20 @@ public interface Container extends AutoCloseable {
     void close() throws Exception;
 
     /**
-     * Adds the {@link SignatureContent} to this {@link Container} with all {@link com.guardtime.container.document.ContainerDocument}s
-     * that don't clash with existing {@link com.guardtime.container.document.ContainerDocument} file names.
-     * @throws ContainerMergingException when the {@link SignatureContent} can not be added into the {@link Container} for any reason.
+     * Adds the {@link SignatureContent} to this {@link Container}.
+     * @throws ContainerMergingException when the {@link SignatureContent} can not be added into the {@link Container} due to clashing file paths or any other reason.
      */
     void add(SignatureContent content) throws ContainerMergingException;
 
     /**
-     * Adds all {@link SignatureContent}s from input {@link Container} to this {@link Container} with all {@link com.guardtime.container.document.ContainerDocument}s
-     * that don't clash with existing {@link com.guardtime.container.document.ContainerDocument} file names.
-     * @throws ContainerMergingException when any {@link SignatureContent} can not be added into the {@link Container} for any reason.
+     * Adds all {@link SignatureContent}s from input {@link Container}.
+     * @throws ContainerMergingException when any {@link SignatureContent} can not be added into the {@link Container} due to clashing file paths or any other reason.
      */
     void add(Container container) throws ContainerMergingException;
 
     /**
-     * Adds all {@link SignatureContent}s to this {@link Container} with all {@link com.guardtime.container.document.ContainerDocument}s
-     * that don't clash with existing {@link com.guardtime.container.document.ContainerDocument} file names.
-     * @throws ContainerMergingException when any {@link SignatureContent} can not be added into the {@link Container} for any reason.
+     * Adds all {@link SignatureContent}s to this {@link Container}.
+     * @throws ContainerMergingException when any {@link SignatureContent} can not be added into the {@link Container} due to clashing file paths or any other reason.
      */
     void addAll(Collection<SignatureContent> contents) throws ContainerMergingException;
 }

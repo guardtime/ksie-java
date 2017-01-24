@@ -104,11 +104,6 @@ public class StreamContainerDocument implements ContainerDocument {
         this.closed = true;
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        close();
-    }
-
     private void checkClosed() {
         if (closed) {
             throw new IllegalStateException("Can't access closed document!");
