@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -49,7 +50,7 @@ public class KsiSignatureFactoryTest extends AbstractContainerTest {
     @Test
     public void testCreate() throws Exception {
         SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
-        DataHash testHash = new DataHash(HashAlgorithm.SHA2_256, "TestStringTestingStuffLongString".getBytes());
+        DataHash testHash = new DataHash(HashAlgorithm.SHA2_256, "TestStringTestingStuffLongString".getBytes(StandardCharsets.UTF_8));
         ContainerSignature signature = signatureFactory.create(testHash);
         assertNotNull(signature);
     }
@@ -57,7 +58,7 @@ public class KsiSignatureFactoryTest extends AbstractContainerTest {
     @Test
     public void testRead() throws Exception {
         SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
-        ContainerSignature signature = signatureFactory.read(new ByteArrayInputStream("".getBytes()));
+        ContainerSignature signature = signatureFactory.read(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)));
         assertNotNull(signature);
     }
 }

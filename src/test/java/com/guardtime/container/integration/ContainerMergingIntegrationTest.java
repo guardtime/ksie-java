@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -66,7 +67,7 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
 
     private SignatureContent createSignatureContent() throws Exception {
         StreamContainerDocument containerDocument = new StreamContainerDocument(
-                new ByteArrayInputStream(UUID.randomUUID().toString().getBytes()),
+                new ByteArrayInputStream(UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8)),
                 "text/plain",
                 UUID.randomUUID().toString()
         );

@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +89,7 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
     public void testCreateContainer() throws Exception {
         try (
                 Container container = new ContainerBuilder(defaultPackagingFactory)
-                        .withDocument(new ByteArrayInputStream("Test_Data".getBytes()), TEST_FILE_NAME_TEST_TXT, "application/txt")
+                        .withDocument(new ByteArrayInputStream("Test_Data".getBytes(StandardCharsets.UTF_8)), TEST_FILE_NAME_TEST_TXT, "application/txt")
                         .build()
         ) {
             assertSingleContentsWithSingleDocumentWithName(container, TEST_FILE_NAME_TEST_TXT);
@@ -110,7 +111,7 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
         try (
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 Container container = new ContainerBuilder(defaultPackagingFactory)
-                        .withDocument(new ByteArrayInputStream("Test_Data".getBytes()), TEST_FILE_NAME_TEST_TXT, "application/txt")
+                        .withDocument(new ByteArrayInputStream("Test_Data".getBytes(StandardCharsets.UTF_8)), TEST_FILE_NAME_TEST_TXT, "application/txt")
                         .build()
             ) {
                 container.writeTo(bos);

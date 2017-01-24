@@ -37,6 +37,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.util.Collections;
 import java.util.List;
@@ -284,7 +285,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         ContainerVerifier containerVerifier = new ContainerVerifier(verificationPolicy);
 
         String documentName = "Document1.txt";
-        byte[] documentContent = "This is document's content.".getBytes();
+        byte[] documentContent = "This is document's content.".getBytes(StandardCharsets.UTF_8);
         Pair<byte[], String> documents = Pair.of(documentContent, documentName);
         try (
                 ContainerDocument document = new EmptyContainerDocument(

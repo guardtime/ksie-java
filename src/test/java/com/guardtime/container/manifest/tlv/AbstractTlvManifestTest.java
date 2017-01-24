@@ -20,6 +20,7 @@ import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,10 +42,10 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
     protected static final int ANNOTATION_REFERENCE_TYPE = 0xb05;
     protected static final int SIGNATURE_REFERENCE_TYPE = 0xb06;
 
-    protected static final byte[] SINGLE_ANNOTATION_MANIFEST_MAGIC = "KSIEANNT".getBytes();
-    protected static final byte[] ANNOTATIONS_MANIFEST_MAGIC = "KSIEANMF".getBytes();
-    protected static final byte[] DOCUMENTS_MANIFEST_MAGIC = "KSIEDAMF".getBytes();
-    protected static final byte[] SIGNATURE_MANIFEST_MAGIC = "KSIEMFST".getBytes();
+    protected static final byte[] SINGLE_ANNOTATION_MANIFEST_MAGIC = "KSIEANNT".getBytes(StandardCharsets.UTF_8);
+    protected static final byte[] ANNOTATIONS_MANIFEST_MAGIC = "KSIEANMF".getBytes(StandardCharsets.UTF_8);
+    protected static final byte[] DOCUMENTS_MANIFEST_MAGIC = "KSIEDAMF".getBytes(StandardCharsets.UTF_8);
+    protected static final byte[] SIGNATURE_MANIFEST_MAGIC = "KSIEMFST".getBytes(StandardCharsets.UTF_8);
 
     protected static final String ANNOTATIONS_MANIFEST_TYPE = "ksie10/annotmanifest";
     protected static final String DOCUMENTS_MANIFEST_TYPE = "ksie10/datamanifest";

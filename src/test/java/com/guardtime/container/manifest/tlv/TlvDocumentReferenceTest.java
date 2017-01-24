@@ -8,6 +8,7 @@ import com.guardtime.ksi.tlv.TLVElement;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,8 +40,8 @@ public class TlvDocumentReferenceTest extends AbstractTlvManifestTest {
     public void testReadDocumentReferenceWithMultipleHashes() throws Exception {
         List<DataHash> dataHashList = new LinkedList<>();
         dataHashList.add(dataHash);
-        dataHashList.add(new DataHash(HashAlgorithm.SHA2_384, "123456789012345678901234567890123456789012345678".getBytes()));
-        dataHashList.add(new DataHash(HashAlgorithm.SHA2_512, "1234567890123456789012345678909812345678901234567890123456789098".getBytes()));
+        dataHashList.add(new DataHash(HashAlgorithm.SHA2_384, "123456789012345678901234567890123456789012345678".getBytes(StandardCharsets.UTF_8)));
+        dataHashList.add(new DataHash(HashAlgorithm.SHA2_512, "1234567890123456789012345678909812345678901234567890123456789098".getBytes(StandardCharsets.UTF_8)));
         TLVElement element = createReference(DOCUMENT_REFERENCE_TYPE, TEST_FILE_NAME_TEST_TXT, MIME_TYPE_APPLICATION_TXT, dataHashList);
         TlvDocumentReference reference = new TlvDocumentReference(element);
         assertEquals(TEST_FILE_NAME_TEST_TXT, reference.getUri());

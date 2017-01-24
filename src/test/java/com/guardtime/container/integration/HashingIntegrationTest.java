@@ -25,6 +25,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,7 +41,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     private static final String CONTAINER_DOCUMENT_MIME_TYPE = "Stream";
     private static final String INPUT_STREAM_STRING = "Input from stream.";
     private final ContainerAnnotation CONTAINER_ANNOTATION = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, CONTAINER_ANNOTATION_CONTENT, CONTAINER_ANNOTATION_TYPE_DOMAIN);
-    private final ContainerDocument CONTAINER_DOCUMENT = new StreamContainerDocument(new ByteArrayInputStream(INPUT_STREAM_STRING.getBytes()), CONTAINER_DOCUMENT_MIME_TYPE, CONTAINER_DOCUMENT_FILE_NAME);
+    private final ContainerDocument CONTAINER_DOCUMENT = new StreamContainerDocument(new ByteArrayInputStream(INPUT_STREAM_STRING.getBytes(StandardCharsets.UTF_8)), CONTAINER_DOCUMENT_MIME_TYPE, CONTAINER_DOCUMENT_FILE_NAME);
     private Container container;
 
     @After

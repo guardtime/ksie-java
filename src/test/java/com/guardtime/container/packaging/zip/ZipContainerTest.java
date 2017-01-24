@@ -11,6 +11,7 @@ import com.guardtime.container.packaging.ContainerPackagingFactory;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import static java.util.Collections.singletonList;
@@ -61,7 +62,7 @@ public class ZipContainerTest extends AbstractContainerTest {
             assertEquals(1, container.getSignatureContents().size());
             try (Container newContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<>())) {
                 StreamContainerDocument containerDocument =
-                        new StreamContainerDocument(new ByteArrayInputStream("auh".getBytes()), "text/plain", "someTestFile.txt");
+                        new StreamContainerDocument(new ByteArrayInputStream("auh".getBytes(StandardCharsets.UTF_8)), "text/plain", "someTestFile.txt");
                 packagingFactory.create(newContainer, singletonList(containerDocument), new ArrayList<>());
                 container.add(newContainer);
                 assertEquals(newContainer.getSignatureContents().size() + 1, container.getSignatureContents().size());
