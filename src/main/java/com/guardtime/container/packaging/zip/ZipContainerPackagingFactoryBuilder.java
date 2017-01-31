@@ -100,26 +100,6 @@ public class ZipContainerPackagingFactoryBuilder {
         return new ZipContainerPackagingFactory(this);
     }
 
-    public SignatureFactory getSignatureFactory() {
-        return signatureFactory;
-    }
-
-    public ContainerManifestFactory getManifestFactory() {
-        return manifestFactory;
-    }
-
-    public IndexProviderFactory getIndexProviderFactory() {
-        return indexProviderFactory;
-    }
-
-    public ParsingStoreFactory getParsingStoreFactory() {
-        return parsingStoreFactory;
-    }
-
-    public boolean getDisableInternalVerification() {
-        return disableInternalVerification;
-    }
-
 
     private static class ZipContainerPackagingFactory implements ContainerPackagingFactory<ZipContainer> {
         private static final String CONTAINER_MIME_TYPE = "application/guardtime.ksie10+zip";
@@ -131,15 +111,15 @@ public class ZipContainerPackagingFactoryBuilder {
         private final ParsingStoreFactory parsingStoreFactory;
 
         private ZipContainerPackagingFactory(ZipContainerPackagingFactoryBuilder builder) {
-            Util.notNull(builder.getSignatureFactory(), "Signature factory");
-            Util.notNull(builder.getManifestFactory(), "Manifest factory");
-            Util.notNull(builder.getIndexProviderFactory(), "Index provider factory");
-            Util.notNull(builder.getParsingStoreFactory(), "Parsing store factory");
-            this.signatureFactory = builder.getSignatureFactory();
-            this.manifestFactory = builder.getManifestFactory();
-            this.indexProviderFactory = builder.getIndexProviderFactory();
-            this.disableVerification = builder.getDisableInternalVerification();
-            this.parsingStoreFactory = builder.getParsingStoreFactory();
+            Util.notNull(builder.signatureFactory, "Signature factory");
+            Util.notNull(builder.manifestFactory, "Manifest factory");
+            Util.notNull(builder.indexProviderFactory, "Index provider factory");
+            Util.notNull(builder.parsingStoreFactory, "Parsing store factory");
+            this.signatureFactory = builder.signatureFactory;
+            this.manifestFactory = builder.manifestFactory;
+            this.indexProviderFactory = builder.indexProviderFactory;
+            this.disableVerification = builder.disableInternalVerification;
+            this.parsingStoreFactory = builder.parsingStoreFactory;
             logger.info("Zip container factory initialized");
         }
 

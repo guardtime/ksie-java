@@ -29,13 +29,13 @@ public class SignatureContent {
     private ContainerSignature signature;
 
     protected SignatureContent(Builder builder) {
-        this.documents = formatDocumentsListToMap(builder.getDocuments());
-        this.annotations = formatAnnotationsListToMap(builder.getAnnotations());
-        this.singleAnnotationManifestMap = formatSingleAnnotationManifestsListToMap(builder.getSingleAnnotationManifestList());
-        this.documentsManifest = builder.getDocumentsManifest();
-        this.annotationsManifest = builder.getAnnotationsManifest();
-        this.manifest = builder.getManifest();
-        this.signature = builder.getSignature();
+        this.documents = formatDocumentsListToMap(builder.documents);
+        this.annotations = formatAnnotationsListToMap(builder.annotations);
+        this.singleAnnotationManifestMap = formatSingleAnnotationManifestsListToMap(builder.singleAnnotationManifests);
+        this.documentsManifest = builder.documentsManifest;
+        this.annotationsManifest = builder.annotationsManifest;
+        this.manifest = builder.manifest;
+        this.signature = builder.signature;
     }
 
     /**
@@ -151,34 +151,6 @@ public class SignatureContent {
 
         public SignatureContent build() {
             return new SignatureContent(this);
-        }
-
-        public List<ContainerDocument> getDocuments() {
-            return documents;
-        }
-
-        public List<Pair<String,ContainerAnnotation>> getAnnotations() {
-            return annotations;
-        }
-
-        public List<Pair<String,SingleAnnotationManifest>> getSingleAnnotationManifestList() {
-            return singleAnnotationManifests;
-        }
-
-        public Pair<String,DocumentsManifest> getDocumentsManifest() {
-            return documentsManifest;
-        }
-
-        public Pair<String,AnnotationsManifest> getAnnotationsManifest() {
-            return annotationsManifest;
-        }
-
-        public Pair<String,Manifest> getManifest() {
-            return manifest;
-        }
-
-        public ContainerSignature getSignature() {
-            return signature;
         }
     }
 
