@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class EmptyContainerDocumentTest extends AbstractContainerTest {
 
     @Before
     public void setUp() {
-        hash = Util.hash(new ByteArrayInputStream("".getBytes()), HashAlgorithm.SHA2_256);
+        hash = Util.hash(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)), HashAlgorithm.SHA2_256);
         document = new EmptyContainerDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, Arrays.asList(hash));
     }
 
@@ -92,7 +93,7 @@ public class EmptyContainerDocumentTest extends AbstractContainerTest {
     public void testGetDataHashListForNotPresentAlgorithm() throws Exception {
         expectedException.expect(DataHashException.class);
         expectedException.expectMessage("Could not find any pre-generated hashes for requested algorithms!");
-        List<DataHash> hashes = Arrays.asList(Util.hash(new ByteArrayInputStream("".getBytes()), HashAlgorithm.SHA2_256));
+        List<DataHash> hashes = Arrays.asList(Util.hash(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)), HashAlgorithm.SHA2_256));
         ContainerDocument doc = new EmptyContainerDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, hashes);
         doc.getDataHashList(Arrays.asList(HashAlgorithm.RIPEMD_160));
     }

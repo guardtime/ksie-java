@@ -91,7 +91,7 @@ class ZipContainerReader {
                 }
             }
         }
-        List<ZipSignatureContent> contents = buildSignatures(readingException);
+        List<SignatureContent> contents = buildSignatures(readingException);
         MimeType mimeType = getMimeType();
         List<UnknownDocument> unknownFiles = getUnknownFiles(readingException);
         ZipContainer zipContainer = new ZipContainer(contents, unknownFiles, mimeType, parsingStore);
@@ -107,7 +107,7 @@ class ZipContainerReader {
         return zipContainer;
     }
 
-    private boolean containsValidContents(List<ZipSignatureContent> signatureContents) {
+    private boolean containsValidContents(List<SignatureContent> signatureContents) {
         for (SignatureContent content : signatureContents) {
             if (containsManifest(content) ||
                     containsOrContainedDocuments(content) ||
@@ -183,12 +183,12 @@ class ZipContainerReader {
         unknownFileHandler.add(name, zipInput);
     }
 
-    private List<ZipSignatureContent> buildSignatures(ContainerReadingException readingException) {
+    private List<SignatureContent> buildSignatures(ContainerReadingException readingException) {
         Set<String> parsedManifestUriSet = manifestHandler.getNames();
-        List<ZipSignatureContent> signatures = new LinkedList<>();
+        List<SignatureContent> signatures = new LinkedList<>();
         for (String manifestUri : parsedManifestUriSet) {
             try {
-                Pair<ZipSignatureContent, List<Throwable>> zipSignatureContentVectorPair = signatureContentHandler.get(manifestUri);
+                Pair<SignatureContent, List<Throwable>> zipSignatureContentVectorPair = signatureContentHandler.get(manifestUri);
                 signatures.add(zipSignatureContentVectorPair.getLeft());
                 readingException.addExceptions(zipSignatureContentVectorPair.getRight());
             } catch (ContentParsingException e) {

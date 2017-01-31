@@ -12,6 +12,7 @@ import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
+import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.parsing.ParsingStore;
 import com.guardtime.container.packaging.zip.handler.AnnotationContentHandler;
 import com.guardtime.container.packaging.zip.handler.AnnotationsManifestHandler;
@@ -51,18 +52,18 @@ class SignatureContentHandler {
         this.signatureHandler = signatureHandler;
     }
 
-    public Pair<ZipSignatureContent, List<Throwable>> get(String manifestPath) throws ContentParsingException {
+    public Pair<SignatureContent, List<Throwable>> get(String manifestPath) throws ContentParsingException {
         SignatureContentGroup group = new SignatureContentGroup(manifestPath);
-        ZipSignatureContent signatureContent = new ZipSignatureContent.Builder()
+        SignatureContent signatureContent = new SignatureContent.Builder()
                 .withManifest(group.manifest)
                 .withDocumentsManifest(group.documentsManifest)
                 .withAnnotationsManifest(group.annotationsManifest)
                 .withSingleAnnotationManifests(group.singleAnnotationManifests)
                 .withDocuments(group.documents)
                 .withAnnotations(group.annotations)
+                .withSignature(group.signature)
                 .build();
 
-        signatureContent.setSignature(group.signature);
         return Pair.of(signatureContent, group.exceptions);
     }
 

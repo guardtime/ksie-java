@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -28,7 +29,7 @@ public class MimeTypeIntegrityRuleTest extends AbstractContainerTest {
     private ContainerPackagingFactory mockedPackagingFactory;
 
     private Rule rule;
-    private byte[] mimetypeContent = "someValueAsMimetype".getBytes();
+    private byte[] mimetypeContent = "someValueAsMimetype".getBytes(StandardCharsets.UTF_8);
 
     @Before
     public void setUpRule() {
@@ -40,7 +41,7 @@ public class MimeTypeIntegrityRuleTest extends AbstractContainerTest {
     public void testVerifyInvalidMimetypeContent_ThrowsRuleTerminatingException() throws Exception {
         expectedException.expect(RuleTerminatingException.class);
         expectedException.expectMessage("MIME type integrity could not be verified for");
-        MimeType mockMimetype = getMimeType("NotTheMimeTypeValue".getBytes());
+        MimeType mockMimetype = getMimeType("NotTheMimeTypeValue".getBytes(StandardCharsets.UTF_8));
         Container mockContainer = Mockito.mock(Container.class);
         when(mockContainer.getMimeType()).thenReturn(mockMimetype);
         rule.verify(new ResultHolder(), mockContainer);

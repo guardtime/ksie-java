@@ -13,6 +13,7 @@ import com.guardtime.ksi.tlv.TLVParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ import java.util.Set;
 
 class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements AnnotationsManifest {
 
-    private static final byte[] MAGIC = "KSIEANMF".getBytes();
+    private static final byte[] MAGIC = "KSIEANMF".getBytes(StandardCharsets.UTF_8);
 
     private List<TlvSingleAnnotationManifestReference> singleAnnotationManifestReferences = new LinkedList<>();
 

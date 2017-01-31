@@ -11,12 +11,13 @@ import com.guardtime.ksi.tlv.TLVParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
 class TlvDocumentsManifest extends AbstractTlvManifestStructure implements DocumentsManifest {
 
-    private static final byte[] MAGIC = "KSIEDAMF".getBytes();
+    private static final byte[] MAGIC = "KSIEDAMF".getBytes(StandardCharsets.UTF_8);
 
     private List<TlvDocumentReference> documents = new LinkedList<>();
 

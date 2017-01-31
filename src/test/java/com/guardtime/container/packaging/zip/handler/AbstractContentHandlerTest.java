@@ -14,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -50,10 +51,10 @@ public abstract class AbstractContentHandlerTest {
         String unrequestedFileName = "awesomesouce2.txt";
         String unrequestedStreamContent = "TooAwesomeToBeUsed";
 
-        InputStream mockStream = new ByteArrayInputStream(requestedStreamContent.getBytes());
+        InputStream mockStream = new ByteArrayInputStream(requestedStreamContent.getBytes(StandardCharsets.UTF_8));
         handler.add(requestedFileName, mockStream);
         mockStream.close();
-        mockStream = new ByteArrayInputStream(unrequestedStreamContent.getBytes());
+        mockStream = new ByteArrayInputStream(unrequestedStreamContent.getBytes(StandardCharsets.UTF_8));
         handler.add(unrequestedFileName, mockStream);
         handler.get(requestedFileName);
 
@@ -63,7 +64,7 @@ public abstract class AbstractContentHandlerTest {
         assertFalse(doc.getFileName().equals(requestedFileName));
         assertTrue(doc.getFileName().equals(unrequestedFileName));
         try(InputStream inputStream = doc.getInputStream()) {
-            Arrays.equals(unrequestedStreamContent.getBytes(), toByteArray(inputStream));
+            Arrays.equals(unrequestedStreamContent.getBytes(StandardCharsets.UTF_8), toByteArray(inputStream));
         }
     }
 

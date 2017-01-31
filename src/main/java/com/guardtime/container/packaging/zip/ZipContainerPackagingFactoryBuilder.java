@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -96,11 +97,11 @@ public class ZipContainerPackagingFactoryBuilder {
     }
 
     public ContainerPackagingFactory<ZipContainer> build() {
-        return new ZipContainerPackagingFactory(signatureFactory, manifestFactory, indexProviderFactory, disableInternalVerification, parsingStoreFactory);
+        return new ZipContainerPackagingFactory(this);
     }
 
 
-    private class ZipContainerPackagingFactory implements ContainerPackagingFactory<ZipContainer> {
+    private static class ZipContainerPackagingFactory implements ContainerPackagingFactory<ZipContainer> {
         private static final String CONTAINER_MIME_TYPE = "application/guardtime.ksie10+zip";
 
         private final SignatureFactory signatureFactory;
@@ -109,16 +110,16 @@ public class ZipContainerPackagingFactoryBuilder {
         private final boolean disableVerification;
         private final ParsingStoreFactory parsingStoreFactory;
 
-        private ZipContainerPackagingFactory(SignatureFactory signatureFactory, ContainerManifestFactory manifestFactory, IndexProviderFactory indexProviderFactory, boolean disableVerification, ParsingStoreFactory parsingStoreFactory) {
-            Util.notNull(signatureFactory, "Signature factory");
-            Util.notNull(manifestFactory, "Manifest factory");
-            Util.notNull(indexProviderFactory, "Index provider factory");
-            Util.notNull(parsingStoreFactory, "Parsing store factory");
-            this.signatureFactory = signatureFactory;
-            this.manifestFactory = manifestFactory;
-            this.indexProviderFactory = indexProviderFactory;
-            this.disableVerification = disableVerification;
-            this.parsingStoreFactory = parsingStoreFactory;
+        private ZipContainerPackagingFactory(ZipContainerPackagingFactoryBuilder builder) {
+            Util.notNull(builder.signatureFactory, "Signature factory");
+            Util.notNull(builder.manifestFactory, "Manifest factory");
+            Util.notNull(builder.indexProviderFactory, "Index provider factory");
+            Util.notNull(builder.parsingStoreFactory, "Parsing store factory");
+            this.signatureFactory = builder.signatureFactory;
+            this.manifestFactory = builder.manifestFactory;
+            this.indexProviderFactory = builder.indexProviderFactory;
+            this.disableVerification = builder.disableInternalVerification;
+            this.parsingStoreFactory = builder.parsingStoreFactory;
             logger.info("Zip container factory initialized");
         }
 
@@ -140,8 +141,9 @@ public class ZipContainerPackagingFactoryBuilder {
             Util.notEmpty(files, "Document files");
             try {
                 verifyNoDuplicateDocumentNames(new HashSet<>(files));
-                ContentSigner signer = new ContentSigner(files, annotations, indexProviderFactory.create());
-                ZipSignatureContent signatureContent = signer.sign();
+                ContentSigner signer =
+                        new ContentSigner(files, annotations, indexProviderFactory.create(), manifestFactory, signatureFactory);
+                SignatureContent signatureContent = signer.sign();
                 MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
                 ZipContainer zipContainer = new ZipContainer(signatureContent, mimeType);
                 verifyContainer(zipContainer);
@@ -154,7 +156,7 @@ public class ZipContainerPackagingFactoryBuilder {
         }
 
         public byte[] getMimeTypeContent() {
-            return CONTAINER_MIME_TYPE.getBytes(Charset.forName("UTF-8"));
+            return CONTAINER_MIME_TYPE.getBytes(StandardCharsets.UTF_8);
         }
 
         @Override
@@ -171,12 +173,18 @@ public class ZipContainerPackagingFactoryBuilder {
 
             try {
                 ZipContainer existingZipContainer = (ZipContainer) existingContainer;
-                ContentSigner signer = new ContentSigner(files, annotations, indexProviderFactory.create(existingContainer));
-                ZipSignatureContent signatureContent = signer.sign();
-                List<ZipSignatureContent> contents = new LinkedList<>(existingZipContainer.getSignatureContents());
+                IndexProvider indexProvider = indexProviderFactory.create(existingContainer);
+                ContentSigner signer = new ContentSigner(files, annotations, indexProvider, manifestFactory, signatureFactory);
+                SignatureContent signatureContent = signer.sign();
+                List<SignatureContent> contents = new LinkedList<>(existingZipContainer.getSignatureContents());
                 contents.add(signatureContent);
                 ParsingStore store = getParsingStore();
-                ZipContainer zipContainer = new ZipContainer(contents, getCopies(existingContainer.getUnknownFiles(), store), existingContainer.getMimeType(), store);
+                ZipContainer zipContainer = new ZipContainer(
+                        contents,
+                        getCopies(existingContainer.getUnknownFiles(), store),
+                        existingContainer.getMimeType(),
+                        store
+                );
                 verifyContainer(zipContainer);
                 return zipContainer;
             } catch (IOException | DataHashException | InvalidManifestException e) {
@@ -231,55 +239,63 @@ public class ZipContainerPackagingFactoryBuilder {
             return parsingStoreFactory.create();
         }
 
-        class ContentSigner {
+        private static class ContentSigner {
 
             private List<ContainerDocument> documents;
             private List<ContainerAnnotation> annotations;
             private EntryNameProvider nameProvider;
+            private ContainerManifestFactory manifestFactory;
+            private SignatureFactory signatureFactory;
 
             private List<Pair<String, ContainerAnnotation>> annotationPairs = new LinkedList<>();
             private List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifestPairs = new LinkedList<>();
             private Map<String, Pair<ContainerAnnotation, SingleAnnotationManifest>> annotationsManifestContent = new HashMap<>();
 
-            public ContentSigner(List<ContainerDocument> documents, List<ContainerAnnotation> annotations, IndexProvider indexProvider) {
+            public ContentSigner(List<ContainerDocument> documents, List<ContainerAnnotation> annotations,
+                                 IndexProvider indexProvider, ContainerManifestFactory manifestFactory, SignatureFactory signatureFactory) {
                 this.documents = documents;
                 this.annotations = annotations;
 
-                String manifestFileExtension = manifestFactory.getManifestFactoryType().getManifestFileExtension();
-                String signatureFileExtension = signatureFactory.getSignatureFactoryType().getSignatureFileExtension();
-                this.nameProvider = new EntryNameProvider(manifestFileExtension, signatureFileExtension, indexProvider);
+                this.manifestFactory = manifestFactory;
+                this.signatureFactory = signatureFactory;
+                this.nameProvider = new EntryNameProvider(
+                        manifestFactory.getManifestFactoryType().getManifestFileExtension(),
+                        signatureFactory.getSignatureFactoryType().getSignatureFileExtension(),
+                        indexProvider
+                );
             }
 
-            public ZipSignatureContent sign() throws InvalidManifestException, SignatureException, DataHashException {
+            public SignatureContent sign() throws InvalidManifestException, SignatureException, DataHashException {
                 ManifestFactoryType manifestFactoryType = manifestFactory.getManifestFactoryType();
                 SignatureFactoryType signatureFactoryType = signatureFactory.getSignatureFactoryType();
                 logger.info("'{}' is used to create and read container manifests", manifestFactoryType.getName());
                 logger.info("'{}' is used to create and read container signatures", signatureFactoryType.getName());
-                Pair<String, DocumentsManifest> documentsManifest = Pair.of(nameProvider.nextDocumentsManifestName(), manifestFactory.createDocumentsManifest(documents));
+                Pair<String, DocumentsManifest> documentsManifest =
+                        Pair.of(nameProvider.nextDocumentsManifestName(), manifestFactory.createDocumentsManifest(documents));
                 processAnnotations(documentsManifest);
                 AnnotationsManifest annotationsManifest = manifestFactory.createAnnotationsManifest(annotationsManifestContent);
-                Pair<String, AnnotationsManifest> annotationsManifestPair = Pair.of(nameProvider.nextAnnotationsManifestName(), annotationsManifest);
+                Pair<String, AnnotationsManifest> annotationsManifestPair =
+                        Pair.of(nameProvider.nextAnnotationsManifestName(), annotationsManifest);
 
                 Manifest manifest = manifestFactory.createManifest(documentsManifest, annotationsManifestPair,
                         Pair.of(nameProvider.nextSignatureName(), signatureFactoryType.getSignatureMimeType()));
 
-                ZipSignatureContent signatureContent = new ZipSignatureContent.Builder()
+
+                DataHash hash = getSignatureContentSigningHash(manifest);
+                ContainerSignature signature = signatureFactory.create(hash);
+                SignatureContent signatureContent = new SignatureContent.Builder()
                         .withDocuments(documents)
                         .withDocumentsManifest(documentsManifest)
                         .withAnnotations(annotationPairs)
                         .withSingleAnnotationManifests(singleAnnotationManifestPairs)
                         .withAnnotationsManifest(annotationsManifestPair)
                         .withManifest(Pair.of(nameProvider.nextManifestName(), manifest))
+                        .withSignature(signature)
                         .build();
-
-                DataHash hash = getSignatureContentSigningHash(signatureContent);
-                ContainerSignature signature = signatureFactory.create(hash);
-                signatureContent.setSignature(signature);
                 return signatureContent;
             }
 
-            private DataHash getSignatureContentSigningHash(ZipSignatureContent signatureContent) throws DataHashException {
-                Manifest manifest = signatureContent.getManifest().getRight();
+            private DataHash getSignatureContentSigningHash(Manifest manifest) throws DataHashException {
                 HashAlgorithmProvider algorithmProvider = manifestFactory.getHashAlgorithmProvider();
                 return manifest.getDataHash(algorithmProvider.getSigningHashAlgorithm());
             }
@@ -289,9 +305,11 @@ public class ZipContainerPackagingFactoryBuilder {
                     return;
                 }
                 for (ContainerAnnotation annotation : annotations) {
-                    Pair<String, ContainerAnnotation> annotationPair = Pair.of(nameProvider.nextAnnotationDataFileName(), annotation);
+                    Pair<String, ContainerAnnotation> annotationPair =
+                            Pair.of(nameProvider.nextAnnotationDataFileName(), annotation);
                     annotationPairs.add(annotationPair);
-                    SingleAnnotationManifest singleAnnotationManifest = manifestFactory.createSingleAnnotationManifest(documentsManifest, annotationPair);
+                    SingleAnnotationManifest singleAnnotationManifest =
+                            manifestFactory.createSingleAnnotationManifest(documentsManifest, annotationPair);
                     String annotationManifestName = nameProvider.nextSingleAnnotationManifestName();
                     singleAnnotationManifestPairs.add(Pair.of(annotationManifestName, singleAnnotationManifest));
                     annotationsManifestContent.put(annotationManifestName, Pair.of(annotation, singleAnnotationManifest));

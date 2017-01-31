@@ -4,6 +4,7 @@ package com.guardtime.container.annotation;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import static com.guardtime.container.util.Util.notNull;
 
@@ -22,6 +23,6 @@ public class StringContainerAnnotation extends AbstractContainerAnnotation {
 
     @Override
     public InputStream getInputStream() {
-        return new ByteArrayInputStream(content.getBytes(Charset.forName("UTF-8")));
+        return new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
     }
 }

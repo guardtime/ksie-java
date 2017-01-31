@@ -15,13 +15,14 @@ import com.guardtime.ksi.tlv.TLVStructure;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 
 class TlvSingleAnnotationManifest extends AbstractTlvManifestStructure implements SingleAnnotationManifest {
 
-    private static final byte[] MAGIC = "KSIEANNT".getBytes();
+    private static final byte[] MAGIC = "KSIEANNT".getBytes(StandardCharsets.UTF_8);
 
     private TlvAnnotationDataReference annotationReference;
     private TlvDocumentsManifestReference documentsManifestReference;

@@ -2,6 +2,8 @@ package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.manifest.ManifestFactoryType;
 
+import java.util.Objects;
+
 class TlvManifestFactoryType implements ManifestFactoryType {
 
     private final String name;
@@ -30,4 +32,17 @@ class TlvManifestFactoryType implements ManifestFactoryType {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TlvManifestFactoryType that = (TlvManifestFactoryType) o;
+        return Objects.equals(name, that.name) &&
+                Objects.equals(manifestFileExtension, that.manifestFileExtension);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, manifestFileExtension);
+    }
 }

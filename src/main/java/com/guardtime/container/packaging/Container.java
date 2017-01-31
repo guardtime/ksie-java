@@ -4,6 +4,7 @@ import com.guardtime.container.document.UnknownDocument;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ public interface Container extends AutoCloseable {
     /**
      * Returns list of {@link SignatureContent} contained in this container.
      */
-    List<? extends SignatureContent> getSignatureContents();
+    List<SignatureContent> getSignatureContents();
 
     /**
      * Writes data to provided stream.
@@ -40,4 +41,22 @@ public interface Container extends AutoCloseable {
      */
     @Override
     void close() throws Exception;
+
+    /**
+     * Adds the {@link SignatureContent} to this {@link Container}.
+     * @throws ContainerMergingException when the {@link SignatureContent} can not be added into the {@link Container} due to clashing file paths or any other reason.
+     */
+    void add(SignatureContent content) throws ContainerMergingException;
+
+    /**
+     * Adds all {@link SignatureContent}s from input {@link Container}.
+     * @throws ContainerMergingException when any {@link SignatureContent} can not be added into the {@link Container} due to clashing file paths or any other reason.
+     */
+    void add(Container container) throws ContainerMergingException;
+
+    /**
+     * Adds all {@link SignatureContent}s to this {@link Container}.
+     * @throws ContainerMergingException when any {@link SignatureContent} can not be added into the {@link Container} due to clashing file paths or any other reason.
+     */
+    void addAll(Collection<SignatureContent> contents) throws ContainerMergingException;
 }
