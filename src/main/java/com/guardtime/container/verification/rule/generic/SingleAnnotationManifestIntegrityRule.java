@@ -23,11 +23,11 @@ import java.util.Map;
 public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
     private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION.getName();
-    private final MultiHashElementIntegrityRule integrityRule;
+    private final MultiHashElementIntegrityRule multiHashElementIntegrityRule;
 
     public SingleAnnotationManifestIntegrityRule(RuleStateProvider stateProvider) {
         super(stateProvider.getStateForRule(NAME));
-        integrityRule = new MultiHashElementIntegrityRule(stateProvider.getStateForRule(NAME), NAME);
+        multiHashElementIntegrityRule = new MultiHashElementIntegrityRule(stateProvider.getStateForRule(NAME), NAME);
     }
 
     @Override
@@ -35,10 +35,13 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<Sig
         FileReference reference = verifiable.getRight();
 
         Map<String, SingleAnnotationManifest> singleAnnotationManifests = verifiable.getLeft().getSingleAnnotationManifests();
-        MultiHashElement manifest = singleAnnotationManifests.get(reference.getUri());
+        SingleAnnotationManifest manifest = singleAnnotationManifests.get(reference.getUri());
+        MultiHashElement documentsManifest = verifiable.getLeft().getDocumentsManifest().getRight();
+        FileReference documentsManifestReference = manifest.getDocumentsManifestReference();
         ResultHolder tempHolder = new ResultHolder();
         try {
-            integrityRule.verify(tempHolder, Pair.of(manifest, reference));
+            multiHashElementIntegrityRule.verify(tempHolder, Pair.of((MultiHashElement) manifest, reference));
+            multiHashElementIntegrityRule.verifyRule(tempHolder, Pair.of(documentsManifest, documentsManifestReference));
         } finally {
             RuleState ruleState = getRuleState(reference);
             for (RuleVerificationResult result : tempHolder.getResults()) {
