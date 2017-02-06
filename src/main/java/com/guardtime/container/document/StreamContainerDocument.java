@@ -64,13 +64,6 @@ public class StreamContainerDocument implements ContainerDocument {
         return !closed;
     }
 
-    @Override
-    public String toString() {
-        return "{type=Stream" +
-                ", fileName=" + containerDocument.getFileName() +
-                ", mimeType=" + containerDocument.getMimeType() + "}";
-    }
-
     protected File copy(InputStream input) {
         try {
             File tempFile = createTempFile();

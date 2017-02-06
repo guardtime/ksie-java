@@ -44,4 +44,11 @@ public abstract class AbstractRule<O> implements Rule<O> {
     public String getErrorMessage() {
         return null;
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().toString() + " {" +
+                "name= \'" + getName() + '\'' +
+                ", state= \'" + state + "\'}";
+    }
 }

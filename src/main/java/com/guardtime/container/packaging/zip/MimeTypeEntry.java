@@ -4,6 +4,7 @@ import com.guardtime.container.packaging.MimeType;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 
 class MimeTypeEntry implements MimeType {
 
@@ -23,4 +24,10 @@ class MimeTypeEntry implements MimeType {
         return new ByteArrayInputStream(content);
     }
 
+    @Override
+    public String toString() {
+        return this.getClass().toString() + " {" +
+                "uri= \'" + uri + '\'' +
+                ", content= \'" + new String(content) + "\'}";
+    }
 }

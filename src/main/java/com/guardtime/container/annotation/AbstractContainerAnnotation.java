@@ -59,9 +59,9 @@ public abstract class AbstractContainerAnnotation implements ContainerAnnotation
     @Override
     public String toString() {
         return this.getClass().toString() +
-                " {type=\'" + type.getContent() + "\'" +
-                ", domain=\'" + domain + "\'" +
-                ", content=\'" + getContent() + "\'}";
+                " {type= \'" + type.getContent() + "\'" +
+                ", domain= \'" + domain + "\'" +
+                ", content= \'" + getContent() + "\'}";
     }
 
     private String getContent() {

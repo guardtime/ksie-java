@@ -71,8 +71,8 @@ public abstract class AbstractContainerDocument implements ContainerDocument {
     @Override
     public String toString() {
         return this.getClass().toString() +
-                " {fileName=\'" + fileName +
-                "\', mimeType=\'" + mimeType + "\'}";
+                " {fileName= \'" + getFileName() + '\'' +
+                ", mimeType= \'" + getMimeType() + "\'}";
     }
 
     @Override

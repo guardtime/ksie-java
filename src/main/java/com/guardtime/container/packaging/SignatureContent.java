@@ -154,4 +154,16 @@ public class SignatureContent {
         }
     }
 
+    @Override
+    public String toString() {
+        return this.getClass().toString() + " {" +
+                "manifest= " + manifest.getLeft() + '\'' +
+                ", signature= " + manifest.getRight().getSignatureReference().getUri() +
+                ", documentsManifest= " + documentsManifest.getLeft() + '\'' +
+                ", annotationsManifest= " + annotationsManifest.getLeft() + '\'' +
+                ", documents= '" + documents.keySet() +
+                ", singleAnnotationManifests= " + singleAnnotationManifestMap.keySet() +
+                ", annotations= " + annotations.keySet() +
+                '}';
+    }
 }

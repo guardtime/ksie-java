@@ -133,6 +133,16 @@ class ZipContainer implements Container {
         }
     }
 
+    @Override
+    public String toString() {
+        return this.getClass().toString() + " {" +
+                "signatureContents= " + signatureContents +
+                ", mimeType= " + mimeType +
+                ", closed= " + closed +
+                ", unknownFiles= " + unknownFiles +
+                '}';
+    }
+
     private void writeMimeTypeEntry(ZipOutputStream zipOutputStream) throws IOException {
         ZipEntry mimeTypeEntry = new ZipEntry(mimeType.getUri());
         byte[] data = Util.toByteArray(mimeType.getInputStream());
