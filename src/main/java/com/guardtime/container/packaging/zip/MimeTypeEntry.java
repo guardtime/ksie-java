@@ -4,7 +4,6 @@ import com.guardtime.container.packaging.MimeType;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Arrays;
 
 class MimeTypeEntry implements MimeType {
 
