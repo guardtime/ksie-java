@@ -163,11 +163,11 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
-    public void testVerifyContainerWithInvalidDatamanifestHashInAnnotationManifest() throws Exception {
+    public void testVerifyContainerWithInvalidDatamanifestReferenceInAnnotationManifest() throws Exception {
         try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_INVALID_DATAMANIFEST_HASH_IN_ANNOTATION_MANIFEST)) {
             ContainerVerifierResult results = verifier.verify(container);
             Assert.assertEquals(VerificationResult.NOK, results.getVerificationResult());
-            verifyFailingRule(results, "KSIE_VERIFY_ANNOTATION", "invalid-path", "Hash mismatch");
+            verifyFailingRule(results, "KSIE_VERIFY_ANNOTATION", "META-INF/annotation-1.tlv", "Annotation meta-data mismatch.");
         }
     }
 
