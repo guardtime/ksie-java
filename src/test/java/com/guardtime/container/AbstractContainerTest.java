@@ -84,6 +84,7 @@ public class AbstractContainerTest {
     protected static final String CONTAINER_WITH_CHANGED_ANNOTATIONS_MANIFEST_HASH_IN_MANIFEST = "containers/invalid/container-changed-annotations-manifest-hash-in-manifest.ksie";
     protected static final String CONTAINER_WITH_CHANGED_AND_EXTENDED_SIGNATURE_FILE = "containers/invalid/container-invalid-signature-from-last-aggregation-hash-chain-extended.ksie";
     protected static final String CONTAINER_WITH_CHANGED_DATAMANIFEST_HASH_IN_ANNOTATION_MANIFEST = "containers/invalid/container-changed-datamanifest-hash-in-annotation-manifest.ksie";
+    protected static final String CONTAINER_WITH_INVALID_DATAMANIFEST_HASH_IN_ANNOTATION_MANIFEST = "containers/invalid/container-invalid-datamanifest-in-single-annotation-manifest.ksie";
     protected static final String CONTAINER_WITH_CHANGED_ANNOTATION_MANIFEST_HASH_IN_ANNOTATIONS_MANIFEST = "containers/invalid/container-changed-annotation-manifest-hash-in-annotations-manifest.ksie";
 
     protected static final String MIME_TYPE_APPLICATION_TXT = "application/txt";
@@ -112,7 +113,7 @@ public class AbstractContainerTest {
 
     @Before
     public void setUpDocumentsAndAnnotations() {
-        STRING_CONTAINER_ANNOTATION  = new StringContainerAnnotation(ContainerAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME);
+        STRING_CONTAINER_ANNOTATION = new StringContainerAnnotation(ContainerAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME);
         TEST_DOCUMENT_HELLO_TEXT = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
         TEST_DOCUMENT_HELLO_PDF = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_PDF_CONTENT), MIME_TYPE_APPLICATION_PDF, TEST_FILE_NAME_TEST_PDF);
         containerElements.addAll(Arrays.asList(

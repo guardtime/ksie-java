@@ -1,11 +1,13 @@
 package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.annotation.ContainerAnnotationType;
+import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.MultiHashElement;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
+import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
@@ -23,22 +25,31 @@ import java.util.Map;
 public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
 
     private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION.getName();
-    private final MultiHashElementIntegrityRule integrityRule;
+    private final MultiHashElementIntegrityRule multiHashElementIntegrityRule;
 
     public SingleAnnotationManifestIntegrityRule(RuleStateProvider stateProvider) {
         super(stateProvider.getStateForRule(NAME));
-        integrityRule = new MultiHashElementIntegrityRule(stateProvider.getStateForRule(NAME), NAME);
+        multiHashElementIntegrityRule = new MultiHashElementIntegrityRule(stateProvider.getStateForRule(NAME), NAME);
     }
 
     @Override
     protected void verifyRule(ResultHolder holder, Pair<SignatureContent, FileReference> verifiable) throws RuleTerminatingException {
         FileReference reference = verifiable.getRight();
+        String singleAnnotationManifestUri = reference.getUri();
 
         Map<String, SingleAnnotationManifest> singleAnnotationManifests = verifiable.getLeft().getSingleAnnotationManifests();
-        MultiHashElement manifest = singleAnnotationManifests.get(reference.getUri());
+        SingleAnnotationManifest manifest = singleAnnotationManifests.get(singleAnnotationManifestUri);
+        Pair<String, DocumentsManifest> documentsManifestPair = verifiable.getLeft().getDocumentsManifest();
+        FileReference documentsManifestReference = manifest.getDocumentsManifestReference();
         ResultHolder tempHolder = new ResultHolder();
         try {
-            integrityRule.verify(tempHolder, Pair.of(manifest, reference));
+            multiHashElementIntegrityRule.verify(tempHolder, Pair.of((MultiHashElement) manifest, reference));
+
+            if (!documentsManifestPair.getLeft().equals(documentsManifestReference.getUri())) {
+                holder.addResult(new GenericVerificationResult(VerificationResult.NOK, this, reference.getUri()));
+                throw new RuleTerminatingException("Documents manifest path mismatch found.");
+            }
+            multiHashElementIntegrityRule.verifyRule(holder, Pair.of((MultiHashElement) documentsManifestPair.getRight(), documentsManifestReference));
         } finally {
             RuleState ruleState = getRuleState(reference);
             for (RuleVerificationResult result : tempHolder.getResults()) {
@@ -63,6 +74,6 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<Sig
 
     @Override
     public String getErrorMessage() {
-        return "Annotation meta-data hash mismatch.";
+        return "Annotation meta-data mismatch.";
     }
 }
