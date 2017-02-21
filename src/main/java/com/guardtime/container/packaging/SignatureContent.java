@@ -156,7 +156,7 @@ public class SignatureContent {
 
     @Override
     public String toString() {
-        return this.getClass().toString() + " {" +
+        return this.getClass().getSimpleName() + " {" +
                 "manifest= " + manifest.getLeft() + '\'' +
                 ", signature= " + manifest.getRight().getSignatureReference().getUri() +
                 ", documentsManifest= " + documentsManifest.getLeft() + '\'' +

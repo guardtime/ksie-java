@@ -70,7 +70,7 @@ public abstract class AbstractContainerDocument implements ContainerDocument {
 
     @Override
     public String toString() {
-        return this.getClass().toString() +
+        return this.getClass().getSimpleName() +
                 " {fileName= \'" + getFileName() + '\'' +
                 ", mimeType= \'" + getMimeType() + "\'}";
     }

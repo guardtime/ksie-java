@@ -47,7 +47,7 @@ public abstract class AbstractRule<O> implements Rule<O> {
 
     @Override
     public String toString() {
-        return this.getClass().toString() + " {" +
+        return this.getClass().getSimpleName() + " {" +
                 "name= \'" + getName() + '\'' +
                 ", state= \'" + state + "\'}";
     }

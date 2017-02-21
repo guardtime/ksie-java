@@ -135,7 +135,7 @@ class ZipContainer implements Container {
 
     @Override
     public String toString() {
-        return this.getClass().toString() + " {" +
+        return this.getClass().getSimpleName() + " {" +
                 "signatureContents= " + signatureContents +
                 ", mimeType= " + mimeType +
                 ", closed= " + closed +

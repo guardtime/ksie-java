@@ -25,7 +25,7 @@ class KsiSignatureFactoryType implements SignatureFactoryType {
 
     @Override
     public String toString() {
-        return this.getClass().toString() + " {" +
+        return this.getClass().getSimpleName() + " {" +
                 "name= \'" + getName() + '\'' +
                 ", fileExtension= \'" + getSignatureFileExtension() + '\'' +
                 ", mimeType= \'" + getSignatureMimeType() + "\'}";

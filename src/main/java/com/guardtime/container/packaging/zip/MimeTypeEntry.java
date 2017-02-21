@@ -25,7 +25,7 @@ class MimeTypeEntry implements MimeType {
 
     @Override
     public String toString() {
-        return this.getClass().toString() + " {" +
+        return this.getClass().getSimpleName() + " {" +
                 "uri= \'" + uri + '\'' +
                 ", content= \'" + new String(content) + "\'}";
     }
