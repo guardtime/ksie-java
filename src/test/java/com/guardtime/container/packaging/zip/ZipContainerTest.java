@@ -2,10 +2,8 @@ package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.document.StreamContainerDocument;
-import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.container.indexing.UuidIndexProviderFactory;
 import com.guardtime.container.packaging.Container;
-import com.guardtime.container.packaging.ContainerMergingException;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 
 import org.junit.Test;
@@ -66,40 +64,6 @@ public class ZipContainerTest extends AbstractContainerTest {
                 packagingFactory.create(newContainer, singletonList(containerDocument), new ArrayList<>());
                 container.add(newContainer);
                 assertEquals(newContainer.getSignatureContents().size() + 1, container.getSignatureContents().size());
-            }
-        }
-    }
-
-    @Test
-    public void testAddWithSameManifestName_ThrowsContainerMergingException() throws Exception {
-        expectedException.expect(ContainerMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for Manifest!");
-        ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                disableInternalVerification().
-                withIndexProviderFactory(new IncrementingIndexProviderFactory()).
-                build();
-        try (Container container = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_CONTAINER_ANNOTATION))) {
-            assertEquals(1, container.getSignatureContents().size());
-            try (Container newContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<>())) {
-                container.add(newContainer.getSignatureContents().get(0));
-            }
-        }
-    }
-
-    @Test
-    public void testAddWithSameContainerDocument_ThrowsContainerMergingException() throws Exception {
-        expectedException.expect(ContainerMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for ContainerDocument!");
-        ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                disableInternalVerification().
-                withIndexProviderFactory(new UuidIndexProviderFactory()).
-                build();
-        try (Container container = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_CONTAINER_ANNOTATION))) {
-            assertEquals(1, container.getSignatureContents().size());
-            try (Container newContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), new ArrayList<>())) {
-                container.add(newContainer.getSignatureContents().get(0));
             }
         }
     }

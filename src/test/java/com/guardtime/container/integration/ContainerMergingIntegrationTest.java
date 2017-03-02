@@ -1,17 +1,24 @@
 package com.guardtime.container.integration;
 
+import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
+import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.container.indexing.UuidIndexProviderFactory;
 import com.guardtime.container.packaging.Container;
+import com.guardtime.container.packaging.ContainerMergingException;
+import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +27,7 @@ import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 
 public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTest {
+    ContainerPackagingFactory incPackagingFactory;
 
     @Before
     public void setUp() throws Exception {
@@ -27,6 +35,10 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
         packagingFactory = new ZipContainerPackagingFactoryBuilder().
                 withSignatureFactory(signatureFactory).
                 withIndexProviderFactory(new UuidIndexProviderFactory()).
+                build();
+        incPackagingFactory = new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(signatureFactory).
+                withIndexProviderFactory(new IncrementingIndexProviderFactory()).
                 build();
     }
 
@@ -62,6 +74,120 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
                     parsedContainer.getSignatureContents().size() + signatureContents.size();
             parsedContainer.addAll(signatureContents);
             assertSignatureContentsCount(parsedContainer, expectedSignatureContentsSize);
+        }
+    }
+
+    @Ignore //TODO: KSIE-57 - This should be possible since current KSIE implementation does allow creating containers similar to CONTAINER_WITH_MIXED_INDEX_TYPES_IN_CONTENTS content where two or more contents are using the same container document.
+    @Test
+    public void testMergeContainersWithDifferentIndexProviders1() throws Exception {
+        try (   Container container1 = getContainer(CONTAINER_WITH_MIXED_INDEX_TYPES);
+                Container container2 = getContainer(CONTAINER_WITH_MIXED_INDEX_TYPES_IN_CONTENTS)) {
+            container1.add(container2);
+            container1.getSignatureContents();
+            Assert.assertEquals(4, container1.getSignatureContents().size());
+        }
+    }
+
+    @Test
+    public void testMergeContainersWithDifferentIndexProviders2() throws Exception {
+        try (   Container container1 = getContainer(CONTAINER_WITH_MIXED_INDEX_TYPES);
+                Container container2 = getContainer(CONTAINER_WITH_MIXED_INDEX_TYPES_IN_CONTENTS)) {
+            container2.add(container1);
+            Assert.assertEquals(4, container2.getSignatureContents().size());
+        }
+    }
+
+    @Ignore //TODO: KSIE-58
+    @Test
+    public void testAddNewContentToMergedContainer1() throws Exception {
+        try (   ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream("".getBytes()), "textDoc", "1-" + Long.toString(new Date().getTime()));
+                Container uuidContainer = packagingFactory.create(singletonList(document), singletonList(STRING_CONTAINER_ANNOTATION));
+                Container incContainer = getContainer(CONTAINER_WITH_RANDOM_INCREMENTING_INDEXES);
+                ContainerDocument document2 = new StreamContainerDocument(new ByteArrayInputStream("".getBytes()), "textDoc", "2-" + Long.toString(new Date().getTime()))) {
+            uuidContainer.add(incContainer);
+            try (Container newContainer = packagingFactory.create(uuidContainer, singletonList(document2), singletonList(STRING_CONTAINER_ANNOTATION))) {
+                assertEquals(newContainer.getSignatureContents().size(), 3);
+            }
+        }
+    }
+
+    @Ignore //TODO: KSIE-58
+    @Test
+    public void testAddNewContentToMergedContainer2() throws Exception {
+        ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(signatureFactory).
+                withIndexProviderFactory(new IncrementingIndexProviderFactory()).
+                build();
+        try (   Container uuidContainer = getContainer(CONTAINER_WITH_RANDOM_UUID_INDEXES);
+                Container incContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), singletonList(STRING_CONTAINER_ANNOTATION));
+                ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream("".getBytes()), "textDoc", Long.toString(new Date().getTime()))) {
+            incContainer.add(uuidContainer);
+            try (Container newContainer = packagingFactory.create(incContainer, singletonList(document), singletonList(STRING_CONTAINER_ANNOTATION))) {
+                assertEquals(newContainer.getSignatureContents().size(), 3);
+            }
+        }
+    }
+
+    @Test
+    public void testMergeContainersUnknownFileConflict() throws Exception {
+        expectedException.expect(ContainerMergingException.class);
+        expectedException.expectMessage("New SignatureContent has clashing name for UnknownDocuments!");
+        mergeContainersWithConflicts(CONTAINER_FOR_UNKNOWN_FILE_CONFLICT);
+    }
+
+    @Test
+    public void testMergeContainersDocumentManifestConflict() throws Exception {
+        expectedException.expect(ContainerMergingException.class);
+        expectedException.expectMessage("New SignatureContent has clashing name for DocumentsManifest!");
+        mergeContainersWithConflicts(CONTAINER_FOR_DOCUMENTS_MANIFEST_CONFLICT);
+    }
+
+    @Test
+    public void testMergeContainersAnnotationDataConflict() throws Exception {
+        expectedException.expect(ContainerMergingException.class);
+        expectedException.expectMessage("New SignatureContent has clashing name for AnnotationData!");
+        mergeContainersWithConflicts(CONTAINER_FOR_ANNOTATION_DATA_CONFLICT);
+    }
+
+    @Test
+    public void testMergeContainersSingleAnnotationManifestConflict() throws Exception {
+        expectedException.expect(ContainerMergingException.class);
+        expectedException.expectMessage("New SignatureContent has clashing name for SingleAnnotationManifest!");
+        mergeContainersWithConflicts(CONTAINER_FOR_SINGLE_ANNOTATION_MANIFEST_CONFLICT);
+    }
+
+    @Test
+    public void testMergeContainersAnnotationsManifestConflict() throws Exception {
+        expectedException.expect(ContainerMergingException.class);
+        expectedException.expectMessage("New SignatureContent has clashing name for AnnotationsManifest!");
+        mergeContainersWithConflicts(CONTAINER_FOR_ANNOTATIONS_MANIFEST_CONFLICT);
+    }
+
+    @Test
+    public void testMergeContainersSignatureConflict() throws Exception {
+        expectedException.expect(ContainerMergingException.class);
+        expectedException.expectMessage("New SignatureContent has clashing name for Signature!");
+        mergeContainersWithConflicts(CONTAINER_FOR_SIGNATURE_CONFLICT);
+    }
+
+    @Test
+    public void testMergeContainersDocumentConflict() throws Exception {
+        expectedException.expect(ContainerMergingException.class);
+        expectedException.expectMessage("New SignatureContent has clashing name for ContainerDocument!");
+        mergeContainersWithConflicts(CONTAINER_FOR_DOCUMENT_CONFLICT);
+    }
+
+    @Test
+    public void testMergeContainersManifestConflict() throws Exception {
+        expectedException.expect(ContainerMergingException.class);
+        expectedException.expectMessage("New SignatureContent has clashing name for Manifest!");
+        mergeContainersWithConflicts(CONTAINER_FOR_MANIFEST_CONFLICT);
+    }
+
+    private void mergeContainersWithConflicts(String[] containers) throws Exception {
+        try (   Container container1 = getContainer(containers[0]);
+                Container container2 = getContainer(containers[1])) {
+            container1.add(container2);
         }
     }
 

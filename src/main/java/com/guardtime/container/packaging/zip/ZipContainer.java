@@ -283,7 +283,7 @@ class ZipContainer implements Container {
     private void verifyNonClashingSignaturePath(SignatureContent content, SignatureContent existingContent) throws ContainerMergingException {
         String newSignaturePath = content.getManifest().getRight().getSignatureReference().getUri();
         if (existingContent.getManifest().getRight().getSignatureReference().getUri().equals(newSignaturePath)) {
-            throw new ContainerMergingException("New SignatureContent has clashing name for signature!");
+            throw new ContainerMergingException("New SignatureContent has clashing name for Signature!");
         }
     }
 
@@ -298,7 +298,7 @@ class ZipContainer implements Container {
     private void verifyNonClashingAnnotationPaths(SignatureContent content, SignatureContent existingContent) throws ContainerMergingException {
         for (String annotationPath : existingContent.getAnnotations().keySet()) {
             if (content.getAnnotations().containsKey(annotationPath)) {
-                throw new ContainerMergingException("New SignatureContent has clashing name for Annotation data!");
+                throw new ContainerMergingException("New SignatureContent has clashing name for AnnotationData!");
             }
         }
     }
@@ -319,7 +319,7 @@ class ZipContainer implements Container {
         }
         for (UnknownDocument unknownDocument : container.getUnknownFiles()) {
             if (unknownDocumentPaths.contains(unknownDocument.getFileName())) {
-                throw new ContainerMergingException("There are clashing files in the Containers!");
+                throw new ContainerMergingException("New SignatureContent has clashing name for UnknownDocuments!");
             }
         }
     }
