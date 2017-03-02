@@ -65,6 +65,8 @@ public class AbstractContainerTest {
     protected static final String[] CONTAINER_FOR_DOCUMENT_CONFLICT = {"containers/container-for-document-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
     protected static final String[] CONTAINER_FOR_MANIFEST_CONFLICT = {"containers/container-for-manifest-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
     protected static final String[] CONTAINER_FOR_SIGNATURE_CONFLICT = {"containers/container-for-signature-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    protected static final String[] CONTAINER_FOR_MIX_CONFLICT_1 = {"containers/container-for-mix-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    protected static final String[] CONTAINER_FOR_MIX_CONFLICT_2 = {CONTAINER_WITH_MULTIPLE_ANNOTATIONS, "containers/container-for-mix-conflict.ksie"};
 
     /**
      * Containers - Internally invalid or does not verify against anchors.

@@ -184,6 +184,20 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
         mergeContainersWithConflicts(CONTAINER_FOR_MANIFEST_CONFLICT);
     }
 
+    @Test
+    public void testMergeContainersUnknownConflictsWithContainerFile1() throws Exception {
+        expectedException.expect(ContainerMergingException.class);
+        expectedException.expectMessage("New SignatureContent has clashing name for UnknownDocuments!");
+        mergeContainersWithConflicts(CONTAINER_FOR_MIX_CONFLICT_1);
+    }
+
+    @Test
+    public void testMergeContainersUnknownConflictsWithContainerFile2() throws Exception {
+        expectedException.expect(ContainerMergingException.class);
+        expectedException.expectMessage("New SignatureContent has clashing name for UnknownDocuments!");
+        mergeContainersWithConflicts(CONTAINER_FOR_MIX_CONFLICT_2);
+    }
+
     private void mergeContainersWithConflicts(String[] containers) throws Exception {
         try (   Container container1 = getContainer(containers[0]);
                 Container container2 = getContainer(containers[1])) {
