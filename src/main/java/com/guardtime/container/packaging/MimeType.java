@@ -7,6 +7,7 @@ import java.io.InputStream;
  * MIME type in container.
  */
 public interface MimeType {
+    String MIME_TYPE_ENTRY_NAME = "mimetype";
 
     String getUri();
 

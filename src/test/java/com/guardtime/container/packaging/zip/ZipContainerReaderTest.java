@@ -7,7 +7,7 @@ import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
-import com.guardtime.container.packaging.ContainerReadingException;
+import com.guardtime.container.packaging.exception.ContainerReadingException;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.parsing.TemporaryFileBasedParsingStoreFactory;
 import com.guardtime.container.signature.SignatureException;

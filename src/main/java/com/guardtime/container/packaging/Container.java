@@ -1,6 +1,7 @@
 package com.guardtime.container.packaging;
 
 import com.guardtime.container.document.UnknownDocument;
+import com.guardtime.container.packaging.exception.ContainerMergingException;
 
 import java.io.IOException;
 import java.io.OutputStream;
