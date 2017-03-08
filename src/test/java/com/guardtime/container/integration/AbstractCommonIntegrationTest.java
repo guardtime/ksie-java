@@ -57,7 +57,12 @@ public abstract class AbstractCommonIntegrationTest extends AbstractContainerTes
             TEST_EXTENDING_SERVICE = properties.getProperty("service.extending");
             GUARDTIME_PUBLICATIONS_FILE = properties.getProperty("publications.file.url");
             KSI_SERVICE_CREDENTIALS = new KSIServiceCredentials(properties.getProperty("credentials.id"), properties.getProperty("credentials.key"));
-            TRUST_STORE_FILE = new File(Thread.currentThread().getContextClassLoader().getResource("ksi-truststore.jks").getFile());
+            TRUST_STORE_FILE = new File(
+                    Thread.currentThread().
+                            getContextClassLoader().
+                            getResource("ksi-truststore.jks").
+                            toURI()
+            );
             TRUST_STORE_PASSWORD = "changeit";
         } catch (URISyntaxException | IOException e) {
             throw new RuntimeException(e);
