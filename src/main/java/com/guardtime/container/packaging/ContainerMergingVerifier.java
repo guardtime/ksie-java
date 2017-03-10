@@ -11,6 +11,7 @@ import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.packaging.exception.AnnotationsManifestMergingException;
 import com.guardtime.container.packaging.exception.ContainerAnnotationMergingException;
 import com.guardtime.container.packaging.exception.ContainerMergingException;
+import com.guardtime.container.packaging.exception.DocumentMergingException;
 import com.guardtime.container.packaging.exception.DocumentsManifestMergingException;
 import com.guardtime.container.packaging.exception.ManifestMergingException;
 import com.guardtime.container.packaging.exception.MimeTypeMergingException;
@@ -113,15 +114,11 @@ public class ContainerMergingVerifier {
             }
         } else if (content.getDocumentsManifest().getLeft().equals(fileName)) {
             if (!contentsMatch(content.getDocumentsManifest().getRight().getInputStream(), unknownDocument.getInputStream())) {
-                throw new DocumentsManifestMergingException(
-                        "New SignatureContent has clashing DocumentsManifest! Path: " + fileName
-                );
+                throw new DocumentsManifestMergingException(fileName);
             }
         } else if (content.getAnnotationsManifest().getLeft().equals(fileName)) {
             if (!contentsMatch(content.getAnnotationsManifest().getRight().getInputStream(), unknownDocument.getInputStream())) {
-                throw new AnnotationsManifestMergingException(
-                        "New SignatureContent has clashing AnnotationsManifest! Path: " + fileName
-                );
+                throw new AnnotationsManifestMergingException(fileName);
             }
         } else {
             checkSingleAnnotationManifests(fileName, unknownDocument, content);
@@ -135,9 +132,7 @@ public class ContainerMergingVerifier {
             SingleAnnotationManifest existingManifest =
                     existingContent.getSingleAnnotationManifests().get(fileName);
             if (!contentsMatch(existingManifest.getInputStream(), unknownDocument.getInputStream())) {
-                throw new SingleAnnotationManifestMergingException(
-                        "New SignatureContent has clashing SingleAnnotationManifest! Path: " + fileName
-                );
+                throw new SingleAnnotationManifestMergingException(fileName);
             }
         }
     }
@@ -147,9 +142,7 @@ public class ContainerMergingVerifier {
         if (content.getAnnotations().containsKey(fileName)) {
             ContainerAnnotation currentAnnotation = content.getAnnotations().get(fileName);
             if (!contentsMatch(currentAnnotation.getInputStream(), unknownDocument.getInputStream())) {
-                throw new ContainerAnnotationMergingException(
-                        "New SignatureContent has clashing Annotation data! Path: " + fileName
-                );
+                throw new ContainerAnnotationMergingException(fileName);
             }
         }
     }
@@ -162,9 +155,7 @@ public class ContainerMergingVerifier {
                 for (HashAlgorithm algorithm : HashAlgorithm.getImplementedHashAlgorithms()) {
                     try {
                         if (!newDocument.getDataHash(algorithm).equals(doc.getDataHash(algorithm))) {
-                            throw new ContainerMergingException(
-                                    "New SignatureContent has clashing name for ContainerDocument! Path: " + fileName
-                            );
+                            throw new DocumentMergingException(fileName);
                         }
                     } catch (DataHashException e) {
                         // ignore since it is an EmptyContainerDocument that can't generate new hash
@@ -213,9 +204,7 @@ public class ContainerMergingVerifier {
                         newDocumentsManifest.getRight().getInputStream()
                 )
                 ) {
-            throw new DocumentsManifestMergingException(
-                    "New SignatureContent has clashing DocumentsManifest! Path: " + newDocumentsManifest.getLeft()
-            );
+            throw new DocumentsManifestMergingException(newDocumentsManifest.getLeft());
         }
     }
 
@@ -229,9 +218,7 @@ public class ContainerMergingVerifier {
                         newAnnotationsManifest.getRight().getInputStream()
                 )
                 ) {
-            throw new AnnotationsManifestMergingException(
-                    "New SignatureContent has clashing AnnotationsManifest! Path: " + newAnnotationsManifest.getLeft()
-            );
+            throw new AnnotationsManifestMergingException(newAnnotationsManifest.getLeft());
         }
     }
 
@@ -256,9 +243,7 @@ public class ContainerMergingVerifier {
                         existingContent.getSingleAnnotationManifests().get(singleAnnotationManifestPath);
                 SingleAnnotationManifest newManifest = content.getSingleAnnotationManifests().get(singleAnnotationManifestPath);
                 if (!contentsMatch(existingManifest.getInputStream(), newManifest.getInputStream())) {
-                    throw new SingleAnnotationManifestMergingException(
-                            "New SignatureContent has clashing SingleAnnotationManifest! Path: " + singleAnnotationManifestPath
-                    );
+                    throw new SingleAnnotationManifestMergingException(singleAnnotationManifestPath);
                 }
             }
         }
@@ -271,9 +256,7 @@ public class ContainerMergingVerifier {
                 ContainerAnnotation newAnnotation = content.getAnnotations().get(annotationPath);
                 ContainerAnnotation currentAnnotation = existingContent.getAnnotations().get(annotationPath);
                 if (!contentsMatch(currentAnnotation.getInputStream(), newAnnotation.getInputStream())) {
-                    throw new ContainerAnnotationMergingException(
-                            "New SignatureContent has clashing Annotation data! Path: " + annotationPath
-                    );
+                    throw new ContainerAnnotationMergingException(annotationPath);
                 }
             }
         }
