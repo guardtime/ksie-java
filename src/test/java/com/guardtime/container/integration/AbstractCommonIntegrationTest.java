@@ -110,35 +110,4 @@ public abstract class AbstractCommonIntegrationTest extends AbstractContainerTes
         }
     }
 
-    byte[] addDocumentsToExistingContainer_SkipDuplicate(byte[] zipFile, List<Pair<byte[], String>> files) throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try (
-                ZipInputStream zin = new ZipInputStream(new ByteArrayInputStream(zipFile));
-                ZipOutputStream out = new ZipOutputStream(bos)
-        ) {
-            ZipEntry entry;
-            List<String> filesInZip = new LinkedList<>();
-            while ((entry = zin.getNextEntry()) != null) {
-                filesInZip.add(entry.getName());
-                writeFromInputToZipOutput(out, zin, entry.getName());
-            }
-            for (Pair pair : files) {
-                if (!filesInZip.contains(pair.getRight())) {
-                    try (InputStream in = new ByteArrayInputStream((byte[]) pair.getLeft())) {
-                        writeFromInputToZipOutput(out, in, (String) pair.getRight());
-                    }
-                }
-            }
-        }
-        return bos.toByteArray();
-    }
-
-    /*
-    Closes ZipOutputStream entry.
-     */
-    private void writeFromInputToZipOutput(ZipOutputStream out, InputStream in, String fileName) throws IOException {
-        out.putNextEntry(new ZipEntry(fileName));
-        Util.copyData(in, out);
-        out.closeEntry();
-    }
 }

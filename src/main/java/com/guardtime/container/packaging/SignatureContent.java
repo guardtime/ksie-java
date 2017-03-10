@@ -2,6 +2,8 @@ package com.guardtime.container.packaging;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.document.EmptyContainerDocument;
+import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.manifest.Manifest;
@@ -9,6 +11,7 @@ import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
 
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -78,6 +81,20 @@ public class SignatureContent {
 
     public Map<String, SingleAnnotationManifest> getSingleAnnotationManifests() {
         return Collections.unmodifiableMap(singleAnnotationManifestMap);
+    }
+
+    /**
+     * Attached data to a detached {@link ContainerDocument}. Returns true after successful attachment.
+     * @param path Path of the {@link ContainerDocument} to attach the data to.
+     * @param data Data stream to be attached to the {@link ContainerDocument}. NB! Does NOT close the stream!
+     */
+    public boolean attachDetachedDocument(String path, InputStream data) {
+        ContainerDocument document = documents.get(path);
+        if (document != null && document instanceof EmptyContainerDocument) {
+            documents.put(path, new StreamContainerDocument(data, document.getMimeType(), document.getFileName()));
+            return true;
+        }
+        return false;
     }
 
     private Map<String, SingleAnnotationManifest> formatSingleAnnotationManifestsListToMap(List<Pair<String, SingleAnnotationManifest>> annotationManifests) {
