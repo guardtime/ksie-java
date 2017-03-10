@@ -1,12 +1,13 @@
 package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.AbstractContainerTest;
+import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.container.indexing.UuidIndexProviderFactory;
 import com.guardtime.container.packaging.Container;
-import com.guardtime.container.packaging.exception.ContainerMergingException;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
+import com.guardtime.container.packaging.exception.ContainerMergingException;
 
 import org.junit.Test;
 
@@ -91,15 +92,24 @@ public class ZipContainerTest extends AbstractContainerTest {
     @Test
     public void testAddWithSameContainerDocument_ThrowsContainerMergingException() throws Exception {
         expectedException.expect(ContainerMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for ContainerDocument!");
+        expectedException.expectMessage("New SignatureContent has clashing name for ContainerDocument! Path: ");
         ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
                 withSignatureFactory(mockedSignatureFactory).
                 disableInternalVerification().
                 withIndexProviderFactory(new UuidIndexProviderFactory()).
                 build();
-        try (Container container = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_CONTAINER_ANNOTATION))) {
+        try (Container container = packagingFactory.create(
+                singletonList(TEST_DOCUMENT_HELLO_PDF),
+                singletonList(STRING_CONTAINER_ANNOTATION)
+        )) {
             assertEquals(1, container.getSignatureContents().size());
-            try (Container newContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), new ArrayList<>())) {
+            try (ContainerDocument clashingDocument = new StreamContainerDocument(
+                    new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
+                    TEST_DOCUMENT_HELLO_PDF.getMimeType(),
+                    TEST_DOCUMENT_HELLO_PDF.getFileName()
+            );
+                 Container newContainer = packagingFactory.create(singletonList(clashingDocument), new ArrayList<>())
+            ) {
                 container.add(newContainer.getSignatureContents().get(0));
             }
         }
