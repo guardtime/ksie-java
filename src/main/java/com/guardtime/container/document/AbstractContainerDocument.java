@@ -81,10 +81,10 @@ public abstract class AbstractContainerDocument implements ContainerDocument {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
-            FileContainerDocument that = (FileContainerDocument) o;
+            ContainerDocument that = (ContainerDocument) o;
 
-            if (fileName != null ? !fileName.equals(that.fileName) : that.fileName != null) return false;
-            if (mimeType != null ? !mimeType.equals(that.mimeType) : that.mimeType != null) return false;
+            if (getFileName() != null ? !getFileName().equals(that.getFileName()) : that.getFileName()!= null) return false;
+            if (getMimeType() != null ? !getMimeType().equals(that.getMimeType()) : that.getMimeType() != null) return false;
             return this.getDataHash(HASH_ALGORITHM).equals(that.getDataHash(HASH_ALGORITHM));
         } catch (DataHashException e) {
             return false;
