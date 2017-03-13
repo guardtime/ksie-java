@@ -139,7 +139,7 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
         }
     }
 
-    @Ignore //Should be possible.
+    @Ignore //TODO-58 - Should be possible.
     @Test
     public void testCreateContainerFromExistingWithDifferentIndexProviderCombination_OK() throws Exception {
         try (
@@ -150,7 +150,7 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
         }
     }
 
-    @Ignore //Should be possible.
+    @Ignore //TODO-58 - Should be possible.
     @Test
     public void testCreateContainerFromExistingWithDifferentIndexProviderCombination2_OK() throws Exception {
         try (
@@ -191,7 +191,7 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
         }
     }
 
-    @Ignore //Should be possible.
+    @Ignore //TODO-58 - Should be possible.
     @Test
     public void testCreateContainerFromExistingWithDifferentIndexTypesInSameContent_OK() throws Exception {
         try (
@@ -207,7 +207,7 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
         }
     }
 
-    @Ignore //Should be possible.
+    @Ignore //TODO-58 - Should be possible.
     @Test
     public void testCreateContainerFromExistingWithDifferentIndexesInContents_OK() throws Exception {
         try (
@@ -221,7 +221,7 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
         }
     }
 
-    @Ignore //Should be possible.
+    @Ignore //TODO-58 - Should be possible.
     @Test
     public void testAddDocumentsToExistingContainerWithOneContentRemoved_OK() throws Exception {
         try (
@@ -250,68 +250,68 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
         }
     }
 
-    @Ignore //Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
+    @Ignore //TODO-53 Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
     @Test
     public void testCreateContainerWhereDocumentFileUriMatchesManifestUri_throws() throws Exception {
         String item = "META-INF/manifest-1.tlv";
         createContainerWriteItToAndReadFromStream(item);
     }
 
-    @Ignore //Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
+    @Ignore //TODO-53 Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
     @Test
     public void testCreateContainerWhereDocumentFileUriMatchesDocumentManifestUri_throws() throws Exception {
         String item = "META-INF/datamanifest-1.tlv";
         createContainerWriteItToAndReadFromStream(item);
     }
 
-    @Ignore //Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
+    @Ignore //TODO-53 Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
     @Test
     public void testCreateContainerWhereDocumentFileUriMatchesAnnotationsManifestUri_throws() throws Exception {
         String item = "META-INF/annotmanifest-1.tlv";
         createContainerWriteItToAndReadFromStream(item);
     }
 
-    @Ignore //Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
+    @Ignore //TODO-53 Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
     @Test
     public void testCreateContainerWhereDocumentFileUriMatchesSingleAnnotationManifestUri_throws() throws Exception {
         String item = "META-INF/annotation-1.tlv";
         createContainerWriteItToAndReadFromStream(item);
     }
 
-    @Ignore //Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
+    @Ignore //TODO-53 Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
     @Test
     public void testCreateContainerWhereDocumentFileUriMatchesAnnotationUri_throws() throws Exception {
         String item = "META-INF/annotation-1.dat";
         createContainerWriteItToAndReadFromStream(item);
     }
 
-    @Ignore //Exception is expected because it should not be possible to add document with file ur is "mimetype". Not because of duplicate entry.
+    @Ignore //TODO-53 Exception is expected because it should not be possible to add document with file ur is "mimetype". Not because of duplicate entry.
     @Test
     public void testCreateContainerWhereDocumentFileUriMatchesMimeTypeUri_throws() throws Exception {
         String item = "mimetype";
         createContainerWriteItToAndReadFromStream(item);
     }
 
-    @Ignore //Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
+    @Ignore //TODO-53 Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
     @Test
     public void testCreateContainerWhereDocumentFileUriMatchesSignatureUri_throws() throws Exception {
         String item = "META-INF/signature-1.ksi";
         createContainerWriteItToAndReadFromStream(item);
     }
 
-    @Ignore //Exception is expected because document file name is dir and it should not be possible to add documents to META-INF. Not because of duplicate entry.
+    @Ignore //TODO-54 Exception is expected because document file name is dir and it should not be possible to add documents to META-INF. Not because of duplicate entry.
     @Test
     public void testCreateContainerWhereDocumentIsWrittenAsMetaInfDirectory_throws() throws Exception {
         createContainerWriteItToAndReadFromStream("META-INF/");
     }
 
-    @Ignore //Exception is expected because document file name matches with META-INF directory name. Not because of duplicate entry.
+    @Ignore //TODO-54 Exception is expected because document file name matches with META-INF directory name. Not because of duplicate entry.
     @Test
     public void testCreateContainerWhereDocumentFileUriMatchesMetaInfDirectoryName_throws() throws Exception {
         createContainerWriteItToAndReadFromStream("META-INF");
     }
 
-    @Ignore //Exception is expected because document file name is dir
+    @Ignore //TODO-54 Exception is expected because document file name is dir
     @Test
     public void testCreateContainerWhereDocumentIsWrittenAsDirectory_throws() throws Exception {
         createContainerWriteItToAndReadFromStream("SubDir/");
