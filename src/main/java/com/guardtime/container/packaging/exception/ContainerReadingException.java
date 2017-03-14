@@ -1,4 +1,6 @@
-package com.guardtime.container.packaging;
+package com.guardtime.container.packaging.exception;
+
+import com.guardtime.container.packaging.Container;
 
 import java.util.ArrayList;
 import java.util.Collection;

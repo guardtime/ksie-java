@@ -1,5 +1,6 @@
 package com.guardtime.container.integration;
 
+import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.indexing.UuidIndexProviderFactory;
 import com.guardtime.container.packaging.Container;
@@ -18,6 +19,8 @@ import java.util.UUID;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTest {
 
@@ -65,15 +68,40 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
         }
     }
 
-    private SignatureContent createSignatureContent() throws Exception {
-        StreamContainerDocument containerDocument = new StreamContainerDocument(
-                new ByteArrayInputStream(UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8)),
-                "text/plain",
-                UUID.randomUUID().toString()
-        );
+    @Test
+    public void testWritingMergedContainer_OK() throws Exception {
+        try (Container parsedContainer = getContainer(CONTAINER_WITH_RANDOM_UUID_INDEXES);
+             Container secondParsedContainer = getContainer(CONTAINER_WITH_RANDOM_INCREMENTING_INDEXES);
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+        ) {
+            int expectedSignatureContentCount =
+                    parsedContainer.getSignatureContents().size() + secondParsedContainer.getSignatureContents().size();
+            parsedContainer.add(secondParsedContainer);
+            parsedContainer.writeTo(outputStream);
+            assertNotNull(outputStream.toByteArray());
+            assertTrue(outputStream.toByteArray().length > 0);
+            try (Container mergedContainer = packagingFactory.read(new ByteArrayInputStream(outputStream.toByteArray()))) {
+                assertEquals(expectedSignatureContentCount, mergedContainer.getSignatureContents().size());
+            }
+        }
+    }
+
+    private SignatureContent createSignatureContent(ContainerDocument existingDocument) throws Exception {
+        ContainerDocument containerDocument = existingDocument;
+        if (containerDocument == null) {
+            containerDocument = new StreamContainerDocument(
+                    new ByteArrayInputStream(UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8)),
+                    "text/plain",
+                    UUID.randomUUID().toString()
+            );
+        }
         try (Container temp = packagingFactory.create(singletonList(containerDocument), new LinkedList<>())) {
             return temp.getSignatureContents().get(0);
         }
+    }
+
+    private SignatureContent createSignatureContent() throws Exception {
+        return createSignatureContent(null);
     }
 
     private void assertSignatureContentsCount(Container parsedContainer, int expectedSignatureContentsSize) throws Exception {
