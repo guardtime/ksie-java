@@ -72,13 +72,17 @@ public class ContainerMergingVerifier {
     }
 
     public static void verifyUniqueUnknownFiles(Container newContainer, Container existingContainer)
-            throws ContainerMergingException, IOException {
-        for (UnknownDocument unknownDocument : newContainer.getUnknownFiles()) {
-            checkUniqueness(unknownDocument.getFileName(), unknownDocument, existingContainer);
-        }
+            throws ContainerMergingException {
+        try {
+            for (UnknownDocument unknownDocument : newContainer.getUnknownFiles()) {
+                checkUniqueness(unknownDocument.getFileName(), unknownDocument, existingContainer);
+            }
 
-        for (UnknownDocument unknownDocument : existingContainer.getUnknownFiles()) {
-            checkUniqueness(unknownDocument.getFileName(), unknownDocument, newContainer);
+            for (UnknownDocument unknownDocument : existingContainer.getUnknownFiles()) {
+                checkUniqueness(unknownDocument.getFileName(), unknownDocument, newContainer);
+            }
+        } catch (IOException e) {
+            throw new ContainerMergingException("Failed to verify uniqueness!", e);
         }
     }
 

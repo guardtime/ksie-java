@@ -22,9 +22,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 import java.util.zip.ZipEntry;
@@ -42,6 +44,7 @@ class ZipContainer implements Container {
     private MimeType mimeType;
     private boolean closed = false;
     private List<UnknownDocument> unknownFiles = new LinkedList<>();
+    private Set<String> writtenFiles = new HashSet<>();
 
     public ZipContainer(SignatureContent signatureContent, MimeType mimeType) {
         this(Collections.singletonList(signatureContent), Collections.<UnknownDocument>emptyList(), mimeType);
@@ -72,7 +75,7 @@ class ZipContainer implements Container {
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(output))) {
             writeMimeTypeEntry(zipOutputStream);
             writeSignatureContents(signatureContents, zipOutputStream);
-            writeExcessFiles(zipOutputStream);
+            writeUnknownFiles(zipOutputStream);
         }
     }
 
@@ -116,14 +119,10 @@ class ZipContainer implements Container {
 
     @Override
     public void add(Container container) throws ContainerMergingException {
-        try {
-            verifySameMimeType(container, this);
-            verifyUniqueUnknownFiles(container, this);
-            addAll(container.getSignatureContents());
-            unknownFiles.addAll(container.getUnknownFiles());
-        } catch (IOException e) {
-            throw new ContainerMergingException("Failed to verify uniqueness!", e);
-        }
+        verifySameMimeType(container, this);
+        verifyUniqueUnknownFiles(container, this);
+        addAll(container.getSignatureContents());
+        unknownFiles.addAll(container.getUnknownFiles());
     }
 
     @Override
@@ -148,7 +147,10 @@ class ZipContainer implements Container {
         checksum.update(data, 0, data.length);
         mimeTypeEntry.setCrc(checksum.getValue());
         mimeTypeEntry.setMethod(ZipEntry.STORED);
-        writeEntry(mimeTypeEntry, mimeType.getInputStream(), zipOutputStream);
+
+        zipOutputStream.putNextEntry(mimeTypeEntry);
+        zipOutputStream.write(data);
+        zipOutputStream.closeEntry();
     }
 
     private void writeSignatureContents(List<SignatureContent> signatureContents, ZipOutputStream output) throws IOException {
@@ -156,9 +158,9 @@ class ZipContainer implements Container {
             Pair<String, Manifest> manifest = signatureContent.getManifest();
             Pair<String, DocumentsManifest> documentsManifest = signatureContent.getDocumentsManifest();
             Pair<String, AnnotationsManifest> annotationsManifest = signatureContent.getAnnotationsManifest();
-            writeEntry(new ZipEntry(manifest.getLeft()), manifest.getRight().getInputStream(), output);
-            writeEntry(new ZipEntry(documentsManifest.getLeft()), documentsManifest.getRight().getInputStream(), output);
-            writeEntry(new ZipEntry(annotationsManifest.getLeft()), annotationsManifest.getRight().getInputStream(), output);
+            writeEntry(manifest.getLeft(), manifest.getRight().getInputStream(), output);
+            writeEntry(documentsManifest.getLeft(), documentsManifest.getRight().getInputStream(), output);
+            writeEntry(annotationsManifest.getLeft(), annotationsManifest.getRight().getInputStream(), output);
             writeSignature(signatureContent.getContainerSignature(), manifest.getRight(), output);
             writeDocuments(signatureContent.getDocuments(), output);
             writeSingleAnnotationManifests(signatureContent.getSingleAnnotationManifests(), output);
@@ -166,10 +168,10 @@ class ZipContainer implements Container {
         }
     }
 
-    private void writeExcessFiles(ZipOutputStream zipOutputStream) throws IOException {
+    private void writeUnknownFiles(ZipOutputStream zipOutputStream) throws IOException {
         for (UnknownDocument file : unknownFiles) {
             try (InputStream inputStream = file.getInputStream()) {
-                writeEntry(new ZipEntry(file.getFileName()), inputStream, zipOutputStream);
+                writeEntry(file.getFileName(), inputStream, zipOutputStream);
             }
         }
     }
@@ -178,7 +180,7 @@ class ZipContainer implements Container {
                                                 ZipOutputStream output) throws IOException {
         for (String uri : singleAnnotationManifestMap.keySet()) {
             SingleAnnotationManifest singleAnnotationManifest = singleAnnotationManifestMap.get(uri);
-            writeEntry(new ZipEntry(uri), singleAnnotationManifest.getInputStream(), output);
+            writeEntry(uri, singleAnnotationManifest.getInputStream(), output);
         }
     }
 
@@ -186,17 +188,22 @@ class ZipContainer implements Container {
         for (String uri : annotations.keySet()) {
             ContainerAnnotation annotation = annotations.get(uri);
             try (InputStream inputStream = annotation.getInputStream()) {
-                writeEntry(new ZipEntry(uri), inputStream, output);
+                writeEntry(uri, inputStream, output);
             }
         }
     }
 
     private void writeSignature(ContainerSignature signature, Manifest manifest, ZipOutputStream output) throws IOException {
         String signatureUri = manifest.getSignatureReference().getUri();
+        if (writtenFiles.contains(signatureUri)) {
+            // Skip since the signature has already been written from another SignatureContent
+            return;
+        }
         ZipEntry signatureEntry = new ZipEntry(signatureUri);
         output.putNextEntry(signatureEntry);
         signature.writeTo(output);
         output.closeEntry();
+        writtenFiles.add(signatureUri);
     }
 
     private void writeDocuments(Map<String, ContainerDocument> documents, ZipOutputStream zipOutputStream) throws IOException {
@@ -204,16 +211,21 @@ class ZipContainer implements Container {
             ContainerDocument document = documents.get(uri);
             if (document.isWritable()) {
                 try (InputStream inputStream = document.getInputStream()) {
-                    writeEntry(new ZipEntry(uri), inputStream, zipOutputStream);
+                    writeEntry(uri, inputStream, zipOutputStream);
                 }
             }
         }
     }
 
-    private void writeEntry(ZipEntry entry, InputStream input, ZipOutputStream output) throws IOException {
-        output.putNextEntry(entry);
+    private void writeEntry(String path, InputStream input, ZipOutputStream output) throws IOException {
+        if (writtenFiles.contains(path)) {
+            // Skip since the file has already been written from another SignatureContent
+            return;
+        }
+        output.putNextEntry(new ZipEntry(path));
         Util.copyData(input, output);
         output.closeEntry();
+        writtenFiles.add(path);
     }
 
 }

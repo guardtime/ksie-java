@@ -73,7 +73,7 @@ public class ZipContainerTest extends AbstractContainerTest {
     }
 
     @Test
-    public void testAddWithSameManifestName_ThrowsContainerMergingException() throws Exception {
+    public void testAddWithSameManifestPath_ThrowsContainerMergingException() throws Exception {
         expectedException.expect(ContainerMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing Manifest!");
         ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
@@ -90,7 +90,7 @@ public class ZipContainerTest extends AbstractContainerTest {
     }
 
     @Test
-    public void testAddWithSameContainerDocument_ThrowsContainerMergingException() throws Exception {
+    public void testAddWithSameContainerDocumentPath_ThrowsContainerMergingException() throws Exception {
         expectedException.expect(ContainerMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing name for ContainerDocument! Path: ");
         ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
