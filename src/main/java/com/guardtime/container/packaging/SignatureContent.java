@@ -6,14 +6,17 @@ import com.guardtime.container.document.EmptyContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.DocumentsManifest;
+import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
+import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -95,6 +98,26 @@ public class SignatureContent {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Returns existing {@link ContainerDocument} if present and replaces it with an {@link EmptyContainerDocument} in the
+     * {@link SignatureContent}. If no document found or if the document is already detached null will be returned.
+     */
+    public ContainerDocument detachDocument(String path) {
+        if (!documents.containsKey(path) || documents.get(path) instanceof EmptyContainerDocument) {
+            return null;
+        }
+        ContainerDocument removed = documents.remove(path);
+        List<DataHash> removedDocumentHashes = new LinkedList<>();
+        for (FileReference ref : documentsManifest.getRight().getDocumentReferences()) {
+            if (ref.getUri().equals(path)) {
+                removedDocumentHashes.addAll(ref.getHashList());
+                break;
+            }
+        }
+        documents.put(path, new EmptyContainerDocument(removed.getFileName(), removed.getMimeType(), removedDocumentHashes));
+        return removed;
     }
 
     private Map<String, SingleAnnotationManifest> formatSingleAnnotationManifestsListToMap(List<Pair<String, SingleAnnotationManifest>> annotationManifests) {
