@@ -6,7 +6,7 @@ import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.packaging.Container;
-import com.guardtime.container.packaging.InvalidPackageException;
+import com.guardtime.container.packaging.exception.InvalidPackageException;
 import com.guardtime.container.util.Util;
 
 import org.junit.After;

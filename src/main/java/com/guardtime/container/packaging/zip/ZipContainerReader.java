@@ -2,10 +2,10 @@ package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.manifest.ContainerManifestFactory;
-import com.guardtime.container.packaging.ContainerReadingException;
-import com.guardtime.container.packaging.InvalidPackageException;
 import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.packaging.exception.ContainerReadingException;
+import com.guardtime.container.packaging.exception.InvalidPackageException;
 import com.guardtime.container.packaging.parsing.ParsingStore;
 import com.guardtime.container.packaging.parsing.ParsingStoreException;
 import com.guardtime.container.packaging.zip.handler.AnnotationContentHandler;
@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import static com.guardtime.container.packaging.MimeType.MIME_TYPE_ENTRY_NAME;
 
 /**
  * Helper class for reading Zip container.
@@ -145,7 +147,7 @@ class ZipContainerReader {
 
     private MimeType getMimeType() {
         try {
-            String uri = ZipContainerPackagingFactoryBuilder.MIME_TYPE_ENTRY_NAME;
+            String uri = MIME_TYPE_ENTRY_NAME;
             byte[] content = mimeTypeHandler.get(uri);
             return new MimeTypeEntry(uri, content);
         } catch (ContentParsingException e) {

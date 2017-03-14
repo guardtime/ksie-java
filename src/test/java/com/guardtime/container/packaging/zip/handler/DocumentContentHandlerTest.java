@@ -3,7 +3,7 @@ package com.guardtime.container.packaging.zip.handler;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder.MIME_TYPE_ENTRY_NAME;
+import static com.guardtime.container.packaging.MimeType.MIME_TYPE_ENTRY_NAME;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
