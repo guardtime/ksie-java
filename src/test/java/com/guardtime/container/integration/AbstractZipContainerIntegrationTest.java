@@ -139,7 +139,6 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
         }
     }
 
-    @Ignore //TODO-58 - Should be possible.
     @Test
     public void testCreateContainerFromExistingWithDifferentIndexProviderCombination_OK() throws Exception {
         try (
@@ -150,7 +149,6 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
         }
     }
 
-    @Ignore //TODO-58 - Should be possible.
     @Test
     public void testCreateContainerFromExistingWithDifferentIndexProviderCombination2_OK() throws Exception {
         try (
@@ -191,7 +189,6 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
         }
     }
 
-    @Ignore //TODO-58 - Should be possible.
     @Test
     public void testCreateContainerFromExistingWithDifferentIndexTypesInSameContent_OK() throws Exception {
         try (
@@ -207,7 +204,6 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
         }
     }
 
-    @Ignore //TODO-58 - Should be possible.
     @Test
     public void testCreateContainerFromExistingWithDifferentIndexesInContents_OK() throws Exception {
         try (
@@ -221,7 +217,6 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
         }
     }
 
-    @Ignore //TODO-58 - Should be possible.
     @Test
     public void testAddDocumentsToExistingContainerWithOneContentRemoved_OK() throws Exception {
         try (

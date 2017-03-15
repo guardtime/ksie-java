@@ -30,10 +30,7 @@ public class IncrementingIndexProviderFactoryTest extends AbstractContainerTest 
     }
 
     @Test
-    public void testCreateWithInvalidContainer() throws Exception {
-        expectedException.expect(IndexingException.class);
-        expectedException.expectMessage("Not an integer based index");
-
+    public void testCreateWithMixedContainer() throws Exception {
         ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
                 withSignatureFactory(mockedSignatureFactory).
                 withManifestFactory(mockedManifestFactory).
@@ -41,7 +38,8 @@ public class IncrementingIndexProviderFactoryTest extends AbstractContainerTest 
                 disableInternalVerification().
                 build();
         try (Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(STRING_CONTAINER_ANNOTATION))) {
-            indexProviderFactory.create(container);
+            IndexProvider indexProvider = indexProviderFactory.create(container);
+            Assert.assertEquals("1", indexProvider.getNextSignatureIndex());
         }
     }
 

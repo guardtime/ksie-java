@@ -4,6 +4,9 @@ import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -13,13 +16,15 @@ import java.util.UUID;
  */
 public class UuidIndexProviderFactory implements IndexProviderFactory {
 
+    private static final Logger logger = LoggerFactory.getLogger(UuidIndexProviderFactory.class);
+
     @Override
     public IndexProvider create() {
         return new UuidIndexProvider();
     }
 
     @Override
-    public IndexProvider create(Container container) throws IndexingException {
+    public IndexProvider create(Container container) {
         for (SignatureContent signatureContent : container.getSignatureContents()) {
             Set<String> uris = getUriSet(signatureContent);
             verifyUuidExistence(uris);
@@ -42,14 +47,14 @@ public class UuidIndexProviderFactory implements IndexProviderFactory {
         return uris;
     }
 
-    private void verifyUuidExistence(Set<String> set) throws IndexingException {
+    private void verifyUuidExistence(Set<String> set) {
         for (String str : set) {
             str = str.substring(str.lastIndexOf("/") + 1);
             String index = str.substring(str.indexOf("-") + 1, str.lastIndexOf("."));
             try {
                 UUID.fromString(index);
             } catch (IllegalArgumentException e) {
-                throw new IndexingException("Not a RFC4122 UUID based index");
+                logger.warn("Not a RFC4122 UUID based index");
             }
         }
     }

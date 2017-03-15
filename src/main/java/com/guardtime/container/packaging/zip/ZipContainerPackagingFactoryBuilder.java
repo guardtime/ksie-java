@@ -8,7 +8,6 @@ import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.container.indexing.IndexProvider;
 import com.guardtime.container.indexing.IndexProviderFactory;
-import com.guardtime.container.indexing.IndexingException;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.DocumentsManifest;
@@ -191,8 +190,6 @@ public class ZipContainerPackagingFactoryBuilder {
                 throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
             } catch (SignatureException e) {
                 throw new InvalidPackageException("Failed to sign ZipContainer!", e);
-            } catch (IndexingException e) {
-                throw new InvalidPackageException("Failed to extract signature indexes from existing Container!", e);
             } catch (ParsingStoreException e) {
                 throw new InvalidPackageException("Failed to create private store!", e);
             }
