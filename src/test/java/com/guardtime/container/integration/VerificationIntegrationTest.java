@@ -283,65 +283,38 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testCreateContainerUsingEmptyContainerDocumentAndAddDocumentLater() throws Exception {
-        VerificationPolicy verificationPolicy = new DefaultVerificationPolicy(
-                defaultRuleStateProvider,
-                new KsiSignatureVerifier(ksi, new InternalVerificationPolicy()),
-                packagingFactory
-        );
-        ContainerVerifier containerVerifier = new ContainerVerifier(verificationPolicy);
-
-        String documentName = "Document1.txt";
         byte[] documentContent = "This is document's content.".getBytes(StandardCharsets.UTF_8);
-        try (
-                ContainerDocument document = new EmptyContainerDocument(
-                        documentName,
-                        "txt",
-                        Collections.singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(documentContent).getHash()));
-                ContainerAnnotation annotation = new StringContainerAnnotation(
-                        ContainerAnnotationType.NON_REMOVABLE,
-                        "Document is not with container. Container was created created with empty container document. Document itself can be added later on if needed.",
-                        "com.guardtime.com");
-                Container container = packagingFactory.create(Collections.singletonList(document), Collections.singletonList(annotation));
-                InputStream stream = new ByteArrayInputStream(documentContent)
-        ) {
-            ContainerVerifierResult results = containerVerifier.verify(container);
-            assertTrue(results.getVerificationResult().equals(VerificationResult.NOK));
-
-            container.getSignatureContents().get(0).attachDetachedDocument(documentName, stream);
-            results = containerVerifier.verify(container);
-            assertTrue(results.getVerificationResult().equals(VerificationResult.OK));
-        }
+        baseTestCreateContainerUsingEmptyContainerDocumentAndAddDocumentData(VerificationResult.OK, documentContent, documentContent);
     }
 
     @Test
     public void testCreateContainerUsingEmptyContainerDocumentAndAddWrongDocumentLater() throws Exception {
-        VerificationPolicy verificationPolicy = new DefaultVerificationPolicy(
-                defaultRuleStateProvider,
-                new KsiSignatureVerifier(ksi, new InternalVerificationPolicy()),
-                packagingFactory
-        );
-        ContainerVerifier containerVerifier = new ContainerVerifier(verificationPolicy);
+        byte[] documentContent = "This is document's content.".getBytes(StandardCharsets.UTF_8);
+        baseTestCreateContainerUsingEmptyContainerDocumentAndAddDocumentData(VerificationResult.NOK, documentContent, "IncorrectContent".getBytes());
+    }
+
+    private void baseTestCreateContainerUsingEmptyContainerDocumentAndAddDocumentData(VerificationResult verificationResult, byte[] expectedDocumentContent, byte[] addedDocumentContent) throws Exception {
+        ContainerVerifier containerVerifier = getContainerVerifier(new InternalVerificationPolicy());
 
         String documentName = "Document1.txt";
-        byte[] documentContent = "This is document's content.".getBytes(StandardCharsets.UTF_8);
         try (
                 ContainerDocument document = new EmptyContainerDocument(
                         documentName,
                         "txt",
-                        Collections.singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(documentContent).getHash()));
+                        Collections.singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(expectedDocumentContent).getHash()));
                 ContainerAnnotation annotation = new StringContainerAnnotation(
                         ContainerAnnotationType.NON_REMOVABLE,
                         "Document is not with container. Container was created created with empty container document. Document itself can be added later on if needed.",
                         "com.guardtime.com");
                 Container container = packagingFactory.create(Collections.singletonList(document), Collections.singletonList(annotation));
-                InputStream stream = new ByteArrayInputStream("IncorrectContent".getBytes())
+                InputStream stream = new ByteArrayInputStream(addedDocumentContent)
         ) {
             ContainerVerifierResult results = containerVerifier.verify(container);
             assertTrue(results.getVerificationResult().equals(VerificationResult.NOK));
 
             container.getSignatureContents().get(0).attachDetachedDocument(documentName, stream);
             results = containerVerifier.verify(container);
-            assertTrue(results.getVerificationResult().equals(VerificationResult.NOK));
+            assertTrue(results.getVerificationResult().equals(verificationResult));
         }
     }
 

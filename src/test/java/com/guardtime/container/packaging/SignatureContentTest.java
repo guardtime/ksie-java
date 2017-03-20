@@ -16,6 +16,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -76,16 +77,16 @@ public class SignatureContentTest extends AbstractContainerTest {
         );
         when(mockedDocumentsManifest.getDocumentReferences()).thenAnswer(makeFileReferenceList(documents));
         return new SignatureContent.Builder()
-                .withDocuments(documents).
-                        withAnnotations(Collections.<Pair<String, ContainerAnnotation>>emptyList()).
-                        withSingleAnnotationManifests(Collections.<Pair<String, SingleAnnotationManifest>>emptyList()).
-                        withDocumentsManifest(Pair.of("datamanifest.tlv", mockedDocumentsManifest))
+                .withDocuments(documents)
+                .withAnnotations(Collections.<Pair<String, ContainerAnnotation>>emptyList())
+                .withSingleAnnotationManifests(Collections.<Pair<String, SingleAnnotationManifest>>emptyList())
+                .withDocumentsManifest(Pair.of("datamanifest.tlv", mockedDocumentsManifest))
                 .build();
     }
 
     private Answer<List<? extends FileReference>> makeFileReferenceList(List<ContainerDocument> documents) {
 
-        final List<FileReference> fileReferenceList = new LinkedList<>();
+        final List<FileReference> fileReferenceList = new ArrayList<>();
         for (final ContainerDocument doc : documents) {
             fileReferenceList.add(new FileReference() {
                 @Override

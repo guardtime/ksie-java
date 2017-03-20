@@ -93,7 +93,7 @@ public class SignatureContent {
      */
     public boolean attachDetachedDocument(String path, InputStream data) {
         ContainerDocument document = documents.get(path);
-        if (document != null && document instanceof EmptyContainerDocument) {
+        if (document instanceof EmptyContainerDocument) {
             documents.put(path, new StreamContainerDocument(data, document.getMimeType(), document.getFileName()));
             return true;
         }
@@ -109,10 +109,10 @@ public class SignatureContent {
             return null;
         }
         ContainerDocument removed = documents.remove(path);
-        List<DataHash> removedDocumentHashes = new LinkedList<>();
+        List<DataHash> removedDocumentHashes = null;
         for (FileReference ref : documentsManifest.getRight().getDocumentReferences()) {
             if (ref.getUri().equals(path)) {
-                removedDocumentHashes.addAll(ref.getHashList());
+                removedDocumentHashes = ref.getHashList();
                 break;
             }
         }
