@@ -7,7 +7,13 @@ import com.guardtime.container.indexing.UuidIndexProviderFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.packaging.exception.ContainerMergingException;
+import com.guardtime.container.packaging.exception.AnnotationsManifestMergingException;
+import com.guardtime.container.packaging.exception.ContainerAnnotationMergingException;
+import com.guardtime.container.packaging.exception.DocumentMergingException;
+import com.guardtime.container.packaging.exception.DocumentsManifestMergingException;
+import com.guardtime.container.packaging.exception.ManifestMergingException;
+import com.guardtime.container.packaging.exception.SignatureMergingException;
+import com.guardtime.container.packaging.exception.SingleAnnotationManifestMergingException;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 
 import org.junit.Assert;
@@ -30,6 +36,27 @@ import static org.junit.Assert.assertTrue;
 
 public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTest {
     private ContainerPackagingFactory incPackagingFactory;
+
+
+    /**
+     * Containers - for creating file conflicts when trying to merge containers.
+     */
+    private static final String[] CONTAINERS_FOR_UNKNOWN_FILE_CONFLICT = {"containers/container-for-unknown-file-conflict.ksie", CONTAINER_WITH_UNKNOWN_FILES};
+    private static final String[] CONTAINERS_FOR_DOCUMENTS_MANIFEST_CONFLICT = {"containers/container-for-documents-manifest-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_FOR_ANNOTATION_DATA_CONFLICT = {"containers/container-for-annotation-data-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_FOR_SINGLE_ANNOTATION_MANIFEST_CONFLICT = {"containers/container-for-annotation-manifest-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_FOR_ANNOTATIONS_MANIFEST_CONFLICT = {"containers/container-for-annotations-manifest-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_FOR_DOCUMENT_CONFLICT = {"containers/container-for-document-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_FOR_MANIFEST_CONFLICT = {"containers/container-for-manifest-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_FOR_SIGNATURE_CONFLICT = {"containers/container-for-signature-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_FOR_MIX_CONFLICT_1 = {"containers/container-for-mix-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_FOR_MIX_CONFLICT_2 = {CONTAINER_WITH_MULTIPLE_ANNOTATIONS, "containers/container-for-mix-conflict.ksie"};
+
+    /**
+     * Containers - merging those container should not yield any exception.
+     */
+    private static final String[] CONTAINERS_FOR_SAME_DOCUMENT = {"containers/container-for-same-document-file.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_IDENTICAL = {"containers/container-multiple-annotations-copy.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
 
     @Before
     public void setUp() throws Exception {
@@ -143,70 +170,70 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
 
     @Test
     public void testMergeContainersUnknownFileConflict() throws Exception {
-        expectedException.expect(ContainerMergingException.class);
+        expectedException.expect(DocumentMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing name for ContainerDocument! Path: META-INF/sun.txt");
         mergeContainersWithConflicts(CONTAINERS_FOR_UNKNOWN_FILE_CONFLICT);
     }
 
     @Test
     public void testMergeContainersDocumentManifestConflict() throws Exception {
-        expectedException.expect(ContainerMergingException.class);
+        expectedException.expect(DocumentsManifestMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing DocumentsManifest! Path: META-INF/datamanifest-1.tlv");
         mergeContainersWithConflicts(CONTAINERS_FOR_DOCUMENTS_MANIFEST_CONFLICT);
     }
 
     @Test
     public void testMergeContainersAnnotationDataConflict() throws Exception {
-        expectedException.expect(ContainerMergingException.class);
+        expectedException.expect(ContainerAnnotationMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing Annotation data! Path: META-INF/annotation-1.dat");
         mergeContainersWithConflicts(CONTAINERS_FOR_ANNOTATION_DATA_CONFLICT);
     }
 
     @Test
     public void testMergeContainersSingleAnnotationManifestConflict() throws Exception {
-        expectedException.expect(ContainerMergingException.class);
+        expectedException.expect(SingleAnnotationManifestMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing SingleAnnotationManifest! Path: META-INF/annotation-1.tlv");
         mergeContainersWithConflicts(CONTAINERS_FOR_SINGLE_ANNOTATION_MANIFEST_CONFLICT);
     }
 
     @Test
     public void testMergeContainersAnnotationsManifestConflict() throws Exception {
-        expectedException.expect(ContainerMergingException.class);
+        expectedException.expect(AnnotationsManifestMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing AnnotationsManifest! Path: META-INF/annotmanifest-1.tlv");
         mergeContainersWithConflicts(CONTAINERS_FOR_ANNOTATIONS_MANIFEST_CONFLICT);
     }
 
     @Test
     public void testMergeContainersSignatureConflict() throws Exception {
-        expectedException.expect(ContainerMergingException.class);
+        expectedException.expect(SignatureMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing signature! Path: META-INF/signature-1.ksi");
         mergeContainersWithConflicts(CONTAINERS_FOR_SIGNATURE_CONFLICT);
     }
 
     @Test
     public void testMergeContainersDocumentConflict() throws Exception {
-        expectedException.expect(ContainerMergingException.class);
+        expectedException.expect(DocumentMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing name for ContainerDocument!");
         mergeContainersWithConflicts(CONTAINERS_FOR_DOCUMENT_CONFLICT);
     }
 
     @Test
     public void testMergeContainersManifestConflict() throws Exception {
-        expectedException.expect(ContainerMergingException.class);
+        expectedException.expect(ManifestMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing Manifest! Path: META-INF/manifest-1.tlv");
         mergeContainersWithConflicts(CONTAINERS_FOR_MANIFEST_CONFLICT);
     }
 
     @Test
     public void testMergeContainersUnknownConflictsWithContainerFile1() throws Exception {
-        expectedException.expect(ContainerMergingException.class);
+        expectedException.expect(ContainerAnnotationMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing Annotation data! Path: META-INF/annotation-2.dat");
         mergeContainersWithConflicts(CONTAINERS_FOR_MIX_CONFLICT_1);
     }
 
     @Test
     public void testMergeContainersUnknownConflictsWithContainerFile2() throws Exception {
-        expectedException.expect(ContainerMergingException.class);
+        expectedException.expect(ContainerAnnotationMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing Annotation data! Path: META-INF/annotation-2.dat");
         mergeContainersWithConflicts(CONTAINERS_FOR_MIX_CONFLICT_2);
     }
