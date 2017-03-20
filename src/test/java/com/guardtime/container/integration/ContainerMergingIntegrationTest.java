@@ -5,13 +5,14 @@ import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.container.indexing.UuidIndexProviderFactory;
 import com.guardtime.container.packaging.Container;
-import com.guardtime.container.packaging.exception.ContainerMergingException;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.packaging.exception.ContainerMergingException;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -105,7 +106,7 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
              ContainerDocument document2 = new StreamContainerDocument(new ByteArrayInputStream("".getBytes()), "textDoc", "2-" + Long.toString(new Date().getTime()))) {
             uuidContainer.add(incContainer);
             try (Container newContainer = packagingFactory.create(uuidContainer, singletonList(document2), singletonList(STRING_CONTAINER_ANNOTATION))) {
-                assertEquals(newContainer.getSignatureContents().size(), 3);
+                assertEquals(newContainer.getSignatureContents().size(), 4);
             }
         }
     }
@@ -143,71 +144,88 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
     @Test
     public void testMergeContainersUnknownFileConflict() throws Exception {
         expectedException.expect(ContainerMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for UnknownDocuments!");
-        mergeContainersWithConflicts(CONTAINER_FOR_UNKNOWN_FILE_CONFLICT);
+        expectedException.expectMessage("New SignatureContent has clashing name for ContainerDocument! Path: META-INF/sun.txt");
+        mergeContainersWithConflicts(CONTAINERS_FOR_UNKNOWN_FILE_CONFLICT);
     }
 
     @Test
     public void testMergeContainersDocumentManifestConflict() throws Exception {
         expectedException.expect(ContainerMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for DocumentsManifest!");
-        mergeContainersWithConflicts(CONTAINER_FOR_DOCUMENTS_MANIFEST_CONFLICT);
+        expectedException.expectMessage("New SignatureContent has clashing DocumentsManifest! Path: META-INF/datamanifest-1.tlv");
+        mergeContainersWithConflicts(CONTAINERS_FOR_DOCUMENTS_MANIFEST_CONFLICT);
     }
 
     @Test
     public void testMergeContainersAnnotationDataConflict() throws Exception {
         expectedException.expect(ContainerMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for AnnotationData!");
-        mergeContainersWithConflicts(CONTAINER_FOR_ANNOTATION_DATA_CONFLICT);
+        expectedException.expectMessage("New SignatureContent has clashing Annotation data! Path: META-INF/annotation-1.dat");
+        mergeContainersWithConflicts(CONTAINERS_FOR_ANNOTATION_DATA_CONFLICT);
     }
 
     @Test
     public void testMergeContainersSingleAnnotationManifestConflict() throws Exception {
         expectedException.expect(ContainerMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for SingleAnnotationManifest!");
-        mergeContainersWithConflicts(CONTAINER_FOR_SINGLE_ANNOTATION_MANIFEST_CONFLICT);
+        expectedException.expectMessage("New SignatureContent has clashing SingleAnnotationManifest! Path: META-INF/annotation-1.tlv");
+        mergeContainersWithConflicts(CONTAINERS_FOR_SINGLE_ANNOTATION_MANIFEST_CONFLICT);
     }
 
     @Test
     public void testMergeContainersAnnotationsManifestConflict() throws Exception {
         expectedException.expect(ContainerMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for AnnotationsManifest!");
-        mergeContainersWithConflicts(CONTAINER_FOR_ANNOTATIONS_MANIFEST_CONFLICT);
+        expectedException.expectMessage("New SignatureContent has clashing AnnotationsManifest! Path: META-INF/annotmanifest-1.tlv");
+        mergeContainersWithConflicts(CONTAINERS_FOR_ANNOTATIONS_MANIFEST_CONFLICT);
     }
 
     @Test
     public void testMergeContainersSignatureConflict() throws Exception {
         expectedException.expect(ContainerMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for Signature!");
-        mergeContainersWithConflicts(CONTAINER_FOR_SIGNATURE_CONFLICT);
+        expectedException.expectMessage("New SignatureContent has clashing signature! Path: META-INF/signature-1.ksi");
+        mergeContainersWithConflicts(CONTAINERS_FOR_SIGNATURE_CONFLICT);
     }
 
     @Test
     public void testMergeContainersDocumentConflict() throws Exception {
         expectedException.expect(ContainerMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing name for ContainerDocument!");
-        mergeContainersWithConflicts(CONTAINER_FOR_DOCUMENT_CONFLICT);
+        mergeContainersWithConflicts(CONTAINERS_FOR_DOCUMENT_CONFLICT);
     }
 
     @Test
     public void testMergeContainersManifestConflict() throws Exception {
         expectedException.expect(ContainerMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for Manifest!");
-        mergeContainersWithConflicts(CONTAINER_FOR_MANIFEST_CONFLICT);
+        expectedException.expectMessage("New SignatureContent has clashing Manifest! Path: META-INF/manifest-1.tlv");
+        mergeContainersWithConflicts(CONTAINERS_FOR_MANIFEST_CONFLICT);
     }
 
     @Test
     public void testMergeContainersUnknownConflictsWithContainerFile1() throws Exception {
         expectedException.expect(ContainerMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for UnknownDocuments!");
-        mergeContainersWithConflicts(CONTAINER_FOR_MIX_CONFLICT_1);
+        expectedException.expectMessage("New SignatureContent has clashing Annotation data! Path: META-INF/annotation-2.dat");
+        mergeContainersWithConflicts(CONTAINERS_FOR_MIX_CONFLICT_1);
     }
 
     @Test
     public void testMergeContainersUnknownConflictsWithContainerFile2() throws Exception {
         expectedException.expect(ContainerMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for UnknownDocuments!");
-        mergeContainersWithConflicts(CONTAINER_FOR_MIX_CONFLICT_2);
+        expectedException.expectMessage("New SignatureContent has clashing Annotation data! Path: META-INF/annotation-2.dat");
+        mergeContainersWithConflicts(CONTAINERS_FOR_MIX_CONFLICT_2);
+    }
+
+    @Ignore //TODO-77
+    @Test
+    public void testMergeContainersWithExactSameDocument() throws Exception {
+        try (Container container = mergeContainers(CONTAINERS_FOR_SAME_DOCUMENT)) {
+            assertEquals(2, container.getSignatureContents().size());
+        }
+    }
+
+    @Ignore //TODO-77
+    @Test
+    public void testMergeContainerWithExactSameContainer() throws Exception {
+        try (Container container = mergeContainers(CONTAINERS_IDENTICAL)) {
+            assertEquals(2, container.getSignatureContents().size());
+            assertSignatureContentsCount(container, 1);
+        }
     }
 
     private void mergeContainersWithConflicts(String[] containers) throws Exception {
@@ -215,6 +233,14 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
                 Container container2 = getContainer(containers[1])) {
             container1.add(container2);
         }
+    }
+
+    private Container mergeContainers(String[] containers) throws Exception {
+        Container container1 = getContainer(containers[0]);
+        try (Container container2 = getContainer(containers[1])) {
+            container1.add(container2);
+        }
+        return container1;
     }
 
 
@@ -239,8 +265,8 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
     private void assertSignatureContentsCount(Container parsedContainer, int expectedSignatureContentsSize) throws Exception {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         parsedContainer.writeTo(bos);
-        try (Container parsedMergedContainer = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
-            assertEquals(expectedSignatureContentsSize, parsedMergedContainer.getSignatureContents().size());
+        try (Container containerFromBos = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
+            assertEquals(expectedSignatureContentsSize, containerFromBos.getSignatureContents().size());
         }
     }
 }

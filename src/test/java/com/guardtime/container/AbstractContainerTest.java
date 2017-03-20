@@ -57,16 +57,22 @@ public class AbstractContainerTest {
     /**
      * Containers - for creating file conflicts when trying to merge containers.
      */
-    protected static final String[] CONTAINER_FOR_UNKNOWN_FILE_CONFLICT = {"containers/container-for-unknown-file-conflict.ksie", CONTAINER_WITH_UNKNOWN_FILES};
-    protected static final String[] CONTAINER_FOR_DOCUMENTS_MANIFEST_CONFLICT = {"containers/container-for-documents-manifest-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
-    protected static final String[] CONTAINER_FOR_ANNOTATION_DATA_CONFLICT = {"containers/container-for-annotation-data-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
-    protected static final String[] CONTAINER_FOR_SINGLE_ANNOTATION_MANIFEST_CONFLICT = {"containers/container-for-annotation-manifest-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
-    protected static final String[] CONTAINER_FOR_ANNOTATIONS_MANIFEST_CONFLICT = {"containers/container-for-annotations-manifest-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
-    protected static final String[] CONTAINER_FOR_DOCUMENT_CONFLICT = {"containers/container-for-document-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
-    protected static final String[] CONTAINER_FOR_MANIFEST_CONFLICT = {"containers/container-for-manifest-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
-    protected static final String[] CONTAINER_FOR_SIGNATURE_CONFLICT = {"containers/container-for-signature-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
-    protected static final String[] CONTAINER_FOR_MIX_CONFLICT_1 = {"containers/container-for-mix-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
-    protected static final String[] CONTAINER_FOR_MIX_CONFLICT_2 = {CONTAINER_WITH_MULTIPLE_ANNOTATIONS, "containers/container-for-mix-conflict.ksie"};
+    protected static final String[] CONTAINERS_FOR_UNKNOWN_FILE_CONFLICT = {"containers/container-for-unknown-file-conflict.ksie", CONTAINER_WITH_UNKNOWN_FILES};
+    protected static final String[] CONTAINERS_FOR_DOCUMENTS_MANIFEST_CONFLICT = {"containers/container-for-documents-manifest-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    protected static final String[] CONTAINERS_FOR_ANNOTATION_DATA_CONFLICT = {"containers/container-for-annotation-data-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    protected static final String[] CONTAINERS_FOR_SINGLE_ANNOTATION_MANIFEST_CONFLICT = {"containers/container-for-annotation-manifest-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    protected static final String[] CONTAINERS_FOR_ANNOTATIONS_MANIFEST_CONFLICT = {"containers/container-for-annotations-manifest-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    protected static final String[] CONTAINERS_FOR_DOCUMENT_CONFLICT = {"containers/container-for-document-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    protected static final String[] CONTAINERS_FOR_MANIFEST_CONFLICT = {"containers/container-for-manifest-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    protected static final String[] CONTAINERS_FOR_SIGNATURE_CONFLICT = {"containers/container-for-signature-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    protected static final String[] CONTAINERS_FOR_MIX_CONFLICT_1 = {"containers/container-for-mix-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    protected static final String[] CONTAINERS_FOR_MIX_CONFLICT_2 = {CONTAINER_WITH_MULTIPLE_ANNOTATIONS, "containers/container-for-mix-conflict.ksie"};
+
+    /**
+     *
+     */
+    protected static final String[] CONTAINERS_FOR_SAME_DOCUMENT = {"containers/container-for-same-document-file.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
+    protected static final String[] CONTAINERS_IDENTICAL = {"containers/container-multiple-annotations-copy.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
 
     /**
      * Containers - Internally invalid or does not verify against anchors.
