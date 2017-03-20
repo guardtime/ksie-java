@@ -3,9 +3,8 @@ package com.guardtime.container.integration;
 import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
-import com.guardtime.container.packaging.ContainerReadingException;
+import com.guardtime.container.packaging.exception.ContainerReadingException;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
-import com.guardtime.container.packaging.zip.handler.ContentParsingException;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.ksi.KsiSignatureFactory;
 import com.guardtime.container.util.Pair;
@@ -36,6 +35,8 @@ import java.util.zip.ZipOutputStream;
 
 public abstract class AbstractCommonIntegrationTest extends AbstractContainerTest {
 
+    private static final File TRUST_STORE_FILE;
+    private static final String TRUST_STORE_PASSWORD;
     protected ContainerPackagingFactory packagingFactory;
     protected SignatureFactory signatureFactory;
     protected KSI ksi;
@@ -55,6 +56,13 @@ public abstract class AbstractCommonIntegrationTest extends AbstractContainerTes
             TEST_EXTENDING_SERVICE = properties.getProperty("service.extending");
             GUARDTIME_PUBLICATIONS_FILE = properties.getProperty("publications.file.url");
             KSI_SERVICE_CREDENTIALS = new KSIServiceCredentials(properties.getProperty("credentials.id"), properties.getProperty("credentials.key"));
+            TRUST_STORE_FILE = new File(
+                    Thread.currentThread().
+                            getContextClassLoader().
+                            getResource("ksi-truststore.jks").
+                            toURI()
+            );
+            TRUST_STORE_PASSWORD = "changeit";
         } catch (URISyntaxException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -74,6 +82,7 @@ public abstract class AbstractCommonIntegrationTest extends AbstractContainerTes
                 .setKsiProtocolExtenderClient(httpClient)
                 .setKsiProtocolPublicationsFileClient(httpClient)
                 .setPublicationsFileTrustedCertSelector(new X509CertificateSubjectRdnSelector("E=publications@guardtime.com"))
+                .setPublicationsFilePkiTrustStore(TRUST_STORE_FILE, TRUST_STORE_PASSWORD)
                 .build();
         signatureFactory = new KsiSignatureFactory(ksi);
         packagingFactory = new ZipContainerPackagingFactoryBuilder().withSignatureFactory(signatureFactory).build();

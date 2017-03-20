@@ -10,7 +10,7 @@ import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
-import com.guardtime.container.packaging.InvalidPackageException;
+import com.guardtime.container.packaging.exception.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;

@@ -1,7 +1,6 @@
 package com.guardtime.container.packaging;
 
 import com.guardtime.container.indexing.IndexProvider;
-import com.guardtime.container.indexing.IndexingException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +21,7 @@ public class EntryNameProviderTest {
     private EntryNameProvider nameProvider;
 
     @Before
-    public void setUp() throws IndexingException {
+    public void setUp() {
         indexProvider = Mockito.mock(IndexProvider.class);
         nameProvider = new EntryNameProvider(MANIFEST_SUFFIX, SIGNATURE_SUFFIX, indexProvider);
     }

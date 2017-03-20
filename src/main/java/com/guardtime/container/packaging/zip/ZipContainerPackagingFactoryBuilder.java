@@ -8,7 +8,6 @@ import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.container.indexing.IndexProvider;
 import com.guardtime.container.indexing.IndexProviderFactory;
-import com.guardtime.container.indexing.IndexingException;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.DocumentsManifest;
@@ -20,7 +19,7 @@ import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.EntryNameProvider;
-import com.guardtime.container.packaging.InvalidPackageException;
+import com.guardtime.container.packaging.exception.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.parsing.ParsingStore;
 import com.guardtime.container.packaging.parsing.ParsingStoreException;
@@ -44,7 +43,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,12 +51,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.guardtime.container.packaging.MimeType.MIME_TYPE_ENTRY_NAME;
+
 /**
  * Builds {@link ContainerPackagingFactory} for generating {@link Container} instances that use ZIP archiving for storing.
  */
 
 public class ZipContainerPackagingFactoryBuilder {
-    public static final String MIME_TYPE_ENTRY_NAME = "mimetype";
     private static final Logger logger = LoggerFactory.getLogger(ZipContainerPackagingFactory.class);
     private SignatureFactory signatureFactory;
     private ContainerManifestFactory manifestFactory = new TlvContainerManifestFactory();
@@ -191,8 +190,6 @@ public class ZipContainerPackagingFactoryBuilder {
                 throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
             } catch (SignatureException e) {
                 throw new InvalidPackageException("Failed to sign ZipContainer!", e);
-            } catch (IndexingException e) {
-                throw new InvalidPackageException("Failed to extract signature indexes from existing Container!", e);
             } catch (ParsingStoreException e) {
                 throw new InvalidPackageException("Failed to create private store!", e);
             }

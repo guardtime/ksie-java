@@ -5,6 +5,7 @@ import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -16,17 +17,15 @@ public class UuidIndexProviderFactoryTest extends AbstractContainerTest {
     private IndexProviderFactory indexProviderFactory = new UuidIndexProviderFactory();
 
     @Test
-    public void testCreateWithInvalidContainer() throws Exception {
-        expectedException.expect(IndexingException.class);
-        expectedException.expectMessage("Not a RFC4122 UUID based index");
-
+    public void testCreateWithMixedContainer() throws Exception {
         ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
                 withSignatureFactory(mockedSignatureFactory).
                 withManifestFactory(mockedManifestFactory).
                 disableInternalVerification().
                 build();
         try (Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(STRING_CONTAINER_ANNOTATION))) {
-            indexProviderFactory.create(container);
+            IndexProvider indexProvider = indexProviderFactory.create(container);
+            Assert.assertNotNull(indexProvider);
         }
     }
 
