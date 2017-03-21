@@ -12,7 +12,6 @@ import com.guardtime.ksi.tlv.TLVStructure;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 abstract class TlvFileReference extends TLVStructure implements FileReference {
