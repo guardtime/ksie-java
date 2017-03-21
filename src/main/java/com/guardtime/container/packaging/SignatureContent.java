@@ -2,13 +2,18 @@ package com.guardtime.container.packaging;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
+import com.guardtime.container.document.EmptyContainerDocument;
+import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.DocumentsManifest;
+import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
+import com.guardtime.ksi.hashing.DataHash;
 
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -78,6 +83,40 @@ public class SignatureContent {
 
     public Map<String, SingleAnnotationManifest> getSingleAnnotationManifests() {
         return Collections.unmodifiableMap(singleAnnotationManifestMap);
+    }
+
+    /**
+     * Attached data to a detached {@link ContainerDocument}. Returns true after successful attachment.
+     * @param path Path of the {@link ContainerDocument} to attach the data to.
+     * @param data Data stream to be attached to the {@link ContainerDocument}. NB! Does NOT close the stream!
+     */
+    public boolean attachDetachedDocument(String path, InputStream data) {
+        ContainerDocument document = documents.get(path);
+        if (document instanceof EmptyContainerDocument) {
+            documents.put(path, new StreamContainerDocument(data, document.getMimeType(), document.getFileName()));
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns existing {@link ContainerDocument} if present and replaces it with an {@link EmptyContainerDocument} in the
+     * {@link SignatureContent}. If no document found or if the document is already detached null will be returned.
+     */
+    public ContainerDocument detachDocument(String path) {
+        if (!documents.containsKey(path) || documents.get(path) instanceof EmptyContainerDocument) {
+            return null;
+        }
+        ContainerDocument removed = documents.remove(path);
+        List<DataHash> removedDocumentHashes = null;
+        for (FileReference ref : documentsManifest.getRight().getDocumentReferences()) {
+            if (ref.getUri().equals(path)) {
+                removedDocumentHashes = ref.getHashList();
+                break;
+            }
+        }
+        documents.put(path, new EmptyContainerDocument(removed.getFileName(), removed.getMimeType(), removedDocumentHashes));
+        return removed;
     }
 
     private Map<String, SingleAnnotationManifest> formatSingleAnnotationManifestsListToMap(List<Pair<String, SingleAnnotationManifest>> annotationManifests) {

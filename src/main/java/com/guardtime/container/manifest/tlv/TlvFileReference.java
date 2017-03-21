@@ -12,13 +12,12 @@ import com.guardtime.ksi.tlv.TLVStructure;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 abstract class TlvFileReference extends TLVStructure implements FileReference {
 
     private String uri;
-    private List<DataHash> hashList = new LinkedList<>();
+    private List<DataHash> hashList = new ArrayList<>();
     private String mimeType;
 
     public TlvFileReference(TLVElement rootElement) throws TLVParserException {

@@ -7,7 +7,6 @@ import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.EmptyContainerDocument;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.ContainerVerifier;
 import com.guardtime.container.verification.policy.DefaultVerificationPolicy;
 import com.guardtime.container.verification.policy.VerificationPolicy;
@@ -35,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.util.Collections;
@@ -284,36 +283,38 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testCreateContainerUsingEmptyContainerDocumentAndAddDocumentLater() throws Exception {
-        VerificationPolicy verificationPolicy = new DefaultVerificationPolicy(
-                defaultRuleStateProvider,
-                new KsiSignatureVerifier(ksi, new InternalVerificationPolicy()),
-                packagingFactory
-        );
-        ContainerVerifier containerVerifier = new ContainerVerifier(verificationPolicy);
+        byte[] documentContent = "This is document's content.".getBytes(StandardCharsets.UTF_8);
+        baseTestCreateContainerUsingEmptyContainerDocumentAndAddDocumentData(VerificationResult.OK, documentContent, documentContent);
+    }
+
+    @Test
+    public void testCreateContainerUsingEmptyContainerDocumentAndAddWrongDocumentLater() throws Exception {
+        byte[] documentContent = "This is document's content.".getBytes(StandardCharsets.UTF_8);
+        baseTestCreateContainerUsingEmptyContainerDocumentAndAddDocumentData(VerificationResult.NOK, documentContent, "IncorrectContent".getBytes());
+    }
+
+    private void baseTestCreateContainerUsingEmptyContainerDocumentAndAddDocumentData(VerificationResult verificationResult, byte[] expectedDocumentContent, byte[] addedDocumentContent) throws Exception {
+        ContainerVerifier containerVerifier = getContainerVerifier(new InternalVerificationPolicy());
 
         String documentName = "Document1.txt";
-        byte[] documentContent = "This is document's content.".getBytes(StandardCharsets.UTF_8);
-        Pair<byte[], String> documents = Pair.of(documentContent, documentName);
         try (
                 ContainerDocument document = new EmptyContainerDocument(
                         documentName,
                         "txt",
-                        Collections.singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(documentContent).getHash()));
+                        Collections.singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(expectedDocumentContent).getHash()));
                 ContainerAnnotation annotation = new StringContainerAnnotation(
                         ContainerAnnotationType.NON_REMOVABLE,
                         "Document is not with container. Container was created created with empty container document. Document itself can be added later on if needed.",
                         "com.guardtime.com");
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                Container container = packagingFactory.create(Collections.singletonList(document), Collections.singletonList(annotation));
+                InputStream stream = new ByteArrayInputStream(addedDocumentContent)
         ) {
-            try (Container container = packagingFactory.create(Collections.singletonList(document), Collections.singletonList(annotation))) {
-                container.writeTo(bos);
-            }
-            byte[] zipBytes = addDocumentsToExistingContainer_SkipDuplicate(bos.toByteArray(), Collections.singletonList(documents));
+            ContainerVerifierResult results = containerVerifier.verify(container);
+            assertTrue(results.getVerificationResult().equals(VerificationResult.NOK));
 
-            try (Container readin = packagingFactory.read(new ByteArrayInputStream(zipBytes))) {
-                ContainerVerifierResult results = containerVerifier.verify(readin);
-                assertTrue(results.getVerificationResult().equals(VerificationResult.OK));
-            }
+            container.getSignatureContents().get(0).attachDetachedDocument(documentName, stream);
+            results = containerVerifier.verify(container);
+            assertTrue(results.getVerificationResult().equals(verificationResult));
         }
     }
 

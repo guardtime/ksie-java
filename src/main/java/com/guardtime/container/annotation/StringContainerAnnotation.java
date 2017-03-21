@@ -3,7 +3,6 @@ package com.guardtime.container.annotation;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import static com.guardtime.container.util.Util.notNull;

@@ -7,31 +7,21 @@ import com.guardtime.container.packaging.exception.ContainerReadingException;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.ksi.KsiSignatureFactory;
-import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.KSIBuilder;
 import com.guardtime.ksi.service.client.KSIServiceCredentials;
 import com.guardtime.ksi.service.client.http.HttpClientSettings;
 import com.guardtime.ksi.service.http.simple.SimpleHttpClient;
 import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
-import com.guardtime.ksi.util.Util;
 
 import org.junit.Before;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 public abstract class AbstractCommonIntegrationTest extends AbstractContainerTest {
 
@@ -109,35 +99,4 @@ public abstract class AbstractCommonIntegrationTest extends AbstractContainerTes
         }
     }
 
-    byte[] addDocumentsToExistingContainer_SkipDuplicate(byte[] zipFile, List<Pair<byte[], String>> files) throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try (
-                ZipInputStream zin = new ZipInputStream(new ByteArrayInputStream(zipFile));
-                ZipOutputStream out = new ZipOutputStream(bos)
-        ) {
-            ZipEntry entry;
-            List<String> filesInZip = new LinkedList<>();
-            while ((entry = zin.getNextEntry()) != null) {
-                filesInZip.add(entry.getName());
-                writeFromInputToZipOutput(out, zin, entry.getName());
-            }
-            for (Pair pair : files) {
-                if (!filesInZip.contains(pair.getRight())) {
-                    try (InputStream in = new ByteArrayInputStream((byte[]) pair.getLeft())) {
-                        writeFromInputToZipOutput(out, in, (String) pair.getRight());
-                    }
-                }
-            }
-        }
-        return bos.toByteArray();
-    }
-
-    /*
-    Closes ZipOutputStream entry.
-     */
-    private void writeFromInputToZipOutput(ZipOutputStream out, InputStream in, String fileName) throws IOException {
-        out.putNextEntry(new ZipEntry(fileName));
-        Util.copyData(in, out);
-        out.closeEntry();
-    }
 }
