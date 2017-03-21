@@ -6,7 +6,7 @@
 
     <groupId>com.guardtime.container</groupId>
     <artifactId>ksie-java-container</artifactId>
-    <version>0.2.92-SNAPSHOT</version>
+    <version>0.2.93-SNAPSHOT</version>
 
     <name>KSIE Java Container</name>
 
