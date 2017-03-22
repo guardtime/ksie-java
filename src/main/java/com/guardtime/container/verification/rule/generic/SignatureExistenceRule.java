@@ -26,10 +26,10 @@ public class SignatureExistenceRule extends AbstractRule<SignatureContent> {
         String uri = verifiable.getManifest().getRight().getSignatureReference().getUri();
         ContainerSignature signature = verifiable.getContainerSignature();
         if (signature == null || signature.getSignature() == null) {
-            holder.addResult(new GenericVerificationResult(VerificationResult.NOK, this, uri));
+            holder.addResult(new GenericVerificationResult(VerificationResult.NOK, getName(), getErrorMessage(), uri));
             throw new RuleTerminatingException("Can't locate signature! Path provided: '" + uri + "'");
         } else {
-            holder.addResult(new GenericVerificationResult(VerificationResult.OK, this, uri));
+            holder.addResult(new GenericVerificationResult(VerificationResult.OK, getName(), getErrorMessage(), uri));
         }
     }
 

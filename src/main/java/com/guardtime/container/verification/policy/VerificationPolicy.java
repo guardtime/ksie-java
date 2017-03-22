@@ -1,11 +1,11 @@
 package com.guardtime.container.verification.policy;
 
-import com.guardtime.container.verification.rule.ContainerRule;
+import com.guardtime.container.verification.rule.Rule;
 
 import java.util.List;
 
 /**
- * Access interface for providing {@link ContainerRule} to be used for verifying {@link com.guardtime.container.packaging.Container}
+ * Access interface for providing {@link Rule}s to be used for verifying {@link com.guardtime.container.packaging.Container}
  */
 public interface VerificationPolicy {
 
@@ -21,7 +21,7 @@ public interface VerificationPolicy {
      *   <li>verifying annotations (including annotation manifests)</li>
      * </ol>
      * May contain extra rules to add specialized verification requirements to the policy.
-     * @return List of all {@link ContainerRule} to be performed when verifying with the policy.
+     * @return List of all {@link Rule}s to be performed when verifying with the policy.
      */
-    List<ContainerRule> getContainerRules();
+    List<Rule> getRules();
 }

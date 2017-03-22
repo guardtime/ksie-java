@@ -1,24 +1,22 @@
 package com.guardtime.container.verification.result;
 
-import com.guardtime.container.verification.rule.Rule;
-
 public class GenericVerificationResult implements RuleVerificationResult {
     private final VerificationResult result;
     private final String ruleName;
     private final String testedElement;
     private String ruleMessage;
 
-    public GenericVerificationResult(VerificationResult result, Rule rule, String testedElement, Exception exception) {
-        this(result, rule, testedElement);
+    public GenericVerificationResult(VerificationResult result, String ruleName, String ruleMessage, String testedElement, Exception exception) {
+        this(result, ruleName, ruleMessage, testedElement);
         this.ruleMessage = exception.getMessage();
     }
 
 
-    public GenericVerificationResult(VerificationResult result, Rule rule, String testedElement) {
+    public GenericVerificationResult(VerificationResult result, String ruleName, String ruleMessage, String testedElement) {
         this.result = result;
         this.testedElement = testedElement;
-        this.ruleName = rule.getName();
-        this.ruleMessage = rule.getErrorMessage();
+        this.ruleName = ruleName;
+        this.ruleMessage = ruleMessage;
     }
 
     @Override

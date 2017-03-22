@@ -16,7 +16,7 @@ public class SignatureSignsManifestRule extends AbstractRule<SignatureContent> {
 
     private static final String NAME = RuleType.KSIE_VERIFY_MANIFEST_HASH.getName();
 
-    protected SignatureSignsManifestRule(RuleStateProvider stateProvider) {
+    public SignatureSignsManifestRule(RuleStateProvider stateProvider) {
         super(stateProvider.getStateForRule(NAME));
     }
 
@@ -34,7 +34,7 @@ public class SignatureSignsManifestRule extends AbstractRule<SignatureContent> {
             throw new RuleTerminatingException("Failed to verify hash of manifest!", e);
         } finally {
             String manifestUri = verifiable.getManifest().getLeft();
-            holder.addResult(new GenericVerificationResult(result, this, manifestUri));
+            holder.addResult(new GenericVerificationResult(result, getName(), getErrorMessage(), manifestUri));
         }
     }
 

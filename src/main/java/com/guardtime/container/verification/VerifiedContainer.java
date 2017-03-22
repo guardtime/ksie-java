@@ -16,6 +16,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static com.guardtime.container.verification.result.ResultHolder.findHighestPriorityResult;
+
 /**
  * Encompasses all results from verifying a {@link Container} Provides easier access to overall result of verification.
  */
@@ -86,7 +88,7 @@ public class VerifiedContainer implements Container {
     }
 
     @Override
-    public void addAll(Collection<SignatureContent> contents) throws ContainerMergingException {
+    public void addAll(Collection<? extends SignatureContent> contents) throws ContainerMergingException {
         container.addAll(contents);
         updateVerifiedSignatureContent();
     }
@@ -99,15 +101,4 @@ public class VerifiedContainer implements Container {
         this.verifiedSignatureContents = verifiedContents;
     }
 
-    private VerificationResult findHighestPriorityResult(List<RuleVerificationResult> verificationResults) {
-        VerificationResult returnable = VerificationResult.OK;
-        for (RuleVerificationResult result : verificationResults) {
-            VerificationResult verificationResult = result.getVerificationResult();
-            if (verificationResult.isMoreImportantThan(returnable)) {
-                returnable = verificationResult;
-                if (VerificationResult.NOK.equals(returnable)) break; // No need to check once max failure level reached
-            }
-        }
-        return returnable;
-    }
 }

@@ -39,10 +39,10 @@ public class MimeTypeIntegrityRule extends AbstractRule<Container> implements Co
             if (Arrays.equals(expectedContent, realContent)) {
                 result = VerificationResult.OK;
             }
-            holder.addResult(new GenericVerificationResult(result, this, mimetypeUri));
+            holder.addResult(new GenericVerificationResult(result, getName(), getErrorMessage(), mimetypeUri));
         } catch (IOException e) {
             LOGGER.info("Verifying MIME type failed!", e);
-            holder.addResult(new GenericVerificationResult(result, this, mimetypeUri, e));
+            holder.addResult(new GenericVerificationResult(result, getName(), getErrorMessage(), mimetypeUri, e));
         }
 
         if (!result.equals(VerificationResult.OK)) {

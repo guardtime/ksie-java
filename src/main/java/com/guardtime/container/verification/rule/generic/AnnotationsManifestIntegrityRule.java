@@ -6,17 +6,23 @@ import com.guardtime.container.manifest.MultiHashElement;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.ResultHolder;
+import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
-import com.guardtime.container.verification.rule.RuleType;
 import com.guardtime.container.verification.rule.state.RuleStateProvider;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS;
 
 /**
  * This rule verifies that the annotmanifest has not been corrupted.
  */
 public class AnnotationsManifestIntegrityRule extends AbstractRule<SignatureContent> {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST.getName();
+    private static final String NAME = KSIE_VERIFY_ANNOTATION_MANIFEST.getName();
     private final MultiHashElementIntegrityRule integrityRule;
 
     public AnnotationsManifestIntegrityRule(RuleStateProvider stateProvider) {
@@ -41,4 +47,16 @@ public class AnnotationsManifestIntegrityRule extends AbstractRule<SignatureCont
     public String getErrorMessage() {
         return "Annotation manifest hash mismatch.";
     }
+
+    @Override
+    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder) {
+        List<RuleVerificationResult> filteredResults = new LinkedList<>();
+        for (RuleVerificationResult result : holder.getResults()) {
+            if (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName())) {
+                filteredResults.add(result);
+            }
+        }
+        return filteredResults;
+    }
+
 }

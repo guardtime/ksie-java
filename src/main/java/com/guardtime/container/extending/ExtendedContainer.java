@@ -60,7 +60,7 @@ public class ExtendedContainer implements Container {
     }
 
     @Override
-    public void addAll(Collection<SignatureContent> contents) throws ContainerMergingException {
+    public void addAll(Collection<? extends SignatureContent> contents) throws ContainerMergingException {
         wrappedContainer.addAll(contents);
         updateExtendedSignatureContents();
     }

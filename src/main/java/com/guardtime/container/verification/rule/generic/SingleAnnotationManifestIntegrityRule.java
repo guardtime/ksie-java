@@ -17,14 +17,22 @@ import com.guardtime.container.verification.rule.RuleType;
 import com.guardtime.container.verification.rule.state.RuleState;
 import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+
+import static com.guardtime.container.verification.result.ResultHolder.findHighestPriorityResult;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_EXISTS;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS;
 
 /**
  * This rule verifies the validity of the manifest file containing meta-data for an annotation.
  */
-public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<SignatureContent, FileReference>> {
+public class SingleAnnotationManifestIntegrityRule extends AbstractRule<SignatureContent> {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION.getName();
+    private static final String NAME = KSIE_VERIFY_ANNOTATION.getName();
     private final MultiHashElementIntegrityRule multiHashElementIntegrityRule;
 
     public SingleAnnotationManifestIntegrityRule(RuleStateProvider stateProvider) {
@@ -33,31 +41,35 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<Sig
     }
 
     @Override
-    protected void verifyRule(ResultHolder holder, Pair<SignatureContent, FileReference> verifiable) throws RuleTerminatingException {
-        FileReference reference = verifiable.getRight();
-        String singleAnnotationManifestUri = reference.getUri();
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
+        for(FileReference reference : verifiable.getAnnotationsManifest().getRight().getSingleAnnotationManifestReferences()) {
+            String singleAnnotationManifestUri = reference.getUri();
+            if(existenceRuleFailed(holder, singleAnnotationManifestUri)) continue;
 
-        Map<String, SingleAnnotationManifest> singleAnnotationManifests = verifiable.getLeft().getSingleAnnotationManifests();
-        SingleAnnotationManifest manifest = singleAnnotationManifests.get(singleAnnotationManifestUri);
-        Pair<String, DocumentsManifest> documentsManifestPair = verifiable.getLeft().getDocumentsManifest();
-        FileReference documentsManifestReference = manifest.getDocumentsManifestReference();
-        ResultHolder tempHolder = new ResultHolder();
-        try {
-            multiHashElementIntegrityRule.verify(tempHolder, Pair.of((MultiHashElement) manifest, reference));
+            SingleAnnotationManifest manifest = verifiable.getSingleAnnotationManifests().get(singleAnnotationManifestUri);
+            Pair<String, DocumentsManifest> documentsManifestPair = verifiable.getDocumentsManifest();
+            FileReference documentsManifestReference = manifest.getDocumentsManifestReference();
+            ResultHolder tempHolder = new ResultHolder();
+            try {
+                multiHashElementIntegrityRule.verify(tempHolder, Pair.of((MultiHashElement) manifest, reference));
 
-            if (!documentsManifestPair.getLeft().equals(documentsManifestReference.getUri())) {
-                holder.addResult(new GenericVerificationResult(VerificationResult.NOK, this, reference.getUri()));
-                throw new RuleTerminatingException("Documents manifest path mismatch found.");
-            }
-            multiHashElementIntegrityRule.verifyRule(holder, Pair.of((MultiHashElement) documentsManifestPair.getRight(), documentsManifestReference));
-        } finally {
-            RuleState ruleState = getRuleState(reference);
-            for (RuleVerificationResult result : tempHolder.getResults()) {
-                if (!result.getVerificationResult().equals(VerificationResult.OK) && ruleState.equals(RuleState.IGNORE)) {
-                    // We ignore problems
-                    continue;
+                if (!documentsManifestPair.getLeft().equals(documentsManifestReference.getUri())) {
+                    tempHolder.addResult(new GenericVerificationResult(VerificationResult.NOK, getName(), getErrorMessage(), reference.getUri()));
+                    throw new RuleTerminatingException("Documents manifest path mismatch found.");
                 }
-                holder.addResult(result);
+                multiHashElementIntegrityRule.verifyRule(tempHolder, Pair.of((MultiHashElement) documentsManifestPair.getRight(), documentsManifestReference));
+            } catch (RuleTerminatingException e) {
+                // we do not let this through
+                LOGGER.info("Annotation manifest hash verification failed with message: '{}'", e.getMessage());
+            } finally {
+                RuleState ruleState = getRuleState(reference);
+                for (RuleVerificationResult result : tempHolder.getResults()) {
+                    if (!result.getVerificationResult().equals(VerificationResult.OK) && ruleState.equals(RuleState.IGNORE)) {
+                        // We ignore problems
+                        continue;
+                    }
+                    holder.addResult(result);
+                }
             }
         }
     }
@@ -76,4 +88,28 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Pair<Sig
     public String getErrorMessage() {
         return "Annotation meta-data mismatch.";
     }
+
+    @Override
+    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder) {
+        List<RuleVerificationResult> filteredResults = new LinkedList<>();
+        for (RuleVerificationResult result : holder.getResults()) {
+            if (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName()) ||
+                    result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST.getName())) {
+                filteredResults.add(result);
+            }
+        }
+        return filteredResults;
+    }
+
+    private boolean existenceRuleFailed(ResultHolder holder, String uri) {
+        List<RuleVerificationResult> filteredResults = new LinkedList<>();
+        for (RuleVerificationResult result : holder.getResults()) {
+            if (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_EXISTS.getName()) &&
+                    result.getTestedElementPath().equals(uri)) {
+                filteredResults.add(result);
+            }
+        }
+        return filteredResults.isEmpty() || !findHighestPriorityResult(filteredResults).equals(VerificationResult.OK);
+    }
+
 }

@@ -59,5 +59,5 @@ public interface Container extends AutoCloseable {
      * Adds all {@link SignatureContent}s to this {@link Container}.
      * @throws ContainerMergingException when any {@link SignatureContent} can not be added into the {@link Container} due to clashing file paths or any other reason.
      */
-    void addAll(Collection<SignatureContent> contents) throws ContainerMergingException;
+    void addAll(Collection<? extends SignatureContent> contents) throws ContainerMergingException;
 }

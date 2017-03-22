@@ -1,12 +1,13 @@
 package com.guardtime.container.verification;
 
 import com.guardtime.container.packaging.Container;
+import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.policy.VerificationPolicy;
-import com.guardtime.container.verification.result.VerifiedContainer;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.rule.ContainerRule;
+import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 
 import org.slf4j.Logger;
@@ -33,8 +34,16 @@ public class ContainerVerifier {
     public VerifiedContainer verify(Container container) {
         ResultHolder holder = new ResultHolder();
         try {
-            for (ContainerRule rule : policy.getContainerRules()) {
-                rule.verify(holder, container);
+            for (Rule rule : policy.getRules()) {
+                if(rule instanceof ContainerRule) {
+                    holder.activateContainerResultsGathering();
+                    rule.verify(holder, container);
+                } else {
+                    for(SignatureContent content : container.getSignatureContents()) {
+                        holder.activateSignatureContentResultsGathering(content);
+                        rule.verify(holder, content);
+                    }
+                }
             }
         } catch (RuleTerminatingException e) {
             logger.info("Container verification terminated! Reason: '{}'", e.getMessage());

@@ -36,7 +36,7 @@ public class DocumentsManifestExistenceRule extends AbstractRule<SignatureConten
             verificationResult = VerificationResult.OK;
         }
         String manifestUri = documentsManifestReference.getUri();
-        holder.addResult(new GenericVerificationResult(verificationResult, this, manifestUri));
+        holder.addResult(new GenericVerificationResult(verificationResult, getName(), getErrorMessage(), manifestUri));
 
         if (!verificationResult.equals(VerificationResult.OK)) {
             throw new RuleTerminatingException("DocumentsManifest existence could not be verified for '" + manifestUri + "'");

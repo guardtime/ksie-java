@@ -34,7 +34,7 @@ import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.ContainerVerifier;
 import com.guardtime.container.verification.policy.InternalVerificationPolicy;
-import com.guardtime.container.verification.result.VerifiedContainer;
+import com.guardtime.container.verification.VerifiedContainer;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.ksi.hashing.DataHash;
 

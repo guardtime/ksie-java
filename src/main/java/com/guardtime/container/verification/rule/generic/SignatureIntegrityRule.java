@@ -38,11 +38,11 @@ public class SignatureIntegrityRule extends AbstractRule<SignatureContent> {
             }
             SignatureResult signatureResult = verifier.getSignatureVerificationResult(containerSignature.getSignature(), manifest);
             signatureResult = new WrappedSignatureResult(signatureResult, result);
-            holder.setSignatureResult(signatureUri, signatureResult);
-            holder.addResult(new GenericVerificationResult(signatureResult.getSimplifiedResult(), this, signatureUri));
+            holder.addSignatureResult(signatureResult);
+            holder.addResult(new GenericVerificationResult(signatureResult.getSimplifiedResult(), getName(), getErrorMessage(), signatureUri));
         } catch (RuleTerminatingException e) {
             LOGGER.info("Verifying signature failed!", e);
-            holder.addResult(new GenericVerificationResult(result, this, signatureUri, e));
+            holder.addResult(new GenericVerificationResult(result, getName(), getErrorMessage(), signatureUri, e));
         }
     }
 

@@ -126,7 +126,7 @@ class ZipContainer implements Container {
     }
 
     @Override
-    public void addAll(Collection<SignatureContent> contents) throws ContainerMergingException {
+    public void addAll(Collection<? extends SignatureContent> contents) throws ContainerMergingException {
         List<SignatureContent> original = new LinkedList<>(signatureContents);
         try {
             for (SignatureContent content : contents) {
