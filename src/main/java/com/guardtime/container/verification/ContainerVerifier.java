@@ -3,7 +3,7 @@ package com.guardtime.container.verification;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.policy.VerificationPolicy;
-import com.guardtime.container.verification.result.ContainerVerifierResult;
+import com.guardtime.container.verification.result.VerifiedContainer;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.rule.ContainerRule;
@@ -27,12 +27,10 @@ public class ContainerVerifier {
 
     /**
      * Verifies the {@link Container} based on the rules provided by the {@link VerificationPolicy}.
-     *
-     * @param container
-     *         container to be verified
-     * @return {@link ContainerVerifierResult} based on all {@link RuleVerificationResult} gathered during verification.
+     * @param container  container to be verified
+     * @return {@link VerifiedContainer} based on all {@link RuleVerificationResult} gathered during verification.
      */
-    public ContainerVerifierResult verify(Container container) {
+    public VerifiedContainer verify(Container container) {
         ResultHolder holder = new ResultHolder();
         try {
             for (ContainerRule rule : policy.getContainerRules()) {
@@ -41,7 +39,7 @@ public class ContainerVerifier {
         } catch (RuleTerminatingException e) {
             logger.info("Container verification terminated! Reason: '{}'", e.getMessage());
         }
-        return new ContainerVerifierResult(container, holder);
+        return new VerifiedContainer(container, holder);
     }
 
 }

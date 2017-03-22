@@ -34,7 +34,7 @@ import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.ContainerVerifier;
 import com.guardtime.container.verification.policy.InternalVerificationPolicy;
-import com.guardtime.container.verification.result.ContainerVerifierResult;
+import com.guardtime.container.verification.result.VerifiedContainer;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.ksi.hashing.DataHash;
 
@@ -210,7 +210,7 @@ public class ZipContainerPackagingFactoryBuilder {
             if (disableVerification) {
                 return;
             }
-            ContainerVerifierResult result = new ContainerVerifier(new InternalVerificationPolicy(this)).verify(zipContainer);
+            VerifiedContainer result = new ContainerVerifier(new InternalVerificationPolicy(this)).verify(zipContainer);
             if (!result.getVerificationResult().equals(VerificationResult.OK)) {
                 try {
                     zipContainer.close();

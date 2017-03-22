@@ -16,7 +16,7 @@ public interface Container extends AutoCloseable {
     /**
      * Returns list of {@link SignatureContent} contained in this container.
      */
-    List<SignatureContent> getSignatureContents();
+    List<? extends SignatureContent> getSignatureContents();
 
     /**
      * Writes data to provided stream.

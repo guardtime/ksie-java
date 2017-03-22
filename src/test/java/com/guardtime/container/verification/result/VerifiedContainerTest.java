@@ -18,16 +18,16 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.doReturn;
 
-public class ContainerVerifierResultTest {
+public class VerifiedContainerTest {
     private static final Container MOCK_CONTAINER = Mockito.mock(Container.class);
     private static final ResultHolder RESULT_HOLDER = new ResultHolder();
-    private ContainerVerifierResult result;
+    private VerifiedContainer result;
 
     @Before
     public void setUp() throws Exception {
         RESULT_HOLDER.addResult(new GenericVerificationResult(VerificationResult.OK, Mockito.mock(Rule.class), "some-element"));
         RESULT_HOLDER.addResult(new GenericVerificationResult(VerificationResult.NOK, Mockito.mock(Rule.class), "some-other-element"));
-        this.result = new ContainerVerifierResult(MOCK_CONTAINER, RESULT_HOLDER);
+        this.result = new VerifiedContainer(MOCK_CONTAINER, RESULT_HOLDER);
     }
 
     @Test
@@ -61,7 +61,7 @@ public class ContainerVerifierResultTest {
         doReturn(path).when(mockSignatureReference).getUri();
 
         RESULT_HOLDER.setSignatureResult(path, Mockito.mock(SignatureResult.class));
-        ContainerVerifierResult result = new ContainerVerifierResult(MOCK_CONTAINER, RESULT_HOLDER);
+        VerifiedContainer result = new VerifiedContainer(MOCK_CONTAINER, RESULT_HOLDER);
 
         assertNotNull(result.getSignatureResult(mockSignatureContent));
     }
