@@ -36,13 +36,13 @@ public class ContainerVerifier {
         try {
             for (Rule rule : policy.getRules()) {
                 if(rule instanceof ContainerRule) {
-                    holder.activateContainerResultsGathering();
                     rule.verify(holder, container);
                 } else {
                     for(SignatureContent content : container.getSignatureContents()) {
                         holder.activateSignatureContentResultsGathering(content);
                         rule.verify(holder, content);
                     }
+                    holder.activateContainerResultsGathering();
                 }
             }
         } catch (RuleTerminatingException e) {

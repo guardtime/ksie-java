@@ -6,15 +6,19 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.result.SignatureResult;
 import com.guardtime.container.verification.result.VerificationResult;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.guardtime.container.verification.result.ResultHolder.findHighestPriorityResult;
+
 public class VerifiedSignatureContent extends SignatureContent {
     private final List<RuleVerificationResult> results;
     private final VerificationResult aggregateResult;
+    private List<SignatureResult> signatureResults;
 
 
     VerifiedSignatureContent(SignatureContent original, ResultHolder holder) {
@@ -28,13 +32,9 @@ public class VerifiedSignatureContent extends SignatureContent {
                         .withAnnotations(getAnnotations(original))
                         .withDocuments(original.getDocuments().values())
         );
-        this.results = extractResultsForSignatureContent(holder, original);
+        this.results = holder.getResults(original);
+        this.signatureResults = holder.getSignatureResults(original);
         this.aggregateResult = findHighestPriorityResult(results);
-    }
-
-    private List<RuleVerificationResult> extractResultsForSignatureContent(ResultHolder holder, SignatureContent original) {
-        // TODO: filtering
-        return holder.getResults();
     }
 
     private static List<Pair<String, ContainerAnnotation>> getAnnotations(SignatureContent original) {
@@ -53,18 +53,18 @@ public class VerifiedSignatureContent extends SignatureContent {
         return singleAnnotationManifestPairs;
     }
 
+    /**
+     * Provides access to {@link SignatureResult}s related to this {@link SignatureContent}.
+     */
+    public List<SignatureResult> getSignatureResults() {
+        return signatureResults;
+    }
 
-    // TODO: Move to somewhere else as a public helper method so it won't have to be repeated
-    private VerificationResult findHighestPriorityResult(List<RuleVerificationResult> verificationResults) {
-        VerificationResult returnable = VerificationResult.OK;
-        for (RuleVerificationResult result : verificationResults) {
-            VerificationResult verificationResult = result.getVerificationResult();
-            if (verificationResult.isMoreImportantThan(returnable)) {
-                returnable = verificationResult;
-                if (VerificationResult.NOK.equals(returnable)) break; // No need to check once max failure level reached
-            }
-        }
-        return returnable;
+    /**
+     * Provides access to the overall {@link VerificationResult} of the verification.
+     */
+    public VerificationResult getVerificationResult() {
+        return aggregateResult;
     }
 
 }

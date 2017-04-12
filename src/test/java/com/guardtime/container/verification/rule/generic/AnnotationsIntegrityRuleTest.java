@@ -64,7 +64,7 @@ public class AnnotationsIntegrityRuleTest extends AbstractContainerTest {
 
     private RuleVerificationResult getRuleVerificationResult(String path) throws Exception {
         InputStream input = new FileInputStream(loadFile(path));
-        Container container = null;
+        Container container;
         try {
             container = packagingFactory.read(input);
         } catch (ContainerReadingException e) {
