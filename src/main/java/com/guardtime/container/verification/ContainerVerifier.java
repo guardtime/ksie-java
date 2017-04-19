@@ -13,6 +13,9 @@ import com.guardtime.container.verification.rule.RuleTerminatingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Helper class to verify {@link Container} based on a {@link VerificationPolicy}
  */
@@ -33,16 +36,23 @@ public class ContainerVerifier {
      */
     public VerifiedContainer verify(Container container) {
         ResultHolder holder = new ResultHolder();
+        Set<SignatureContent> terminatedContents = new HashSet<>();
         try {
             for (Rule rule : policy.getRules()) {
                 if(rule instanceof ContainerRule) {
                     rule.verify(holder, container);
                 } else {
                     for(SignatureContent content : container.getSignatureContents()) {
-                        holder.activateSignatureContentResultsGathering(content);
-                        rule.verify(holder, content);
+                        if(terminatedContents.contains(content)) {
+                            continue;
+                        }
+                        try {
+                            rule.verify(holder, content);
+                        } catch (RuleTerminatingException e) {
+                            logger.info("Container verification terminated! Reason: '{}'", e.getMessage());
+                            terminatedContents.add(content);
+                        }
                     }
-                    holder.activateContainerResultsGathering();
                 }
             }
         } catch (RuleTerminatingException e) {

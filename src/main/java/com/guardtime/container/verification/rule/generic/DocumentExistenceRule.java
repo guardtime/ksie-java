@@ -40,7 +40,7 @@ public class DocumentExistenceRule extends AbstractRule<SignatureContent> {
             if (document != null && !(document instanceof EmptyContainerDocument)) {
                 result = VerificationResult.OK;
             }
-            holder.addResult(new GenericVerificationResult(result, getName(), getErrorMessage(), documentUri));
+            holder.addResult(verifiable, new GenericVerificationResult(result, getName(), getErrorMessage(), documentUri));
         }
     }
 
@@ -55,9 +55,9 @@ public class DocumentExistenceRule extends AbstractRule<SignatureContent> {
     }
 
     @Override
-    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder) {
+    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder, SignatureContent verifiable) {
         List<RuleVerificationResult> filteredResults = new LinkedList<>();
-        for (RuleVerificationResult result : holder.getResults()) {
+        for (RuleVerificationResult result : holder.getResults(verifiable)) {
             if (result.getRuleName().equals(KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName()) ||
                     result.getRuleName().equals(KSIE_VERIFY_DATA_MANIFEST.getName())) {
                 filteredResults.add(result);

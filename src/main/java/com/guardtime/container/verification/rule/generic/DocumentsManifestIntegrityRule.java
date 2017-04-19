@@ -36,7 +36,14 @@ public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureConten
         MultiHashElement documentsManifest = verifiable.getDocumentsManifest().getRight();
         Manifest manifest = verifiable.getManifest().getRight();
         FileReference documentsManifestReference = manifest.getDocumentsManifestReference();
-        integrityRule.verify(holder, Pair.of(documentsManifest, documentsManifestReference));
+        ResultHolder tempHolder = new ResultHolder();
+        try {
+            integrityRule.verify(tempHolder, Pair.of(documentsManifest, documentsManifestReference));
+        } catch (RuleTerminatingException e) {
+            LOGGER.info("Documents manifest hash verification failed with message: '{}'", e.getMessage());
+        } finally {
+            holder.addResults(verifiable, tempHolder.getResults());
+        }
     }
 
     @Override
@@ -50,9 +57,9 @@ public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureConten
     }
 
     @Override
-    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder) {
+    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder, SignatureContent verifiable) {
         List<RuleVerificationResult> filteredResults = new LinkedList<>();
-        for (RuleVerificationResult result : holder.getResults()) {
+        for (RuleVerificationResult result : holder.getResults(verifiable)) {
             if (result.getRuleName().equals(KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName())) {
                 filteredResults.add(result);
             }

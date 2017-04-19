@@ -38,7 +38,7 @@ public abstract class AbstractRule<O> implements Rule<O> {
 
     @Override
     public boolean verify(ResultHolder resultHolder, O verifiable) throws RuleTerminatingException {
-        if (this.state == RuleState.IGNORE || !getDependencyRuleResult(resultHolder).equals(OK)) return false;
+        if (this.state == RuleState.IGNORE || !getDependencyRuleResult(resultHolder, verifiable).equals(OK)) return false;
         verifyRule(resultHolder, verifiable);
         return true;
     }
@@ -54,8 +54,8 @@ public abstract class AbstractRule<O> implements Rule<O> {
         return null;
     }
 
-    private VerificationResult getDependencyRuleResult(ResultHolder holder) {
-        List<RuleVerificationResult> results = getFilteredResults(holder);
+    private VerificationResult getDependencyRuleResult(ResultHolder holder, O verifiable) {
+        List<RuleVerificationResult> results = getFilteredResults(holder, verifiable);
         if (!results.isEmpty()) {
             return findHighestPriorityResult(results);
         }
@@ -63,7 +63,7 @@ public abstract class AbstractRule<O> implements Rule<O> {
     }
 
     // Sub classes override to provide correct filtering
-    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder) {
+    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder, O verifiable) {
         return Collections.emptyList();
     }
 }

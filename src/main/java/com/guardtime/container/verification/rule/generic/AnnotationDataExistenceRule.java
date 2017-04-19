@@ -51,7 +51,7 @@ public class AnnotationDataExistenceRule extends AbstractRule<SignatureContent> 
             }
 
             if (!ruleState.equals(RuleState.IGNORE) || result.equals(OK)) {
-                holder.addResult(new GenericVerificationResult(result, getName(), getErrorMessage(), dataPath));
+                holder.addResult(verifiable, new GenericVerificationResult(result, getName(), getErrorMessage(), dataPath));
             }
 
         }
@@ -78,9 +78,9 @@ public class AnnotationDataExistenceRule extends AbstractRule<SignatureContent> 
     }
 
     @Override
-    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder) {
+    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder, SignatureContent verifiable) {
         List<RuleVerificationResult> filteredResults = new LinkedList<>();
-        for (RuleVerificationResult result : holder.getResults()) {
+        for (RuleVerificationResult result : holder.getResults(verifiable)) {
             if (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName()) ||
                     result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST.getName())) {
                 filteredResults.add(result);
@@ -98,6 +98,6 @@ public class AnnotationDataExistenceRule extends AbstractRule<SignatureContent> 
                 filteredResults.add(result);
             }
         }
-        return filteredResults.isEmpty() || !findHighestPriorityResult(filteredResults).equals(OK);
+        return filteredResults.size() < 2 || !findHighestPriorityResult(filteredResults).equals(OK);
     }
 }

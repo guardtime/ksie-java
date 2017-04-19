@@ -22,20 +22,6 @@ public class AnnotationsManifestExistenceRuleTest extends AbstractContainerTest 
     private Rule rule = new AnnotationsManifestExistenceRule(defaultRuleStateProvider);
 
     @Test
-    public void testAnnotationsManifestDoesNotExist_ThrowsRuleTerminatingException() throws Exception {
-        expectedException.expect(RuleTerminatingException.class);
-        expectedException.expectMessage("AnnotationsManifest integrity could not be verified for");
-        FileReference mockFileReference = Mockito.mock(FileReference.class);
-        SignatureContent mockSignatureContent = Mockito.mock(SignatureContent.class);
-
-        when(mockFileReference.getUri()).thenReturn("somePath");
-        when(mockedManifest.getAnnotationsManifestReference()).thenReturn(mockFileReference);
-        when(mockSignatureContent.getManifest()).thenReturn(Pair.of("path", mockedManifest));
-
-        rule.verify(new ResultHolder(), mockSignatureContent);
-    }
-
-    @Test
     public void testAnnotationsManifestDoesExistResultsInOK() throws Exception {
         String annotManifestPath = "annotmanifest.ext";
         FileReference mockFileReference = Mockito.mock(FileReference.class);

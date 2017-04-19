@@ -36,7 +36,10 @@ public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureCont
         if (annotationsManifest != null && annotationsManifest.getLeft().equals(annotationsManifestUri)) {
             verificationResult = VerificationResult.OK;
         }
-        holder.addResult(new GenericVerificationResult(verificationResult, getName(), getErrorMessage(), annotationsManifestUri));
+        holder.addResult(
+                verifiable,
+                new GenericVerificationResult(verificationResult, getName(), getErrorMessage(), annotationsManifestUri)
+        );
     }
 
     @Override

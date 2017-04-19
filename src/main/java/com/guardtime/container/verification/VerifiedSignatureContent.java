@@ -61,6 +61,13 @@ public class VerifiedSignatureContent extends SignatureContent {
     }
 
     /**
+     * Provides access to {@link RuleVerificationResult}s related to this {@link SignatureContent}.
+     */
+    public List<RuleVerificationResult> getResults() {
+        return results;
+    }
+
+    /**
      * Provides access to the overall {@link VerificationResult} of the verification.
      */
     public VerificationResult getVerificationResult() {

@@ -36,8 +36,6 @@ public class DocumentsIntegrityRuleTest extends AbstractContainerTest {
     private KSISignature mockKsiSignature;
 
     private ContainerPackagingFactory packagingFactory;
-//    private Rule rule = new DocumentsIntegrityRule(defaultRuleStateProvider);
-    // TODO: Move these tests somewhere new!
 
     @Before
     public void setUp() throws Exception {
@@ -60,12 +58,18 @@ public class DocumentsIntegrityRuleTest extends AbstractContainerTest {
         }
         SignatureContent content = container.getSignatureContents().get(0);
         ResultHolder holder = new ResultHolder();
-//        rule.verify(holder, content);
+        new DocumentsManifestExistenceRule(defaultRuleStateProvider).verify(holder, content);
+        new DocumentsManifestIntegrityRule(defaultRuleStateProvider).verify(holder, content);
+        new DocumentExistenceRule(defaultRuleStateProvider).verify(holder, content);
+        new DocumentIntegrityRule(defaultRuleStateProvider).verify(holder, content);
         container.close();
         return selectMostImportantResult(holder.getResults());
     }
 
     private RuleVerificationResult selectMostImportantResult(List<RuleVerificationResult> results) {
+        if(results.isEmpty()) {
+            return null;
+        }
         RuleVerificationResult returnable = results.get(0);
         for (RuleVerificationResult result : results) {
             if (result.getVerificationResult().isMoreImportantThan(returnable.getVerificationResult())) {

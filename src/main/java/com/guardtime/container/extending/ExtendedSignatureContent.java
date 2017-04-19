@@ -24,6 +24,9 @@ public class ExtendedSignatureContent extends SignatureContent {
         );
     }
 
+    /**
+     * Returns true if the {@link com.guardtime.container.signature.ContainerSignature} is extended.
+     */
     public boolean isExtended() {
         return getContainerSignature().isExtended();
     }

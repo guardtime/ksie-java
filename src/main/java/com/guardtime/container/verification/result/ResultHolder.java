@@ -11,25 +11,29 @@ import java.util.Map;
 public class ResultHolder {
 
     private final List<RuleVerificationResult> containerResults;
-    private final List<RuleVerificationResult> allResults;
     private final Map<SignatureContent, List<RuleVerificationResult>> signatureContentResultsMap;
     private final Map<SignatureContent, List<SignatureResult>> signatureResultsMap = new HashMap<>();
-    private List<RuleVerificationResult> activeResults;
-    private List<SignatureResult> activeSignatureResults;
 
     public ResultHolder() {
         this.containerResults = new ArrayList<>();
         this.signatureContentResultsMap = new HashMap<>();
-        this.allResults = new ArrayList<>();
-        activateContainerResultsGathering();
     }
 
     public List<RuleVerificationResult> getResults() {
+        List<RuleVerificationResult> allResults = new ArrayList<>();
+        allResults.addAll(containerResults);
+        for (List<RuleVerificationResult> results : signatureContentResultsMap.values()) {
+            allResults.addAll(results);
+        }
         return allResults;
     }
 
     public List<RuleVerificationResult> getResults(SignatureContent content) {
-        List<RuleVerificationResult> ruleVerificationResults = new ArrayList<>(signatureContentResultsMap.get(content));
+        List<RuleVerificationResult> contentVerificationResults = signatureContentResultsMap.get(content);
+        if(contentVerificationResults == null) {
+            return null;
+        }
+        List<RuleVerificationResult> ruleVerificationResults = new ArrayList<>(contentVerificationResults);
         ruleVerificationResults.addAll(containerResults); // Lets make sure that generic container rules are accessible as well
         return ruleVerificationResults;
     }
@@ -38,34 +42,39 @@ public class ResultHolder {
         return signatureResultsMap.get(content);
     }
 
-    public void addSignatureResult(SignatureResult result) {
-        activeSignatureResults.add(result);
+    public void addSignatureResult(SignatureContent content, SignatureResult result) {
+        List<SignatureResult> signatureResults = signatureResultsMap.get(content);
+        if (signatureResults == null) {
+            signatureResults = new ArrayList<>();
+            signatureResultsMap.put(content, signatureResults);
+        }
+        signatureResults.add(result);
     }
 
     public void addResult(RuleVerificationResult ruleVerificationResult) {
-        activeResults.add(ruleVerificationResult);
-        allResults.add(ruleVerificationResult);
+        containerResults.add(ruleVerificationResult);
     }
 
     public void addResults(List<RuleVerificationResult> ruleVerificationResults) {
-        activeResults.addAll(ruleVerificationResults);
-        allResults.addAll(ruleVerificationResults);
+        containerResults.addAll(ruleVerificationResults);
     }
 
-    public void activateContainerResultsGathering() {
-        activeResults = containerResults;
+    public void addResult(SignatureContent content, RuleVerificationResult ruleVerificationResult) {
+        List<RuleVerificationResult> results = signatureContentResultsMap.get(content);
+        if (results == null) {
+            results = new ArrayList<>();
+            signatureContentResultsMap.put(content, results);
+        }
+        results.add(ruleVerificationResult);
     }
 
-    public void activateSignatureContentResultsGathering(SignatureContent content) {
-        if(!signatureContentResultsMap.containsKey(content)) {
-            signatureContentResultsMap.put(content, new ArrayList<RuleVerificationResult>());
+    public void addResults(SignatureContent content, List<RuleVerificationResult> ruleVerificationResults) {
+        List<RuleVerificationResult> results = signatureContentResultsMap.get(content);
+        if (results == null) {
+            results = new ArrayList<>();
+            signatureContentResultsMap.put(content, results);
         }
-        activeResults = signatureContentResultsMap.get(content);
-
-        if(!signatureResultsMap.containsKey(content)) {
-            signatureResultsMap.put(content, new ArrayList<SignatureResult>());
-        }
-        activeSignatureResults = signatureResultsMap.get(content);
+        results.addAll(ruleVerificationResults);
     }
 
     public static VerificationResult findHighestPriorityResult(List<RuleVerificationResult> verificationResults) {

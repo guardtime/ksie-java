@@ -38,14 +38,17 @@ public class DocumentIntegrityRule extends AbstractRule<SignatureContent> {
     protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
         for (FileReference documentReference : verifiable.getDocumentsManifest().getRight().getDocumentReferences()) {
             String uri = documentReference.getUri();
-            if (existenceRuleFailed(holder, uri)) continue;
+            if (existenceRuleFailed(holder.getResults(verifiable), uri)) continue;
 
             MultiHashElement document = verifiable.getDocuments().get(uri);
 
+            ResultHolder tempHolder = new ResultHolder();
             try {
-                integrityRule.verify(holder, Pair.of(document, documentReference));
+                integrityRule.verify(tempHolder, Pair.of(document, documentReference));
             } catch (RuleTerminatingException e) {
                 LOGGER.info("Data file hash verification failed with message: '{}'", e.getMessage());
+            } finally {
+                holder.addResults(verifiable, tempHolder.getResults());
             }
         }
     }
@@ -61,9 +64,9 @@ public class DocumentIntegrityRule extends AbstractRule<SignatureContent> {
     }
 
     @Override
-    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder) {
+    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder, SignatureContent verifiable) {
         List<RuleVerificationResult> filteredResults = new LinkedList<>();
-        for (RuleVerificationResult result : holder.getResults()) {
+        for (RuleVerificationResult result : holder.getResults(verifiable)) {
             if (result.getRuleName().equals(KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName()) ||
                     result.getRuleName().equals(KSIE_VERIFY_DATA_MANIFEST.getName())) {
                 filteredResults.add(result);
@@ -72,9 +75,9 @@ public class DocumentIntegrityRule extends AbstractRule<SignatureContent> {
         return filteredResults;
     }
 
-    private boolean existenceRuleFailed(ResultHolder holder, String documentUri) {
+    private boolean existenceRuleFailed(List<RuleVerificationResult> results, String documentUri) {
         List<RuleVerificationResult> filteredResults = new LinkedList<>();
-        for (RuleVerificationResult result : holder.getResults()) {
+        for (RuleVerificationResult result : results) {
             if (result.getRuleName().equals(KSIE_VERIFY_DATA_EXISTS.getName()) &&
                     result.getTestedElementPath().equals(documentUri)) {
                 filteredResults.add(result);

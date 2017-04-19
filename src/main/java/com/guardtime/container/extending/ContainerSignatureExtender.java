@@ -32,8 +32,7 @@ public class ContainerSignatureExtender {
      * @param container    Container to be extended.
      * @return True if all signatures were extended successfully, false otherwise.
      */
-    public boolean extend(Container container) {
-        boolean status = true;
+    public ExtendedContainer extend(Container container) {
         for (SignatureContent content : container.getSignatureContents()) {
             Manifest manifest = content.getManifest().getRight();
             String signatureUri = manifest.getSignatureReference().getUri();
@@ -42,15 +41,13 @@ public class ContainerSignatureExtender {
                 signatureFactory.extend(containerSignature, policy);
 
                 if (!containerSignature.isExtended()) {
-                    status = false;
                     logger.info("Extending signature '{}' resulted in a non-extended signature without exception!", signatureUri);
                 }
             } catch (SignatureException e) {
-                status = false;
                 logger.info("Failed to extend signature '{}' because: '{}'", signatureUri, e.getMessage());
             }
         }
-        return status;
+        return new ExtendedContainer(container);
     }
 
 }

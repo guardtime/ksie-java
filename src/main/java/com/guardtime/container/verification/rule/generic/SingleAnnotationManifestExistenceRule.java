@@ -4,20 +4,17 @@ import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
-import com.guardtime.container.verification.rule.RuleType;
 import com.guardtime.container.verification.rule.state.RuleState;
 import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_EXISTS;
 import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST;
@@ -48,7 +45,7 @@ public class SingleAnnotationManifestExistenceRule extends AbstractRule<Signatur
             }
 
             if (!ruleState.equals(RuleState.IGNORE) || result.equals(VerificationResult.OK)) {
-                holder.addResult(new GenericVerificationResult(result, getName(), getErrorMessage(), manifestUri));
+                holder.addResult(verifiable, new GenericVerificationResult(result, getName(), getErrorMessage(), manifestUri));
             }
         }
 
@@ -65,9 +62,9 @@ public class SingleAnnotationManifestExistenceRule extends AbstractRule<Signatur
     }
 
     @Override
-    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder) {
+    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder, SignatureContent verifiable) {
         List<RuleVerificationResult> filteredResults = new LinkedList<>();
-        for (RuleVerificationResult result : holder.getResults()) {
+        for (RuleVerificationResult result : holder.getResults(verifiable)) {
             if (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName()) ||
                     result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST.getName())) {
                 filteredResults.add(result);

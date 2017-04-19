@@ -8,7 +8,6 @@ import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.Rule;
-import com.guardtime.container.verification.rule.RuleTerminatingException;
 
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -19,16 +18,6 @@ import static org.mockito.Mockito.when;
 public class DocumentsManifestExistenceRuleTest extends AbstractContainerTest {
 
     private Rule rule = new DocumentsManifestExistenceRule(defaultRuleStateProvider);
-
-    @Test
-    public void testDocumentsManifestDoesNotExist_ThrowsRuleTerminatingException() throws Exception {
-        expectedException.expect(RuleTerminatingException.class);
-        expectedException.expectMessage("DocumentsManifest existence could not be verified for");
-        SignatureContent mockSignatureContent = Mockito.mock(SignatureContent.class);
-        when(mockedManifest.getDocumentsManifestReference()).thenReturn(Mockito.mock(FileReference.class));
-        when(mockSignatureContent.getManifest()).thenReturn(Pair.of("path", mockedManifest));
-        rule.verify(new ResultHolder(), mockSignatureContent);
-    }
 
     @Test
     public void testDocumentsManifestExistsResultsInOK() throws Exception {

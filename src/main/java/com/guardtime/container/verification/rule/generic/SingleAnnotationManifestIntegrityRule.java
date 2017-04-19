@@ -10,18 +10,17 @@ import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
-import com.guardtime.container.verification.rule.RuleType;
 import com.guardtime.container.verification.rule.state.RuleState;
 import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import static com.guardtime.container.verification.result.ResultHolder.findHighestPriorityResult;
+import static com.guardtime.container.verification.result.VerificationResult.NOK;
+import static com.guardtime.container.verification.result.VerificationResult.OK;
 import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION;
 import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_EXISTS;
 import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST;
@@ -42,9 +41,9 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Signatur
 
     @Override
     protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
-        for(FileReference reference : verifiable.getAnnotationsManifest().getRight().getSingleAnnotationManifestReferences()) {
+        for (FileReference reference : verifiable.getAnnotationsManifest().getRight().getSingleAnnotationManifestReferences()) {
             String singleAnnotationManifestUri = reference.getUri();
-            if(existenceRuleFailed(holder, singleAnnotationManifestUri)) continue;
+            if (existenceRuleFailed(holder, singleAnnotationManifestUri)) continue;
 
             SingleAnnotationManifest manifest = verifiable.getSingleAnnotationManifests().get(singleAnnotationManifestUri);
             Pair<String, DocumentsManifest> documentsManifestPair = verifiable.getDocumentsManifest();
@@ -54,21 +53,27 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Signatur
                 multiHashElementIntegrityRule.verify(tempHolder, Pair.of((MultiHashElement) manifest, reference));
 
                 if (!documentsManifestPair.getLeft().equals(documentsManifestReference.getUri())) {
-                    tempHolder.addResult(new GenericVerificationResult(VerificationResult.NOK, getName(), getErrorMessage(), reference.getUri()));
+                    tempHolder.addResult(
+                            verifiable,
+                            new GenericVerificationResult(NOK, getName(), getErrorMessage(), reference.getUri())
+                    );
                     throw new RuleTerminatingException("Documents manifest path mismatch found.");
                 }
-                multiHashElementIntegrityRule.verifyRule(tempHolder, Pair.of((MultiHashElement) documentsManifestPair.getRight(), documentsManifestReference));
+                multiHashElementIntegrityRule.verifyRule(
+                        tempHolder,
+                        Pair.of((MultiHashElement) documentsManifestPair.getRight(), documentsManifestReference)
+                );
             } catch (RuleTerminatingException e) {
                 // we do not let this through
                 LOGGER.info("Annotation manifest hash verification failed with message: '{}'", e.getMessage());
             } finally {
                 RuleState ruleState = getRuleState(reference);
                 for (RuleVerificationResult result : tempHolder.getResults()) {
-                    if (!result.getVerificationResult().equals(VerificationResult.OK) && ruleState.equals(RuleState.IGNORE)) {
+                    if (!result.getVerificationResult().equals(OK) && ruleState.equals(RuleState.IGNORE)) {
                         // We ignore problems
                         continue;
                     }
-                    holder.addResult(result);
+                    holder.addResult(verifiable, result);
                 }
             }
         }
@@ -90,9 +95,9 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Signatur
     }
 
     @Override
-    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder) {
+    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder, SignatureContent verifiable) {
         List<RuleVerificationResult> filteredResults = new LinkedList<>();
-        for (RuleVerificationResult result : holder.getResults()) {
+        for (RuleVerificationResult result : holder.getResults(verifiable)) {
             if (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName()) ||
                     result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST.getName())) {
                 filteredResults.add(result);
@@ -109,7 +114,7 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Signatur
                 filteredResults.add(result);
             }
         }
-        return filteredResults.isEmpty() || !findHighestPriorityResult(filteredResults).equals(VerificationResult.OK);
+        return filteredResults.isEmpty() || !findHighestPriorityResult(filteredResults).equals(OK);
     }
 
 }

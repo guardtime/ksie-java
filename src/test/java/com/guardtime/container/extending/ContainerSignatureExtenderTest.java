@@ -62,7 +62,7 @@ public class ContainerSignatureExtenderTest extends AbstractContainerTest {
     @Test
     public void testExtendingSuccess() throws Exception {
         doReturn(true).when(mockSignature).isExtended();
-        assertTrue(extender.extend(makeMockContainer()));
+        assertTrue(extender.extend(makeMockContainer()).getSignatureContents().get(0).isExtended());
     }
 
     @Test
@@ -70,13 +70,13 @@ public class ContainerSignatureExtenderTest extends AbstractContainerTest {
         doThrow(SignatureException.class)
                 .when(mockSignatureFactory)
                 .extend(Mockito.any(ContainerSignature.class), Mockito.any(ExtendingPolicy.class));
-        assertFalse(extender.extend(makeMockContainer()));
+        assertFalse(extender.extend(makeMockContainer()).getSignatureContents().get(0).isExtended());
     }
 
     @Test
     public void testExtendingIsNotDone() throws Exception {
         doReturn(false).when(mockSignature).isExtended();
-        assertFalse(extender.extend(makeMockContainer()));
+        assertFalse(extender.extend(makeMockContainer()).getSignatureContents().get(0).isExtended());
     }
 
 }

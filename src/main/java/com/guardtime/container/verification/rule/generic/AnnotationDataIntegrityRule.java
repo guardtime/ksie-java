@@ -51,8 +51,9 @@ public class AnnotationDataIntegrityRule extends AbstractRule<SignatureContent> 
             VerificationResult verificationResult = getFailureVerificationResult();
             GenericVerificationResult result;
 
+            if (manifestExistenceOrIntegrityRuleFailed(holder, manifestUri)) continue;
             AnnotationDataReference annotationDataReference = getAnnotationDataReference(manifestUri, signatureContent);
-            if (manifestOrExistenceRuleFailed(holder, manifestUri, annotationDataReference.getUri())) continue;
+            if(dataExistenceRuleFailed(holder, annotationDataReference.getUri())) continue;
 
             String annotationDataUri = annotationDataReference.getUri();
             ContainerAnnotation annotation = signatureContent.getAnnotations().get(annotationDataUri);
@@ -74,7 +75,7 @@ public class AnnotationDataIntegrityRule extends AbstractRule<SignatureContent> 
                 continue;
             }
 
-            holder.addResult(result);
+            holder.addResult(signatureContent, result);
         }
     }
 
@@ -89,9 +90,9 @@ public class AnnotationDataIntegrityRule extends AbstractRule<SignatureContent> 
     }
 
     @Override
-    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder) {
+    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder, SignatureContent verifiable) {
         List<RuleVerificationResult> filteredResults = new LinkedList<>();
-        for (RuleVerificationResult result : holder.getResults()) {
+        for (RuleVerificationResult result : holder.getResults(verifiable)) {
             if (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName()) ||
                     result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST.getName())) {
                 filteredResults.add(result);
@@ -110,8 +111,7 @@ public class AnnotationDataIntegrityRule extends AbstractRule<SignatureContent> 
         return type.equals(ContainerAnnotationType.NON_REMOVABLE) ? state : RuleState.IGNORE;
     }
 
-
-    private boolean manifestOrExistenceRuleFailed(ResultHolder holder, String manifestUri, String dataUri) {
+    private boolean manifestExistenceOrIntegrityRuleFailed(ResultHolder holder, String manifestUri) {
         List<RuleVerificationResult> filteredResults = new LinkedList<>();
         for (RuleVerificationResult result : holder.getResults()) {
             if (result.getTestedElementPath().equals(manifestUri) &&
@@ -119,6 +119,13 @@ public class AnnotationDataIntegrityRule extends AbstractRule<SignatureContent> 
                             result.getRuleName().equals(KSIE_VERIFY_ANNOTATION.getName()))) {
                 filteredResults.add(result);
             }
+        }
+        return filteredResults.size() < 2 || !findHighestPriorityResult(filteredResults).equals(OK);
+    }
+
+    private boolean dataExistenceRuleFailed(ResultHolder holder, String dataUri) {
+        List<RuleVerificationResult> filteredResults = new LinkedList<>();
+        for (RuleVerificationResult result : holder.getResults()) {
             if((result.getTestedElementPath().equals(dataUri) &&
                     result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_DATA_EXISTS.getName()))) {
                 filteredResults.add(result);

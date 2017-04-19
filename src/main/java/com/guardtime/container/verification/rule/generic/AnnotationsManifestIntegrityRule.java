@@ -35,7 +35,14 @@ public class AnnotationsManifestIntegrityRule extends AbstractRule<SignatureCont
         MultiHashElement annotationsManifest = verifiable.getAnnotationsManifest().getRight();
         Manifest manifest = verifiable.getManifest().getRight();
         FileReference annotationsManifestReference = manifest.getAnnotationsManifestReference();
-        integrityRule.verify(holder, Pair.of(annotationsManifest, annotationsManifestReference));
+        ResultHolder tempHolder = new ResultHolder();
+        try {
+            integrityRule.verify(tempHolder, Pair.of(annotationsManifest, annotationsManifestReference));
+        } catch (RuleTerminatingException e) {
+            LOGGER.info("Annotations manifest hash verification failed with message: '{}'", e.getMessage());
+        } finally {
+            holder.addResults(verifiable, tempHolder.getResults());
+        }
     }
 
     @Override
@@ -49,9 +56,9 @@ public class AnnotationsManifestIntegrityRule extends AbstractRule<SignatureCont
     }
 
     @Override
-    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder) {
+    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder, SignatureContent verifiable) {
         List<RuleVerificationResult> filteredResults = new LinkedList<>();
-        for (RuleVerificationResult result : holder.getResults()) {
+        for (RuleVerificationResult result : holder.getResults(verifiable)) {
             if (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName())) {
                 filteredResults.add(result);
             }

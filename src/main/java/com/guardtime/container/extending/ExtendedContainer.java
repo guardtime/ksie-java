@@ -22,6 +22,19 @@ public class ExtendedContainer implements Container {
         updateExtendedSignatureContents();
     }
 
+    /**
+     * Returns true if all {@link SignatureContent}s of this {@link Container} are extended.
+     */
+    public boolean isExtended() {
+        boolean extended = true;
+        for(ExtendedSignatureContent content : extendedSignatureContents) {
+            if (!content.isExtended()) {
+                extended = false;
+            }
+        }
+        return extended;
+    }
+
     @Override
     public List<ExtendedSignatureContent> getSignatureContents() {
         return Collections.unmodifiableList(extendedSignatureContents);
