@@ -1,7 +1,9 @@
 package com.guardtime.container.verification.policy;
 
 import com.guardtime.container.manifest.DocumentsManifest;
+import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
+import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.generic.AnnotationDataExistenceRule;
 import com.guardtime.container.verification.rule.generic.AnnotationDataIntegrityRule;
@@ -40,36 +42,52 @@ import java.util.List;
  * pre-existing rules.
  */
 public class DefaultVerificationPolicy implements VerificationPolicy {
-    private ArrayList<Rule> rules = new ArrayList<>();
+    private ArrayList<Rule<SignatureContent>> signatureContentRules = new ArrayList<>();
+    private ArrayList<Rule<Container>> containerRules = new ArrayList<>();
 
     /**
      * @param signatureVerifier will be called for verifying each signature.
      * @param packagingFactory will be used to create the appropriate MIME type rule.
      */
-    public DefaultVerificationPolicy(RuleStateProvider stateProvider, SignatureVerifier signatureVerifier, ContainerPackagingFactory packagingFactory) {
-        this(stateProvider, signatureVerifier, packagingFactory, Collections.<Rule>emptyList());
+    public DefaultVerificationPolicy(RuleStateProvider stateProvider, SignatureVerifier signatureVerifier,
+                                     ContainerPackagingFactory packagingFactory) {
+        this(
+                stateProvider,
+                signatureVerifier,
+                packagingFactory,
+                Collections.<Rule<Container>>emptyList(),
+                Collections.<Rule<SignatureContent>>emptyList()
+        );
     }
 
-    public DefaultVerificationPolicy(RuleStateProvider stateProvider, SignatureVerifier signatureVerifier, ContainerPackagingFactory packagingFactory, List<Rule> customRules) {
-        rules.add(new MimeTypeIntegrityRule(stateProvider, packagingFactory));
-        rules.add(new SignatureExistenceRule(stateProvider));
-        rules.add(new SignatureSignsManifestRule(stateProvider));
-        rules.add(new SignatureIntegrityRule(stateProvider, signatureVerifier));
-        rules.add(new DocumentsManifestExistenceRule(stateProvider));
-        rules.add(new DocumentsManifestIntegrityRule(stateProvider));
-        rules.add(new DocumentExistenceRule(stateProvider));
-        rules.add(new DocumentIntegrityRule(stateProvider));
-        rules.add(new AnnotationsManifestExistenceRule(stateProvider));
-        rules.add(new AnnotationsManifestIntegrityRule(stateProvider));
-        rules.add(new SingleAnnotationManifestExistenceRule(stateProvider));
-        rules.add(new SingleAnnotationManifestIntegrityRule(stateProvider));
-        rules.add(new AnnotationDataExistenceRule(stateProvider));
-        rules.add(new AnnotationDataIntegrityRule(stateProvider));
-        rules.addAll(customRules);
+    public DefaultVerificationPolicy(RuleStateProvider stateProvider, SignatureVerifier signatureVerifier,
+                                     ContainerPackagingFactory packagingFactory, List<Rule<Container>> customContainerRules,
+                                     List<Rule<SignatureContent>> customSignatureContentRules) {
+        containerRules.add(new MimeTypeIntegrityRule(stateProvider, packagingFactory));
+        containerRules.addAll(customContainerRules);
+        signatureContentRules.add(new SignatureExistenceRule(stateProvider));
+        signatureContentRules.add(new SignatureSignsManifestRule(stateProvider));
+        signatureContentRules.add(new SignatureIntegrityRule(stateProvider, signatureVerifier));
+        signatureContentRules.add(new DocumentsManifestExistenceRule(stateProvider));
+        signatureContentRules.add(new DocumentsManifestIntegrityRule(stateProvider));
+        signatureContentRules.add(new DocumentExistenceRule(stateProvider));
+        signatureContentRules.add(new DocumentIntegrityRule(stateProvider));
+        signatureContentRules.add(new AnnotationsManifestExistenceRule(stateProvider));
+        signatureContentRules.add(new AnnotationsManifestIntegrityRule(stateProvider));
+        signatureContentRules.add(new SingleAnnotationManifestExistenceRule(stateProvider));
+        signatureContentRules.add(new SingleAnnotationManifestIntegrityRule(stateProvider));
+        signatureContentRules.add(new AnnotationDataExistenceRule(stateProvider));
+        signatureContentRules.add(new AnnotationDataIntegrityRule(stateProvider));
+        signatureContentRules.addAll(customSignatureContentRules);
     }
 
-    public List<Rule> getRules() {
-        return rules;
+    public List<Rule<SignatureContent>> getSignatureContentRules() {
+        return signatureContentRules;
+    }
+
+    @Override
+    public List<Rule<Container>> getContainerRules() {
+        return containerRules;
     }
 
 }

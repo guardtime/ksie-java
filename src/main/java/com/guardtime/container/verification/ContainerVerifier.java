@@ -6,15 +6,13 @@ import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.policy.VerificationPolicy;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.rule.ContainerRule;
 import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Helper class to verify {@link Container} based on a {@link VerificationPolicy}
@@ -36,29 +34,31 @@ public class ContainerVerifier {
      */
     public VerifiedContainer verify(Container container) {
         ResultHolder holder = new ResultHolder();
-        Set<SignatureContent> terminatedContents = new HashSet<>();
         try {
-            for (Rule rule : policy.getRules()) {
-                if(rule instanceof ContainerRule) {
-                    rule.verify(holder, container);
-                } else {
-                    for(SignatureContent content : container.getSignatureContents()) {
-                        if(terminatedContents.contains(content)) {
-                            continue;
-                        }
-                        try {
-                            rule.verify(holder, content);
-                        } catch (RuleTerminatingException e) {
-                            logger.info("Container verification terminated! Reason: '{}'", e.getMessage());
-                            terminatedContents.add(content);
-                        }
-                    }
-                }
-            }
+            verifyGeneralRules(container, holder);
+            verifySignatureContents(container.getSignatureContents(), holder);
         } catch (RuleTerminatingException e) {
             logger.info("Container verification terminated! Reason: '{}'", e.getMessage());
         }
         return new VerifiedContainer(container, holder);
+    }
+
+    private void verifyGeneralRules(Container container, ResultHolder holder) throws RuleTerminatingException {
+        for (Rule<Container> rule : policy.getContainerRules()) {
+            rule.verify(holder, container);
+        }
+    }
+
+    private void verifySignatureContents(List<? extends SignatureContent> signatureContents, ResultHolder holder) {
+        for (SignatureContent content : signatureContents) {
+            try {
+                for (Rule<SignatureContent> rule : policy.getSignatureContentRules()) {
+                    rule.verify(holder, content);
+                }
+            } catch (RuleTerminatingException e) {
+                logger.info("Signature content verification terminated! Reason: '{}'", e.getMessage());
+            }
+        }
     }
 
 }

@@ -13,6 +13,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Wrapper for a {@link Container} that has been processed by {@link ContainerSignatureExtender}.
+ * Provides helper methods to view extending status.
+ */
 public class ExtendedContainer implements Container {
     private final Container wrappedContainer;
     private List<ExtendedSignatureContent> extendedSignatureContents;
@@ -27,7 +31,7 @@ public class ExtendedContainer implements Container {
      */
     public boolean isExtended() {
         boolean extended = true;
-        for(ExtendedSignatureContent content : extendedSignatureContents) {
+        for (ExtendedSignatureContent content : extendedSignatureContents) {
             if (!content.isExtended()) {
                 extended = false;
             }
@@ -80,7 +84,7 @@ public class ExtendedContainer implements Container {
 
     private void updateExtendedSignatureContents() {
         List<ExtendedSignatureContent> extendedContents = new ArrayList<>(wrappedContainer.getSignatureContents().size());
-        for(SignatureContent content : wrappedContainer.getSignatureContents()) {
+        for (SignatureContent content : wrappedContainer.getSignatureContents()) {
             extendedContents.add(new ExtendedSignatureContent(content));
         }
         this.extendedSignatureContents = extendedContents;

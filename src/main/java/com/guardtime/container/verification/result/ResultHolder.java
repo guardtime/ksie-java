@@ -19,6 +19,9 @@ public class ResultHolder {
         this.signatureContentResultsMap = new HashMap<>();
     }
 
+    /**
+     * Returns all verification results gathered.
+     */
     public List<RuleVerificationResult> getResults() {
         List<RuleVerificationResult> allResults = new ArrayList<>();
         allResults.addAll(containerResults);
@@ -28,6 +31,10 @@ public class ResultHolder {
         return allResults;
     }
 
+    /**
+     * Returns verification results specific to provided {@link SignatureContent}.
+     * @param content for which verification results must apply.
+     */
     public List<RuleVerificationResult> getResults(SignatureContent content) {
         List<RuleVerificationResult> contentVerificationResults = signatureContentResultsMap.get(content);
         if(contentVerificationResults == null) {
@@ -38,10 +45,25 @@ public class ResultHolder {
         return ruleVerificationResults;
     }
 
+    /**
+     * Returns root signature verification results specific to provided {@link SignatureContent}.
+     * @param content for which root signature verification results must apply.
+     */
     public List<SignatureResult> getSignatureResults(SignatureContent content) {
         return signatureResultsMap.get(content);
     }
 
+    /**
+     * Returns verification results that apply to a {@link com.guardtime.container.packaging.Container} and not to any one
+     * specific {@link SignatureContent}.
+     */
+    public List<RuleVerificationResult> getGeneralResults() {
+        return containerResults;
+    }
+
+    /**
+     * Adds a {@link SignatureResult} to the result set for the provided {@link SignatureContent}.
+     */
     public void addSignatureResult(SignatureContent content, SignatureResult result) {
         List<SignatureResult> signatureResults = signatureResultsMap.get(content);
         if (signatureResults == null) {
@@ -51,14 +73,23 @@ public class ResultHolder {
         signatureResults.add(result);
     }
 
+    /**
+     * Adds the provided {@link RuleVerificationResult} to the general result set.
+     */
     public void addResult(RuleVerificationResult ruleVerificationResult) {
         containerResults.add(ruleVerificationResult);
     }
 
+    /**
+     * Adds the provided list of {@link RuleVerificationResult}s to the general result set.
+     */
     public void addResults(List<RuleVerificationResult> ruleVerificationResults) {
         containerResults.addAll(ruleVerificationResults);
     }
 
+    /**
+     * Adds the provided {@link RuleVerificationResult} to the result set of the specified {@link SignatureContent}.
+     */
     public void addResult(SignatureContent content, RuleVerificationResult ruleVerificationResult) {
         List<RuleVerificationResult> results = signatureContentResultsMap.get(content);
         if (results == null) {
@@ -68,6 +99,9 @@ public class ResultHolder {
         results.add(ruleVerificationResult);
     }
 
+    /**
+     * Adds the provided list of {@link RuleVerificationResult}s to the result set of the specified {@link SignatureContent}.
+     */
     public void addResults(SignatureContent content, List<RuleVerificationResult> ruleVerificationResults) {
         List<RuleVerificationResult> results = signatureContentResultsMap.get(content);
         if (results == null) {
@@ -77,6 +111,10 @@ public class ResultHolder {
         results.addAll(ruleVerificationResults);
     }
 
+    /**
+     * Finds the highest priority {@link VerificationResult} that exists in the given list of {@link RuleVerificationResult}s.
+     * The priorities of {@link VerificationResult} go from highest (NOK) to lowest (OK).
+     */
     public static VerificationResult findHighestPriorityResult(List<RuleVerificationResult> verificationResults) {
         VerificationResult returnable = VerificationResult.OK;
         if(verificationResults != null) {

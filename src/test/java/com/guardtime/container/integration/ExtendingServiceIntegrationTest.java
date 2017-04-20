@@ -115,8 +115,8 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
         ContainerSignatureExtender extender = new ContainerSignatureExtender(factory, policy);
         try (Container container = getContainer(containerName)) {
             assertSignaturesExtendedStatus(container, false);
-            extender.extend(container);
-            assertSignaturesExtendedStatus(container, extendedStatusAfterExtending);
+            ExtendedContainer extendedContainer = extender.extend(container);
+            assertSignaturesExtendedStatus(extendedContainer, extendedStatusAfterExtending);
         }
     }
 

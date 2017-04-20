@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Wrapper for a {@link SignatureContent} that has been processed by {@link ContainerSignatureExtender}.
+ * Provides helper methods to view extending status.
+ */
 public class ExtendedSignatureContent extends SignatureContent {
 
     ExtendedSignatureContent(SignatureContent original) {

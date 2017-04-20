@@ -27,10 +27,9 @@ public class ContainerSignatureExtender {
     }
 
     /**
-     * Extends each signature in input container and returns the container.
+     * Extends each signature in input container and returns an {@link ExtendedContainer}.
      * If a signature extending fails it is logged at INFO level and skipped.
      * @param container    Container to be extended.
-     * @return True if all signatures were extended successfully, false otherwise.
      */
     public ExtendedContainer extend(Container container) {
         for (SignatureContent content : container.getSignatureContents()) {
@@ -41,10 +40,10 @@ public class ContainerSignatureExtender {
                 signatureFactory.extend(containerSignature, policy);
 
                 if (!containerSignature.isExtended()) {
-                    logger.info("Extending signature '{}' resulted in a non-extended signature without exception!", signatureUri);
+                    logger.warn("Extending signature '{}' resulted in a non-extended signature without exception!", signatureUri);
                 }
             } catch (SignatureException e) {
-                logger.info("Failed to extend signature '{}' because: '{}'", signatureUri, e.getMessage());
+                logger.warn("Failed to extend signature '{}' because: '{}'", signatureUri, e.getMessage());
             }
         }
         return new ExtendedContainer(container);

@@ -36,7 +36,6 @@ public class VerifiedContainer implements Container {
 
     /**
      * Provides access to all the {@link RuleVerificationResult} gathered during verification.
-     *
      * @return List of {@link RuleVerificationResult}
      */
     public List<RuleVerificationResult> getResults() {
