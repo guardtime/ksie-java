@@ -95,7 +95,10 @@ The following example shows extending of all signatures in a container.
 ```java
 ExtendingPolicy extendingPolicy = new KsiContainerSignatureExtendingPolicy(ksi)
 ContainerSignatureExtender signatureExtender = new ContainerSignatureExtender(signatureFactory, extendingPolicy)
-extender.extend(container);
+ExtendedContainer extendedContainer = extender.extend(container);
+extendedContainer.isExtended();
+extendedContainer.getSignatureContents().get(0).isExtended();
+
 ```
 
 ## Verifying a container
@@ -110,8 +113,9 @@ List<Rule> implicitRules;
 Rule signatureRule = new KsiPolicyBasedSignatureIntegrityRule(ksi, KeyBasedVerificationPolicy());
 DefaultVerificationPolicy policy = new DefaultVerificationPolicy(signatureRule, new MimeTypeIntegrityRule(packagingFactory), implicitRules);
 ContainerVerifier verifier = new ContainerVerifier(policy);
-ContainerVerifierResult result = verifier.verify(container);
-VerificationResult verificationResult = result.getVerificationResult(); // OK/NOK/WARN
+VerifiedContaienr verifiedContainer = verifier.verify(container);
+VerificationResult verificationResult = verifiedContainer.getVerificationResult(); // OK/NOK/WARN
+VerificationResult verificationResult = verifiedContainer.getSignatureContents().get(0).getVerificationResult(); // OK/NOK/WARN
 ```
 
 Since there currently are no reports for verification then you'd have to loop through the raw results to get a more detailed overview of what failed verification.
