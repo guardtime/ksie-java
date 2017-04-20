@@ -4,7 +4,6 @@ import com.guardtime.container.packaging.SignatureContent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +31,8 @@ public class ResultHolder {
     }
 
     /**
-     * Returns verification results specific to provided {@link SignatureContent}.
+     * Returns verification results specific to provided {@link SignatureContent} as well as generic results not specific to any
+     * {@link SignatureContent}.
      * @param content for which verification results must apply.
      */
     public List<RuleVerificationResult> getResults(SignatureContent content) {

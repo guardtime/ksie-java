@@ -8,7 +8,6 @@ import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.Rule;
 
 import org.junit.Test;
@@ -20,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.guardtime.container.verification.result.VerificationResult.OK;
-import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST;
 import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;

@@ -12,6 +12,7 @@ import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
 /**
  * Rule that verifies that there is a signature in the container for the given {@link SignatureContent}
+ * Will terminate verification upon non OK results.
  */
 public class SignatureExistenceRule extends AbstractRule<SignatureContent> {
 

@@ -15,7 +15,6 @@ import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.publication.inmemory.PublicationsFilePublicationRecord;
 import com.guardtime.ksi.unisignature.KSISignature;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 

@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.guardtime.container.verification.result.VerificationResult.OK;
-import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_DATA_MANIFEST;
 import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_DATA_MANIFEST_EXISTS;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;

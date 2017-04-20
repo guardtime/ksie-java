@@ -16,7 +16,7 @@ import static com.guardtime.container.verification.result.VerificationResult.NOK
 import static com.guardtime.container.verification.result.VerificationResult.OK;
 import static com.guardtime.container.verification.result.VerificationResult.WARN;
 
-public abstract class AbstractRule<O> implements Rule<O> {
+public abstract class AbstractRule<V> implements Rule<V> {
     protected static final Logger LOGGER = LoggerFactory.getLogger(Rule.class);
 
     protected final RuleState state;
@@ -37,13 +37,13 @@ public abstract class AbstractRule<O> implements Rule<O> {
     }
 
     @Override
-    public boolean verify(ResultHolder resultHolder, O verifiable) throws RuleTerminatingException {
+    public boolean verify(ResultHolder resultHolder, V verifiable) throws RuleTerminatingException {
         if (this.state == RuleState.IGNORE || !getDependencyRuleResult(resultHolder, verifiable).equals(OK)) return false;
         verifyRule(resultHolder, verifiable);
         return true;
     }
 
-    protected abstract void verifyRule(ResultHolder holder, O verifiable) throws RuleTerminatingException;
+    protected abstract void verifyRule(ResultHolder holder, V verifiable) throws RuleTerminatingException;
 
     public String getName() {
         return null;
@@ -54,7 +54,7 @@ public abstract class AbstractRule<O> implements Rule<O> {
         return null;
     }
 
-    private VerificationResult getDependencyRuleResult(ResultHolder holder, O verifiable) {
+    private VerificationResult getDependencyRuleResult(ResultHolder holder, V verifiable) {
         List<RuleVerificationResult> results = getFilteredResults(holder, verifiable);
         if (!results.isEmpty()) {
             return findHighestPriorityResult(results);
@@ -63,7 +63,7 @@ public abstract class AbstractRule<O> implements Rule<O> {
     }
 
     // Sub classes override to provide correct filtering
-    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder, O verifiable) {
+    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder, V verifiable) {
         return Collections.emptyList();
     }
 }

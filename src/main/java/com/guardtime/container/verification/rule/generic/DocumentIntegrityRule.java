@@ -23,6 +23,8 @@ import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_DAT
 
 /**
  * This rule verifies that the {@link ContainerDocument} being tested has not been corrupted.
+ * It expects to find successful results for rules verifying existence and integrity of
+ * {@link com.guardtime.container.manifest.DocumentsManifest} and document existence.
  */
 public class DocumentIntegrityRule extends AbstractRule<SignatureContent> {
 

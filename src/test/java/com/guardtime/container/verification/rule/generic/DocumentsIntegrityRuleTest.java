@@ -3,14 +3,13 @@ package com.guardtime.container.verification.rule.generic;
 import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
-import com.guardtime.container.packaging.exception.ContainerReadingException;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.packaging.exception.ContainerReadingException;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
-import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.ksi.unisignature.KSISignature;
 
 import org.junit.Before;

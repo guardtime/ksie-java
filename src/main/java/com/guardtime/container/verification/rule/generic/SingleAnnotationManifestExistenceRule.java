@@ -22,6 +22,8 @@ import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANN
 
 /**
  * This rule verifies the existence of the meta-data file of an annotation.
+ * It expects to find successful results for rules verifying existence and integrity of
+ * {@link com.guardtime.container.manifest.AnnotationsManifest}.
  */
 public class SingleAnnotationManifestExistenceRule extends AbstractRule<SignatureContent> {
 

@@ -20,6 +20,8 @@ import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_DAT
 /**
  * This rule verifies the validity of the datamanifest which contains records for all {@link
  * com.guardtime.container.document.ContainerDocument}s associated with a signature.
+ * It expects to find successful results for rules verifying existence of
+ * {@link com.guardtime.container.manifest.DocumentsManifest}.
  */
 public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureContent> {
 

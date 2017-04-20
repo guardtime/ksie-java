@@ -32,6 +32,8 @@ import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANN
 
 /**
  * This rule verifies that the annotation data has not been corrupted.
+ * It expects to find successful results for rules verifying existence and integrity of
+ * {@link com.guardtime.container.manifest.AnnotationsManifest} and {@link SingleAnnotationManifest} and annotation data.
  */
 public class AnnotationDataIntegrityRule extends AbstractRule<SignatureContent> {
 

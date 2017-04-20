@@ -19,6 +19,8 @@ import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANN
 
 /**
  * This rule verifies that the annotmanifest has not been corrupted.
+ * It expects to find successful results for rules verifying existence of
+ * {@link com.guardtime.container.manifest.AnnotationsManifest}.
  */
 public class AnnotationsManifestIntegrityRule extends AbstractRule<SignatureContent> {
 

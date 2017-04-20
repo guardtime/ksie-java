@@ -28,6 +28,8 @@ import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANN
 
 /**
  * This rule verifies the validity of the manifest file containing meta-data for an annotation.
+ * It expects to find successful results for rules verifying existence and integrity of
+ * {@link com.guardtime.container.manifest.AnnotationsManifest} and existence of {@link SingleAnnotationManifest}.
  */
 public class SingleAnnotationManifestIntegrityRule extends AbstractRule<SignatureContent> {
 

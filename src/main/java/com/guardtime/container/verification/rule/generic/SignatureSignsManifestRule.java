@@ -5,7 +5,6 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
-import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
@@ -13,14 +12,10 @@ import com.guardtime.container.verification.rule.RuleType;
 import com.guardtime.container.verification.rule.state.RuleStateProvider;
 import com.guardtime.ksi.hashing.DataHash;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
-import static com.guardtime.container.verification.result.ResultHolder.findHighestPriorityResult;
-import static com.guardtime.container.verification.result.VerificationResult.OK;
-import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_SIGNATURE_EXISTS;
-
+/**
+ * Rule to verify the input hash of root signature and {@link Manifest}.
+ * Will terminate verification upon non OK results.
+ */
 public class SignatureSignsManifestRule extends AbstractRule<SignatureContent> {
 
     private static final String NAME = RuleType.KSIE_VERIFY_MANIFEST_HASH.getName();

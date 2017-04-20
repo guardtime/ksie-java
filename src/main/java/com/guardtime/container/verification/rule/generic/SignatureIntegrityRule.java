@@ -16,6 +16,7 @@ import com.guardtime.container.verification.rule.state.RuleStateProvider;
 /**
  * Rule that verifies the {@link ContainerSignature} of a {@link SignatureContent} by using a {@link SignatureVerifier}
  * to verify the underlying signature.
+ * Will terminate verification upon non OK results.
  */
 public class SignatureIntegrityRule extends AbstractRule<SignatureContent> {
     private static final String NAME = RuleType.KSIE_VERIFY_MANIFEST.getName();

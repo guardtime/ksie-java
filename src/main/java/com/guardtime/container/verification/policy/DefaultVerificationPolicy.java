@@ -20,6 +20,7 @@ import com.guardtime.container.verification.rule.generic.SignatureSignsManifestR
 import com.guardtime.container.verification.rule.generic.SingleAnnotationManifestExistenceRule;
 import com.guardtime.container.verification.rule.generic.SingleAnnotationManifestIntegrityRule;
 import com.guardtime.container.verification.rule.signature.SignatureVerifier;
+import com.guardtime.container.verification.rule.state.DefaultRuleStateProvider;
 import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
 import java.util.ArrayList;
@@ -49,10 +50,10 @@ public class DefaultVerificationPolicy implements VerificationPolicy {
      * @param signatureVerifier will be called for verifying each signature.
      * @param packagingFactory will be used to create the appropriate MIME type rule.
      */
-    public DefaultVerificationPolicy(RuleStateProvider stateProvider, SignatureVerifier signatureVerifier,
+    public DefaultVerificationPolicy(SignatureVerifier signatureVerifier,
                                      ContainerPackagingFactory packagingFactory) {
         this(
-                stateProvider,
+                new DefaultRuleStateProvider(),
                 signatureVerifier,
                 packagingFactory,
                 Collections.<Rule<Container>>emptyList(),

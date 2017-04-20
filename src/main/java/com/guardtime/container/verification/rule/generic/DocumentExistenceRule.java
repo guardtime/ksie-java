@@ -22,6 +22,8 @@ import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_DAT
 /**
  * This rule verifies that the tested {@link ContainerDocument} is indeed present in the {@link
  * com.guardtime.container.packaging.Container}
+ * It expects to find successful results for rules verifying existence and integrity of
+ * {@link com.guardtime.container.manifest.DocumentsManifest}.
  */
 public class DocumentExistenceRule extends AbstractRule<SignatureContent> {
 
