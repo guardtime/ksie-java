@@ -31,7 +31,7 @@ public class VerifiedContainer implements Container {
         this.container = container;
         this.resultHolder = holder;
         this.aggregateResult = findHighestPriorityResult(resultHolder.getResults());
-        updateVerifiedSignatureContent();
+        wrapSignatureContents();
     }
 
     /**
@@ -77,22 +77,22 @@ public class VerifiedContainer implements Container {
     @Override
     public void add(SignatureContent content) throws ContainerMergingException {
         container.add(content);
-        updateVerifiedSignatureContent();
+        wrapSignatureContents();
     }
 
     @Override
     public void add(Container container) throws ContainerMergingException {
         container.add(container);
-        updateVerifiedSignatureContent();
+        wrapSignatureContents();
     }
 
     @Override
     public void addAll(Collection<? extends SignatureContent> contents) throws ContainerMergingException {
         container.addAll(contents);
-        updateVerifiedSignatureContent();
+        wrapSignatureContents();
     }
 
-    private void updateVerifiedSignatureContent() {
+    private void wrapSignatureContents() {
         List<VerifiedSignatureContent> verifiedContents = new ArrayList<>(container.getSignatureContents().size());
         for(SignatureContent content : container.getSignatureContents()) {
             verifiedContents.add(new VerifiedSignatureContent(content, resultHolder));

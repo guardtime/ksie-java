@@ -44,8 +44,9 @@ public class ExtendedSignatureContent extends SignatureContent {
     }
 
     private static List<Pair<String, SingleAnnotationManifest>> getSingleAnnotationManifests(SignatureContent original) {
-        List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifestPairs = new ArrayList<>(original.getSingleAnnotationManifests().size());
-        for (Map.Entry<String, SingleAnnotationManifest> entry : original.getSingleAnnotationManifests().entrySet()) {
+        Map<String, SingleAnnotationManifest> singleAnnotationManifests = original.getSingleAnnotationManifests();
+        List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifestPairs = new ArrayList<>(singleAnnotationManifests.size());
+        for (Map.Entry<String, SingleAnnotationManifest> entry : singleAnnotationManifests.entrySet()) {
             singleAnnotationManifestPairs.add(Pair.of(entry.getKey(), entry.getValue()));
         }
         return singleAnnotationManifestPairs;

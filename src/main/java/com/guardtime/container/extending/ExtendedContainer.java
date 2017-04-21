@@ -23,20 +23,19 @@ public class ExtendedContainer implements Container {
 
     public ExtendedContainer(Container original) {
         this.wrappedContainer = original;
-        updateExtendedSignatureContents();
+        wrapSignatureContents();
     }
 
     /**
      * Returns true if all {@link SignatureContent}s of this {@link Container} are extended.
      */
-    public boolean isExtended() {
-        boolean extended = true;
+    public boolean isFullyExtended() {
         for (ExtendedSignatureContent content : extendedSignatureContents) {
             if (!content.isExtended()) {
-                extended = false;
+                return false;
             }
         }
-        return extended;
+        return true;
     }
 
     @Override
@@ -67,22 +66,22 @@ public class ExtendedContainer implements Container {
     @Override
     public void add(SignatureContent content) throws ContainerMergingException {
         wrappedContainer.add(content);
-        updateExtendedSignatureContents();
+        wrapSignatureContents();
     }
 
     @Override
     public void add(Container container) throws ContainerMergingException {
         wrappedContainer.add(container);
-        updateExtendedSignatureContents();
+        wrapSignatureContents();
     }
 
     @Override
     public void addAll(Collection<? extends SignatureContent> contents) throws ContainerMergingException {
         wrappedContainer.addAll(contents);
-        updateExtendedSignatureContents();
+        wrapSignatureContents();
     }
 
-    private void updateExtendedSignatureContents() {
+    private void wrapSignatureContents() {
         List<ExtendedSignatureContent> extendedContents = new ArrayList<>(wrappedContainer.getSignatureContents().size());
         for (SignatureContent content : wrappedContainer.getSignatureContents()) {
             extendedContents.add(new ExtendedSignatureContent(content));
