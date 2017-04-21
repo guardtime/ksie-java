@@ -7,12 +7,13 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.result.VerificationResultFilter;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_DATA_MANIFEST;
 import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_DATA_MANIFEST_EXISTS;
@@ -59,13 +60,13 @@ public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureConten
     }
 
     @Override
-    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder, SignatureContent verifiable) {
-        List<RuleVerificationResult> filteredResults = new LinkedList<>();
-        for (RuleVerificationResult result : holder.getResults(verifiable)) {
-            if (result.getRuleName().equals(KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName())) {
-                filteredResults.add(result);
+    protected VerificationResultFilter getFilter(ResultHolder holder, SignatureContent verifiable) {
+        final Set<RuleVerificationResult> results = new HashSet<>(holder.getResults(verifiable));
+        return new VerificationResultFilter() {
+            @Override
+            public boolean apply(RuleVerificationResult result) {
+                return results.contains(result) && (result.getRuleName().equals(KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName()));
             }
-        }
-        return filteredResults;
+        };
     }
 }

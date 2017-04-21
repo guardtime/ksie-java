@@ -3,12 +3,26 @@ package com.guardtime.container.verification.result;
 import com.guardtime.container.packaging.SignatureContent;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ResultHolder {
 
+    public static final VerificationResultFilter ALL = new VerificationResultFilter() {
+        @Override
+        public boolean apply(RuleVerificationResult result) {
+            return true;
+        }
+    };
+    public static final VerificationResultFilter NONE = new VerificationResultFilter() {
+        @Override
+        public boolean apply(RuleVerificationResult result) {
+            return false;
+        }
+    };
     private final List<RuleVerificationResult> containerResults;
     private final Map<SignatureContent, List<RuleVerificationResult>> signatureContentResultsMap;
     private final Map<SignatureContent, List<SignatureResult>> signatureResultsMap = new HashMap<>();
@@ -111,21 +125,40 @@ public class ResultHolder {
         results.addAll(ruleVerificationResults);
     }
 
-    /**
-     * Finds the highest priority {@link VerificationResult} that exists in the given list of {@link RuleVerificationResult}s.
-     * The priorities of {@link VerificationResult} go from highest (NOK) to lowest (OK).
-     */
-    public static VerificationResult findHighestPriorityResult(List<RuleVerificationResult> verificationResults) {
-        VerificationResult returnable = VerificationResult.OK;
-        if(verificationResults != null) {
-            for (RuleVerificationResult result : verificationResults) {
-                VerificationResult verificationResult = result.getVerificationResult();
-                if (verificationResult.isMoreImportantThan(returnable)) {
-                    returnable = verificationResult;
-                    if (VerificationResult.NOK.equals(returnable)) break; // No need to check once max failure level reached
-                }
+    public VerificationResult getAggregatedResult() {
+        return getFilteredAggregatedResult(ALL);
+    }
+
+    public VerificationResult getFilteredAggregatedResult(VerificationResultFilter filter) {
+        return getFilteredAggregatedResult(filter, 0);
+    }
+
+    public VerificationResult getFilteredAggregatedResult(VerificationResultFilter filter, int resultsCount) {
+        List<VerificationResult> filteredResults = new ArrayList<>();
+        for (RuleVerificationResult result : getResults()) {
+            if (filter.apply(result)) {
+                filteredResults.add(result.getVerificationResult());
             }
         }
-        return returnable;
+        if (filteredResults.size() < resultsCount) {
+            return VerificationResult.NOK;
+        }
+        return findHighestPriorityResult(filteredResults);
+    }
+
+    /**
+     * Finds the highest priority {@link VerificationResult} that exists in the given list of {@link VerificationResult}s.
+     * The priorities of {@link VerificationResult} go from highest (NOK) to lowest (OK).
+     */
+    private VerificationResult findHighestPriorityResult(List<VerificationResult> verificationResults) {
+        List<VerificationResult> sortedList = new ArrayList<>(verificationResults);
+        sortedList.add(VerificationResult.OK); // So we always have at least one default value in list
+        Collections.sort(sortedList, new Comparator<VerificationResult>() {
+            @Override
+            public int compare(VerificationResult verificationResult, VerificationResult t1) {
+                return t1.compareTo(verificationResult);
+            }
+        });
+        return sortedList.get(0);
     }
 }

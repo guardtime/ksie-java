@@ -7,16 +7,16 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
-import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.result.VerificationResultFilter;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.container.verification.rule.RuleType;
 import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import static com.guardtime.container.verification.result.ResultHolder.findHighestPriorityResult;
+import static com.guardtime.container.verification.result.VerificationResult.OK;
 import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_DATA_EXISTS;
 import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_DATA_MANIFEST;
 import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_DATA_MANIFEST_EXISTS;
@@ -40,7 +40,7 @@ public class DocumentIntegrityRule extends AbstractRule<SignatureContent> {
     protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
         for (FileReference documentReference : verifiable.getDocumentsManifest().getRight().getDocumentReferences()) {
             String uri = documentReference.getUri();
-            if (existenceRuleFailed(holder.getResults(verifiable), uri)) continue;
+            if (existenceRuleFailed(holder, verifiable, uri)) continue;
 
             MultiHashElement document = verifiable.getDocuments().get(uri);
 
@@ -66,26 +66,27 @@ public class DocumentIntegrityRule extends AbstractRule<SignatureContent> {
     }
 
     @Override
-    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder, SignatureContent verifiable) {
-        List<RuleVerificationResult> filteredResults = new LinkedList<>();
-        for (RuleVerificationResult result : holder.getResults(verifiable)) {
-            if (result.getRuleName().equals(KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName()) ||
-                    result.getRuleName().equals(KSIE_VERIFY_DATA_MANIFEST.getName())) {
-                filteredResults.add(result);
+    protected VerificationResultFilter getFilter(ResultHolder holder, SignatureContent verifiable) {
+        final Set<RuleVerificationResult> results = new HashSet<>(holder.getResults(verifiable));
+        return new VerificationResultFilter() {
+            @Override
+            public boolean apply(RuleVerificationResult result) {
+                return results.contains(result) && (result.getRuleName().equals(KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName()) ||
+                        result.getRuleName().equals(KSIE_VERIFY_DATA_MANIFEST.getName()));
             }
-        }
-        return filteredResults;
+        };
     }
 
-    private boolean existenceRuleFailed(List<RuleVerificationResult> results, String documentUri) {
-        List<RuleVerificationResult> filteredResults = new LinkedList<>();
-        for (RuleVerificationResult result : results) {
-            if (result.getRuleName().equals(KSIE_VERIFY_DATA_EXISTS.getName()) &&
-                    result.getTestedElementPath().equals(documentUri)) {
-                filteredResults.add(result);
+    private boolean existenceRuleFailed(ResultHolder holder, SignatureContent verifiable, final String documentUri) {
+        final Set<RuleVerificationResult> results = new HashSet<>(holder.getResults(verifiable));
+        VerificationResultFilter filter = new VerificationResultFilter() {
+            @Override
+            public boolean apply(RuleVerificationResult result) {
+                return results.contains(result) && (result.getRuleName().equals(KSIE_VERIFY_DATA_EXISTS.getName()) &&
+                        result.getTestedElementPath().equals(documentUri));
             }
-        }
-        return filteredResults.isEmpty() || !findHighestPriorityResult(filteredResults).equals(VerificationResult.OK);
+        };
+        return !holder.getFilteredAggregatedResult(filter, 1).equals(OK);
     }
 
 }

@@ -16,8 +16,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static com.guardtime.container.verification.result.ResultHolder.findHighestPriorityResult;
-
 /**
  * Encompasses all results from verifying a {@link Container} Provides easier access to overall result of verification.
  */
@@ -30,7 +28,7 @@ public class VerifiedContainer implements Container {
     public VerifiedContainer(Container container, ResultHolder holder) {
         this.container = container;
         this.resultHolder = holder;
-        this.aggregateResult = findHighestPriorityResult(resultHolder.getResults());
+        this.aggregateResult = resultHolder.getAggregatedResult();
         wrapSignatureContents();
     }
 

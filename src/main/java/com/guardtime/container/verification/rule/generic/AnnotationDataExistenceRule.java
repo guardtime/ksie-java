@@ -9,16 +9,16 @@ import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.result.VerificationResultFilter;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.container.verification.rule.RuleType;
 import com.guardtime.container.verification.rule.state.RuleState;
 import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import static com.guardtime.container.verification.result.ResultHolder.findHighestPriorityResult;
 import static com.guardtime.container.verification.result.VerificationResult.OK;
 import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION;
 import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_EXISTS;
@@ -40,9 +40,9 @@ public class AnnotationDataExistenceRule extends AbstractRule<SignatureContent> 
 
     @Override
     protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
-        for(FileReference reference : verifiable.getAnnotationsManifest().getRight().getSingleAnnotationManifestReferences()) {
+        for (FileReference reference : verifiable.getAnnotationsManifest().getRight().getSingleAnnotationManifestReferences()) {
             String manifestUri = reference.getUri();
-            if(anyRuleFailed(holder, manifestUri)) continue;
+            if (anyRuleFailed(holder, manifestUri)) continue;
             RuleState ruleState = getRuleState(reference);
             VerificationResult result = getFailureVerificationResult();
 
@@ -55,7 +55,6 @@ public class AnnotationDataExistenceRule extends AbstractRule<SignatureContent> 
             if (!ruleState.equals(RuleState.IGNORE) || result.equals(OK)) {
                 holder.addResult(verifiable, new GenericVerificationResult(result, getName(), getErrorMessage(), dataPath));
             }
-
         }
     }
 
@@ -80,26 +79,26 @@ public class AnnotationDataExistenceRule extends AbstractRule<SignatureContent> 
     }
 
     @Override
-    protected List<RuleVerificationResult> getFilteredResults(ResultHolder holder, SignatureContent verifiable) {
-        List<RuleVerificationResult> filteredResults = new LinkedList<>();
-        for (RuleVerificationResult result : holder.getResults(verifiable)) {
-            if (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName()) ||
-                    result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST.getName())) {
-                filteredResults.add(result);
+    protected VerificationResultFilter getFilter(ResultHolder holder, SignatureContent verifiable) {
+        final Set<RuleVerificationResult> results = new HashSet<>(holder.getResults(verifiable));
+        return new VerificationResultFilter() {
+            @Override
+            public boolean apply(RuleVerificationResult result) {
+                return results.contains(result) && (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName()) ||
+                        result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST.getName()));
             }
-        }
-        return filteredResults;
+        };
     }
 
-    private boolean anyRuleFailed(ResultHolder holder, String uri) {
-        List<RuleVerificationResult> filteredResults = new LinkedList<>();
-        for (RuleVerificationResult result : holder.getResults()) {
-            if (result.getTestedElementPath().equals(uri) &&
-                    (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_EXISTS.getName()) ||
-                            result.getRuleName().equals(KSIE_VERIFY_ANNOTATION.getName()))) {
-                filteredResults.add(result);
+    private boolean anyRuleFailed(ResultHolder holder, final String uri) {
+        VerificationResultFilter filter = new VerificationResultFilter() {
+            @Override
+            public boolean apply(RuleVerificationResult result) {
+                return result.getTestedElementPath().equals(uri) &&
+                        (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_EXISTS.getName()) ||
+                                result.getRuleName().equals(KSIE_VERIFY_ANNOTATION.getName()));
             }
-        }
-        return filteredResults.size() < 2 || !findHighestPriorityResult(filteredResults).equals(OK);
+        };
+        return !holder.getFilteredAggregatedResult(filter, 2).equals(OK);
     }
 }

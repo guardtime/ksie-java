@@ -8,12 +8,11 @@ import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.SignatureResult;
 import com.guardtime.container.verification.result.VerificationResult;
+import com.guardtime.container.verification.result.VerificationResultFilter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static com.guardtime.container.verification.result.ResultHolder.findHighestPriorityResult;
 
 public class VerifiedSignatureContent extends SignatureContent {
     private final List<RuleVerificationResult> results;
@@ -34,7 +33,12 @@ public class VerifiedSignatureContent extends SignatureContent {
         );
         this.results = holder.getResults(original);
         this.signatureResults = holder.getSignatureResults(original);
-        this.aggregateResult = findHighestPriorityResult(results);
+        this.aggregateResult = holder.getFilteredAggregatedResult(new VerificationResultFilter() {
+            @Override
+            public boolean apply(RuleVerificationResult result) {
+                return results.contains(result);
+            }
+        });
     }
 
     private static List<Pair<String, ContainerAnnotation>> getAnnotations(SignatureContent original) {
