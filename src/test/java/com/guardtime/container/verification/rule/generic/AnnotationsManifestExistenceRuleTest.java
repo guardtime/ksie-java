@@ -34,8 +34,24 @@ public class AnnotationsManifestExistenceRuleTest extends AbstractContainerTest 
         ResultHolder holder = new ResultHolder();
         rule.verify(holder, mockSignatureContent);
 
-        RuleVerificationResult result = holder.getResults().get(0);
-        assertEquals(VerificationResult.OK, result.getVerificationResult());
+        assertEquals(VerificationResult.OK, holder.getAggregatedResult());
+    }
+
+    @Test
+    public void testAnnotationsManifestDoesNotExistResultsInNOK() throws Exception {
+        String annotManifestPath = "annotmanifest.ext";
+        FileReference mockFileReference = Mockito.mock(FileReference.class);
+        SignatureContent mockSignatureContent = Mockito.mock(SignatureContent.class);
+
+        when(mockFileReference.getUri()).thenReturn(annotManifestPath);
+        when(mockedManifest.getAnnotationsManifestReference()).thenReturn(mockFileReference);
+        when(mockSignatureContent.getManifest()).thenReturn(Pair.of("path", mockedManifest));
+        when(mockSignatureContent.getAnnotationsManifest()).thenReturn(null);
+
+        ResultHolder holder = new ResultHolder();
+        rule.verify(holder, mockSignatureContent);
+
+        assertEquals(VerificationResult.NOK, holder.getAggregatedResult());
     }
 
 }

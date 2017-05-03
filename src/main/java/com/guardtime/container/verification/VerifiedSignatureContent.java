@@ -36,7 +36,7 @@ public class VerifiedSignatureContent extends SignatureContent {
         this.aggregateResult = holder.getFilteredAggregatedResult(new VerificationResultFilter() {
             @Override
             public boolean apply(RuleVerificationResult result) {
-                return results.contains(result);
+                return results != null && results.contains(result);
             }
         });
     }

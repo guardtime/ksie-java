@@ -30,7 +30,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
     public void testExtendingContainerWithValidAndInvalidSignatures()throws Exception {
         ExtendingPolicy policy = new KsiContainerSignatureExtendingPolicy(ksi);
         ContainerSignatureExtender extender = new ContainerSignatureExtender(signatureFactory, policy);
-        try (Container container = getContainer(CONTAINER_WITH_MULTIPLE_EXTENDABLE_SIGNATURES)) {
+        try (Container container = getContainer(CONTAINER_WITH_MULTI_CONTENT_ONE_SIGNATURE_IS_INVALID)) {
             assertSignaturesExtendedStatus(container, false);
             ExtendedContainer extendedContainer = extender.extend(container);
             for (ExtendedSignatureContent content : extendedContainer.getSignatureContents()) {

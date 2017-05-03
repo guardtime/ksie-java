@@ -47,8 +47,29 @@ public class DocumentExistenceRuleTest extends AbstractContainerTest {
         holder.addResult(mockSignatureContent, new GenericVerificationResult(OK, KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName(), "", documentPath));
         rule.verify(holder, mockSignatureContent);
 
-        RuleVerificationResult result = holder.getResults().get(0);
-        assertEquals(VerificationResult.OK, result.getVerificationResult());
+        assertEquals(VerificationResult.OK, holder.getAggregatedResult());
+    }
+
+    @Test
+    public void testDocumentDoesNotExistsResultsInNOK() throws Exception {
+        final FileReference mockFileReference = Mockito.mock(FileReference.class);
+        SignatureContent mockSignatureContent = Mockito.mock(SignatureContent.class);
+        String documentPath = "somePath";
+        when(mockFileReference.getUri()).thenReturn(documentPath);
+        when(mockSignatureContent.getDocuments()).thenReturn(Collections.<String, ContainerDocument>emptyMap());
+        when(mockSignatureContent.getDocumentsManifest()).thenReturn(Pair.of("", mockedDocumentsManifest));
+        when(mockedDocumentsManifest.getDocumentReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {
+            @Override
+            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) throws Throwable {
+                return Collections.singletonList(mockFileReference);
+            }
+        });
+
+        ResultHolder holder = new ResultHolder();
+        holder.addResult(mockSignatureContent, new GenericVerificationResult(OK, KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName(), "", documentPath));
+        rule.verify(holder, mockSignatureContent);
+
+        assertEquals(VerificationResult.NOK, holder.getAggregatedResult());
     }
 
 }

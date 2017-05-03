@@ -35,7 +35,7 @@ public class AnnotationDataExistenceRuleTest extends AbstractContainerTest {
     @Test
     public void testNonRemovableAnnotationDataExistsResultsInOK() throws Exception {
         ResultHolder holder = new ResultHolder();
-        SignatureContent verifiable = setUpVerifiable(true, ContainerAnnotationType.NON_REMOVABLE, holder);
+        SignatureContent verifiable = setUpVerifiable(ContainerAnnotationType.NON_REMOVABLE, holder);
         rule.verify(holder, verifiable);
 
         RuleVerificationResult result = holder.getResults().get(0);
@@ -45,7 +45,7 @@ public class AnnotationDataExistenceRuleTest extends AbstractContainerTest {
     @Test
     public void testValueRemovableAnnotationDataExistsResultsInOK() throws Exception {
         ResultHolder holder = new ResultHolder();
-        SignatureContent verifiable = setUpVerifiable(true, ContainerAnnotationType.VALUE_REMOVABLE, holder);
+        SignatureContent verifiable = setUpVerifiable(ContainerAnnotationType.VALUE_REMOVABLE, holder);
         rule.verify(holder, verifiable);
 
         RuleVerificationResult result = holder.getResults().get(0);
@@ -55,14 +55,14 @@ public class AnnotationDataExistenceRuleTest extends AbstractContainerTest {
     @Test
     public void testFullyRemovableAnnotationDataExistsResultsInOK() throws Exception {
         ResultHolder holder = new ResultHolder();
-        SignatureContent verifiable = setUpVerifiable(true, ContainerAnnotationType.FULLY_REMOVABLE, holder);
+        SignatureContent verifiable = setUpVerifiable(ContainerAnnotationType.FULLY_REMOVABLE, holder);
         rule.verify(holder, verifiable);
 
         RuleVerificationResult result = holder.getResults().get(0);
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
-    private SignatureContent setUpVerifiable(boolean setUpAnnotation, ContainerAnnotationType annotationType, ResultHolder holder) {
+    private SignatureContent setUpVerifiable(ContainerAnnotationType annotationType, ResultHolder holder) {
         String annotationPath = "annotation.dat";
         String annotationManifestPath = "annotation.ext";
         SignatureContent mockSignatureContent = Mockito.mock(SignatureContent.class);
@@ -74,9 +74,7 @@ public class AnnotationDataExistenceRuleTest extends AbstractContainerTest {
         when(mockAnnotationManifestReference.getMimeType()).thenReturn(annotationType.getContent());
         when(mockAnnotationReference.getUri()).thenReturn(annotationPath);
         when(mockSignaleAnnotationManifest.getAnnotationReference()).thenReturn(mockAnnotationReference);
-        if (setUpAnnotation) {
-            when(mockSignatureContent.getAnnotations()).thenReturn(Collections.singletonMap(annotationPath, Mockito.mock(ContainerAnnotation.class)));
-        }
+        when(mockSignatureContent.getAnnotations()).thenReturn(Collections.singletonMap(annotationPath, Mockito.mock(ContainerAnnotation.class)));
         holder.addResult(mockSignatureContent, new GenericVerificationResult(VerificationResult.OK, KSIE_VERIFY_ANNOTATION_EXISTS.getName(), "", annotationManifestPath));
         when(mockSignatureContent.getSingleAnnotationManifests()).thenReturn(Collections.singletonMap(annotationManifestPath, mockSignaleAnnotationManifest));
         AnnotationsManifest mockAnnotationsManifest = mock(AnnotationsManifest.class);
