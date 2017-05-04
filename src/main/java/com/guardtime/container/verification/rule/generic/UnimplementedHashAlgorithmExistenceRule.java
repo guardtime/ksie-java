@@ -10,6 +10,8 @@ import com.guardtime.container.verification.rule.state.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
+import static com.guardtime.container.verification.result.VerificationResult.OK;
+
 /**
  * Rule that checks if there are any {@link DataHash}es that use a {@link HashAlgorithm} which has state
  * {@link HashAlgorithm#status#NOT_IMPLEMENTED}
@@ -25,7 +27,7 @@ public class UnimplementedHashAlgorithmExistenceRule extends AbstractRule<FileRe
 
     @Override
     protected void verifyRule(ResultHolder holder, FileReference verifiable) throws RuleTerminatingException {
-        VerificationResult verificationResult = VerificationResult.OK;
+        VerificationResult verificationResult = OK;
         for (DataHash hash : verifiable.getHashList()) {
             if (hash.getAlgorithm().getStatus() == HashAlgorithm.Status.NOT_IMPLEMENTED) {
                 verificationResult = getFailureVerificationResult();
@@ -33,8 +35,8 @@ public class UnimplementedHashAlgorithmExistenceRule extends AbstractRule<FileRe
             }
         }
 
-        holder.addResult(new GenericVerificationResult(verificationResult, this, verifiable.getUri()));
-        if (verificationResult != VerificationResult.OK) {
+        holder.addResult(new GenericVerificationResult(verificationResult, getName(), getErrorMessage(), verifiable.getUri()));
+        if (!verificationResult.equals(OK)) {
             throw new RuleTerminatingException("Found a hash with not implemented hash algorithm.");
         }
     }

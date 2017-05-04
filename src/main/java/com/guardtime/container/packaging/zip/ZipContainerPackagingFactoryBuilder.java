@@ -19,8 +19,8 @@ import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.EntryNameProvider;
-import com.guardtime.container.packaging.exception.InvalidPackageException;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.packaging.exception.InvalidPackageException;
 import com.guardtime.container.packaging.parsing.ParsingStore;
 import com.guardtime.container.packaging.parsing.ParsingStoreException;
 import com.guardtime.container.packaging.parsing.ParsingStoreFactory;
@@ -33,8 +33,8 @@ import com.guardtime.container.util.DataHashException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.ContainerVerifier;
+import com.guardtime.container.verification.VerifiedContainer;
 import com.guardtime.container.verification.policy.InternalVerificationPolicy;
-import com.guardtime.container.verification.result.ContainerVerifierResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.ksi.hashing.DataHash;
 
@@ -210,7 +210,7 @@ public class ZipContainerPackagingFactoryBuilder {
             if (disableVerification) {
                 return;
             }
-            ContainerVerifierResult result = new ContainerVerifier(new InternalVerificationPolicy(this)).verify(zipContainer);
+            VerifiedContainer result = new ContainerVerifier(new InternalVerificationPolicy(this)).verify(zipContainer);
             if (!result.getVerificationResult().equals(VerificationResult.OK)) {
                 try {
                     zipContainer.close();

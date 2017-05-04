@@ -12,6 +12,7 @@ import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
 /**
  * Rule that verifies that there is a signature in the container for the given {@link SignatureContent}
+ * Will terminate verification upon non OK results.
  */
 public class SignatureExistenceRule extends AbstractRule<SignatureContent> {
 
@@ -26,10 +27,16 @@ public class SignatureExistenceRule extends AbstractRule<SignatureContent> {
         String uri = verifiable.getManifest().getRight().getSignatureReference().getUri();
         ContainerSignature signature = verifiable.getContainerSignature();
         if (signature == null || signature.getSignature() == null) {
-            holder.addResult(new GenericVerificationResult(VerificationResult.NOK, this, uri));
-            throw new RuleTerminatingException("Can't locate signature! Path provided: '" + uri + "'");
+            holder.addResult(
+                    verifiable,
+                    new GenericVerificationResult(VerificationResult.NOK, getName(), getErrorMessage(), uri)
+            );
+            throw new RuleTerminatingException("No signature present!");
         } else {
-            holder.addResult(new GenericVerificationResult(VerificationResult.OK, this, uri));
+            holder.addResult(
+                    verifiable,
+                    new GenericVerificationResult(VerificationResult.OK, getName(), getErrorMessage(), uri)
+            );
         }
     }
 

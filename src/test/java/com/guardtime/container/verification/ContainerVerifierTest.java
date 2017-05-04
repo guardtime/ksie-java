@@ -2,9 +2,10 @@ package com.guardtime.container.verification;
 
 import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.packaging.Container;
+import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.verification.policy.VerificationPolicy;
 import com.guardtime.container.verification.result.ResultHolder;
-import com.guardtime.container.verification.rule.ContainerRule;
+import com.guardtime.container.verification.rule.Rule;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 
 import org.junit.Test;
@@ -27,12 +28,12 @@ public class ContainerVerifierTest extends AbstractContainerTest {
 
     @Test
     public void testTerminatedTopLevelRuleStopsVerification() throws Exception {
-        ContainerRule mockContainerRuleFirst = Mockito.mock(ContainerRule.class);
-        ContainerRule mockContainerRuleSecond = Mockito.mock(ContainerRule.class);
-        ContainerRule mockContainerRuleThird = Mockito.mock(ContainerRule.class);
+        Rule mockContainerRuleFirst = Mockito.mock(Rule.class);
+        Rule mockContainerRuleSecond = Mockito.mock(Rule.class);
+        Rule mockContainerRuleThird = Mockito.mock(Rule.class);
         VerificationPolicy mockPolicy = Mockito.mock(VerificationPolicy.class);
         when(mockContainerRuleSecond.verify(Mockito.any(ResultHolder.class), Mockito.any(Container.class))).thenThrow(RuleTerminatingException.class);
-        when(mockPolicy.getContainerRules()).thenReturn(Arrays.asList(
+        when(mockPolicy.getSignatureContentRules()).thenReturn(Arrays.<Rule<SignatureContent>>asList(
                 mockContainerRuleFirst,
                 mockContainerRuleSecond,
                 mockContainerRuleThird

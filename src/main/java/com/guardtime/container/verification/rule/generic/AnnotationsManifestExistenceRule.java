@@ -10,8 +10,9 @@ import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
-import com.guardtime.container.verification.rule.RuleType;
 import com.guardtime.container.verification.rule.state.RuleStateProvider;
+
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS;
 
 /**
  * This rule verifies that the annotations manifest is actually present in the {@link
@@ -19,7 +20,7 @@ import com.guardtime.container.verification.rule.state.RuleStateProvider;
  */
 public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureContent> {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName();
+    private static final String NAME = KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName();
 
     public AnnotationsManifestExistenceRule(RuleStateProvider stateProvider) {
         super(stateProvider.getStateForRule(NAME));
@@ -35,12 +36,10 @@ public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureCont
         if (annotationsManifest != null && annotationsManifest.getLeft().equals(annotationsManifestUri)) {
             verificationResult = VerificationResult.OK;
         }
-        holder.addResult(new GenericVerificationResult(verificationResult, this, annotationsManifestUri));
-
-
-        if (!verificationResult.equals(VerificationResult.OK)) {
-            throw new RuleTerminatingException("AnnotationsManifest integrity could not be verified for '" + annotationsManifestUri + "'");
-        }
+        holder.addResult(
+                verifiable,
+                new GenericVerificationResult(verificationResult, getName(), getErrorMessage(), annotationsManifestUri)
+        );
     }
 
     @Override

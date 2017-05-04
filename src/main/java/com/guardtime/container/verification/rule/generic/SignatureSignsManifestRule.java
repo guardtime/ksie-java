@@ -12,11 +12,15 @@ import com.guardtime.container.verification.rule.RuleType;
 import com.guardtime.container.verification.rule.state.RuleStateProvider;
 import com.guardtime.ksi.hashing.DataHash;
 
+/**
+ * Rule to verify the input hash of root signature and {@link Manifest}.
+ * Will terminate verification upon non OK results.
+ */
 public class SignatureSignsManifestRule extends AbstractRule<SignatureContent> {
 
     private static final String NAME = RuleType.KSIE_VERIFY_MANIFEST_HASH.getName();
 
-    protected SignatureSignsManifestRule(RuleStateProvider stateProvider) {
+    public SignatureSignsManifestRule(RuleStateProvider stateProvider) {
         super(stateProvider.getStateForRule(NAME));
     }
 
@@ -34,7 +38,7 @@ public class SignatureSignsManifestRule extends AbstractRule<SignatureContent> {
             throw new RuleTerminatingException("Failed to verify hash of manifest!", e);
         } finally {
             String manifestUri = verifiable.getManifest().getLeft();
-            holder.addResult(new GenericVerificationResult(result, this, manifestUri));
+            holder.addResult(verifiable, new GenericVerificationResult(result, getName(), getErrorMessage(), manifestUri));
         }
     }
 
@@ -47,4 +51,5 @@ public class SignatureSignsManifestRule extends AbstractRule<SignatureContent> {
     public String getErrorMessage() {
         return "Manifest hash differs from the one signed!";
     }
+
 }

@@ -16,6 +16,7 @@ import com.guardtime.container.verification.rule.state.RuleStateProvider;
 /**
  * Rule that verifies the {@link ContainerSignature} of a {@link SignatureContent} by using a {@link SignatureVerifier}
  * to verify the underlying signature.
+ * Will terminate verification upon non OK results.
  */
 public class SignatureIntegrityRule extends AbstractRule<SignatureContent> {
     private static final String NAME = RuleType.KSIE_VERIFY_MANIFEST.getName();
@@ -27,7 +28,7 @@ public class SignatureIntegrityRule extends AbstractRule<SignatureContent> {
     }
 
     @Override
-    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) {
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
         Manifest manifest = verifiable.getManifest().getRight();
         String signatureUri = manifest.getSignatureReference().getUri();
         ContainerSignature containerSignature = verifiable.getContainerSignature();
@@ -38,11 +39,15 @@ public class SignatureIntegrityRule extends AbstractRule<SignatureContent> {
             }
             SignatureResult signatureResult = verifier.getSignatureVerificationResult(containerSignature.getSignature(), manifest);
             signatureResult = new WrappedSignatureResult(signatureResult, result);
-            holder.setSignatureResult(signatureUri, signatureResult);
-            holder.addResult(new GenericVerificationResult(signatureResult.getSimplifiedResult(), this, signatureUri));
+            holder.addSignatureResult(verifiable, signatureResult);
+            holder.addResult(
+                    verifiable,
+                    new GenericVerificationResult(signatureResult.getSimplifiedResult(), getName(), getErrorMessage(), signatureUri)
+            );
         } catch (RuleTerminatingException e) {
             LOGGER.info("Verifying signature failed!", e);
-            holder.addResult(new GenericVerificationResult(result, this, signatureUri, e));
+            holder.addResult(verifiable, new GenericVerificationResult(result, getName(), getErrorMessage(), signatureUri, e));
+            throw e;
         }
     }
 

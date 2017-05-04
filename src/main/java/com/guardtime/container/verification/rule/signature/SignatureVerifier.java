@@ -14,4 +14,5 @@ public interface SignatureVerifier<S> {
     Boolean isSupported(ContainerSignature containerSignature);
 
     SignatureResult getSignatureVerificationResult(S signature, Manifest manifest) throws RuleTerminatingException;
+
 }

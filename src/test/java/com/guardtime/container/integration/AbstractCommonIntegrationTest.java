@@ -75,7 +75,9 @@ public abstract class AbstractCommonIntegrationTest extends AbstractContainerTes
                 .setPublicationsFilePkiTrustStore(TRUST_STORE_FILE, TRUST_STORE_PASSWORD)
                 .build();
         signatureFactory = new KsiSignatureFactory(ksi);
-        packagingFactory = new ZipContainerPackagingFactoryBuilder().withSignatureFactory(signatureFactory).build();
+        packagingFactory = new ZipContainerPackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .build();
 
     }
 

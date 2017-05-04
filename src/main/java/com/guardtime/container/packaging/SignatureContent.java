@@ -14,6 +14,8 @@ import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -153,8 +155,8 @@ public class SignatureContent {
         private List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifests;
         private ContainerSignature signature;
 
-        public Builder withDocuments(List<ContainerDocument> documents) {
-            this.documents = documents;
+        public Builder withDocuments(Collection<ContainerDocument> documents) {
+            this.documents = new ArrayList<>(documents);
             return this;
         }
 

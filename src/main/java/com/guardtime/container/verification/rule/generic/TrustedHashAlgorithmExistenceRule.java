@@ -10,6 +10,8 @@ import com.guardtime.container.verification.rule.state.RuleState;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
+import static com.guardtime.container.verification.result.VerificationResult.OK;
+
 /**
  * Rule that checks whether there are any {@link DataHash}es with {@link HashAlgorithm} that have state of
  * {@link HashAlgorithm#status#NORMAL}
@@ -27,11 +29,11 @@ public class TrustedHashAlgorithmExistenceRule extends AbstractRule<FileReferenc
         VerificationResult verificationResult = getFailureVerificationResult();
         for (DataHash hash : verifiable.getHashList()) {
             if (hash.getAlgorithm().getStatus() == HashAlgorithm.Status.NORMAL) {
-                verificationResult = VerificationResult.OK;
+                verificationResult = OK;
             }
         }
-        holder.addResult(new GenericVerificationResult(verificationResult, this, verifiable.getUri()));
-        if (verificationResult != VerificationResult.OK) {
+        holder.addResult(new GenericVerificationResult(verificationResult, getName(), getErrorMessage(), verifiable.getUri()));
+        if (!verificationResult.equals(OK)) {
             throw new RuleTerminatingException("No hashes with trusted hash algorithm found.");
         }
     }

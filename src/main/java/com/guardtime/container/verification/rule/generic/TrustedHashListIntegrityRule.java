@@ -14,6 +14,8 @@ import com.guardtime.ksi.hashing.DataHash;
 
 import java.util.List;
 
+import static com.guardtime.container.verification.result.VerificationResult.OK;
+
 /**
  * Rule that checks whether {@link DataHash}es in {@link FileReference} match those in {@link MultiHashElement}.
  */
@@ -29,9 +31,9 @@ public class TrustedHashListIntegrityRule extends AbstractRule<Pair<MultiHashEle
     protected void verifyRule(ResultHolder holder, Pair<MultiHashElement, FileReference> verifiable) throws RuleTerminatingException {
         FileReference reference = verifiable.getRight();
         VerificationResult verificationResult = getVerificationResult(reference.getHashList(), verifiable.getLeft());
-        holder.addResult(new GenericVerificationResult(verificationResult, this, reference.getUri()));
+        holder.addResult(new GenericVerificationResult(verificationResult, getName(), getErrorMessage(), reference.getUri()));
 
-        if (verificationResult != VerificationResult.OK) {
+        if (!verificationResult.equals(OK)) {
             throw new RuleTerminatingException("Hash mismatch found.");
         }
     }
@@ -49,7 +51,7 @@ public class TrustedHashListIntegrityRule extends AbstractRule<Pair<MultiHashEle
             LOGGER.info("Failed to verify hash match.", e);
             return failureVerificationResult;
         }
-        return VerificationResult.OK;
+        return OK;
     }
 
     @Override

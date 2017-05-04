@@ -25,7 +25,7 @@ public class GenericVerificationResultTest {
         MockitoAnnotations.initMocks(this);
         when(mockRule.getName()).thenReturn(RULE_NAME);
         when(mockRule.getErrorMessage()).thenReturn(RULE_ERROR_MESSAGE);
-        result = new GenericVerificationResult(VERIFICATION_RESULT, mockRule, TESTED_ELEMENT);
+        result = new GenericVerificationResult(VERIFICATION_RESULT, mockRule.getName(), mockRule.getErrorMessage(), TESTED_ELEMENT);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class GenericVerificationResultTest {
     public void getRuleErrorMessageWithExceptionInConstructor() throws Exception {
         String exceptionMessage = "The exception occurred!";
         Exception exception = new Exception(exceptionMessage);
-        RuleVerificationResult genericResult = new GenericVerificationResult(VERIFICATION_RESULT, mockRule, TESTED_ELEMENT, exception);
+        RuleVerificationResult genericResult = new GenericVerificationResult(VERIFICATION_RESULT, mockRule.getName(), mockRule.getErrorMessage(), TESTED_ELEMENT, exception);
         assertNotNull(genericResult.getRuleErrorMessage());
         assertEquals(exceptionMessage, genericResult.getRuleErrorMessage());
     }
