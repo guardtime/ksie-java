@@ -17,7 +17,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Encompasses all results from verifying a {@link Container} Provides easier access to overall result of verification.
+ * Encompasses all results from verifying a {@link Container}.
+ * Provides easier access to overall result of verification.
  */
 public class VerifiedContainer implements Container {
     private final VerificationResult aggregateResult;
