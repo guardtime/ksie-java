@@ -32,7 +32,7 @@ public class VerifiedContainerTest {
     @Test
     public void testSignatureContentsAreWrapped() {
         VerifiedContainer verifiedContainer = new VerifiedContainer(setUpMockedContainer(), new ResultHolder());
-        for(SignatureContent content : verifiedContainer.getSignatureContents()) {
+        for(SignatureContent content : verifiedContainer.getVerifiedSignatureContents()) {
             assertTrue(content instanceof VerifiedSignatureContent);
         }
     }

@@ -20,14 +20,19 @@ import java.util.List;
  * Encompasses all results from verifying a {@link Container}.
  * Provides easier access to overall result of verification.
  */
-public class VerifiedContainer implements Container {
+public class VerifiedContainer extends Container {
     private final VerificationResult aggregateResult;
     private final ResultHolder resultHolder;
-    private final Container container;
     private List<VerifiedSignatureContent> verifiedSignatureContents;
 
     public VerifiedContainer(Container container, ResultHolder holder) {
-        this.container = container;
+        super(
+                container.getSignatureContents(),
+                container.getUnknownFiles(),
+                container.getMimeType(),
+                container.getWriter(),
+                null
+        );
         this.resultHolder = holder;
         this.aggregateResult = resultHolder.getAggregatedResult();
         wrapSignatureContents();
@@ -48,52 +53,29 @@ public class VerifiedContainer implements Container {
         return aggregateResult;
     }
 
-    @Override
-    public List<VerifiedSignatureContent> getSignatureContents() {
+    public List<VerifiedSignatureContent> getVerifiedSignatureContents() {
         return Collections.unmodifiableList(verifiedSignatureContents);
     }
 
-    @Override
-    public void writeTo(OutputStream output) throws IOException {
-        container.writeTo(output);
-    }
-
-    @Override
-    public MimeType getMimeType() {
-        return container.getMimeType();
-    }
-
-    @Override
-    public List<UnknownDocument> getUnknownFiles() {
-        return container.getUnknownFiles();
-    }
-
-    @Override
-    public void close() throws Exception {
-        container.close();
-    }
-
-    @Override
     public void add(SignatureContent content) throws ContainerMergingException {
-        container.add(content);
+        super.add(content);
         wrapSignatureContents();
     }
 
-    @Override
     public void add(Container container) throws ContainerMergingException {
-        container.add(container);
+        super.add(container);
         wrapSignatureContents();
     }
 
-    @Override
     public void addAll(Collection<? extends SignatureContent> contents) throws ContainerMergingException {
-        container.addAll(contents);
+        super.addAll(contents);
         wrapSignatureContents();
     }
 
     private void wrapSignatureContents() {
-        List<VerifiedSignatureContent> verifiedContents = new ArrayList<>(container.getSignatureContents().size());
-        for(SignatureContent content : container.getSignatureContents()) {
+        List<SignatureContent> originalSignatureContents = super.getSignatureContents();
+        List<VerifiedSignatureContent> verifiedContents = new ArrayList<>(originalSignatureContents.size());
+        for(SignatureContent content : originalSignatureContents) {
             verifiedContents.add(new VerifiedSignatureContent(content, resultHolder));
         }
         this.verifiedSignatureContents = verifiedContents;

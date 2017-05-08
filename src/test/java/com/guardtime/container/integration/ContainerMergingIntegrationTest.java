@@ -239,25 +239,29 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
 
     @Test
     public void testMergeContainersWithExactSameDocument() throws Exception {
-        try (Container container = mergeContainers(CONTAINERS_FOR_SAME_DOCUMENT)) {
+        try (Container container = mergeContainersUnclosed(CONTAINERS_FOR_SAME_DOCUMENT)) {
             assertEquals(2, container.getSignatureContents().size());
         }
     }
 
     @Test
     public void testMergeContainerWithExactSameContainer() throws Exception {
-        try (Container container = mergeContainers(CONTAINERS_IDENTICAL)) {
+        try (Container container = mergeContainersUnclosed(CONTAINERS_IDENTICAL)) {
             assertEquals(2, container.getSignatureContents().size());
             assertSignatureContentsCount(container, 1);
         }
     }
 
-    private Container mergeContainers(String[] containers) throws Exception {
-        try (Container container1 = getContainer(containers[0]);
-             Container container2 = getContainer(containers[1])) {
+    private void mergeContainers(String[] containers) throws Exception {
+        mergeContainersUnclosed(containers).close();
+    }
+
+    private Container mergeContainersUnclosed(String[] containers) throws Exception {
+        Container container1 = getContainer(containers[0]);
+        try (Container container2 = getContainer(containers[1])) {
             container1.add(container2);
-            return container1;
         }
+        return container1;
     }
 
 

@@ -2,7 +2,9 @@ package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.manifest.ContainerManifestFactory;
+import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.MimeType;
+import com.guardtime.container.packaging.MimeTypeEntry;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.exception.ContainerReadingException;
 import com.guardtime.container.packaging.exception.InvalidPackageException;
@@ -77,7 +79,7 @@ class ZipContainerReader {
                 documentsManifestHandler, annotationsManifestHandler, singleAnnotationManifestHandler, signatureHandler);
     }
 
-    ZipContainer read(InputStream input) throws IOException, ContainerReadingException {
+    Container read(InputStream input) throws IOException, ContainerReadingException {
         ContainerReadingException readingException = new ContainerReadingException("Reading container encountered errors!");
         try (ZipInputStream zipInput = new ZipInputStream(input)) {
             ZipEntry entry;
@@ -96,8 +98,8 @@ class ZipContainerReader {
         List<SignatureContent> contents = buildSignatures(readingException);
         MimeType mimeType = getMimeType();
         List<UnknownDocument> unknownFiles = getUnknownFiles(readingException);
-        ZipContainer zipContainer = new ZipContainer(contents, unknownFiles, mimeType, parsingStore);
-        readingException.setContainer(zipContainer);
+        Container container = new Container(contents, unknownFiles, mimeType, new ZipContainerWriter(), parsingStore);
+        readingException.setContainer(container);
 
         if (!validMimeType(mimeType) || !containsValidContents(contents)) {
             readingException.addException(new InvalidPackageException("Parsed container was not valid"));
@@ -106,7 +108,7 @@ class ZipContainerReader {
         if (!readingException.getExceptions().isEmpty()) {
             throw readingException;
         }
-        return zipContainer;
+        return container;
     }
 
     private boolean containsValidContents(List<SignatureContent> signatureContents) {

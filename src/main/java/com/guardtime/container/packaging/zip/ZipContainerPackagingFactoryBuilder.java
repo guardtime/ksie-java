@@ -19,6 +19,7 @@ import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.EntryNameProvider;
+import com.guardtime.container.packaging.MimeTypeEntry;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.exception.InvalidPackageException;
 import com.guardtime.container.packaging.parsing.ParsingStore;
@@ -95,12 +96,12 @@ public class ZipContainerPackagingFactoryBuilder {
         return this;
     }
 
-    public ContainerPackagingFactory<ZipContainer> build() {
+    public ContainerPackagingFactory<Container> build() {
         return new ZipContainerPackagingFactory(this);
     }
 
 
-    private static class ZipContainerPackagingFactory implements ContainerPackagingFactory<ZipContainer> {
+    private static class ZipContainerPackagingFactory implements ContainerPackagingFactory<Container> {
         private static final String CONTAINER_MIME_TYPE = "application/guardtime.ksie10+zip";
 
         private final SignatureFactory signatureFactory;
@@ -123,7 +124,7 @@ public class ZipContainerPackagingFactoryBuilder {
         }
 
         @Override
-        public ZipContainer read(InputStream stream) throws InvalidPackageException {
+        public Container read(InputStream stream) throws InvalidPackageException {
             Util.notNull(stream, "Input stream");
             try {
                 ZipContainerReader reader = new ZipContainerReader(manifestFactory, signatureFactory, getParsingStore());
@@ -136,7 +137,7 @@ public class ZipContainerPackagingFactoryBuilder {
         }
 
         @Override
-        public ZipContainer create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
+        public Container create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
             Util.notEmpty(files, "Document files");
             try {
                 verifyNoDuplicateDocumentNames(new HashSet<>(files));
@@ -144,9 +145,9 @@ public class ZipContainerPackagingFactoryBuilder {
                         new ContentSigner(files, annotations, indexProviderFactory.create(), manifestFactory, signatureFactory);
                 SignatureContent signatureContent = signer.sign();
                 MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
-                ZipContainer zipContainer = new ZipContainer(signatureContent, mimeType);
-                verifyContainer(zipContainer);
-                return zipContainer;
+                Container container = new Container(signatureContent, mimeType, new ZipContainerWriter());
+                verifyContainer(container);
+                return container;
             } catch (DataHashException | InvalidManifestException e) {
                 throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
             } catch (SignatureException e) {
@@ -159,7 +160,7 @@ public class ZipContainerPackagingFactoryBuilder {
         }
 
         @Override
-        public ZipContainer create(Container existingContainer, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
+        public Container create(Container existingContainer, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
             Util.notNull(existingContainer, "Container");
             Util.notEmpty(files, "Data files");
 
@@ -171,21 +172,20 @@ public class ZipContainerPackagingFactoryBuilder {
             verifyNoDuplicateDocumentNames(documents);
 
             try {
-                ZipContainer existingZipContainer = (ZipContainer) existingContainer;
                 IndexProvider indexProvider = indexProviderFactory.create(existingContainer);
                 ContentSigner signer = new ContentSigner(files, annotations, indexProvider, manifestFactory, signatureFactory);
                 SignatureContent signatureContent = signer.sign();
-                List<SignatureContent> contents = new LinkedList<>(existingZipContainer.getSignatureContents());
+                List<SignatureContent> contents = new LinkedList<>(existingContainer.getSignatureContents());
                 contents.add(signatureContent);
                 ParsingStore store = getParsingStore();
-                ZipContainer zipContainer = new ZipContainer(
+                Container container = new Container(
                         contents,
                         getCopies(existingContainer.getUnknownFiles(), store),
                         existingContainer.getMimeType(),
-                        store
-                );
-                verifyContainer(zipContainer);
-                return zipContainer;
+                        new ZipContainerWriter(),
+                        store);
+                verifyContainer(container);
+                return container;
             } catch (IOException | DataHashException | InvalidManifestException e) {
                 throw new InvalidPackageException("Failed to create ZipContainer internal structure!", e);
             } catch (SignatureException e) {
@@ -206,14 +206,14 @@ public class ZipContainerPackagingFactoryBuilder {
             return newList;
         }
 
-        private void verifyContainer(ZipContainer zipContainer) throws InvalidPackageException {
+        private void verifyContainer(Container container) throws InvalidPackageException {
             if (disableVerification) {
                 return;
             }
-            VerifiedContainer result = new ContainerVerifier(new InternalVerificationPolicy(this)).verify(zipContainer);
+            VerifiedContainer result = new ContainerVerifier(new InternalVerificationPolicy(this)).verify(container);
             if (!result.getVerificationResult().equals(VerificationResult.OK)) {
                 try {
-                    zipContainer.close();
+                    container.close();
                 } catch (Exception e) {
                     logger.warn("Failed to clean up after created container that did not pass internal verification.", e);
                 }
