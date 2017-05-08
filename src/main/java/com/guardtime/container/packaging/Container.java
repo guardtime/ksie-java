@@ -44,20 +44,26 @@ public interface Container extends AutoCloseable {
     void close() throws Exception;
 
     /**
-     * Adds the {@link SignatureContent} to this {@link Container}.
-     * @throws ContainerMergingException when the {@link SignatureContent} can not be added into the {@link Container} due to clashing file paths or any other reason.
+     * Adds the {@link SignatureContent} to this {@link Container}. Also takes ownership of the resources associated with the
+     * {@link SignatureContent} and as such any external calls to close() on those resources may lead to unexpected behaviour.
+     * @throws ContainerMergingException when the {@link SignatureContent} can not be added into the {@link Container} due to
+     * clashing file paths or any other reason.
      */
     void add(SignatureContent content) throws ContainerMergingException;
 
     /**
-     * Adds all {@link SignatureContent}s from input {@link Container}.
-     * @throws ContainerMergingException when any {@link SignatureContent} can not be added into the {@link Container} due to clashing file paths or any other reason.
+     * Adds all {@link SignatureContent}s from input {@link Container}. Also takes ownership of the resources associated with the
+     * {@link Container} and as such any external calls to close() on those resources may lead to unexpected behaviour.
+     * @throws ContainerMergingException when any {@link SignatureContent} can not be added into the {@link Container} due to
+     * clashing file paths or any other reason.
      */
     void add(Container container) throws ContainerMergingException;
 
     /**
-     * Adds all {@link SignatureContent}s to this {@link Container}.
-     * @throws ContainerMergingException when any {@link SignatureContent} can not be added into the {@link Container} due to clashing file paths or any other reason.
+     * Adds all {@link SignatureContent}s to this {@link Container}. Also takes ownership of the resources associated with the
+     * {@link SignatureContent}s and as such any external calls to close() on those resources may lead to unexpected behaviour.
+     * @throws ContainerMergingException when any {@link SignatureContent} can not be added into the {@link Container} due to
+     * clashing file paths or any other reason.
      */
     void addAll(Collection<? extends SignatureContent> contents) throws ContainerMergingException;
 }

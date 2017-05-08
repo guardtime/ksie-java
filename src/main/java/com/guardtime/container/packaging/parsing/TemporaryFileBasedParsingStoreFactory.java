@@ -55,7 +55,7 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
         }
 
         @Override
-        public Set<String> getStoredNames() {
+        public Set<String> getStoredKeys() {
             return new HashSet<>(store.keySet());
         }
 

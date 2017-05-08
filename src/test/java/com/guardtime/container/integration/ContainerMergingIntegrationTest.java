@@ -237,7 +237,6 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
         mergeContainers(CONTAINERS_FOR_MIX_CONFLICT_2);
     }
 
-    @Ignore //TODO-77
     @Test
     public void testMergeContainersWithExactSameDocument() throws Exception {
         try (Container container = mergeContainers(CONTAINERS_FOR_SAME_DOCUMENT)) {
@@ -245,7 +244,6 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
         }
     }
 
-    @Ignore //TODO-77
     @Test
     public void testMergeContainerWithExactSameContainer() throws Exception {
         try (Container container = mergeContainers(CONTAINERS_IDENTICAL)) {

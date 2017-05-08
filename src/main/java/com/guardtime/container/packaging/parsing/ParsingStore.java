@@ -14,7 +14,7 @@ public interface ParsingStore extends AutoCloseable {
      */
     void store(String key, InputStream stream) throws ParsingStoreException;
 
-    Set<String> getStoredNames();
+    Set<String> getStoredKeys();
 
     /**
      * Produces an {@link InputStream} of the data stored with the {@param key}

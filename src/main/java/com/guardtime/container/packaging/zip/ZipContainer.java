@@ -114,6 +114,7 @@ class ZipContainer implements Container {
     public void add(SignatureContent content) throws ContainerMergingException {
         verifyNewSignatureContentIsAcceptable(content, signatureContents);
         verifyUniqueness(content, signatureContents);
+        // TODO: In case the provided content has some documents/annotations using a parsing store we need to copy over those since we can't access and control that parsing store
         signatureContents.add(content);
     }
 
@@ -123,6 +124,7 @@ class ZipContainer implements Container {
         verifyUniqueUnknownFiles(container, this);
         addAll(container.getSignatureContents());
         unknownFiles.addAll(container.getUnknownFiles());
+        // TODO: Merge the parsing stores
     }
 
     @Override

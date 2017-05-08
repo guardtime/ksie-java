@@ -35,7 +35,7 @@ public class MemoryBasedParsingStoreFactory implements ParsingStoreFactory {
         }
 
         @Override
-        public Set<String> getStoredNames() {
+        public Set<String> getStoredKeys() {
             return new HashSet<>(store.keySet());
         }
 
