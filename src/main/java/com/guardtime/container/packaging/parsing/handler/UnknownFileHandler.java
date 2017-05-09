@@ -1,8 +1,8 @@
-package com.guardtime.container.packaging.zip.handler;
+package com.guardtime.container.packaging.parsing.handler;
 
 import com.guardtime.container.document.ParsedContainerDocument;
 import com.guardtime.container.document.UnknownDocument;
-import com.guardtime.container.packaging.parsing.ParsingStore;
+import com.guardtime.container.packaging.parsing.store.ParsingStore;
 
 /**
  * This content holders is used for any file. Use as the last place to catch any unfiltered files.

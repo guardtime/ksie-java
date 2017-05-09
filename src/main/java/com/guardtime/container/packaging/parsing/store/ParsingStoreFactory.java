@@ -1,4 +1,4 @@
-package com.guardtime.container.packaging.parsing;
+package com.guardtime.container.packaging.parsing.store;
 
 /**
  * Helper used to create new instances of {@link ParsingStore}

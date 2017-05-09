@@ -1,10 +1,10 @@
-package com.guardtime.container.packaging.zip.handler;
+package com.guardtime.container.packaging.parsing.handler;
 
 import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.ManifestFactoryType;
-import com.guardtime.container.packaging.parsing.ParsingStore;
-import com.guardtime.container.packaging.parsing.TemporaryFileBasedParsingStoreFactory;
+import com.guardtime.container.packaging.parsing.store.ParsingStore;
+import com.guardtime.container.packaging.parsing.store.TemporaryFileBasedParsingStoreFactory;
 
 import org.junit.Before;
 import org.junit.Test;

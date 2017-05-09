@@ -1,9 +1,9 @@
-package com.guardtime.container.packaging.zip.handler;
+package com.guardtime.container.packaging.parsing.handler;
 
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.ContainerManifestFactory;
 import com.guardtime.container.manifest.InvalidManifestException;
-import com.guardtime.container.packaging.parsing.ParsingStore;
+import com.guardtime.container.packaging.parsing.store.ParsingStore;
 
 import java.io.IOException;
 import java.io.InputStream;

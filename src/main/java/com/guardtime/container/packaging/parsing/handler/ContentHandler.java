@@ -1,9 +1,9 @@
-package com.guardtime.container.packaging.zip.handler;
+package com.guardtime.container.packaging.parsing.handler;
 
 import com.guardtime.container.document.ParsedContainerDocument;
 import com.guardtime.container.document.UnknownDocument;
-import com.guardtime.container.packaging.parsing.ParsingStore;
-import com.guardtime.container.packaging.parsing.ParsingStoreException;
+import com.guardtime.container.packaging.parsing.store.ParsingStore;
+import com.guardtime.container.packaging.parsing.store.ParsingStoreException;
 
 import java.io.InputStream;
 import java.util.HashSet;
@@ -75,5 +75,11 @@ public abstract class ContentHandler<T> {
     private void markEntryRequested(String name) {
         requestedEntries.add(name);
         unrequestedEntries.remove(name);
+    }
+
+    public void clearRequestedData() {
+        for (String key : requestedEntries) {
+            parsingStore.remove(key);
+        }
     }
 }

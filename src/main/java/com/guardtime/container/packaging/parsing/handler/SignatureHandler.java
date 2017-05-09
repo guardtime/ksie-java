@@ -1,6 +1,6 @@
-package com.guardtime.container.packaging.zip.handler;
+package com.guardtime.container.packaging.parsing.handler;
 
-import com.guardtime.container.packaging.parsing.ParsingStore;
+import com.guardtime.container.packaging.parsing.store.ParsingStore;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureException;
 import com.guardtime.container.signature.SignatureFactory;

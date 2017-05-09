@@ -1,4 +1,4 @@
-package com.guardtime.container.packaging.parsing;
+package com.guardtime.container.packaging.parsing.store;
 
 import com.guardtime.ksi.util.Util;
 
@@ -21,7 +21,7 @@ public class MemoryBasedParsingStoreFactory implements ParsingStoreFactory {
         return new MemoryBasedParsingStore();
     }
 
-    private class MemoryBasedParsingStore implements ParsingStore {
+    private static class MemoryBasedParsingStore implements ParsingStore {
 
         private Map<String, byte[]> store = new HashMap<>();
 
@@ -55,6 +55,14 @@ public class MemoryBasedParsingStoreFactory implements ParsingStoreFactory {
         @Override
         public void remove(String key) {
             store.remove(key);
+        }
+
+        @Override
+        public void absorb(ParsingStore that) throws ParsingStoreException {
+            for(String key : that.getStoredKeys()) {
+                store(key, that.get(key));
+                that.remove(key);
+            }
         }
 
         @Override

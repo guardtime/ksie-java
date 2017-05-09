@@ -1,4 +1,4 @@
-package com.guardtime.container.packaging.zip.handler;
+package com.guardtime.container.packaging.parsing.handler;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +29,6 @@ public class DocumentContentHandlerTest extends AbstractContentHandlerTest {
 
     @Test
     public void testIsSupportedDoesNotValidateMimetypeFile() throws Exception {
-        assertFalse("Identified MIMETYPE filename string.", handler.isSupported(MIME_TYPE_ENTRY_NAME));
+        assertFalse("Identified MIME_TYPE filename string.", handler.isSupported(MIME_TYPE_ENTRY_NAME));
     }
 }

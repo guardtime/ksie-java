@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
- * Rule that verifies the existence and content of a MIMETYPE file in the container. The expected content is given by
+ * Rule that verifies the existence and content of a MIME_TYPE file in the container. The expected content is given by
  * {@link ContainerPackagingFactory}.
  */
 public class MimeTypeIntegrityRule extends AbstractRule<Container> {

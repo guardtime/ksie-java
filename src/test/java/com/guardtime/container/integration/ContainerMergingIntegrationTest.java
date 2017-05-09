@@ -1,5 +1,6 @@
 package com.guardtime.container.integration;
 
+import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
@@ -18,7 +19,6 @@ import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -39,7 +39,7 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
 
 
     /**
-     * Containers - for creating file conflicts when trying to merge containers.
+     * Containers - for creating file conflicts when trying to absorb containers.
      */
     private static final String[] CONTAINERS_FOR_UNKNOWN_FILE_CONFLICT = {"containers/container-for-unknown-file-conflict.ksie", CONTAINER_WITH_UNKNOWN_FILES};
     private static final String[] CONTAINERS_FOR_DOCUMENTS_MANIFEST_CONFLICT = {"containers/container-for-documents-manifest-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};
@@ -74,7 +74,7 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
     @Test
     public void testMergeParsedContainerWithCreatedContainer() throws Exception {
         try (Container parsedContainer = getContainer(CONTAINER_WITH_RANDOM_UUID_INDEXES);
-             Container newContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new LinkedList<>())) {
+             Container newContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new LinkedList<ContainerAnnotation>())) {
             int expectedSignatureContentsSize =
                     parsedContainer.getSignatureContents().size() + newContainer.getSignatureContents().size();
             parsedContainer.add(newContainer);
@@ -131,7 +131,7 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
              Container incContainer = getContainer(CONTAINER_WITH_RANDOM_INCREMENTING_INDEXES);
              ContainerDocument document2 = new StreamContainerDocument(new ByteArrayInputStream("".getBytes()), "textDoc", "2-" + Long.toString(new Date().getTime()))) {
             uuidContainer.add(incContainer);
-            try (Container newContainer = packagingFactory.create(uuidContainer, singletonList(document2), singletonList(STRING_CONTAINER_ANNOTATION))) {
+            try (Container newContainer = packagingFactory.addSignature(uuidContainer, singletonList(document2), singletonList(STRING_CONTAINER_ANNOTATION))) {
                 assertEquals(newContainer.getSignatureContents().size(), 4);
             }
         }
@@ -161,7 +161,7 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
              Container incContainer = incPackagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), singletonList(STRING_CONTAINER_ANNOTATION));
              ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream("".getBytes()), "textDoc", Long.toString(new Date().getTime()))) {
             incContainer.add(uuidContainer);
-            try (Container newContainer = incPackagingFactory.create(incContainer, singletonList(document), singletonList(STRING_CONTAINER_ANNOTATION))) {
+            try (Container newContainer = incPackagingFactory.addSignature(incContainer, singletonList(document), singletonList(STRING_CONTAINER_ANNOTATION))) {
                 assertEquals(newContainer.getSignatureContents().size(), 3);
             }
         }
@@ -274,7 +274,7 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
                     UUID.randomUUID().toString()
             );
         }
-        try (Container temp = packagingFactory.create(singletonList(containerDocument), new LinkedList<>())) {
+        try (Container temp = packagingFactory.create(singletonList(containerDocument), new LinkedList<ContainerAnnotation>())) {
             return temp.getSignatureContents().get(0);
         }
     }

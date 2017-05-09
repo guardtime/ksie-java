@@ -1,4 +1,4 @@
-package com.guardtime.container.packaging.parsing;
+package com.guardtime.container.packaging.parsing.store;
 
 import com.guardtime.container.util.Util;
 
@@ -32,7 +32,7 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
         }
     }
 
-    private class TemporaryFileBasedParsingStore implements ParsingStore {
+    private static class TemporaryFileBasedParsingStore implements ParsingStore {
 
         private final Map<String, File> store = new HashMap<>();
         private final Path tempDir;
@@ -87,6 +87,14 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
                 } catch (IOException e) {
                     logger.warn("Could not delete temporary file for key '{}'", key, e);
                 }
+            }
+        }
+
+        @Override
+        public void absorb(ParsingStore that) throws ParsingStoreException {
+            for(String key : that.getStoredKeys()) {
+                store(key, that.get(key));
+                that.remove(key);
             }
         }
 

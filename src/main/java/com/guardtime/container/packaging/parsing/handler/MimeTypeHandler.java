@@ -1,6 +1,6 @@
-package com.guardtime.container.packaging.zip.handler;
+package com.guardtime.container.packaging.parsing.handler;
 
-import com.guardtime.container.packaging.parsing.ParsingStore;
+import com.guardtime.container.packaging.parsing.store.ParsingStore;
 import com.guardtime.ksi.util.Util;
 
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.io.InputStream;
 import static com.guardtime.container.packaging.MimeType.MIME_TYPE_ENTRY_NAME;
 
 /**
- * This content holders is used for MIMETYPE file inside the container.
+ * This content holders is used for MIME_TYPE file inside the container.
  */
 public class MimeTypeHandler extends ContentHandler<byte[]> {
 

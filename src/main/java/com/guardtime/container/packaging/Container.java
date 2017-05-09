@@ -1,10 +1,9 @@
 package com.guardtime.container.packaging;
 
-import com.guardtime.container.annotation.ContainerAnnotation;
-import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.packaging.exception.ContainerMergingException;
-import com.guardtime.container.packaging.parsing.ParsingStore;
+import com.guardtime.container.packaging.parsing.store.ParsingStore;
+import com.guardtime.container.packaging.parsing.store.ParsingStoreException;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -24,7 +23,7 @@ import static com.guardtime.container.packaging.ContainerMergingVerifier.verifyU
  */
 public class Container implements AutoCloseable {
 
-    protected final ParsingStore parsingStore;
+    protected ParsingStore parsingStore;
     private final ContainerWriter writer;
     private List<SignatureContent> signatureContents = new LinkedList<>();
     private MimeType mimeType;
@@ -49,6 +48,13 @@ public class Container implements AutoCloseable {
      */
     public List<SignatureContent> getSignatureContents() {
         return Collections.unmodifiableList(signatureContents);
+    }
+
+    /**
+     * Returns the {@link SignatureContent} at {@param index} and removes it from this {@link Container}.
+     */
+    public SignatureContent removeSignatureContent(int index) {
+        return signatureContents.remove(index);
     }
 
     /**
@@ -85,17 +91,10 @@ public class Container implements AutoCloseable {
     @Override
     public void close() throws Exception {
         for (SignatureContent content : getSignatureContents()) {
-            for (ContainerAnnotation annotation : content.getAnnotations().values()) {
-                annotation.close();
-            }
-
-            for (ContainerDocument document : content.getDocuments().values()) {
-                document.close();
-            }
-
-            for (UnknownDocument f : getUnknownFiles()) {
-                f.close();
-            }
+            content.close();
+        }
+        for (UnknownDocument f : getUnknownFiles()) {
+            f.close();
         }
         if (parsingStore != null) {
             this.parsingStore.close();
@@ -112,7 +111,6 @@ public class Container implements AutoCloseable {
     public void add(SignatureContent content) throws ContainerMergingException {
         verifyNewSignatureContentIsAcceptable(content, signatureContents);
         verifyUniqueness(content, signatureContents);
-        // TODO: In case the provided content has some documents/annotations using a parsing store we need to copy over those since we can't access and control that parsing store
         signatureContents.add(content);
     }
 
@@ -125,9 +123,21 @@ public class Container implements AutoCloseable {
     public void add(Container container) throws ContainerMergingException {
         verifySameMimeType(container, this);
         verifyUniqueUnknownFiles(container, this);
-        addAll(container.getSignatureContents());
+        int i = container.getSignatureContents().size();
+        while(i > 0 ) {
+            add(container.removeSignatureContent(0));
+            i--;
+        }
         unknownFiles.addAll(container.getUnknownFiles());
-        // TODO: Merge the parsing stores
+        if(parsingStore != null && container.parsingStore != null) {
+            try {
+                parsingStore.absorb(container.parsingStore);
+            } catch (ParsingStoreException e) {
+                throw new ContainerMergingException("Failed to take control of parsed data!", e);
+            }
+        } else if (container.parsingStore != null) {
+            parsingStore = container.parsingStore;
+        }
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.guardtime.container.packaging.parsing;
+package com.guardtime.container.packaging.parsing.store;
 
 import java.io.InputStream;
 import java.util.Set;
@@ -24,5 +24,11 @@ public interface ParsingStore extends AutoCloseable {
     boolean contains(String key);
 
     void remove(String key);
+
+    /**
+     * Takes all the contents of {@param that} and adds it to this.
+     * @param that
+     */
+    void absorb(ParsingStore that) throws ParsingStoreException;
 
 }

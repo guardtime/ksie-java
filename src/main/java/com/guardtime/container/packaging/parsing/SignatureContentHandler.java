@@ -1,4 +1,4 @@
-package com.guardtime.container.packaging.zip;
+package com.guardtime.container.packaging.parsing;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.annotation.ContainerAnnotationType;
@@ -13,23 +13,26 @@ import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.packaging.parsing.ParsingStore;
-import com.guardtime.container.packaging.zip.handler.AnnotationContentHandler;
-import com.guardtime.container.packaging.zip.handler.AnnotationsManifestHandler;
-import com.guardtime.container.packaging.zip.handler.ContentParsingException;
-import com.guardtime.container.packaging.zip.handler.DocumentContentHandler;
-import com.guardtime.container.packaging.zip.handler.DocumentsManifestHandler;
-import com.guardtime.container.packaging.zip.handler.ManifestHandler;
-import com.guardtime.container.packaging.zip.handler.SignatureHandler;
-import com.guardtime.container.packaging.zip.handler.SingleAnnotationManifestHandler;
+import com.guardtime.container.packaging.parsing.store.ParsingStore;
+import com.guardtime.container.packaging.parsing.handler.AnnotationContentHandler;
+import com.guardtime.container.packaging.parsing.handler.AnnotationsManifestHandler;
+import com.guardtime.container.packaging.parsing.handler.ContentParsingException;
+import com.guardtime.container.packaging.parsing.handler.DocumentContentHandler;
+import com.guardtime.container.packaging.parsing.handler.DocumentsManifestHandler;
+import com.guardtime.container.packaging.parsing.handler.ManifestHandler;
+import com.guardtime.container.packaging.parsing.handler.SignatureHandler;
+import com.guardtime.container.packaging.parsing.handler.SingleAnnotationManifestHandler;
+import com.guardtime.container.packaging.parsing.store.ParsingStoreException;
+import com.guardtime.container.packaging.parsing.store.ParsingStoreFactory;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-class SignatureContentHandler {
+public class SignatureContentHandler {
 
     private final DocumentContentHandler documentHandler;
     private final AnnotationContentHandler annotationContentHandler;
@@ -52,8 +55,9 @@ class SignatureContentHandler {
         this.signatureHandler = signatureHandler;
     }
 
-    public Pair<SignatureContent, List<Throwable>> get(String manifestPath) throws ContentParsingException {
-        SignatureContentGroup group = new SignatureContentGroup(manifestPath);
+    public Pair<SignatureContent, List<Throwable>> get(String manifestPath, ParsingStoreFactory parsingStoreFactory)
+            throws ContentParsingException, ParsingStoreException {
+        SignatureContentGroup group = new SignatureContentGroup(manifestPath, parsingStoreFactory.create());
         SignatureContent signatureContent = new SignatureContent.Builder()
                 .withManifest(group.manifest)
                 .withDocumentsManifest(group.documentsManifest)
@@ -62,6 +66,7 @@ class SignatureContentHandler {
                 .withDocuments(group.documents)
                 .withAnnotations(group.annotations)
                 .withSignature(group.signature)
+                .withParsingStore(group.parsingStore)
                 .build();
 
         return Pair.of(signatureContent, group.exceptions);
@@ -77,9 +82,11 @@ class SignatureContentHandler {
         List<Pair<String, ContainerAnnotation>> annotations = new LinkedList<>();
         List<ContainerDocument> documents = new LinkedList<>();
         ContainerSignature signature;
+        ParsingStore parsingStore;
 
 
-        public SignatureContentGroup(String manifestPath) throws ContentParsingException {
+        public SignatureContentGroup(String manifestPath, ParsingStore parsingStore) throws ContentParsingException {
+            this.parsingStore = parsingStore;
             this.manifest = getManifest(manifestPath);
             this.documentsManifest = getDocumentsManifest();
             this.annotationsManifest = getAnnotationsManifest();
@@ -128,9 +135,9 @@ class SignatureContentHandler {
             if (invalidReference(reference)) return null;
             String documentUri = reference.getUri();
             try {
-                ParsingStore streamProvider = documentHandler.get(documentUri);
-                return new ParsedContainerDocument(streamProvider, documentUri, reference.getMimeType(), documentUri);
-            } catch (ContentParsingException e) {
+                parsingStore.store(documentUri, documentHandler.get(documentUri));
+                return new ParsedContainerDocument(parsingStore, documentUri, reference.getMimeType(), documentUri);
+            } catch (ContentParsingException | ParsingStoreException e) {
                 // either removed or was never present in the first place, verifier will decide
                 return new EmptyContainerDocument(documentUri, reference.getMimeType(), reference.getHashList());
             }
@@ -180,10 +187,10 @@ class SignatureContentHandler {
                 }
                 AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
                 String uri = annotationDataReference.getUri();
-                ParsingStore annotationStreamProvider = annotationContentHandler.get(uri);
-                ContainerAnnotation annotation = new ParsedContainerAnnotation(annotationStreamProvider, uri, annotationDataReference.getDomain(), type);
+                parsingStore.store(uri, annotationContentHandler.get(uri));
+                ContainerAnnotation annotation = new ParsedContainerAnnotation(parsingStore, uri, annotationDataReference.getDomain(), type);
                 return Pair.of(uri, annotation);
-            } catch (ContentParsingException e) {
+            } catch (ContentParsingException | ParsingStoreException e) {
                 exceptions.add(e);
                 return null;
             }

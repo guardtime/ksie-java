@@ -3,24 +3,37 @@ package com.guardtime.container;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
+import com.guardtime.container.manifest.SignatureReference;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.packaging.exception.ContainerMergingException;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
+import com.guardtime.container.signature.ContainerSignature;
+import com.guardtime.container.signature.SignatureException;
+import com.guardtime.container.util.Pair;
+import com.guardtime.ksi.hashing.DataHash;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
@@ -88,12 +101,8 @@ public class ContainerBuilderTest extends AbstractContainerTest {
 
     @Test
     public void testCreateWithExistingContainer() throws Exception {
-        ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withManifestFactory(mockedManifestFactory).
-                withIndexProviderFactory(new IncrementingIndexProviderFactory()).
-                disableInternalVerification().
-                build();
+        ContainerPackagingFactory packagingFactory = getContainerPackagingFactory();
+
         // build initial container
         ContainerBuilder builder = new ContainerBuilder(packagingFactory);
         builder.withDocument(TEST_DOCUMENT_HELLO_PDF);
@@ -108,6 +117,33 @@ public class ContainerBuilderTest extends AbstractContainerTest {
                 assertEquals(2, newContainer.getSignatureContents().size());
             }
         }
+    }
+
+    private ContainerPackagingFactory getContainerPackagingFactory() throws IOException, com.guardtime.container.manifest.InvalidManifestException, SignatureException {
+        ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                withManifestFactory(mockedManifestFactory).
+                withIndexProviderFactory(new IncrementingIndexProviderFactory()).
+                disableInternalVerification().
+                build();
+
+        when(mockedManifestFactory.createManifest(Mockito.any(Pair.class), Mockito.any(Pair.class), Mockito.any(Pair.class))).thenReturn(mockedManifest);
+        when(mockedManifest.getManifestFactoryType()).thenReturn(mockedManifestFactoryType);
+        when(mockedManifestFactoryType.getManifestFileExtension()).thenReturn("tlv");
+        SignatureReference mockedSignatureReference = mock(SignatureReference.class);
+        when(mockedManifest.getSignatureReference()).thenReturn(mockedSignatureReference);
+        when(mockedSignatureReference.getType()).thenReturn("signatureType");
+        when(mockedSignatureReference.getUri()).thenReturn("META-INF/signature-1.ksig");
+        ContainerSignature mockedSignature = mock(ContainerSignature.class);
+        when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mockedSignature);
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                invocationOnMock.getArgumentAt(0, OutputStream.class).write("someData".getBytes());
+                return null;
+            }
+        }) .when(mockedSignature).writeTo(any(OutputStream.class));
+        return packagingFactory;
     }
 
     @Test
@@ -127,18 +163,13 @@ public class ContainerBuilderTest extends AbstractContainerTest {
 
     @Test
     public void testCreateWithExistingContainerWithMultipleDocumentsWithSameFileName_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Multiple documents with same name found!");
+        expectedException.expect(ContainerMergingException.class);
+        expectedException.expectMessage("New SignatureContent has clashing name for ContainerDocument! Path: " + TEST_FILE_NAME_TEST_TXT);
         try (
                 ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
-                ContainerDocument streamContainerDocument = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-HAHA".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
+                ContainerDocument streamContainerDocument = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-HAHA".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)
         ) {
-            ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
-                    withSignatureFactory(mockedSignatureFactory).
-                    withManifestFactory(mockedManifestFactory).
-                    withIndexProviderFactory(new IncrementingIndexProviderFactory()).
-                    disableInternalVerification().
-                    build();
+            ContainerPackagingFactory packagingFactory = getContainerPackagingFactory();
             // build initial container
             ContainerBuilder builder = new ContainerBuilder(packagingFactory);
             builder.withDocument(document);
@@ -154,12 +185,7 @@ public class ContainerBuilderTest extends AbstractContainerTest {
 
     @Test
     public void testCreateNewContainerUsingExistingContainerAndExistingDocument() throws Exception {
-        ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withManifestFactory(mockedManifestFactory).
-                withIndexProviderFactory(new IncrementingIndexProviderFactory()).
-                disableInternalVerification().
-                build();
+        ContainerPackagingFactory packagingFactory = getContainerPackagingFactory();
         // build initial container
         ContainerBuilder builder = new ContainerBuilder(packagingFactory);
         builder.withDocument(TEST_DOCUMENT_HELLO_PDF);

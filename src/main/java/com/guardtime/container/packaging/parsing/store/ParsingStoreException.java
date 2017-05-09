@@ -1,4 +1,4 @@
-package com.guardtime.container.packaging.parsing;
+package com.guardtime.container.packaging.parsing.store;
 
 import com.guardtime.container.ContainerException;
 

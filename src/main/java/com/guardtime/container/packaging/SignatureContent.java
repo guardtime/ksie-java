@@ -9,6 +9,7 @@ import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
+import com.guardtime.container.packaging.parsing.store.ParsingStore;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
@@ -25,7 +26,7 @@ import java.util.Map;
  * Structure that groups together all container internal structure elements(manifests), documents, annotations and
  * signature that are directly connected to the signature.
  */
-public class SignatureContent {
+public class SignatureContent implements AutoCloseable {
 
     private final Map<String, ContainerDocument> documents;
     private final Pair<String, DocumentsManifest> documentsManifest;
@@ -34,6 +35,7 @@ public class SignatureContent {
     private final Map<String, SingleAnnotationManifest> singleAnnotationManifestMap;
     private final Map<String, ContainerAnnotation> annotations;
     private ContainerSignature signature;
+    private final ParsingStore store;
 
     protected SignatureContent(Builder builder) {
         this.documents = formatDocumentsListToMap(builder.documents);
@@ -43,6 +45,7 @@ public class SignatureContent {
         this.annotationsManifest = builder.annotationsManifest;
         this.manifest = builder.manifest;
         this.signature = builder.signature;
+        this.store = builder.store;
     }
 
     /**
@@ -121,6 +124,21 @@ public class SignatureContent {
         return removed;
     }
 
+    @Override
+    public void close() throws Exception {
+        for (ContainerAnnotation annotation : annotations.values()) {
+            annotation.close();
+        }
+
+        for (ContainerDocument document : documents.values()) {
+            document.close();
+        }
+
+        if (store != null) {
+            store.close();
+        }
+    }
+
     private Map<String, SingleAnnotationManifest> formatSingleAnnotationManifestsListToMap(List<Pair<String, SingleAnnotationManifest>> annotationManifests) {
         Map<String, SingleAnnotationManifest> returnable = new HashMap<>();
         for (Pair<String, SingleAnnotationManifest> manifestPair : annotationManifests) {
@@ -154,6 +172,7 @@ public class SignatureContent {
         private Pair<String, Manifest> manifest;
         private List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifests;
         private ContainerSignature signature;
+        private ParsingStore store;
 
         public Builder withDocuments(Collection<ContainerDocument> documents) {
             this.documents = new ArrayList<>(documents);
@@ -187,6 +206,11 @@ public class SignatureContent {
 
         public Builder withSignature(ContainerSignature signature) {
             this.signature = signature;
+            return this;
+        }
+
+        public Builder withParsingStore(ParsingStore store) {
+            this.store = store;
             return this;
         }
 
