@@ -1,8 +1,8 @@
 package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.manifest.ContainerManifestFactory;
-import com.guardtime.container.packaging.parsing.ContainerReader;
 import com.guardtime.container.packaging.exception.ContainerReadingException;
+import com.guardtime.container.packaging.parsing.ContainerReader;
 import com.guardtime.container.packaging.parsing.handler.ContentHandler;
 import com.guardtime.container.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.container.packaging.parsing.store.ParsingStoreFactory;

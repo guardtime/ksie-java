@@ -1,7 +1,5 @@
 package com.guardtime.container.packaging;
 
-import com.guardtime.container.packaging.MimeType;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 

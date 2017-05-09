@@ -13,7 +13,6 @@ import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.packaging.parsing.store.ParsingStore;
 import com.guardtime.container.packaging.parsing.handler.AnnotationContentHandler;
 import com.guardtime.container.packaging.parsing.handler.AnnotationsManifestHandler;
 import com.guardtime.container.packaging.parsing.handler.ContentParsingException;
@@ -22,12 +21,12 @@ import com.guardtime.container.packaging.parsing.handler.DocumentsManifestHandle
 import com.guardtime.container.packaging.parsing.handler.ManifestHandler;
 import com.guardtime.container.packaging.parsing.handler.SignatureHandler;
 import com.guardtime.container.packaging.parsing.handler.SingleAnnotationManifestHandler;
+import com.guardtime.container.packaging.parsing.store.ParsingStore;
 import com.guardtime.container.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.container.packaging.parsing.store.ParsingStoreFactory;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

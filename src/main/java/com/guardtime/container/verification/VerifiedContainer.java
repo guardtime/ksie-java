@@ -1,16 +1,12 @@
 package com.guardtime.container.verification;
 
-import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.packaging.Container;
-import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.exception.ContainerMergingException;
 import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
