@@ -19,6 +19,7 @@ import java.util.List;
 public class VerifiedContainer extends Container {
     private final VerificationResult aggregateResult;
     private final ResultHolder resultHolder;
+    private final Container original;
     private List<VerifiedSignatureContent> verifiedSignatureContents;
 
     public VerifiedContainer(Container container, ResultHolder holder) {
@@ -29,6 +30,7 @@ public class VerifiedContainer extends Container {
                 container.getWriter(),
                 null
         );
+        this.original = container;
         this.resultHolder = holder;
         this.aggregateResult = resultHolder.getAggregatedResult();
         wrapSignatureContents();
@@ -68,6 +70,11 @@ public class VerifiedContainer extends Container {
         wrapSignatureContents();
     }
 
+    @Override
+    public void close() throws Exception {
+        original.close();
+    }
+
     private void wrapSignatureContents() {
         List<SignatureContent> originalSignatureContents = super.getSignatureContents();
         List<VerifiedSignatureContent> verifiedContents = new ArrayList<>(originalSignatureContents.size());
@@ -76,5 +83,4 @@ public class VerifiedContainer extends Container {
         }
         this.verifiedSignatureContents = verifiedContents;
     }
-
 }

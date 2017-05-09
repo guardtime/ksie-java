@@ -59,7 +59,6 @@ public class Container implements AutoCloseable {
 
     /**
      * Writes data to provided stream.
-     *
      * @param output    OutputStream to write to. This stream will be closed after writing data to it.
      * @throws IOException When writing to the stream fails for any reason.
      */
@@ -124,12 +123,12 @@ public class Container implements AutoCloseable {
         verifySameMimeType(container, this);
         verifyUniqueUnknownFiles(container, this);
         int i = container.getSignatureContents().size();
-        while(i > 0 ) {
+        while (i > 0) {
             add(container.removeSignatureContent(0));
             i--;
         }
         unknownFiles.addAll(container.getUnknownFiles());
-        if(parsingStore != null && container.parsingStore != null) {
+        if (parsingStore != null && container.parsingStore != null) {
             try {
                 parsingStore.absorb(container.parsingStore);
             } catch (ParsingStoreException e) {

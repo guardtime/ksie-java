@@ -5,7 +5,7 @@ import com.guardtime.container.ContainerException;
 import java.io.IOException;
 
 public class ParsingStoreException extends ContainerException {
-    public ParsingStoreException(String message, IOException cause) {
+    public ParsingStoreException(String message, Throwable cause) {
         super(message, cause);
     }
 

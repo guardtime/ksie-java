@@ -6,6 +6,7 @@ import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.EmptyContainerDocument;
 import com.guardtime.container.packaging.Container;
+import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.verification.ContainerVerifier;
 import com.guardtime.container.verification.VerifiedContainer;
 import com.guardtime.container.verification.VerifiedSignatureContent;
@@ -40,6 +41,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -284,6 +286,38 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     public void testCreateContainerUsingEmptyContainerDocumentAndAddWrongDocumentLater() throws Exception {
         byte[] documentContent = "This is document's content.".getBytes(StandardCharsets.UTF_8);
         baseTestCreateContainerUsingEmptyContainerDocumentAndAddDocumentData(VerificationResult.NOK, documentContent, "IncorrectContent".getBytes());
+    }
+
+    @Test
+    public void testAttachDocumentAndVerify_VerificationSuccessful() throws Exception {
+        VerifiedContainer verifiedContainer = null;
+        ContainerDocument detached = null;
+        try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT)) {
+            SignatureContent content = container.getSignatureContents().get(0);
+            String documentName = content.getDocuments().get(content.getDocuments().keySet().iterator().next()).getFileName();
+
+            verifiedContainer = verifier.verify(container);
+            assertEquals(VerificationResult.OK, verifiedContainer.getVerificationResult());
+
+            detached = content.detachDocument(documentName);
+            verifiedContainer = verifier.verify(container);
+            assertEquals(VerificationResult.NOK, verifiedContainer.getVerificationResult());
+
+            boolean added = content.attachDetachedDocument(detached.getFileName(), detached.getInputStream());
+            assertTrue(added);
+            verifiedContainer = verifier.verify(container);
+            assertEquals(VerificationResult.OK, verifiedContainer.getVerificationResult());
+            added = content.attachDetachedDocument(detached.getFileName(), detached.getInputStream());
+            assertFalse(added);
+        } finally {
+            if(detached != null) {
+                detached.close();
+            }
+
+            if (verifiedContainer != null) {
+                verifiedContainer.close();
+            }
+        }
     }
 
     private void baseTestCreateContainerUsingEmptyContainerDocumentAndAddDocumentData(VerificationResult verificationResult, byte[] expectedDocumentContent, byte[] addedDocumentContent) throws Exception {

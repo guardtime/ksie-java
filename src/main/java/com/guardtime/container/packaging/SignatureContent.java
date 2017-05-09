@@ -1,8 +1,10 @@
 package com.guardtime.container.packaging;
 
+import com.guardtime.container.ContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.EmptyContainerDocument;
+import com.guardtime.container.document.ParsedContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.DocumentsManifest;
@@ -10,10 +12,12 @@ import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
 import com.guardtime.container.packaging.parsing.store.ParsingStore;
+import com.guardtime.container.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -107,8 +111,9 @@ public class SignatureContent implements AutoCloseable {
     /**
      * Returns existing {@link ContainerDocument} if present and replaces it with an {@link EmptyContainerDocument} in the
      * {@link SignatureContent}. If no document found or if the document is already detached null will be returned.
+     * @throws ParsingStoreException When detaching an instance of {@link ParsedContainerDocument} fails.
      */
-    public ContainerDocument detachDocument(String path) {
+    public ContainerDocument detachDocument(String path) throws ParsingStoreException {
         if (!documents.containsKey(path) || documents.get(path) instanceof EmptyContainerDocument) {
             return null;
         }
@@ -121,6 +126,15 @@ public class SignatureContent implements AutoCloseable {
             }
         }
         documents.put(path, new EmptyContainerDocument(removed.getFileName(), removed.getMimeType(), removedDocumentHashes));
+        if (removed instanceof ParsedContainerDocument) {
+            try {
+                ContainerDocument detached = new StreamContainerDocument(removed.getInputStream(), removed.getMimeType(), removed.getFileName());
+                removed.close();
+                return detached;
+            } catch (Exception e) {
+                throw new ParsingStoreException("Failed", e);
+            }
+        }
         return removed;
     }
 

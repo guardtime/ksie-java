@@ -6,6 +6,7 @@ import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.EmptyContainerDocument;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
+import com.guardtime.container.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -50,7 +51,7 @@ public class SignatureContentTest extends AbstractContainerTest {
     }
 
     @Test
-    public void testDetachDocumentData_OK() {
+    public void testDetachDocumentData_OK() throws ParsingStoreException {
         SignatureContent testable = getTestableContent();
         int documentsCount = testable.getDocuments().size();
         ContainerDocument detached = testable.detachDocument(TEST_FILE_NAME_TEST_PDF);
@@ -62,7 +63,7 @@ public class SignatureContentTest extends AbstractContainerTest {
     }
 
     @Test
-    public void testDetachDocumentDataForNonExistentDocument_ReturnsNull() {
+    public void testDetachDocumentDataForNonExistentDocument_ReturnsNull() throws ParsingStoreException {
         SignatureContent testable = getTestableContent();
         ContainerDocument detached = testable.detachDocument("ThisFileIsNotInTheSignatureContent");
         assertNull(detached);

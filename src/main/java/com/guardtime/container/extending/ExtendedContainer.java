@@ -15,6 +15,7 @@ import java.util.List;
  */
 public class ExtendedContainer extends Container {
 
+    private final Container original;
     private List<ExtendedSignatureContent> extendedSignatureContents;
 
     public ExtendedContainer(Container original) {
@@ -25,6 +26,7 @@ public class ExtendedContainer extends Container {
                 original.getWriter(),
                 null
         );
+        this.original = original;
         wrapSignatureContents();
     }
 
@@ -62,6 +64,11 @@ public class ExtendedContainer extends Container {
         wrapSignatureContents();
     }
 
+    @Override
+    public void close() throws Exception {
+        original.close();
+    }
+
     private void wrapSignatureContents() {
         List<? extends SignatureContent> originalSignatureContents = super.getSignatureContents();
         List<ExtendedSignatureContent> extendedContents = new ArrayList<>(originalSignatureContents.size());
@@ -70,5 +77,4 @@ public class ExtendedContainer extends Container {
         }
         this.extendedSignatureContents = extendedContents;
     }
-
 }
