@@ -38,6 +38,10 @@ import java.util.Set;
 
 import static com.guardtime.container.packaging.MimeType.MIME_TYPE_ENTRY_NAME;
 
+/**
+ * Provides stream parsing logic for {@link com.guardtime.container.packaging.ContainerPackagingFactory}
+ * Derivatives of this class must be stateless and reusable.
+ */
 public abstract class ContainerReader {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(ContainerReader.class);

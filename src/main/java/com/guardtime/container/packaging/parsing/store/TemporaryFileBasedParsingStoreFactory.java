@@ -91,7 +91,7 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
         }
 
         @Override
-        public void absorb(ParsingStore that) throws ParsingStoreException {
+        public void transferFrom(ParsingStore that) throws ParsingStoreException {
             for(String key : that.getStoredKeys()) {
                 store(key, that.get(key));
                 that.remove(key);

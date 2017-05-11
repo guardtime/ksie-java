@@ -1,6 +1,5 @@
 package com.guardtime.container.packaging;
 
-import com.guardtime.container.ContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.hash.HashAlgorithmProvider;
@@ -63,7 +62,6 @@ public class ContainerPackagingFactory {
     private final ContainerManifestFactory manifestFactory;
     private final IndexProviderFactory indexProviderFactory;
     private final boolean disableVerification;
-    private final ParsingStoreFactory parsingStoreFactory;
     private final ContainerWriter containerWriter;
     private final ContainerReader containerReader;
 
@@ -79,7 +77,6 @@ public class ContainerPackagingFactory {
         this.manifestFactory = builder.manifestFactory;
         this.indexProviderFactory = builder.indexProviderFactory;
         this.disableVerification = builder.disableInternalVerification;
-        this.parsingStoreFactory = builder.parsingStoreFactory;
         this.containerMimeType = builder.mimeType;
         this.containerWriter = builder.containerWriter;
         this.containerReader = builder.containerReader;
@@ -109,6 +106,13 @@ public class ContainerPackagingFactory {
     }
 
     /**
+     * Provides the MIMETYPE content for container.
+     */
+    public byte[] getMimeTypeContent() {
+        return containerMimeType.getBytes(StandardCharsets.UTF_8);
+    }
+
+    /**
      * Creates a {@link Container} with the input documents and annotations and a signature covering them.
      *
      * @param files          List of {@link ContainerDocument} to be added and signed. Can NOT be null.
@@ -117,27 +121,11 @@ public class ContainerPackagingFactory {
      * @throws InvalidPackageException  When the input data can not be processed or signing fails.
      */
     public Container create(List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws InvalidPackageException {
-        Util.notEmpty(files, "Document files");
-        try {
-            verifyNoDuplicateDocumentNames(new HashSet<>(files));
-            ContentSigner signer = new ContentSigner(files, annotations, indexProviderFactory.create(), manifestFactory, signatureFactory);
-            SignatureContent signatureContent = signer.sign();
-            MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
-            Container container = new Container(signatureContent, mimeType, containerWriter);
-            verifyContainer(container);
-            return container;
-        } catch (DataHashException | InvalidManifestException e) {
-            throw new InvalidPackageException("Failed to create Container internal structure!", e);
-        } catch (SignatureException e) {
-            throw new InvalidPackageException("Failed to sign Container!", e);
-        }
-    }
-
-    /**
-     * Provides the MIME_TYPE content for container.
-     */
-    public byte[] getMimeTypeContent() {
-        return containerMimeType.getBytes(StandardCharsets.UTF_8);
+        SignatureContent signatureContent = verifyAndSign(files, annotations, null);
+        MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
+        Container container = new Container(signatureContent, mimeType, containerWriter);
+        verifyContainer(container);
+        return container;
     }
 
     /**
@@ -152,21 +140,43 @@ public class ContainerPackagingFactory {
      * @throws InvalidPackageException When the input data can not be processed or signing fails.
      * @throws ContainerMergingException When there are issues adding the newly created {@link SignatureContent} to {@param existingContainer}.
      */
-    public Container addSignature(Container existingContainer, List<ContainerDocument> files, List<ContainerAnnotation> annotations) throws ContainerException {
+    public Container addSignature(Container existingContainer, List<ContainerDocument> files, List<ContainerAnnotation> annotations)
+            throws InvalidPackageException, ContainerMergingException {
         Util.notNull(existingContainer, "Container");
-        Util.notEmpty(files, "Data files");
+        SignatureContent signatureContent = verifyAndSign(files, annotations, existingContainer);
+        existingContainer.add(signatureContent);
+        verifyContainer(existingContainer);
+        return existingContainer;
+    }
+
+    private SignatureContent verifyAndSign(List<ContainerDocument> files, List<ContainerAnnotation> annotations,
+                                           Container existingContainer) throws InvalidPackageException {
+        Util.notEmpty(files, "Document files");
+        HashSet<ContainerDocument> documents = new HashSet<>(files);
+
+        IndexProvider indexProvider;
+        if (existingContainer != null) {
+            for (SignatureContent content : existingContainer.getSignatureContents()) {
+                documents.addAll(content.getDocuments().values());
+            }
+            indexProvider = indexProviderFactory.create(existingContainer);
+        } else {
+            indexProvider = indexProviderFactory.create();
+        }
+        verifyNoDuplicateDocumentNames(documents);
 
         try {
-            IndexProvider indexProvider = indexProviderFactory.create(existingContainer);
-            ContentSigner signer = new ContentSigner(files, annotations, indexProvider, manifestFactory, signatureFactory);
-            SignatureContent signatureContent = signer.sign();
-            existingContainer.add(signatureContent);
-            verifyContainer(existingContainer);
-            return existingContainer;
-        } catch ( DataHashException | InvalidManifestException e) {
-            throw new InvalidPackageException("Failed to create SignatureContent internal structure!", e);
+            return new ContentSigner(
+                    files,
+                    annotations,
+                    indexProvider,
+                    manifestFactory,
+                    signatureFactory
+            ).sign();
+        } catch (DataHashException | InvalidManifestException e) {
+            throw new InvalidPackageException("Failed to create internal structure!", e);
         } catch (SignatureException e) {
-            throw new InvalidPackageException("Failed to sign SignatureContent!", e);
+            throw new InvalidPackageException("Failed to acquire signature!", e);
         }
     }
 
@@ -208,8 +218,8 @@ public class ContainerPackagingFactory {
         private List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifestPairs = new LinkedList<>();
         private Map<String, Pair<ContainerAnnotation, SingleAnnotationManifest>> annotationsManifestContent = new HashMap<>();
 
-        public ContentSigner(List<ContainerDocument> documents, List<ContainerAnnotation> annotations,
-                             IndexProvider indexProvider, ContainerManifestFactory manifestFactory, SignatureFactory signatureFactory) {
+        public ContentSigner(List<ContainerDocument> documents, List<ContainerAnnotation> annotations, IndexProvider indexProvider,
+                             ContainerManifestFactory manifestFactory, SignatureFactory signatureFactory) {
             this.documents = documents;
             this.annotations = annotations;
 

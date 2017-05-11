@@ -1,6 +1,5 @@
 package com.guardtime.container.packaging;
 
-import com.guardtime.container.ContainerException;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.EmptyContainerDocument;
@@ -17,7 +16,6 @@ import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -132,7 +130,7 @@ public class SignatureContent implements AutoCloseable {
                 removed.close();
                 return detached;
             } catch (Exception e) {
-                throw new ParsingStoreException("Failed", e);
+                throw new ParsingStoreException("Failed to separate document data from container data store.", e);
             }
         }
         return removed;

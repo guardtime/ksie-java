@@ -23,7 +23,7 @@ import static com.guardtime.container.packaging.ContainerMergingVerifier.verifyU
  */
 public class Container implements AutoCloseable {
 
-    protected ParsingStore parsingStore;
+    private ParsingStore parsingStore;
     private final ContainerWriter writer;
     private List<SignatureContent> signatureContents = new LinkedList<>();
     private MimeType mimeType;
@@ -41,6 +41,16 @@ public class Container implements AutoCloseable {
         this.mimeType = mimeType;
         this.parsingStore = store;
         this.writer = writer;
+    }
+
+    protected Container(Container original) {
+        this(
+                original.getSignatureContents(),
+                original.getUnknownFiles(),
+                original.getMimeType(),
+                original.getWriter(),
+                original.getParsingStore()
+        );
     }
 
     /**
@@ -128,14 +138,14 @@ public class Container implements AutoCloseable {
             i--;
         }
         unknownFiles.addAll(container.getUnknownFiles());
-        if (parsingStore != null && container.parsingStore != null) {
+        if (parsingStore != null && container.getParsingStore() != null) {
             try {
-                parsingStore.absorb(container.parsingStore);
+                parsingStore.transferFrom(container.getParsingStore());
             } catch (ParsingStoreException e) {
                 throw new ContainerMergingException("Failed to take control of parsed data!", e);
             }
-        } else if (container.parsingStore != null) {
-            parsingStore = container.parsingStore;
+        } else if (container.getParsingStore() != null) {
+            parsingStore = container.getParsingStore();
         }
     }
 
@@ -145,7 +155,7 @@ public class Container implements AutoCloseable {
      * @throws ContainerMergingException when any {@link SignatureContent} can not be added into the {@link Container} due to
      * clashing file paths or any other reason.
      */
-    public void addAll(Collection<? extends SignatureContent> contents) throws ContainerMergingException {
+    public void addAll(Collection<SignatureContent> contents) throws ContainerMergingException {
         List<SignatureContent> original = new LinkedList<>(signatureContents);
         try {
             for (SignatureContent content : contents) {
@@ -157,7 +167,11 @@ public class Container implements AutoCloseable {
         }
     }
 
-    public ContainerWriter getWriter() {
+    protected ParsingStore getParsingStore() {
+        return parsingStore;
+    }
+
+    protected ContainerWriter getWriter() {
         return writer;
     }
 }

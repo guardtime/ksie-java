@@ -12,7 +12,6 @@ import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.MimeTypeEntry;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.packaging.exception.ContainerMergingException;
 import com.guardtime.container.packaging.exception.InvalidPackageException;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
@@ -250,14 +249,14 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
         expectedException.expectMessage("Created Container does not pass internal verification");
         ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().withSignatureFactory(mockedSignatureFactory).build();
         Container mockContainer = Mockito.mock(Container.class);
-        when(mockContainer.getMimeType()).thenReturn(new MimeTypeEntry("MIME_TYPE", "Ploomimoos".getBytes(StandardCharsets.UTF_8)));
+        when(mockContainer.getMimeType()).thenReturn(new MimeTypeEntry("MIMETYPE", "Ploomimoos".getBytes(StandardCharsets.UTF_8)));
         packagingFactory.addSignature(mockContainer, containerDocumentList, containerAnnotationList);
     }
 
     @Test
     public void testCreateContainerWithExistingContainerWithDocumentsWithSameName_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(ContainerMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for ContainerDocument! Path: " + TEST_FILE_NAME_TEST_TXT);
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Multiple documents with same name found!");
         try (
                 ContainerDocument containerDocument = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
                 ContainerDocument streamContainerDocument = new StreamContainerDocument(new ByteArrayInputStream("MoreImportantDocument-0411".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)

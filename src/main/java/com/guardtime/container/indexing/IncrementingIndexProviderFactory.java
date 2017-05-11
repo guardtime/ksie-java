@@ -49,7 +49,6 @@ public class IncrementingIndexProviderFactory implements IndexProviderFactory {
 
     private int compareAndUpdate(Set<String> set, int value) {
         for (String str : set) {
-            String auh = str;
             value = compareAndUpdate(str, value);
         }
         if(value < 0) {

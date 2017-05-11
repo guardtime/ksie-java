@@ -19,18 +19,10 @@ import java.util.List;
 public class VerifiedContainer extends Container {
     private final VerificationResult aggregateResult;
     private final ResultHolder resultHolder;
-    private final Container original;
     private List<VerifiedSignatureContent> verifiedSignatureContents;
 
     public VerifiedContainer(Container container, ResultHolder holder) {
-        super(
-                container.getSignatureContents(),
-                container.getUnknownFiles(),
-                container.getMimeType(),
-                container.getWriter(),
-                null
-        );
-        this.original = container;
+        super(container);
         this.resultHolder = holder;
         this.aggregateResult = resultHolder.getAggregatedResult();
         wrapSignatureContents();
@@ -65,18 +57,13 @@ public class VerifiedContainer extends Container {
         wrapSignatureContents();
     }
 
-    public void addAll(Collection<? extends SignatureContent> contents) throws ContainerMergingException {
+    public void addAll(Collection<SignatureContent> contents) throws ContainerMergingException {
         super.addAll(contents);
         wrapSignatureContents();
     }
 
-    @Override
-    public void close() throws Exception {
-        original.close();
-    }
-
     private void wrapSignatureContents() {
-        List<SignatureContent> originalSignatureContents = super.getSignatureContents();
+        List<SignatureContent> originalSignatureContents = getSignatureContents();
         List<VerifiedSignatureContent> verifiedContents = new ArrayList<>(originalSignatureContents.size());
         for(SignatureContent content : originalSignatureContents) {
             verifiedContents.add(new VerifiedSignatureContent(content, resultHolder));

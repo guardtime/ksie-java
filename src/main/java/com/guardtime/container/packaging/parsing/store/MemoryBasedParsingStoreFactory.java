@@ -58,7 +58,7 @@ public class MemoryBasedParsingStoreFactory implements ParsingStoreFactory {
         }
 
         @Override
-        public void absorb(ParsingStore that) throws ParsingStoreException {
+        public void transferFrom(ParsingStore that) throws ParsingStoreException {
             for(String key : that.getStoredKeys()) {
                 store(key, that.get(key));
                 that.remove(key);

@@ -9,7 +9,7 @@ import java.io.InputStream;
 import static com.guardtime.container.packaging.MimeType.MIME_TYPE_ENTRY_NAME;
 
 /**
- * This content holders is used for MIME_TYPE file inside the container.
+ * This content holders is used for MIMETYPE file inside the container.
  */
 public class MimeTypeHandler extends ContentHandler<byte[]> {
 

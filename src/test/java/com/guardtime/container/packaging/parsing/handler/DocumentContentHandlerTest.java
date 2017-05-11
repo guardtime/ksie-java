@@ -29,6 +29,6 @@ public class DocumentContentHandlerTest extends AbstractContentHandlerTest {
 
     @Test
     public void testIsSupportedDoesNotValidateMimetypeFile() throws Exception {
-        assertFalse("Identified MIME_TYPE filename string.", handler.isSupported(MIME_TYPE_ENTRY_NAME));
+        assertFalse("Identified MIMETYPE filename string.", handler.isSupported(MIME_TYPE_ENTRY_NAME));
     }
 }

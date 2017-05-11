@@ -15,18 +15,10 @@ import java.util.List;
  */
 public class ExtendedContainer extends Container {
 
-    private final Container original;
     private List<ExtendedSignatureContent> extendedSignatureContents;
 
     public ExtendedContainer(Container original) {
-        super(
-                original.getSignatureContents(),
-                original.getUnknownFiles(),
-                original.getMimeType(),
-                original.getWriter(),
-                null
-        );
-        this.original = original;
+        super(original);
         wrapSignatureContents();
     }
 
@@ -59,18 +51,13 @@ public class ExtendedContainer extends Container {
     }
 
     @Override
-    public void addAll(Collection<? extends SignatureContent> contents) throws ContainerMergingException {
+    public void addAll(Collection<SignatureContent> contents) throws ContainerMergingException {
         super.addAll(contents);
         wrapSignatureContents();
     }
 
-    @Override
-    public void close() throws Exception {
-        original.close();
-    }
-
     private void wrapSignatureContents() {
-        List<? extends SignatureContent> originalSignatureContents = super.getSignatureContents();
+        List<SignatureContent> originalSignatureContents = getSignatureContents();
         List<ExtendedSignatureContent> extendedContents = new ArrayList<>(originalSignatureContents.size());
         for (SignatureContent content : originalSignatureContents) {
             extendedContents.add(new ExtendedSignatureContent(content));

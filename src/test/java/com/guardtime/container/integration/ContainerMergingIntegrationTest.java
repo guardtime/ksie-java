@@ -39,7 +39,7 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
 
 
     /**
-     * Containers - for creating file conflicts when trying to absorb containers.
+     * Containers - for creating file conflicts when trying to merge containers.
      */
     private static final String[] CONTAINERS_FOR_UNKNOWN_FILE_CONFLICT = {"containers/container-for-unknown-file-conflict.ksie", CONTAINER_WITH_UNKNOWN_FILES};
     private static final String[] CONTAINERS_FOR_DOCUMENTS_MANIFEST_CONFLICT = {"containers/container-for-documents-manifest-conflict.ksie", CONTAINER_WITH_MULTIPLE_ANNOTATIONS};

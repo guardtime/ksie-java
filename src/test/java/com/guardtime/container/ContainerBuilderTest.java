@@ -7,7 +7,6 @@ import com.guardtime.container.manifest.SignatureReference;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.SignatureContent;
-import com.guardtime.container.packaging.exception.ContainerMergingException;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.signature.SignatureException;
@@ -163,8 +162,8 @@ public class ContainerBuilderTest extends AbstractContainerTest {
 
     @Test
     public void testCreateWithExistingContainerWithMultipleDocumentsWithSameFileName_ThrowsIllegalArgumentException() throws Exception {
-        expectedException.expect(ContainerMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for ContainerDocument! Path: " + TEST_FILE_NAME_TEST_TXT);
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Multiple documents with same name found!");
         try (
                 ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
                 ContainerDocument streamContainerDocument = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-HAHA".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)

@@ -29,6 +29,6 @@ public interface ParsingStore extends AutoCloseable {
      * Takes all the contents of {@param that} and adds it to this.
      * @param that
      */
-    void absorb(ParsingStore that) throws ParsingStoreException;
+    void transferFrom(ParsingStore that) throws ParsingStoreException;
 
 }
