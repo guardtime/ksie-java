@@ -82,7 +82,7 @@ List<ContainerAnnotation> annotations;  // Can be empty list
 /* initialize and fill documents and annotations lists
 ...
 */
-Container signedContainer = packagingFactory.create(parsedContainer, documents, annotations);
+Container signedContainer = packagingFactory.addSignature(parsedContainer, documents, annotations);
 ```
 
 ## Extending signatures in a container
@@ -97,7 +97,7 @@ ExtendingPolicy extendingPolicy = new KsiContainerSignatureExtendingPolicy(ksi)
 ContainerSignatureExtender signatureExtender = new ContainerSignatureExtender(signatureFactory, extendingPolicy)
 ExtendedContainer extendedContainer = extender.extend(container);
 extendedContainer.isExtended();
-extendedContainer.getSignatureContents().get(0).isExtended();
+extendedContainer.getExtendedSignatureContents().get(0).isExtended();
 
 ```
 
@@ -115,7 +115,7 @@ DefaultVerificationPolicy policy = new DefaultVerificationPolicy(signatureRule, 
 ContainerVerifier verifier = new ContainerVerifier(policy);
 VerifiedContaienr verifiedContainer = verifier.verify(container);
 VerificationResult verificationResult = verifiedContainer.getVerificationResult(); // OK/NOK/WARN
-VerificationResult verificationResult = verifiedContainer.getSignatureContents().get(0).getVerificationResult(); // OK/NOK/WARN
+VerificationResult verificationResult = verifiedContainer.getVerifiedSignatureContents().get(0).getVerificationResult(); // OK/NOK/WARN
 ```
 
 Since there currently are no reports for verification then you'd have to loop through the raw results to get a more detailed overview of what failed verification.
@@ -130,7 +130,7 @@ for(RuleVerificationResult ruleResult : result.getResults()) {
 
 ## Closing a container
 
-Container, ContainerDocument and ContainerAnnotation are derived from AutoCloseable since they may hold resources which need to be closed once they are no longer needed. 
+Container, SignatureContent, ContainerDocument and ContainerAnnotation are derived from AutoCloseable since they may hold resources which need to be closed once they are no longer needed.
 Therefore calling close() is highly recommended to avoid any data leaks.
 
-Calling close() on a Container will also close all ContainerDocument and ContainerAnnotation that it has references to.
+Calling close() on a Container will also close all SignatureContent, ContainerDocument and ContainerAnnotation that it has references to.
