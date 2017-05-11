@@ -1,3 +1,47 @@
+# KSIE Java SDK #
+
+Guardtime Keyless Signature Infrastructure (KSI) is an industrial scale blockchain platform that cryptographically ensures data
+integrity and proves time of existence. Its keyless signatures, based on hash chains, link data to global calendar blockchain.
+The checkpoints of the blockchain, published in newspapers and electronic media, enable long term integrity of any digital asset
+without the need to trust any system. There are many applications for KSI, a classical example is signing of any type of
+logs - system logs, financial transactions, call records, etc. For more, see https://guardtime.com
+
+KSI Envelope is designed to contain data, meta-data and KSI signatures. The signed data may be detached from the envelope or
+attached to the envelope itself. The KSI Envelope supports two kinds of custom meta-data: meta-data that can be removed and
+meta-data that can not be removed from it without affecting the verification result.
+
+
+The KSIE Java SDK is a software development kit for developers who want to integrate KSIE with their Java based applications and
+systems. It provides an API for all KSIE functionality.
+
+## Installation ##
+
+TODO:
+
+## Usage ##
+
+TODO:
+
+## Dependancies ##
+
+See Maven pom.xml files or use the following Maven command
+```
+mvn dependency:tree
+```
+
+## Compatibility ##
+
+Java 1.7 or newer.
+
+## Contributing ##
+
+See CONTRIBUTING.md file.
+
+## License ##
+
+See LICENSE file.
+
+
 # Introduction
 
 The aim of this project is to implement a container format for associating data object(s) and metadata with blockchain based signatures. 
