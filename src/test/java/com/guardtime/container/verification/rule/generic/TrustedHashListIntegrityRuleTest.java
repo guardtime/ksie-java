@@ -16,7 +16,7 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -31,7 +31,7 @@ public class TrustedHashListIntegrityRuleTest extends AbstractContainerTest {
         expectedException.expectMessage("Hash mismatch found.");
         FileReference mockFileReference = Mockito.mock(FileReference.class);
         DataHash nullDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
-        when(mockFileReference.getHashList()).thenReturn(Arrays.asList(nullDataHash));
+        when(mockFileReference.getHashList()).thenReturn(Collections.singletonList(nullDataHash));
         MultiHashElement mockMultiHashElement = Mockito.mock(MultiHashElement.class);
         when(mockMultiHashElement.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(Mockito.mock(DataHash.class));
         rule.verify(new ResultHolder(), Pair.of(mockMultiHashElement, mockFileReference));
@@ -42,7 +42,7 @@ public class TrustedHashListIntegrityRuleTest extends AbstractContainerTest {
         FileReference mockFileReference = Mockito.mock(FileReference.class);
         HashAlgorithm hashAlgorithm = HashAlgorithm.SHA2_256;
         DataHash nullDataHash = new DataHash(hashAlgorithm, new byte[32]);
-        when(mockFileReference.getHashList()).thenReturn(Arrays.asList(nullDataHash));
+        when(mockFileReference.getHashList()).thenReturn(Collections.singletonList(nullDataHash));
         MultiHashElement mockMultiHashElement = Mockito.mock(MultiHashElement.class);
         when(mockMultiHashElement.getDataHash(hashAlgorithm)).thenReturn(nullDataHash);
         ResultHolder holder = new ResultHolder();

@@ -4,14 +4,15 @@ import com.guardtime.ksi.tlv.TLVElement;
 
 import org.junit.Test;
 
-import static java.util.Arrays.asList;
+import java.util.Collections;
+
 import static org.junit.Assert.assertEquals;
 
 public class TlvDocumentsManifestReferenceTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateDocumentsManifestReference() throws Exception {
-        TlvDocumentsManifest documentsManifest = new TlvDocumentsManifest(asList(TEST_DOCUMENT_HELLO_TEXT), DEFAULT_HASH_ALGORITHM_PROVIDER);
+        TlvDocumentsManifest documentsManifest = new TlvDocumentsManifest(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), DEFAULT_HASH_ALGORITHM_PROVIDER);
         TlvDocumentsManifestReference reference = new TlvDocumentsManifestReference(documentsManifest, TEST_FILE_NAME_TEST_TXT, DEFAULT_HASH_ALGORITHM_PROVIDER);
         assertEquals(DOCUMENTS_MANIFEST_REFERENCE_TYPE, reference.getElementType());
         assertEquals(DOCUMENTS_MANIFEST_TYPE, getMimeType(reference));

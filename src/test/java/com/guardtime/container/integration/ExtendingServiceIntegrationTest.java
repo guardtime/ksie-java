@@ -9,6 +9,7 @@ import com.guardtime.container.extending.ksi.PublicationKsiContainerSignatureExt
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.SignatureFactory;
+import com.guardtime.container.signature.ksi.KsiSignatureFactory;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.publication.PublicationData;
@@ -21,10 +22,23 @@ import org.mockito.Mockito;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTest {
+
+    @Test
+    public void testVerifyOriginalContainerIsExtended() throws Exception {
+        try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_MULTIPLE_SIGNATURES)){
+            KsiContainerSignatureExtendingPolicy policy = new KsiContainerSignatureExtendingPolicy(ksi);
+            ContainerSignatureExtender extender = new ContainerSignatureExtender(new KsiSignatureFactory(ksi), policy);
+            extender.extend(container);
+            ExtendedContainer extendedContainer = new ExtendedContainer(container);
+            assertTrue(extendedContainer.isFullyExtended());
+        }
+    }
 
     @Test
     public void testExtendingContainerWithValidAndInvalidSignatures()throws Exception {
@@ -33,6 +47,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
         try (Container container = getContainer(CONTAINER_WITH_MULTI_CONTENT_ONE_SIGNATURE_IS_INVALID)) {
             assertSignaturesExtendedStatus(container, false);
             ExtendedContainer extendedContainer = extender.extend(container);
+            assertFalse(extendedContainer.isFullyExtended());
             for (ExtendedSignatureContent content : extendedContainer.getSignatureContents()) {
                 if (content.getManifest().getRight().getSignatureReference().getUri().equals("META-INF/signature-1.ksi")) {
                     assertEquals(true, content.isExtended());
@@ -116,6 +131,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
             assertSignaturesExtendedStatus(container, false);
             ExtendedContainer extendedContainer = extender.extend(container);
             assertSignaturesExtendedStatus(extendedContainer, extendedStatusAfterExtending);
+            assertEquals(extendedStatusAfterExtending, extendedContainer.isFullyExtended());
         }
     }
 

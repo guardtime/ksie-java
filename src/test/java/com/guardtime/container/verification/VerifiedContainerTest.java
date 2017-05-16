@@ -20,7 +20,6 @@ import static org.mockito.Mockito.when;
 
 public class VerifiedContainerTest {
 
-
     @Test
     public void testWrappedMethodsProvideAccessToOriginals() {
         Container originalContainer = setUpMockedContainer();

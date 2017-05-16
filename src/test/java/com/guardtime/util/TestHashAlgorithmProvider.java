@@ -3,7 +3,7 @@ package com.guardtime.util;
 import com.guardtime.container.hash.HashAlgorithmProvider;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class TestHashAlgorithmProvider implements HashAlgorithmProvider {
@@ -13,15 +13,15 @@ public class TestHashAlgorithmProvider implements HashAlgorithmProvider {
     private HashAlgorithm signingHashAlgorithm;
 
     public TestHashAlgorithmProvider() throws Exception {
-        this.fileReferenceHashAlgorithms = Arrays.asList(HashAlgorithm.SHA2_256);
-        this.documentReferenceHashAlgorithms = Arrays.asList(HashAlgorithm.SHA2_256);
+        this.fileReferenceHashAlgorithms = Collections.singletonList(HashAlgorithm.SHA2_256);
+        this.documentReferenceHashAlgorithms = Collections.singletonList(HashAlgorithm.SHA2_256);
         this.annotationDataReferenceHashAlgorithm = HashAlgorithm.SHA2_256;
         this.signingHashAlgorithm = HashAlgorithm.SHA2_256;
     }
 
     public TestHashAlgorithmProvider(HashAlgorithm algorithm) throws Exception {
-        this.fileReferenceHashAlgorithms = Arrays.asList(algorithm);
-        this.documentReferenceHashAlgorithms = Arrays.asList(algorithm);
+        this.fileReferenceHashAlgorithms = Collections.singletonList(algorithm);
+        this.documentReferenceHashAlgorithms = Collections.singletonList(algorithm);
         this.annotationDataReferenceHashAlgorithm = algorithm;
         this.signingHashAlgorithm = algorithm;
     }

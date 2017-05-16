@@ -5,6 +5,7 @@ import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.EmptyContainerDocument;
+import com.guardtime.container.extending.ExtendedContainer;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.verification.ContainerVerifier;
 import com.guardtime.container.verification.VerifiedContainer;
@@ -40,6 +41,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -54,6 +56,24 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
                 packagingFactory
         );
         this.verifier = new ContainerVerifier(defaultPolicy);
+    }
+
+    @Test
+    public void testEveryContainerTypeVerifiesOk() throws Exception {
+        ContainerVerifier verifier = new ContainerVerifier(new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy()), packagingFactory));
+        try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_MULTIPLE_SIGNATURES)){
+            VerifiedContainer verifiedContainer = verifier.verify(container);
+            assertEquals(VerificationResult.OK, verifiedContainer.getVerificationResult());
+
+            ExtendedContainer extendedContainer = new ExtendedContainer(container);
+            assertFalse(extendedContainer.isFullyExtended());
+
+            VerifiedContainer verifiedExtendedContainer = verifier.verify(extendedContainer);
+            assertEquals(VerificationResult.OK, verifiedExtendedContainer.getVerificationResult());
+
+            VerifiedContainer verifiedVerifiedContainer = verifier.verify(verifiedExtendedContainer);
+            assertEquals(VerificationResult.OK, verifiedVerifiedContainer.getVerificationResult());
+        }
     }
 
     @Test

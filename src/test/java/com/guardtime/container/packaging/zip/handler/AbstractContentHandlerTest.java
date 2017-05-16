@@ -64,7 +64,7 @@ public abstract class AbstractContentHandlerTest {
         assertFalse(doc.getFileName().equals(requestedFileName));
         assertTrue(doc.getFileName().equals(unrequestedFileName));
         try(InputStream inputStream = doc.getInputStream()) {
-            Arrays.equals(unrequestedStreamContent.getBytes(StandardCharsets.UTF_8), toByteArray(inputStream));
+            assertTrue(Arrays.equals(unrequestedStreamContent.getBytes(StandardCharsets.UTF_8), toByteArray(inputStream)));
         }
     }
 

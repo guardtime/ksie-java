@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -39,7 +39,7 @@ public class ContainerSignatureExtenderTest extends AbstractContainerTest {
         SignatureContent mockSignatureContent = mock(SignatureContent.class);
         Manifest mockManifest = mock(Manifest.class);
         doReturn(mockSignature).when(mockSignatureContent).getContainerSignature();
-        doReturn(Arrays.asList(mockSignatureContent)).when(mockContainer).getSignatureContents();
+        doReturn(Collections.singletonList(mockSignatureContent)).when(mockContainer).getSignatureContents();
         doReturn(mock(SignatureReference.class)).when(mockManifest).getSignatureReference();
         doReturn(Pair.of("str", mockManifest)).when(mockSignatureContent).getManifest();
         return mockContainer;

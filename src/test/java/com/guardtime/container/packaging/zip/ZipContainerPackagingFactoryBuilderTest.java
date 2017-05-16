@@ -183,7 +183,7 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
     public void testCreateContainerWithExistingContainerAndMultipleDocumentsAndAnnotations() throws Exception {
         try (
                 Container container = createInternallyValidContainer(containerDocumentList, containerAnnotationList);
-                ContainerDocument streamContainerDocument = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_DOC);
+                ContainerDocument streamContainerDocument = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_DOC)
         ) {
             List<ContainerDocument> documentsList = new ArrayList<>();
             documentsList.add(TEST_DOCUMENT_HELLO_PDF);

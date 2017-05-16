@@ -5,9 +5,12 @@ import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
+import com.guardtime.container.extending.ExtendedContainer;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.exception.InvalidPackageException;
 import com.guardtime.container.util.Util;
+import com.guardtime.container.verification.VerifiedContainer;
+import com.guardtime.container.verification.result.ResultHolder;
 
 import org.junit.After;
 import org.junit.Before;
@@ -85,7 +88,7 @@ public class ContainerCloseableIntegrationTest extends AbstractCommonIntegration
         try (
                 ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(new byte[313]), "byte inputstream", "byte-input-stream.bis");
                 ContainerAnnotation annotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "content", "domain.com");
-                Container container = packagingFactory.create(existingContainer, Collections.singletonList(document), Collections.singletonList(annotation));
+                Container container = packagingFactory.create(existingContainer, Collections.singletonList(document), Collections.singletonList(annotation))
         ) {
             for (File doc : ksieTempFiles) {
                 if (isTempFile(doc)) {
@@ -172,6 +175,31 @@ public class ContainerCloseableIntegrationTest extends AbstractCommonIntegration
             }
             packagingFactory.create(container, Collections.singletonList(document), Collections.singletonList(annotation));
         }
+    }
+
+    @Test
+    public void testCloseSourceContainer() throws Exception {
+        Container container = getContainer();
+        VerifiedContainer verifiedContainer = new VerifiedContainer(container, new ResultHolder());
+        ExtendedContainer extendedContainer = new ExtendedContainer(container);
+        container.close();
+        assertFalse(anyKsieTempFiles());
+    }
+
+    @Test
+    public void testCloseVerifiedContainer() throws Exception {
+        Container container = getContainer();
+        VerifiedContainer verifiedContainer = new VerifiedContainer(container, new ResultHolder());
+        verifiedContainer.close();
+        assertFalse(anyKsieTempFiles());
+    }
+
+    @Test
+    public void testCloseExtendedContainer() throws Exception {
+        Container container = getContainer();
+        ExtendedContainer extendedContainer = new ExtendedContainer(container);
+        extendedContainer.close();
+        assertFalse(anyKsieTempFiles());
     }
 
     private boolean anyKsieTempFiles() {
