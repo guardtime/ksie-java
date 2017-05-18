@@ -77,6 +77,7 @@ public abstract class AbstractCommonIntegrationTest extends AbstractContainerTes
         signatureFactory = new KsiSignatureFactory(ksi);
         packagingFactory = new ZipContainerPackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
+                .enableInternalVerification()
                 .build();
 
     }
