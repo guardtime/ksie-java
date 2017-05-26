@@ -12,6 +12,7 @@ import com.guardtime.container.verification.VerifiedContainer;
 import com.guardtime.container.verification.VerifiedSignatureContent;
 import com.guardtime.container.verification.policy.DefaultVerificationPolicy;
 import com.guardtime.container.verification.policy.VerificationPolicy;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.SignatureResult;
 import com.guardtime.container.verification.result.VerificationResult;
@@ -56,6 +57,15 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
                 packagingFactory
         );
         this.verifier = new ContainerVerifier(defaultPolicy);
+    }
+
+    @Test
+    public void testVerifiedContainerWithEmptyResults() throws Exception {
+        try(Container container = getContainer(CONTAINER_WITH_NO_DOCUMENTS)){
+            VerifiedContainer verifiedContainer = new VerifiedContainer(container, new ResultHolder());
+            assertEquals(0, verifiedContainer.getResults().size());
+            assertEquals(VerificationResult.OK, verifiedContainer.getVerificationResult());
+        }
     }
 
     @Test
