@@ -23,11 +23,11 @@ import java.util.List;
 public class VerifiedContainer implements Container {
     private final VerificationResult aggregateResult;
     private final ResultHolder resultHolder;
-    private final Container container;
+    private final Container wrapedContainer;
     private List<VerifiedSignatureContent> verifiedSignatureContents;
 
     public VerifiedContainer(Container container, ResultHolder holder) {
-        this.container = container;
+        this.wrapedContainer = container;
         this.resultHolder = holder;
         this.aggregateResult = resultHolder.getAggregatedResult();
         wrapSignatureContents();
@@ -55,45 +55,45 @@ public class VerifiedContainer implements Container {
 
     @Override
     public void writeTo(OutputStream output) throws IOException {
-        container.writeTo(output);
+        wrapedContainer.writeTo(output);
     }
 
     @Override
     public MimeType getMimeType() {
-        return container.getMimeType();
+        return wrapedContainer.getMimeType();
     }
 
     @Override
     public List<UnknownDocument> getUnknownFiles() {
-        return container.getUnknownFiles();
+        return wrapedContainer.getUnknownFiles();
     }
 
     @Override
     public void close() throws Exception {
-        container.close();
+        wrapedContainer.close();
     }
 
     @Override
     public void add(SignatureContent content) throws ContainerMergingException {
-        container.add(content);
+        wrapedContainer.add(content);
         wrapSignatureContents();
     }
 
     @Override
     public void add(Container container) throws ContainerMergingException {
-        container.add(container);
+        wrapedContainer.add(container);
         wrapSignatureContents();
     }
 
     @Override
     public void addAll(Collection<? extends SignatureContent> contents) throws ContainerMergingException {
-        container.addAll(contents);
+        wrapedContainer.addAll(contents);
         wrapSignatureContents();
     }
 
     private void wrapSignatureContents() {
-        List<VerifiedSignatureContent> verifiedContents = new ArrayList<>(container.getSignatureContents().size());
-        for(SignatureContent content : container.getSignatureContents()) {
+        List<VerifiedSignatureContent> verifiedContents = new ArrayList<>(wrapedContainer.getSignatureContents().size());
+        for(SignatureContent content : wrapedContainer.getSignatureContents()) {
             verifiedContents.add(new VerifiedSignatureContent(content, resultHolder));
         }
         this.verifiedSignatureContents = verifiedContents;
