@@ -63,7 +63,7 @@ public interface ContainerPackagingFactory<C extends Container> {
      *                             {@link com.guardtime.container.signature.ContainerSignature}(s)
      * @param files                List of {@link ContainerDocument} to be added and signed. Can NOT be null.
      * @param annotations          List of {@link ContainerAnnotation} to be added and signed. Can be null.
-     * @return A new {@link Container} which contains everything from {@param existingContainer} and the added documents
+     * @return A new {@link Container} which contains everything from existingContainer and the added documents
      * and annotations and a signature to cover them.
      * @throws InvalidPackageException When the input data can not be processed or signing fails.
      */

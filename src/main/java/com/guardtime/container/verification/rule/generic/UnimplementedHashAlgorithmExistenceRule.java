@@ -33,7 +33,7 @@ import static com.guardtime.container.verification.result.VerificationResult.OK;
 
 /**
  * Rule that checks if there are any {@link DataHash}es that use a {@link HashAlgorithm} which has state
- * {@link HashAlgorithm#status#NOT_IMPLEMENTED}
+ * {@link HashAlgorithm#status} NOT_IMPLEMENTED
  */
 public class UnimplementedHashAlgorithmExistenceRule extends AbstractRule<FileReference> {
 

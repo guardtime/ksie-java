@@ -6,7 +6,7 @@ The checkpoints of the blockchain, published in newspapers and electronic media,
 without the need to trust any system. There are many applications for KSI, a classical example is signing of any type of
 logs - system logs, financial transactions, call records, etc. For more, see https://guardtime.com
 
-KSI Envelope is designed to contain data, meta-data and KSI signatures. The signed data may be detached from the envelope or
+KSI Envelope (KSIE) is designed to contain data, meta-data and KSI signatures. The signed data may be detached from the envelope or
 attached to the envelope itself. The KSI Envelope supports two kinds of custom meta-data: meta-data that can be removed and
 meta-data that can not be removed from it without affecting the verification result.
 
