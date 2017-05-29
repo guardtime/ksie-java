@@ -64,11 +64,11 @@ public class ZipContainerTest extends AbstractContainerTest {
             assertEquals(1, container.getSignatureContents().size());
             try (Container newContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<ContainerAnnotation>());
                  ByteArrayInputStream input = new ByteArrayInputStream("auh".getBytes(StandardCharsets.UTF_8));
-                 ContainerDocument containerDocument = new StreamContainerDocument(input, "text/plain", "someTestFile.txt");
-                 Container localContainer = packagingFactory.addSignature(newContainer, singletonList(containerDocument), new ArrayList<ContainerAnnotation>())
+                 ContainerDocument containerDocument = new StreamContainerDocument(input, "text/plain", "someTestFile.txt")
             ) {
-                int expected = localContainer.getSignatureContents().size() + 1;
-                container.add(localContainer);
+                packagingFactory.addSignature(newContainer, singletonList(containerDocument), new ArrayList<ContainerAnnotation>());
+                int expected = newContainer.getSignatureContents().size() + 1;
+                container.add(newContainer);
                 assertEquals(expected, container.getSignatureContents().size());
             }
         }

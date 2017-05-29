@@ -131,9 +131,8 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
              Container incContainer = getContainer(CONTAINER_WITH_RANDOM_INCREMENTING_INDEXES);
              ContainerDocument document2 = new StreamContainerDocument(new ByteArrayInputStream("".getBytes()), "textDoc", "2-" + Long.toString(new Date().getTime()))) {
             uuidContainer.add(incContainer);
-            try (Container newContainer = packagingFactory.addSignature(uuidContainer, singletonList(document2), singletonList(STRING_CONTAINER_ANNOTATION))) {
-                assertEquals(newContainer.getSignatureContents().size(), 4);
-            }
+            packagingFactory.addSignature(uuidContainer, singletonList(document2), singletonList(STRING_CONTAINER_ANNOTATION));
+            assertEquals(uuidContainer.getSignatureContents().size(), 4);
         }
     }
 
@@ -161,9 +160,8 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
              Container incContainer = incPackagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), singletonList(STRING_CONTAINER_ANNOTATION));
              ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream("".getBytes()), "textDoc", Long.toString(new Date().getTime()))) {
             incContainer.add(uuidContainer);
-            try (Container newContainer = incPackagingFactory.addSignature(incContainer, singletonList(document), singletonList(STRING_CONTAINER_ANNOTATION))) {
-                assertEquals(newContainer.getSignatureContents().size(), 3);
-            }
+            incPackagingFactory.addSignature(incContainer, singletonList(document), singletonList(STRING_CONTAINER_ANNOTATION));
+            assertEquals(incContainer.getSignatureContents().size(), 3);
         }
     }
 

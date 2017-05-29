@@ -130,7 +130,7 @@ public class SignatureContent implements AutoCloseable {
                 removed.close();
                 return detached;
             } catch (Exception e) {
-                throw new ParsingStoreException("Failed to separate document data from container data store.", e);
+                throw new ParsingStoreException("Failed to detach document data from container data store.", e);
             }
         }
         return removed;

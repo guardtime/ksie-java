@@ -163,7 +163,7 @@ public class ContainerBuilderTest extends AbstractContainerTest {
     @Test
     public void testCreateWithExistingContainerWithMultipleDocumentsWithSameFileName_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Multiple documents with same name found!");
+        expectedException.expectMessage("Found multiple documents with same name!");
         try (
                 ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
                 ContainerDocument streamContainerDocument = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-HAHA".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)

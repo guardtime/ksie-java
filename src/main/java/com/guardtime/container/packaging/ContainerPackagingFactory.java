@@ -31,6 +31,7 @@ import com.guardtime.container.util.Util;
 import com.guardtime.container.verification.ContainerVerifier;
 import com.guardtime.container.verification.VerifiedContainer;
 import com.guardtime.container.verification.policy.InternalVerificationPolicy;
+import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.ksi.hashing.DataHash;
 
@@ -136,17 +137,15 @@ public class ContainerPackagingFactory {
      *                             {@link com.guardtime.container.signature.ContainerSignature}(s)
      * @param files                List of {@link ContainerDocument} to be added and signed. Can NOT be null.
      * @param annotations          List of {@link ContainerAnnotation} to be added and signed. Can be null.
-     * @return The passed in {@param existingContainer} that now contains a new {@link SignatureContent}.
      * @throws InvalidPackageException When the input data can not be processed or signing fails.
      * @throws ContainerMergingException When there are issues adding the newly created {@link SignatureContent} to {@param existingContainer}.
      */
-    public Container addSignature(Container existingContainer, List<ContainerDocument> files, List<ContainerAnnotation> annotations)
+    public void addSignature(Container existingContainer, List<ContainerDocument> files, List<ContainerAnnotation> annotations)
             throws InvalidPackageException, ContainerMergingException {
         Util.notNull(existingContainer, "Container");
         SignatureContent signatureContent = verifyAndSign(files, annotations, existingContainer);
         existingContainer.add(signatureContent);
         verifyContainer(existingContainer);
-        return existingContainer;
     }
 
     private SignatureContent verifyAndSign(List<ContainerDocument> files, List<ContainerAnnotation> annotations,
@@ -191,18 +190,26 @@ public class ContainerPackagingFactory {
             } catch (Exception e) {
                 logger.warn("Failed to clean up after created container that did not pass internal verification.", e);
             }
-            throw new InvalidPackageException("Created Container does not pass internal verification");
+            for(RuleVerificationResult res : result.getResults()) {
+                if(res.getVerificationResult().equals(VerificationResult.NOK)) {
+                    logger.error("Failed rule '{}' for '{}' ", res.getRuleName(), res.getTestedElementPath());
+                }
+                if(res.getVerificationResult().equals(VerificationResult.WARN)) {
+                    logger.warn("Failed rule '{}' for '{}' ", res.getRuleName(), res.getTestedElementPath());
+                }
+            }
+            throw new InvalidPackageException("Created Container did not pass internal verification");
         }
     }
 
     private void verifyNoDuplicateDocumentNames(Set<ContainerDocument> documents) throws IllegalArgumentException {
-        List<String> documentNameList = new LinkedList<>();
+        Set<String> uniqueDocumentNames = new HashSet<>();
         for (ContainerDocument doc : documents) {
-            documentNameList.add(doc.getFileName());
+            uniqueDocumentNames.add(doc.getFileName());
         }
 
-        if (documentNameList.size() > new HashSet<>(documentNameList).size()) {
-            throw new IllegalArgumentException("Multiple documents with same name found!");
+        if (uniqueDocumentNames.size() < documents.size()) {
+            throw new IllegalArgumentException("Found multiple documents with same name!");
         }
     }
 

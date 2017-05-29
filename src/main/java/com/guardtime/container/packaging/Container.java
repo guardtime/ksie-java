@@ -4,6 +4,7 @@ import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.packaging.exception.ContainerMergingException;
 import com.guardtime.container.packaging.parsing.store.ParsingStore;
 import com.guardtime.container.packaging.parsing.store.ParsingStoreException;
+import com.guardtime.container.util.Util;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -36,6 +37,8 @@ public class Container implements AutoCloseable {
 
     public Container(List<SignatureContent> contents, List<UnknownDocument> unknownFiles, MimeType mimeType,
                      ContainerWriter writer, ParsingStore store) {
+        Util.notNull(contents, "Signature contents");
+        Util.notNull(unknownFiles, "Unknown files");
         this.signatureContents.addAll(contents);
         this.unknownFiles.addAll(unknownFiles);
         this.mimeType = mimeType;

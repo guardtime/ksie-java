@@ -82,7 +82,7 @@ List<ContainerAnnotation> annotations;  // Can be empty list
 /* initialize and fill documents and annotations lists
 ...
 */
-Container signedContainer = packagingFactory.addSignature(parsedContainer, documents, annotations);
+packagingFactory.addSignature(parsedContainer, documents, annotations);
 ```
 
 ## Extending signatures in a container

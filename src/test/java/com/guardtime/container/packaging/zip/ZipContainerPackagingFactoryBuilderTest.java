@@ -89,7 +89,8 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
         when(mockSignature.getSignedDataHash()).thenReturn(nullDataHash);
         when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mockSignature);
         if (existingContainer != null) {
-            return packagingFactory.addSignature(existingContainer, documents, annotations);
+            packagingFactory.addSignature(existingContainer, documents, annotations);
+            return existingContainer;
         }
         return packagingFactory.create(documents, annotations);
     }
@@ -208,7 +209,7 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
     @Test
     public void testCreateContainerWithMultipleDocumentsWithSameName_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Multiple documents with same name found!");
+        expectedException.expectMessage("Found multiple documents with same name!");
 
         List<ContainerDocument> containerDocuments = Arrays.asList(
                 (ContainerDocument) new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT),
@@ -227,7 +228,7 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
     @Test
     public void testCreateVerifiesInvalidContainer_NOK() throws Exception {
         expectedException.expect(InvalidPackageException.class);
-        expectedException.expectMessage("Created Container does not pass internal verification");
+        expectedException.expectMessage("Created Container did not pass internal verification");
         ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().withSignatureFactory(mockedSignatureFactory).build();
         packagingFactory.create(containerDocumentList, containerAnnotationList);
     }
@@ -246,7 +247,7 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
     @Test
     public void testCreateWithExistingContainerVerifiesInvalidContainer_NOK() throws Exception {
         expectedException.expect(InvalidPackageException.class);
-        expectedException.expectMessage("Created Container does not pass internal verification");
+        expectedException.expectMessage("Created Container did not pass internal verification");
         ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().withSignatureFactory(mockedSignatureFactory).build();
         Container mockContainer = Mockito.mock(Container.class);
         when(mockContainer.getMimeType()).thenReturn(new MimeTypeEntry("MIMETYPE", "Ploomimoos".getBytes(StandardCharsets.UTF_8)));
@@ -256,7 +257,7 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
     @Test
     public void testCreateContainerWithExistingContainerWithDocumentsWithSameName_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Multiple documents with same name found!");
+        expectedException.expectMessage("Found multiple documents with same name!");
         try (
                 ContainerDocument containerDocument = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
                 ContainerDocument streamContainerDocument = new StreamContainerDocument(new ByteArrayInputStream("MoreImportantDocument-0411".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)
