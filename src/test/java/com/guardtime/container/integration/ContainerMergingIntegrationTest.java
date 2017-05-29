@@ -259,85 +259,64 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
 
     @Test
     public void testAddContentToVerifiedContainer() throws Exception {
-        try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT)) {
-            VerifiedContainer verifiedContainer = new VerifiedContainer(container, new ResultHolder());
-
-            try (Container otherContainer = getContainerIgnoreExceptions(CONTAINER_WITH_NO_DOCUMENTS)) {
-                verifiedContainer.add(otherContainer.getSignatureContents().get(0));
-
-                assertEquals(2, verifiedContainer.getSignatureContents().size());
-                assertEquals(container.getSignatureContents().size(), verifiedContainer.getSignatureContents().size());
-            }
+        try (VerifiedContainer verifiedContainer = new VerifiedContainer(getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT), new ResultHolder())) {
+            addContent(verifiedContainer, 2);
         }
     }
 
     @Test
     public void testAddContainerToVerifiedContainer() throws Exception {
-        try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT)) {
-            VerifiedContainer verifiedContainer = new VerifiedContainer(container, new ResultHolder());
-
-            try (Container otherContainer = getContainerIgnoreExceptions(CONTAINER_WITH_NO_DOCUMENTS)) {
-                verifiedContainer.add(otherContainer);
-
-                assertEquals(2, verifiedContainer.getSignatureContents().size());
-                assertEquals(container.getSignatureContents().size(), verifiedContainer.getSignatureContents().size());
-            }
+        try (VerifiedContainer verifiedContainer = new VerifiedContainer(getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT), new ResultHolder())) {
+            addContainer(verifiedContainer, 2);
         }
     }
 
     @Test
     public void testAddAllContentsToVerifiedContainer() throws Exception {
-        try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT)) {
-            VerifiedContainer verifiedContainer = new VerifiedContainer(container, new ResultHolder());
-
-            try (Container otherContainer = getContainerIgnoreExceptions(CONTAINER_WITH_MIXED_INDEX_TYPES_IN_CONTENTS)) {
-                verifiedContainer.add(otherContainer);
-
-                assertEquals(4, verifiedContainer.getSignatureContents().size());
-                assertEquals(container.getSignatureContents().size(), verifiedContainer.getSignatureContents().size());
-            }
+        try (VerifiedContainer verifiedContainer = new VerifiedContainer(getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT), new ResultHolder())) {
+            addAllContents(verifiedContainer, 4);
         }
     }
 
     @Test
     public void testAddContentToExtendedContainer() throws Exception {
-        try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT)) {
-            ExtendedContainer extendedContainer = new ExtendedContainer(container);
-
-            try (Container otherContainer = getContainerIgnoreExceptions(CONTAINER_WITH_NO_DOCUMENTS)) {
-                extendedContainer.add(otherContainer.getSignatureContents().get(0));
-
-                assertEquals(2, extendedContainer.getSignatureContents().size());
-                assertEquals(container.getSignatureContents().size(), extendedContainer.getSignatureContents().size());
-            }
+        try (ExtendedContainer extendedContainer = new ExtendedContainer(getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT))) {
+            addContent(extendedContainer, 2);
         }
     }
 
     @Test
     public void testAddContainerToExtendedContainer() throws Exception {
-        try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT)) {
-            ExtendedContainer extendedContainer = new ExtendedContainer(container);
-
-            try (Container otherContainer = getContainerIgnoreExceptions(CONTAINER_WITH_NO_DOCUMENTS)) {
-                extendedContainer.add(otherContainer);
-
-                assertEquals(2, extendedContainer.getSignatureContents().size());
-                assertEquals(container.getSignatureContents().size(), extendedContainer.getSignatureContents().size());
-            }
+        try (ExtendedContainer extendedContainer = new ExtendedContainer(getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT))) {
+            addContainer(extendedContainer, 2);
         }
     }
 
     @Test
     public void testAddAllContentsToExtendedContainer() throws Exception {
-        try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT)) {
-            ExtendedContainer extendedContainer = new ExtendedContainer(container);
+        try (ExtendedContainer extendedContainer = new ExtendedContainer(getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT))) {
+            addAllContents(extendedContainer, 4);
+        }
+    }
 
-            try (Container otherContainer = getContainerIgnoreExceptions(CONTAINER_WITH_MIXED_INDEX_TYPES_IN_CONTENTS)) {
-                extendedContainer.add(otherContainer);
+    private void addContent(Container target, int expectedSize) throws Exception {
+        try (Container source = getContainerIgnoreExceptions(CONTAINER_WITH_NO_DOCUMENTS)) {
+            target.add(source.getSignatureContents().get(0));
+            assertEquals(expectedSize, target.getSignatureContents().size());
+        }
+    }
 
-                assertEquals(4, extendedContainer.getSignatureContents().size());
-                assertEquals(container.getSignatureContents().size(), extendedContainer.getSignatureContents().size());
-            }
+    private void addAllContents(Container target, int expectedSize) throws Exception {
+        try (Container source = getContainerIgnoreExceptions(CONTAINER_WITH_MIXED_INDEX_TYPES_IN_CONTENTS)) {
+            target.addAll(source.getSignatureContents());
+            assertEquals(expectedSize, target.getSignatureContents().size());
+        }
+    }
+
+    private void addContainer(Container target, int expectedSize) throws Exception {
+        try (Container source = getContainerIgnoreExceptions(CONTAINER_WITH_NO_DOCUMENTS)) {
+            target.add(source);
+            assertEquals(expectedSize, target.getSignatureContents().size());
         }
     }
 
