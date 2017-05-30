@@ -22,7 +22,6 @@ import org.mockito.Mockito;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
@@ -47,8 +46,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
         try (Container container = getContainer(CONTAINER_WITH_MULTI_CONTENT_ONE_SIGNATURE_IS_INVALID)) {
             assertSignaturesExtendedStatus(container, false);
             ExtendedContainer extendedContainer = extender.extend(container);
-            assertFalse(extendedContainer.isFullyExtended());
-            for (ExtendedSignatureContent content : extendedContainer.getSignatureContents()) {
+            for (ExtendedSignatureContent content : extendedContainer.getExtendedSignatureContents()) {
                 if (content.getManifest().getRight().getSignatureReference().getUri().equals("META-INF/signature-1.ksi")) {
                     assertEquals(true, content.isExtended());
                 } else if (content.getManifest().getRight().getSignatureReference().getUri().equals("META-INF/signature-01-02-03-04-05.ksi")) {

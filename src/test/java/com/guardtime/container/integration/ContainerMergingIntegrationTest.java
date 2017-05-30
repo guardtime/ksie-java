@@ -1,5 +1,6 @@
 package com.guardtime.container.integration;
 
+import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.extending.ExtendedContainer;
@@ -21,7 +22,6 @@ import com.guardtime.container.verification.result.ResultHolder;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -77,7 +77,7 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
     @Test
     public void testMergeParsedContainerWithCreatedContainer() throws Exception {
         try (Container parsedContainer = getContainer(CONTAINER_WITH_RANDOM_UUID_INDEXES);
-             Container newContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new LinkedList<>())) {
+             Container newContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new LinkedList<ContainerAnnotation>())) {
             int expectedSignatureContentsSize =
                     parsedContainer.getSignatureContents().size() + newContainer.getSignatureContents().size();
             parsedContainer.add(newContainer);
@@ -134,9 +134,8 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
              Container incContainer = getContainer(CONTAINER_WITH_RANDOM_INCREMENTING_INDEXES);
              ContainerDocument document2 = new StreamContainerDocument(new ByteArrayInputStream("".getBytes()), "textDoc", "2-" + Long.toString(new Date().getTime()))) {
             uuidContainer.add(incContainer);
-            try (Container newContainer = packagingFactory.create(uuidContainer, singletonList(document2), singletonList(STRING_CONTAINER_ANNOTATION))) {
-                assertEquals(newContainer.getSignatureContents().size(), 4);
-            }
+            packagingFactory.addSignature(uuidContainer, singletonList(document2), singletonList(STRING_CONTAINER_ANNOTATION));
+            assertEquals(uuidContainer.getSignatureContents().size(), 4);
         }
     }
 
@@ -164,9 +163,8 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
              Container incContainer = incPackagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), singletonList(STRING_CONTAINER_ANNOTATION));
              ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream("".getBytes()), "textDoc", Long.toString(new Date().getTime()))) {
             incContainer.add(uuidContainer);
-            try (Container newContainer = incPackagingFactory.create(incContainer, singletonList(document), singletonList(STRING_CONTAINER_ANNOTATION))) {
-                assertEquals(newContainer.getSignatureContents().size(), 3);
-            }
+            incPackagingFactory.addSignature(incContainer, singletonList(document), singletonList(STRING_CONTAINER_ANNOTATION));
+            assertEquals(incContainer.getSignatureContents().size(), 3);
         }
     }
 
@@ -240,18 +238,16 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
         mergeContainers(CONTAINERS_FOR_MIX_CONFLICT_2);
     }
 
-    @Ignore //TODO-77
     @Test
     public void testMergeContainersWithExactSameDocument() throws Exception {
-        try (Container container = mergeContainers(CONTAINERS_FOR_SAME_DOCUMENT)) {
+        try (Container container = mergeContainersUnclosed(CONTAINERS_FOR_SAME_DOCUMENT)) {
             assertEquals(2, container.getSignatureContents().size());
         }
     }
 
-    @Ignore //TODO-77
     @Test
     public void testMergeContainerWithExactSameContainer() throws Exception {
-        try (Container container = mergeContainers(CONTAINERS_IDENTICAL)) {
+        try (Container container = mergeContainersUnclosed(CONTAINERS_IDENTICAL)) {
             assertEquals(2, container.getSignatureContents().size());
             assertSignatureContentsCount(container, 1);
         }
@@ -320,12 +316,16 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
         }
     }
 
-    private Container mergeContainers(String[] containers) throws Exception {
-        try (Container container1 = getContainer(containers[0]);
-             Container container2 = getContainer(containers[1])) {
+    private void mergeContainers(String[] containers) throws Exception {
+        mergeContainersUnclosed(containers).close();
+    }
+
+    private Container mergeContainersUnclosed(String[] containers) throws Exception {
+        Container container1 = getContainer(containers[0]);
+        try (Container container2 = getContainer(containers[1])) {
             container1.add(container2);
-            return container1;
         }
+        return container1;
     }
 
     private SignatureContent createSignatureContent(ContainerDocument existingDocument) throws Exception {
@@ -337,7 +337,7 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
                     UUID.randomUUID().toString()
             );
         }
-        try (Container temp = packagingFactory.create(singletonList(containerDocument), new LinkedList<>())) {
+        try (Container temp = packagingFactory.create(singletonList(containerDocument), new LinkedList<ContainerAnnotation>())) {
             return temp.getSignatureContents().get(0);
         }
     }

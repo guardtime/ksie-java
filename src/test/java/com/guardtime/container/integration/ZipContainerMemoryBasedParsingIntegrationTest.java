@@ -2,8 +2,8 @@ package com.guardtime.container.integration;
 
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
-import com.guardtime.container.packaging.parsing.MemoryBasedParsingStoreFactory;
-import com.guardtime.container.packaging.parsing.ParsingStoreFactory;
+import com.guardtime.container.packaging.parsing.store.MemoryBasedParsingStoreFactory;
+import com.guardtime.container.packaging.parsing.store.ParsingStoreFactory;
 import com.guardtime.container.util.Util;
 
 import org.junit.Before;

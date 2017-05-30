@@ -79,7 +79,8 @@ public class ContainerBuilder {
         if (existingContainer == null) {
             container = packagingFactory.create(documents, annotations);
         } else {
-            container = packagingFactory.create(existingContainer, documents, annotations);
+            packagingFactory.addSignature(existingContainer, documents, annotations);
+            container = existingContainer;
         }
         documents.clear();
         annotations.clear();

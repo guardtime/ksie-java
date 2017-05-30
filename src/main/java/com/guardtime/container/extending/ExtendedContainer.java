@@ -1,13 +1,9 @@
 package com.guardtime.container.extending;
 
-import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.packaging.Container;
-import com.guardtime.container.packaging.MimeType;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.exception.ContainerMergingException;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,12 +13,12 @@ import java.util.List;
  * Wrapper for a {@link Container} that has been processed by {@link ContainerSignatureExtender}.
  * Provides helper methods to view extending status.
  */
-public class ExtendedContainer implements Container {
-    private final Container wrappedContainer;
+public class ExtendedContainer extends Container {
+
     private List<ExtendedSignatureContent> extendedSignatureContents;
 
     public ExtendedContainer(Container original) {
-        this.wrappedContainer = original;
+        super(original);
         wrapSignatureContents();
     }
 
@@ -38,55 +34,34 @@ public class ExtendedContainer implements Container {
         return true;
     }
 
-    @Override
-    public List<ExtendedSignatureContent> getSignatureContents() {
+    public List<ExtendedSignatureContent> getExtendedSignatureContents() {
         return Collections.unmodifiableList(extendedSignatureContents);
     }
 
     @Override
-    public void writeTo(OutputStream output) throws IOException {
-        wrappedContainer.writeTo(output);
-    }
-
-    @Override
-    public MimeType getMimeType() {
-        return wrappedContainer.getMimeType();
-    }
-
-    @Override
-    public List<UnknownDocument> getUnknownFiles() {
-        return wrappedContainer.getUnknownFiles();
-    }
-
-    @Override
-    public void close() throws Exception {
-        wrappedContainer.close();
-    }
-
-    @Override
     public void add(SignatureContent content) throws ContainerMergingException {
-        wrappedContainer.add(content);
+        super.add(content);
         wrapSignatureContents();
     }
 
     @Override
     public void add(Container container) throws ContainerMergingException {
-        wrappedContainer.add(container);
+        super.add(container);
         wrapSignatureContents();
     }
 
     @Override
-    public void addAll(Collection<? extends SignatureContent> contents) throws ContainerMergingException {
-        wrappedContainer.addAll(contents);
+    public void addAll(Collection<SignatureContent> contents) throws ContainerMergingException {
+        super.addAll(contents);
         wrapSignatureContents();
     }
 
     private void wrapSignatureContents() {
-        List<ExtendedSignatureContent> extendedContents = new ArrayList<>(wrappedContainer.getSignatureContents().size());
-        for (SignatureContent content : wrappedContainer.getSignatureContents()) {
+        List<SignatureContent> originalSignatureContents = getSignatureContents();
+        List<ExtendedSignatureContent> extendedContents = new ArrayList<>(originalSignatureContents.size());
+        for (SignatureContent content : originalSignatureContents) {
             extendedContents.add(new ExtendedSignatureContent(content));
         }
         this.extendedSignatureContents = extendedContents;
     }
-
 }
