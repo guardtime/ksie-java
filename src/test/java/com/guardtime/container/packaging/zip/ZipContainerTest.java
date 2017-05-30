@@ -1,6 +1,7 @@
 package com.guardtime.container.packaging.zip;
 
 import com.guardtime.container.AbstractContainerTest;
+import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
@@ -29,7 +30,7 @@ public class ZipContainerTest extends AbstractContainerTest {
                 build();
         try (Container container = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_CONTAINER_ANNOTATION))) {
             assertEquals(1, container.getSignatureContents().size());
-            try (Container newContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<>())) {
+            try (Container newContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<ContainerAnnotation>())) {
                 container.add(newContainer.getSignatureContents().get(0));
                 assertEquals(2, container.getSignatureContents().size());
             }
@@ -45,7 +46,7 @@ public class ZipContainerTest extends AbstractContainerTest {
                 build();
         try (Container container = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_CONTAINER_ANNOTATION))) {
             assertEquals(1, container.getSignatureContents().size());
-            try (Container newContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<>())) {
+            try (Container newContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<ContainerAnnotation>())) {
                 container.add(newContainer);
                 assertEquals(2, container.getSignatureContents().size());
             }
@@ -61,13 +62,14 @@ public class ZipContainerTest extends AbstractContainerTest {
                 build();
         try (Container container = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_CONTAINER_ANNOTATION))) {
             assertEquals(1, container.getSignatureContents().size());
-            try (Container newContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<>());
+            try (Container newContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<ContainerAnnotation>());
                  ByteArrayInputStream input = new ByteArrayInputStream("auh".getBytes(StandardCharsets.UTF_8));
-                 StreamContainerDocument containerDocument = new StreamContainerDocument(input, "text/plain", "someTestFile.txt");
-                 Container localContainer = packagingFactory.create(newContainer, singletonList(containerDocument), new ArrayList<>())
+                 ContainerDocument containerDocument = new StreamContainerDocument(input, "text/plain", "someTestFile.txt")
             ) {
-                container.add(localContainer);
-                assertEquals(localContainer.getSignatureContents().size() + 1, container.getSignatureContents().size());
+                packagingFactory.addSignature(newContainer, singletonList(containerDocument), new ArrayList<ContainerAnnotation>());
+                int expected = newContainer.getSignatureContents().size() + 1;
+                container.add(newContainer);
+                assertEquals(expected, container.getSignatureContents().size());
             }
         }
     }
@@ -83,7 +85,7 @@ public class ZipContainerTest extends AbstractContainerTest {
                 build();
         try (Container container = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_CONTAINER_ANNOTATION))) {
             assertEquals(1, container.getSignatureContents().size());
-            try (Container newContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<>())) {
+            try (Container newContainer = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<ContainerAnnotation>())) {
                 container.add(newContainer.getSignatureContents().get(0));
             }
         }
@@ -108,7 +110,7 @@ public class ZipContainerTest extends AbstractContainerTest {
                     TEST_DOCUMENT_HELLO_PDF.getMimeType(),
                     TEST_DOCUMENT_HELLO_PDF.getFileName()
             );
-                 Container newContainer = packagingFactory.create(singletonList(clashingDocument), new ArrayList<>())
+                 Container newContainer = packagingFactory.create(singletonList(clashingDocument), new ArrayList<ContainerAnnotation>())
             ) {
                 container.add(newContainer.getSignatureContents().get(0));
             }

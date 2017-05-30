@@ -30,7 +30,7 @@ public class ExtendedContainerTest {
     @Test
     public void testSignatureContentsAreWrapped() {
         ExtendedContainer extendedContainer = new ExtendedContainer(setUpMockedContainer());
-        for(SignatureContent content : extendedContainer.getSignatureContents()) {
+        for(SignatureContent content : extendedContainer.getExtendedSignatureContents()) {
             assertTrue(content instanceof ExtendedSignatureContent);
         }
     }
