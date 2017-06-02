@@ -27,6 +27,8 @@ import com.guardtime.container.packaging.parsing.store.ParsingStoreFactory;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -133,10 +135,10 @@ public class SignatureContentHandler {
         private ContainerDocument fetchDocumentFromHandler(FileReference reference) {
             if (invalidReference(reference)) return null;
             String documentUri = reference.getUri();
-            try {
-                parsingStore.store(documentUri, documentHandler.get(documentUri));
+            try (InputStream stream = documentHandler.get(documentUri)) {
+                parsingStore.store(documentUri, stream);
                 return new ParsedContainerDocument(parsingStore, documentUri, reference.getMimeType(), documentUri);
-            } catch (ContentParsingException | ParsingStoreException e) {
+            } catch (ContentParsingException | ParsingStoreException | IOException e) {
                 // either removed or was never present in the first place, verifier will decide
                 return new EmptyContainerDocument(documentUri, reference.getMimeType(), reference.getHashList());
             }
@@ -173,23 +175,23 @@ public class SignatureContentHandler {
         }
 
         private Pair<String, ContainerAnnotation> getContainerAnnotation(FileReference manifestReference, SingleAnnotationManifest singleAnnotationManifest) {
-            try {
-                ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getMimeType());
-                if (type == null) {
-                    String message = String.format(
-                            "Failed to parse annotation for '%s'. Reason: Invalid annotation type: '%s'",
-                            manifestReference.getUri(),
-                            manifestReference.getMimeType()
-                    );
-                    exceptions.add(new ContentParsingException(message));
-                    return null;
-                }
-                AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
-                String uri = annotationDataReference.getUri();
-                parsingStore.store(uri, annotationContentHandler.get(uri));
+            ContainerAnnotationType type = ContainerAnnotationType.fromContent(manifestReference.getMimeType());
+            if (type == null) {
+                String message = String.format(
+                        "Failed to parse annotation for '%s'. Reason: Invalid annotation type: '%s'",
+                        manifestReference.getUri(),
+                        manifestReference.getMimeType()
+                );
+                exceptions.add(new ContentParsingException(message));
+                return null;
+            }
+            AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
+            String uri = annotationDataReference.getUri();
+            try (InputStream stream = annotationContentHandler.get(uri)) {
+                parsingStore.store(uri, stream);
                 ContainerAnnotation annotation = new ParsedContainerAnnotation(parsingStore, uri, annotationDataReference.getDomain(), type);
                 return Pair.of(uri, annotation);
-            } catch (ContentParsingException | ParsingStoreException e) {
+            } catch (ContentParsingException | ParsingStoreException | IOException e) {
                 exceptions.add(e);
                 return null;
             }

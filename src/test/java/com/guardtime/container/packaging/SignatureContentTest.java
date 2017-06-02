@@ -17,6 +17,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,9 +40,11 @@ public class SignatureContentTest extends AbstractContainerTest {
         assertTrue(testable.attachDetachedDocument(TEST_FILE_NAME_TEST_DOC, new ByteArrayInputStream(bytes)));
         ContainerDocument reAttachedDocument = testable.getDocuments().get(TEST_FILE_NAME_TEST_DOC);
         assertFalse(reAttachedDocument instanceof EmptyContainerDocument);
-        assertNotNull(reAttachedDocument.getInputStream());
-        byte[] documentBytes = Util.toByteArray(reAttachedDocument.getInputStream());
-        assertTrue(Arrays.equals(bytes, documentBytes));
+        try (InputStream inputStream = reAttachedDocument.getInputStream()) {
+            assertNotNull(inputStream);
+            byte[] documentBytes = Util.toByteArray(inputStream);
+            assertTrue(Arrays.equals(bytes, documentBytes));
+        }
     }
 
     @Test

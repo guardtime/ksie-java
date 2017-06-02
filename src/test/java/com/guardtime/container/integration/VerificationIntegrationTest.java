@@ -292,6 +292,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     public void testAttachDocumentAndVerify_VerificationSuccessful() throws Exception {
         VerifiedContainer verifiedContainer = null;
         ContainerDocument detached = null;
+        InputStream inputStream = null;
         try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT)) {
             SignatureContent content = container.getSignatureContents().get(0);
             String documentName = content.getDocuments().get(content.getDocuments().keySet().iterator().next()).getFileName();
@@ -303,13 +304,18 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             verifiedContainer = verifier.verify(container);
             assertEquals(VerificationResult.NOK, verifiedContainer.getVerificationResult());
 
-            boolean added = content.attachDetachedDocument(detached.getFileName(), detached.getInputStream());
+            inputStream = detached.getInputStream();
+            boolean added = content.attachDetachedDocument(detached.getFileName(), inputStream);
             assertTrue(added);
             verifiedContainer = verifier.verify(container);
             assertEquals(VerificationResult.OK, verifiedContainer.getVerificationResult());
-            added = content.attachDetachedDocument(detached.getFileName(), detached.getInputStream());
+            added = content.attachDetachedDocument(detached.getFileName(), inputStream);
             assertFalse(added);
         } finally {
+            if(inputStream != null) {
+                inputStream.close();
+            }
+
             if(detached != null) {
                 detached.close();
             }

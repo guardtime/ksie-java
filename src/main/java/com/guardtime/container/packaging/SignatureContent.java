@@ -125,8 +125,8 @@ public class SignatureContent implements AutoCloseable {
         }
         documents.put(path, new EmptyContainerDocument(removed.getFileName(), removed.getMimeType(), removedDocumentHashes));
         if (removed instanceof ParsedContainerDocument) {
-            try {
-                ContainerDocument detached = new StreamContainerDocument(removed.getInputStream(), removed.getMimeType(), removed.getFileName());
+            try (InputStream inputStream = removed.getInputStream()) {
+                ContainerDocument detached = new StreamContainerDocument(inputStream, removed.getMimeType(), removed.getFileName());
                 removed.close();
                 return detached;
             } catch (Exception e) {

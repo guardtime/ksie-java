@@ -93,8 +93,12 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
         @Override
         public void transferFrom(ParsingStore that) throws ParsingStoreException {
             for(String key : that.getStoredKeys()) {
-                store(key, that.get(key));
-                that.remove(key);
+                try (InputStream stream = that.get(key)) {
+                    store(key, stream);
+                    that.remove(key);
+                } catch (IOException e) {
+                    throw new ParsingStoreException("Failed to close origin stream.", e);
+                }
             }
         }
 

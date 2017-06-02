@@ -1,5 +1,6 @@
 package com.guardtime.container.packaging;
 
+import com.guardtime.container.document.ParsedContainerDocument;
 import com.guardtime.container.document.UnknownDocument;
 import com.guardtime.container.packaging.exception.ContainerMergingException;
 import com.guardtime.container.packaging.parsing.store.ParsingStore;
@@ -140,8 +141,16 @@ public class Container implements AutoCloseable {
             add(container.removeSignatureContent(0));
             i--;
         }
-        unknownFiles.addAll(container.getUnknownFiles());
+
         if (parsingStore != null && container.getParsingStore() != null) {
+            for (UnknownDocument unknownDocument : container.getUnknownFiles()) {
+                unknownFiles.add(new ParsedContainerDocument(
+                        parsingStore,
+                        unknownDocument.getFileName(),
+                        unknownDocument.getMimeType(),
+                        unknownDocument.getFileName()
+                ));
+            }
             try {
                 parsingStore.transferFrom(container.getParsingStore());
             } catch (ParsingStoreException e) {
@@ -149,7 +158,14 @@ public class Container implements AutoCloseable {
             }
         } else if (container.getParsingStore() != null) {
             parsingStore = container.getParsingStore();
+            unknownFiles = container.removeAllUnknownFiles();
         }
+    }
+
+    private List<UnknownDocument> removeAllUnknownFiles() {
+        List<UnknownDocument> returnable = unknownFiles;
+        unknownFiles = Collections.emptyList();
+        return returnable;
     }
 
     /**
