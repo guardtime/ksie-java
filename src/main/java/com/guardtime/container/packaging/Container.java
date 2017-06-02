@@ -14,7 +14,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.guardtime.container.packaging.ContainerMergingVerifier.*;
+import static com.guardtime.container.packaging.ContainerMergingVerifier.verifyNewSignatureContentIsAcceptable;
+import static com.guardtime.container.packaging.ContainerMergingVerifier.verifySameMimeType;
+import static com.guardtime.container.packaging.ContainerMergingVerifier.verifyUniqueUnknownFiles;
+import static com.guardtime.container.packaging.ContainerMergingVerifier.verifyUniqueness;
 
 /**
  * Container that encompasses documents, annotations and structure elements that links the annotations to the documents
