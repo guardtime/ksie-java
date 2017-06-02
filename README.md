@@ -105,7 +105,7 @@ The following example shows extending of all signatures in a container.
 ```java
 ExtendingPolicy extendingPolicy = new KsiContainerSignatureExtendingPolicy(ksi)
 ContainerSignatureExtender signatureExtender = new ContainerSignatureExtender(signatureFactory, extendingPolicy)
-ExtendedContainer extendedContainer = extender.extend(container);
+ExtendedContainer extendedContainer = signatureExtender.extend(container);
 extendedContainer.isExtended();
 extendedContainer.getSignatureContents().get(0).isExtended();
 
@@ -123,7 +123,7 @@ List<Rule> implicitRules;
 Rule signatureRule = new KsiPolicyBasedSignatureIntegrityRule(ksi, KeyBasedVerificationPolicy());
 DefaultVerificationPolicy policy = new DefaultVerificationPolicy(signatureRule, new MimeTypeIntegrityRule(packagingFactory), implicitRules);
 ContainerVerifier verifier = new ContainerVerifier(policy);
-VerifiedContaienr verifiedContainer = verifier.verify(container);
+VerifiedContainer verifiedContainer = verifier.verify(container);
 VerificationResult verificationResult = verifiedContainer.getVerificationResult(); // OK/NOK/WARN
 VerificationResult verificationResult = verifiedContainer.getSignatureContents().get(0).getVerificationResult(); // OK/NOK/WARN
 ```
