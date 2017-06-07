@@ -271,6 +271,6 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     private void checkDataHashList(HashAlgorithm expectedHashAlgorithm, List<DataHash> dataHashes) throws Exception {
-        checkDataHashList(Arrays.asList(expectedHashAlgorithm), dataHashes);
+        checkDataHashList(Collections.singletonList(expectedHashAlgorithm), dataHashes);
     }
 }

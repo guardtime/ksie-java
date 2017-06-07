@@ -14,7 +14,7 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -29,7 +29,7 @@ public class UnimplementedHashAlgorithmExistenceRuleTest extends AbstractContain
         expectedException.expectMessage("Found a hash with not implemented hash algorithm.");
         FileReference mockFileReference = Mockito.mock(FileReference.class);
         DataHash nullDataHash = new DataHash(HashAlgorithm.SHA3_256, new byte[32]);
-        when(mockFileReference.getHashList()).thenReturn(Arrays.asList(nullDataHash));
+        when(mockFileReference.getHashList()).thenReturn(Collections.singletonList(nullDataHash));
         rule.verify(new ResultHolder(), mockFileReference);
     }
 
@@ -37,7 +37,7 @@ public class UnimplementedHashAlgorithmExistenceRuleTest extends AbstractContain
     public void testVerifyAllImplementedResultsInOK() throws Exception {
         FileReference mockFileReference = Mockito.mock(FileReference.class);
         DataHash nullDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
-        when(mockFileReference.getHashList()).thenReturn(Arrays.asList(nullDataHash));
+        when(mockFileReference.getHashList()).thenReturn(Collections.singletonList(nullDataHash));
         ResultHolder holder = new ResultHolder();
         rule.verify(holder, mockFileReference);
         RuleVerificationResult result = holder.getResults().get(0);

@@ -8,15 +8,15 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Collections;
 
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
 public class TlvDocumentsManifestTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateDocumentsManifest() throws Exception {
-        TlvDocumentsManifest documentsManifest = new TlvDocumentsManifest(asList(TEST_DOCUMENT_HELLO_TEXT), DEFAULT_HASH_ALGORITHM_PROVIDER);
+        TlvDocumentsManifest documentsManifest = new TlvDocumentsManifest(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), DEFAULT_HASH_ALGORITHM_PROVIDER);
         try (InputStream is = documentsManifest.getInputStream()) {
             testMagic(is, DOCUMENTS_MANIFEST_MAGIC);
             assertEquals(1, documentsManifest.getDocumentReferences().size());

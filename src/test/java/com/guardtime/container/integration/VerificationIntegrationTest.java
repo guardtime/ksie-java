@@ -5,6 +5,7 @@ import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.EmptyContainerDocument;
+import com.guardtime.container.extending.ExtendedContainer;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.verification.ContainerVerifier;
@@ -12,6 +13,7 @@ import com.guardtime.container.verification.VerifiedContainer;
 import com.guardtime.container.verification.VerifiedSignatureContent;
 import com.guardtime.container.verification.policy.DefaultVerificationPolicy;
 import com.guardtime.container.verification.policy.VerificationPolicy;
+import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.SignatureResult;
 import com.guardtime.container.verification.result.VerificationResult;
@@ -56,6 +58,33 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
                 packagingFactory
         );
         this.verifier = new ContainerVerifier(defaultPolicy);
+    }
+
+    @Test
+    public void testVerifiedContainerWithEmptyResults() throws Exception {
+        try(Container container = getContainer(CONTAINER_WITH_NO_DOCUMENTS)){
+            VerifiedContainer verifiedContainer = new VerifiedContainer(container, new ResultHolder());
+            assertEquals(0, verifiedContainer.getResults().size());
+            assertEquals(VerificationResult.OK, verifiedContainer.getVerificationResult());
+        }
+    }
+
+    @Test
+    public void testEveryContainerTypeVerifiesOk() throws Exception {
+        ContainerVerifier verifier = new ContainerVerifier(new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy()), packagingFactory));
+        try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_MULTIPLE_SIGNATURES)){
+            VerifiedContainer verifiedContainer = verifier.verify(container);
+            assertEquals(VerificationResult.OK, verifiedContainer.getVerificationResult());
+
+            ExtendedContainer extendedContainer = new ExtendedContainer(container);
+            assertFalse(extendedContainer.isFullyExtended());
+
+            VerifiedContainer verifiedExtendedContainer = verifier.verify(extendedContainer);
+            assertEquals(VerificationResult.OK, verifiedExtendedContainer.getVerificationResult());
+
+            VerifiedContainer verifiedVerifiedContainer = verifier.verify(verifiedExtendedContainer);
+            assertEquals(VerificationResult.OK, verifiedVerifiedContainer.getVerificationResult());
+        }
     }
 
     @Test
@@ -187,9 +216,9 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testContainerWithInvalidSignature_VerificationFails() throws Exception {
         try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_WRONG_SIGNATURE_FILE)) {
-            VerifiedContainer verifierResult = verifier.verify(container);
-            SignatureResult signatureResult = verifierResult.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
-            assertEquals(VerificationResult.NOK, verifierResult.getVerificationResult());
+            VerifiedContainer verifiedContainer = verifier.verify(container);
+            SignatureResult signatureResult = verifiedContainer.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
+            assertEquals(VerificationResult.NOK, verifiedContainer.getVerificationResult());
             assertNotNull(signatureResult);
             assertEquals(VerificationResult.NOK, signatureResult.getSimplifiedResult());
 
@@ -204,9 +233,9 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         Policy signatureVerificationPolicy = new InternalVerificationPolicy();
         try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_WRONG_SIGNATURE_FILE)) {
             ContainerVerifier verifier = getContainerVerifier(signatureVerificationPolicy);
-            VerifiedContainer result = verifier.verify(container);
-            assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
-            SignatureResult signatureResult = result.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
+            VerifiedContainer verifiedContainer = verifier.verify(container);
+            assertTrue(verifiedContainer.getVerificationResult().equals(VerificationResult.NOK));
+            SignatureResult signatureResult = verifiedContainer.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
             checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.GEN_1, signatureResult);
         }
     }
@@ -216,9 +245,9 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         Policy signatureVerificationPolicy = new CalendarBasedVerificationPolicy();
         try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_CHANGED_SIGNATURE_FILE)) {
             ContainerVerifier verifier = getContainerVerifier(signatureVerificationPolicy);
-            VerifiedContainer result = verifier.verify(container);
-            assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
-            SignatureResult signatureResult = result.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
+            VerifiedContainer verifiedContainer = verifier.verify(container);
+            assertTrue(verifiedContainer.getVerificationResult().equals(VerificationResult.NOK));
+            SignatureResult signatureResult = verifiedContainer.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
             checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.CAL_02, signatureResult);
         }
     }
@@ -228,9 +257,9 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         Policy signatureVerificationPolicy = new KeyBasedVerificationPolicy();
         try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_CHANGED_SIGNATURE_FILE)) {
             ContainerVerifier verifier = getContainerVerifier(signatureVerificationPolicy);
-            VerifiedContainer result = verifier.verify(container);
-            assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
-            SignatureResult signatureResult = result.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
+            VerifiedContainer verifiedContainer = verifier.verify(container);
+            assertTrue(verifiedContainer.getVerificationResult().equals(VerificationResult.NOK));
+            SignatureResult signatureResult = verifiedContainer.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
             checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.KEY_02, signatureResult);
         }
     }
@@ -244,9 +273,9 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
                     packagingFactory
             );
             ContainerVerifier verifier = new ContainerVerifier(policy);
-            VerifiedContainer result = verifier.verify(container);
-            assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
-            SignatureResult signatureResult = result.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
+            VerifiedContainer verifiedContainer = verifier.verify(container);
+            assertTrue(verifiedContainer.getVerificationResult().equals(VerificationResult.NOK));
+            SignatureResult signatureResult = verifiedContainer.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
             checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.INT_09, signatureResult);
         }
     }
@@ -256,9 +285,9 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         Policy signatureVerificationPolicy = new PublicationsFileBasedVerificationPolicy();
         try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_CHANGED_SIGNATURE_FILE)) {
             ContainerVerifier verifier = getContainerVerifier(signatureVerificationPolicy);
-            VerifiedContainer result = verifier.verify(container);
-            assertTrue(result.getVerificationResult().equals(VerificationResult.NOK));
-            SignatureResult signatureResult = result.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
+            VerifiedContainer verifiedContainer = verifier.verify(container);
+            assertTrue(verifiedContainer.getVerificationResult().equals(VerificationResult.NOK));
+            SignatureResult signatureResult = verifiedContainer.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
             checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.PUB_03, signatureResult);
         }
     }
@@ -266,10 +295,10 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testContainerWithValidSignature_VerificationSucceeds() throws Exception {
         try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT)) {
-            VerifiedContainer verifierResult = verifier.verify(container);
+            VerifiedContainer verifiedContainer = verifier.verify(container);
 
-            SignatureResult signatureResult = verifierResult.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
-            assertEquals(VerificationResult.OK, verifierResult.getVerificationResult());
+            SignatureResult signatureResult = verifiedContainer.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
+            assertEquals(VerificationResult.OK, verifiedContainer.getVerificationResult());
             assertNotNull(signatureResult);
             assertEquals(VerificationResult.OK, signatureResult.getSimplifiedResult());
             assertNotNull(signatureResult.getFullResult());
@@ -342,12 +371,12 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
                 Container container = packagingFactory.create(Collections.singletonList(document), Collections.singletonList(annotation));
                 InputStream stream = new ByteArrayInputStream(addedDocumentContent)
         ) {
-            VerifiedContainer results = containerVerifier.verify(container);
-            assertTrue(results.getVerificationResult().equals(VerificationResult.NOK));
+            VerifiedContainer verifiedContainer = containerVerifier.verify(container);
+            assertTrue(verifiedContainer.getVerificationResult().equals(VerificationResult.NOK));
 
             container.getSignatureContents().get(0).attachDetachedDocument(documentName, stream);
-            results = containerVerifier.verify(container);
-            assertTrue(results.getVerificationResult().equals(verificationResult));
+            verifiedContainer = containerVerifier.verify(container);
+            assertTrue(verifiedContainer.getVerificationResult().equals(verificationResult));
         }
     }
 

@@ -8,10 +8,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -89,7 +89,7 @@ public class TlvContainerManifestFactoryTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateDocumentsManifestOK() throws Exception {
-        TlvDocumentsManifest documentsManifest = factory.createDocumentsManifest(asList(TEST_DOCUMENT_HELLO_TEXT));
+        TlvDocumentsManifest documentsManifest = factory.createDocumentsManifest(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT));
         assertNotNull("Manifest was not created", documentsManifest);
         assertEquals(1, documentsManifest.getDocumentReferences().size());
     }

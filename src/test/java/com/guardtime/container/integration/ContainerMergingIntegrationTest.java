@@ -3,6 +3,7 @@ package com.guardtime.container.integration;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
+import com.guardtime.container.extending.ExtendedContainer;
 import com.guardtime.container.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.container.indexing.UuidIndexProviderFactory;
 import com.guardtime.container.packaging.Container;
@@ -16,6 +17,8 @@ import com.guardtime.container.packaging.exception.ManifestMergingException;
 import com.guardtime.container.packaging.exception.SignatureMergingException;
 import com.guardtime.container.packaging.exception.SingleAnnotationManifestMergingException;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
+import com.guardtime.container.verification.VerifiedContainer;
+import com.guardtime.container.verification.result.ResultHolder;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -250,6 +253,69 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
         }
     }
 
+    @Test
+    public void testAddContentToVerifiedContainer() throws Exception {
+        try (VerifiedContainer verifiedContainer = new VerifiedContainer(getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT), new ResultHolder())) {
+            addContent(verifiedContainer, 2);
+        }
+    }
+
+    @Test
+    public void testAddContainerToVerifiedContainer() throws Exception {
+        try (VerifiedContainer verifiedContainer = new VerifiedContainer(getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT), new ResultHolder())) {
+            addContainer(verifiedContainer, 2);
+        }
+    }
+
+    @Test
+    public void testAddAllContentsToVerifiedContainer() throws Exception {
+        try (VerifiedContainer verifiedContainer = new VerifiedContainer(getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT), new ResultHolder())) {
+            addAllContents(verifiedContainer, 4);
+        }
+    }
+
+    @Test
+    public void testAddContentToExtendedContainer() throws Exception {
+        try (ExtendedContainer extendedContainer = new ExtendedContainer(getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT))) {
+            addContent(extendedContainer, 2);
+        }
+    }
+
+    @Test
+    public void testAddContainerToExtendedContainer() throws Exception {
+        try (ExtendedContainer extendedContainer = new ExtendedContainer(getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT))) {
+            addContainer(extendedContainer, 2);
+        }
+    }
+
+    @Test
+    public void testAddAllContentsToExtendedContainer() throws Exception {
+        try (ExtendedContainer extendedContainer = new ExtendedContainer(getContainerIgnoreExceptions(CONTAINER_WITH_ONE_DOCUMENT))) {
+            addAllContents(extendedContainer, 4);
+        }
+    }
+
+    private void addContent(Container target, int expectedSize) throws Exception {
+        try (Container source = getContainerIgnoreExceptions(CONTAINER_WITH_NO_DOCUMENTS)) {
+            target.add(source.getSignatureContents().get(0));
+            assertEquals(expectedSize, target.getSignatureContents().size());
+        }
+    }
+
+    private void addAllContents(Container target, int expectedSize) throws Exception {
+        try (Container source = getContainerIgnoreExceptions(CONTAINER_WITH_MIXED_INDEX_TYPES_IN_CONTENTS)) {
+            target.addAll(source.getSignatureContents());
+            assertEquals(expectedSize, target.getSignatureContents().size());
+        }
+    }
+
+    private void addContainer(Container target, int expectedSize) throws Exception {
+        try (Container source = getContainerIgnoreExceptions(CONTAINER_WITH_NO_DOCUMENTS)) {
+            target.add(source);
+            assertEquals(expectedSize, target.getSignatureContents().size());
+        }
+    }
+
     private void mergeContainers(String[] containers) throws Exception {
         mergeContainersUnclosed(containers).close();
     }
@@ -261,7 +327,6 @@ public class ContainerMergingIntegrationTest extends AbstractCommonIntegrationTe
         }
         return container1;
     }
-
 
     private SignatureContent createSignatureContent(ContainerDocument existingDocument) throws Exception {
         ContainerDocument containerDocument = existingDocument;

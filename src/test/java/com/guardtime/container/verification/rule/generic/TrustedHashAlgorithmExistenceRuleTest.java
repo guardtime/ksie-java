@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -39,7 +39,7 @@ public class TrustedHashAlgorithmExistenceRuleTest extends AbstractContainerTest
         DataHash nullDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
         ResultHolder holder = new ResultHolder();
         FileReference reference = Mockito.mock(FileReference.class);
-        when(reference.getHashList()).thenReturn(Arrays.asList(nullDataHash));
+        when(reference.getHashList()).thenReturn(Collections.singletonList(nullDataHash));
         rule.verify(holder, reference);
 
         RuleVerificationResult result = holder.getResults().get(0);

@@ -21,7 +21,7 @@ import org.mockito.Mockito;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.guardtime.container.util.Util.hash;
@@ -107,7 +107,7 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
     }
 
     protected TLVElement createReference(int referenceType, String referenceUri, String referenceMime, DataHash dataHash) throws Exception {
-        return createReference(referenceType, referenceUri, referenceMime, Arrays.asList(dataHash));
+        return createReference(referenceType, referenceUri, referenceMime, Collections.singletonList(dataHash));
     }
 
     protected TLVElement createReference(int referenceType, String referenceUri, String referenceMime, List<DataHash> dataHashList) throws Exception {

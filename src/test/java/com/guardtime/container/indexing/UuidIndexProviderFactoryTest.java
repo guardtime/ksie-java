@@ -8,7 +8,7 @@ import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.Assert.assertNotEquals;
 
@@ -23,7 +23,7 @@ public class UuidIndexProviderFactoryTest extends AbstractContainerTest {
                 withManifestFactory(mockedManifestFactory).
                 disableInternalVerification().
                 build();
-        try (Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(STRING_CONTAINER_ANNOTATION))) {
+        try (Container container = packagingFactory.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_CONTAINER_ANNOTATION))) {
             IndexProvider indexProvider = indexProviderFactory.create(container);
             Assert.assertNotNull(indexProvider);
         }
