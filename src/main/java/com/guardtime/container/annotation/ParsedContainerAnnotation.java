@@ -19,7 +19,7 @@
 
 package com.guardtime.container.annotation;
 
-import com.guardtime.container.packaging.parsing.ParsingStore;
+import com.guardtime.container.packaging.parsing.store.ParsingStore;
 
 import java.io.IOException;
 import java.io.InputStream;

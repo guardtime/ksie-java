@@ -22,12 +22,15 @@ package com.guardtime.container.packaging;
 import com.guardtime.container.annotation.ContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.EmptyContainerDocument;
+import com.guardtime.container.document.ParsedContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
 import com.guardtime.container.manifest.AnnotationsManifest;
 import com.guardtime.container.manifest.DocumentsManifest;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
+import com.guardtime.container.packaging.parsing.store.ParsingStore;
+import com.guardtime.container.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.container.signature.ContainerSignature;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
@@ -44,7 +47,7 @@ import java.util.Map;
  * Structure that groups together all container internal structure elements(manifests), documents, annotations and
  * signature that are directly connected to the signature.
  */
-public class SignatureContent {
+public class SignatureContent implements AutoCloseable {
 
     private final Map<String, ContainerDocument> documents;
     private final Pair<String, DocumentsManifest> documentsManifest;
@@ -53,6 +56,7 @@ public class SignatureContent {
     private final Map<String, SingleAnnotationManifest> singleAnnotationManifestMap;
     private final Map<String, ContainerAnnotation> annotations;
     private ContainerSignature signature;
+    private final ParsingStore store;
 
     protected SignatureContent(Builder builder) {
         this.documents = formatDocumentsListToMap(builder.documents);
@@ -62,6 +66,7 @@ public class SignatureContent {
         this.annotationsManifest = builder.annotationsManifest;
         this.manifest = builder.manifest;
         this.signature = builder.signature;
+        this.store = builder.store;
     }
 
     /**
@@ -123,8 +128,9 @@ public class SignatureContent {
     /**
      * Returns existing {@link ContainerDocument} if present and replaces it with an {@link EmptyContainerDocument} in the
      * {@link SignatureContent}. If no document found or if the document is already detached null will be returned.
+     * @throws ParsingStoreException When detaching an instance of {@link ParsedContainerDocument} fails.
      */
-    public ContainerDocument detachDocument(String path) {
+    public ContainerDocument detachDocument(String path) throws ParsingStoreException {
         if (!documents.containsKey(path) || documents.get(path) instanceof EmptyContainerDocument) {
             return null;
         }
@@ -137,7 +143,31 @@ public class SignatureContent {
             }
         }
         documents.put(path, new EmptyContainerDocument(removed.getFileName(), removed.getMimeType(), removedDocumentHashes));
+        if (removed instanceof ParsedContainerDocument) {
+            try (InputStream inputStream = removed.getInputStream()) {
+                ContainerDocument detached = new StreamContainerDocument(inputStream, removed.getMimeType(), removed.getFileName());
+                removed.close();
+                return detached;
+            } catch (Exception e) {
+                throw new ParsingStoreException("Failed to detach document data from container data store.", e);
+            }
+        }
         return removed;
+    }
+
+    @Override
+    public void close() throws Exception {
+        for (ContainerAnnotation annotation : annotations.values()) {
+            annotation.close();
+        }
+
+        for (ContainerDocument document : documents.values()) {
+            document.close();
+        }
+
+        if (store != null) {
+            store.close();
+        }
     }
 
     private Map<String, SingleAnnotationManifest> formatSingleAnnotationManifestsListToMap(List<Pair<String, SingleAnnotationManifest>> annotationManifests) {
@@ -173,6 +203,7 @@ public class SignatureContent {
         private Pair<String, Manifest> manifest;
         private List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifests;
         private ContainerSignature signature;
+        private ParsingStore store;
 
         public Builder withDocuments(Collection<ContainerDocument> documents) {
             this.documents = new ArrayList<>(documents);
@@ -206,6 +237,11 @@ public class SignatureContent {
 
         public Builder withSignature(ContainerSignature signature) {
             this.signature = signature;
+            return this;
+        }
+
+        public Builder withParsingStore(ParsingStore store) {
+            this.store = store;
             return this;
         }
 

@@ -92,7 +92,7 @@ List<ContainerAnnotation> annotations;  // Can be empty list
 /* initialize and fill documents and annotations lists
 ...
 */
-Container signedContainer = packagingFactory.create(parsedContainer, documents, annotations);
+packagingFactory.addSignature(parsedContainer, documents, annotations);
 ```
 
 ### Extending signatures in a container ###
@@ -107,7 +107,7 @@ ExtendingPolicy extendingPolicy = new KsiContainerSignatureExtendingPolicy(ksi)
 ContainerSignatureExtender signatureExtender = new ContainerSignatureExtender(signatureFactory, extendingPolicy)
 ExtendedContainer extendedContainer = signatureExtender.extend(container);
 extendedContainer.isExtended();
-extendedContainer.getSignatureContents().get(0).isExtended();
+extendedContainer.getExtendedSignatureContents().get(0).isExtended();
 
 ```
 
@@ -125,7 +125,7 @@ DefaultVerificationPolicy policy = new DefaultVerificationPolicy(signatureRule, 
 ContainerVerifier verifier = new ContainerVerifier(policy);
 VerifiedContainer verifiedContainer = verifier.verify(container);
 VerificationResult verificationResult = verifiedContainer.getVerificationResult(); // OK/NOK/WARN
-VerificationResult verificationResult = verifiedContainer.getSignatureContents().get(0).getVerificationResult(); // OK/NOK/WARN
+VerificationResult verificationResult = verifiedContainer.getVerifiedSignatureContents().get(0).getVerificationResult(); // OK/NOK/WARN
 ```
 
 Since there currently are no reports for verification then you'd have to loop through the raw results to get a more detailed overview of what failed verification.
@@ -186,3 +186,4 @@ See CONTRIBUTING.md file.
 ## License ##
 
 See LICENSE file.
+

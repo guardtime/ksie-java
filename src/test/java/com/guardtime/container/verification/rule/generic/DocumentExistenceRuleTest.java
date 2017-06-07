@@ -26,7 +26,6 @@ import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.GenericVerificationResult;
 import com.guardtime.container.verification.result.ResultHolder;
-import com.guardtime.container.verification.result.RuleVerificationResult;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.Rule;
 

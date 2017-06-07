@@ -292,18 +292,19 @@ public class ContainerMergingVerifier {
         }
     }
 
-    private static boolean contentsMatch(InputStream firstStream, InputStream secondStream) {
-        DataHash first = new DataHasher().addData(firstStream).getHash();
-        DataHash second = new DataHasher().addData(secondStream).getHash();
-        return first.equals(second);
+    private static boolean contentsMatch(InputStream firstStream, InputStream secondStream) throws IOException {
+        try {
+            DataHash first = new DataHasher().addData(firstStream).getHash();
+            DataHash second = new DataHasher().addData(secondStream).getHash();
+            return first.equals(second);
+        } finally {
+            firstStream.close();
+            secondStream.close();
+        }
     }
 
     private static boolean contentsMatch(ContainerSignature first, ContainerSignature second) throws IOException {
-        try (ByteArrayInputStream firstStream = new ByteArrayInputStream(toByteArray(first));
-             ByteArrayInputStream secondStream = new ByteArrayInputStream(toByteArray(second))
-        ) {
-            return contentsMatch(firstStream, secondStream);
-        }
+        return contentsMatch(new ByteArrayInputStream(toByteArray(first)), new ByteArrayInputStream(toByteArray(second)));
     }
 
     private static byte[] toByteArray(ContainerSignature signature) throws IOException {

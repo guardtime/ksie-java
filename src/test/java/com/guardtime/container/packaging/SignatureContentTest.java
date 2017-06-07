@@ -25,6 +25,7 @@ import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.EmptyContainerDocument;
 import com.guardtime.container.manifest.FileReference;
 import com.guardtime.container.manifest.SingleAnnotationManifest;
+import com.guardtime.container.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -35,6 +36,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -57,9 +59,11 @@ public class SignatureContentTest extends AbstractContainerTest {
         assertTrue(testable.attachDetachedDocument(TEST_FILE_NAME_TEST_DOC, new ByteArrayInputStream(bytes)));
         ContainerDocument reAttachedDocument = testable.getDocuments().get(TEST_FILE_NAME_TEST_DOC);
         assertFalse(reAttachedDocument instanceof EmptyContainerDocument);
-        assertNotNull(reAttachedDocument.getInputStream());
-        byte[] documentBytes = Util.toByteArray(reAttachedDocument.getInputStream());
-        assertTrue(Arrays.equals(bytes, documentBytes));
+        try (InputStream inputStream = reAttachedDocument.getInputStream()) {
+            assertNotNull(inputStream);
+            byte[] documentBytes = Util.toByteArray(inputStream);
+            assertTrue(Arrays.equals(bytes, documentBytes));
+        }
     }
 
     @Test
@@ -69,7 +73,7 @@ public class SignatureContentTest extends AbstractContainerTest {
     }
 
     @Test
-    public void testDetachDocumentData_OK() {
+    public void testDetachDocumentData_OK() throws ParsingStoreException {
         SignatureContent testable = getTestableContent();
         int documentsCount = testable.getDocuments().size();
         ContainerDocument detached = testable.detachDocument(TEST_FILE_NAME_TEST_PDF);
@@ -81,7 +85,7 @@ public class SignatureContentTest extends AbstractContainerTest {
     }
 
     @Test
-    public void testDetachDocumentDataForNonExistentDocument_ReturnsNull() {
+    public void testDetachDocumentDataForNonExistentDocument_ReturnsNull() throws ParsingStoreException {
         SignatureContent testable = getTestableContent();
         ContainerDocument detached = testable.detachDocument("ThisFileIsNotInTheSignatureContent");
         assertNull(detached);

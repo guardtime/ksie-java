@@ -29,6 +29,7 @@ import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.manifest.tlv.TlvContainerManifestFactory;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
+import com.guardtime.container.packaging.MimeTypeEntry;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.exception.InvalidPackageException;
 import com.guardtime.container.signature.ContainerSignature;
@@ -84,13 +85,13 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
         closeAll(containerDocumentList);
     }
 
-    private ZipContainer createInternallyValidContainer(List<ContainerDocument> documents, List<ContainerAnnotation> annotations) throws Exception {
+    private Container createInternallyValidContainer(List<ContainerDocument> documents, List<ContainerAnnotation> annotations) throws Exception {
         return createInternallyValidContainer(documents, annotations, null);
     }
 
-    private ZipContainer createInternallyValidContainer(List<ContainerDocument> documents, List<ContainerAnnotation> annotations, Container existingContainer) throws Exception {
+    private Container createInternallyValidContainer(List<ContainerDocument> documents, List<ContainerAnnotation> annotations, Container existingContainer) throws Exception {
         TlvContainerManifestFactory manifestFactorySpy = spy(new TlvContainerManifestFactory());
-        ContainerPackagingFactory<ZipContainer> packagingFactory = new ZipContainerPackagingFactoryBuilder().
+        ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
                 withSignatureFactory(mockedSignatureFactory).
                 withManifestFactory(manifestFactorySpy).
                 build();
@@ -107,7 +108,8 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
         when(mockSignature.getSignedDataHash()).thenReturn(nullDataHash);
         when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mockSignature);
         if (existingContainer != null) {
-            return packagingFactory.create(existingContainer, documents, annotations);
+            packagingFactory.addSignature(existingContainer, documents, annotations);
+            return existingContainer;
         }
         return packagingFactory.create(documents, annotations);
     }
@@ -123,10 +125,11 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
     public void testCreatePackagingFactoryWithoutParsingStoreFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Parsing store factory must be present");
-        new ZipContainerPackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withParsingStoreFactory(null).
-                build();
+        new ZipContainerPackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withManifestFactory(mockedManifestFactory)
+                .withParsingStoreFactory(null)
+                .build();
     }
 
     @Test
@@ -158,14 +161,14 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
 
     @Test
     public void testCreateContainerWithDocument() throws Exception {
-        try (ZipContainer container = createInternallyValidContainer(containerDocumentList, null)) {
+        try (Container container = createInternallyValidContainer(containerDocumentList, null)) {
             assertNotNull(container);
         }
     }
 
     @Test
     public void testCreateContainerWithDocumentAndAnnotation() throws Exception {
-        try (ZipContainer container = createInternallyValidContainer(containerDocumentList, containerAnnotationList)) {
+        try (Container container = createInternallyValidContainer(containerDocumentList, containerAnnotationList)) {
             assertNotNull(container);
         }
     }
@@ -175,7 +178,7 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
         List<ContainerDocument> documentsList = new ArrayList<>(containerDocumentList);
         documentsList.add(TEST_DOCUMENT_HELLO_PDF);
 
-        try (ZipContainer container = createInternallyValidContainer(documentsList, null)) {
+        try (Container container = createInternallyValidContainer(documentsList, null)) {
             assertNotNull(container);
             Collection<ContainerDocument> containedDocuments = container.getSignatureContents().get(0).getDocuments().values();
             assertNotNull(containedDocuments);
@@ -190,7 +193,7 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
         List<ContainerAnnotation> annotationsList = new ArrayList<>(containerAnnotationList);
         annotationsList.add(new StringContainerAnnotation(ContainerAnnotationType.VALUE_REMOVABLE, "moreContent", "com.guardtime.test.inner"));
 
-        try (ZipContainer container = createInternallyValidContainer(documentsList, annotationsList)) {
+        try (Container container = createInternallyValidContainer(documentsList, annotationsList)) {
             assertNotNull(container);
             Collection<ContainerAnnotation> containedAnnotations = container.getSignatureContents().get(0).getAnnotations().values();
             assertNotNull(containedAnnotations);
@@ -210,7 +213,7 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
             List<ContainerAnnotation> annotationsList = new ArrayList<>(containerAnnotationList);
             annotationsList.add(new StringContainerAnnotation(ContainerAnnotationType.VALUE_REMOVABLE, "moreContent", "com.guardtime.test.inner"));
 
-            try (ZipContainer newContainer = createInternallyValidContainer(documentsList, annotationsList, container)) {
+            try (Container newContainer = createInternallyValidContainer(documentsList, annotationsList, container)) {
                 assertNotNull(newContainer);
                 Collection<ContainerDocument> containedDocuments = newContainer.getSignatureContents().get(1).getDocuments().values();
                 assertNotNull(containedDocuments);
@@ -225,7 +228,7 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
     @Test
     public void testCreateContainerWithMultipleDocumentsWithSameName_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Multiple documents with same name found!");
+        expectedException.expectMessage("Found multiple documents with same name!");
 
         List<ContainerDocument> containerDocuments = Arrays.asList(
                 (ContainerDocument) new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT),
@@ -236,7 +239,7 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
 
     @Test
     public void testCreateVerifiesContainer_OK() throws Exception {
-        try (ZipContainer container = createInternallyValidContainer(containerDocumentList, containerAnnotationList)) {
+        try (Container container = createInternallyValidContainer(containerDocumentList, containerAnnotationList)) {
             assertNotNull(container);
         }
     }
@@ -244,7 +247,7 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
     @Test
     public void testCreateVerifiesInvalidContainer_NOK() throws Exception {
         expectedException.expect(InvalidPackageException.class);
-        expectedException.expectMessage("Created Container does not pass internal verification");
+        expectedException.expectMessage("Created Container did not pass internal verification");
         ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().withSignatureFactory(mockedSignatureFactory).build();
         packagingFactory.create(containerDocumentList, containerAnnotationList);
     }
@@ -253,8 +256,8 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
     public void testCreateWithExistingContainerVerifiesContainer_OK() throws Exception {
         try (
                 ContainerDocument streamContainerDocument = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_PDF);
-                ZipContainer container = createInternallyValidContainer(containerDocumentList, containerAnnotationList);
-                ZipContainer newContainer = createInternallyValidContainer(Collections.singletonList(streamContainerDocument), containerAnnotationList, container)
+                Container container = createInternallyValidContainer(containerDocumentList, containerAnnotationList);
+                Container newContainer = createInternallyValidContainer(Collections.singletonList(streamContainerDocument), containerAnnotationList, container)
         ) {
             assertNotNull(newContainer);
         }
@@ -263,17 +266,17 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
     @Test
     public void testCreateWithExistingContainerVerifiesInvalidContainer_NOK() throws Exception {
         expectedException.expect(InvalidPackageException.class);
-        expectedException.expectMessage("Created Container does not pass internal verification");
+        expectedException.expectMessage("Created Container did not pass internal verification");
         ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().withSignatureFactory(mockedSignatureFactory).build();
-        Container mockContainer = Mockito.mock(ZipContainer.class);
+        Container mockContainer = Mockito.mock(Container.class);
         when(mockContainer.getMimeType()).thenReturn(new MimeTypeEntry("MIMETYPE", "Ploomimoos".getBytes(StandardCharsets.UTF_8)));
-        packagingFactory.create(mockContainer, containerDocumentList, containerAnnotationList);
+        packagingFactory.addSignature(mockContainer, containerDocumentList, containerAnnotationList);
     }
 
     @Test
     public void testCreateContainerWithExistingContainerWithDocumentsWithSameName_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Multiple documents with same name found!");
+        expectedException.expectMessage("Found multiple documents with same name!");
         try (
                 ContainerDocument containerDocument = new StreamContainerDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
                 ContainerDocument streamContainerDocument = new StreamContainerDocument(new ByteArrayInputStream("MoreImportantDocument-0411".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)
@@ -305,7 +308,7 @@ public class ZipContainerPackagingFactoryBuilderTest extends AbstractContainerTe
     public void testReadFromBadStream_ThrowsInvalidPackageException() throws Exception {
         expectedException.expect(InvalidPackageException.class);
         expectedException.expectMessage("Failed to parse InputStream");
-        ContainerPackagingFactory<ZipContainer> packagingFactory = new ZipContainerPackagingFactoryBuilder().
+        ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
                 withSignatureFactory(mockedSignatureFactory).
                 withManifestFactory(new TlvContainerManifestFactory()).
                 build();

@@ -31,7 +31,7 @@ import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.packaging.exception.InvalidPackageException;
-import com.guardtime.container.packaging.parsing.ParsingStoreFactory;
+import com.guardtime.container.packaging.parsing.store.ParsingStoreFactory;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 
 import org.junit.Before;
@@ -161,20 +161,20 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
     @Test
     public void testCreateContainerFromExistingWithDifferentIndexProviderCombination_OK() throws Exception {
         try (
-                Container existingContainer = packagingFactoryWithIncIndex.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_CONTAINER_ANNOTATION));
-                Container container = packagingFactoryWithUuid.create(existingContainer, Collections.singletonList(TEST_DOCUMENT_HELLO_PDF), Collections.singletonList(STRING_CONTAINER_ANNOTATION))
+                Container existingContainer = packagingFactoryWithIncIndex.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_CONTAINER_ANNOTATION))
         ){
-            writeContainerToAndReadFromStream(container, packagingFactoryWithUuid);
+            packagingFactoryWithUuid.addSignature(existingContainer, Collections.singletonList(TEST_DOCUMENT_HELLO_PDF), Collections.singletonList(STRING_CONTAINER_ANNOTATION));
+            writeContainerToAndReadFromStream(existingContainer, packagingFactoryWithUuid);
         }
     }
 
     @Test
     public void testCreateContainerFromExistingWithDifferentIndexProviderCombination2_OK() throws Exception {
         try (
-                Container existingContainer = packagingFactoryWithUuid.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_CONTAINER_ANNOTATION));
-                Container container = packagingFactoryWithIncIndex.create(existingContainer, Collections.singletonList(TEST_DOCUMENT_HELLO_PDF), Collections.singletonList(STRING_CONTAINER_ANNOTATION))
+                Container existingContainer = packagingFactoryWithUuid.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_CONTAINER_ANNOTATION))
             ){
-                writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+                packagingFactoryWithIncIndex.addSignature(existingContainer, Collections.singletonList(TEST_DOCUMENT_HELLO_PDF), Collections.singletonList(STRING_CONTAINER_ANNOTATION));
+                writeContainerToAndReadFromStream(existingContainer, packagingFactoryWithIncIndex);
         }
     }
 
@@ -184,12 +184,12 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
                 FileInputStream stream = new FileInputStream(loadFile(CONTAINER_WITH_RANDOM_INCREMENTING_INDEXES));
                 Container existingContainer = defaultPackagingFactory.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-                ContainerDocument document = new StreamContainerDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc");
-                Container container = defaultPackagingFactory.create(existingContainer,
-                        Collections.singletonList(document),
-                        Collections.singletonList(STRING_CONTAINER_ANNOTATION))
+                ContainerDocument document = new StreamContainerDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
         ) {
-            writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+            defaultPackagingFactory.addSignature(existingContainer,
+                    Collections.singletonList(document),
+                    Collections.singletonList(STRING_CONTAINER_ANNOTATION));
+            writeContainerToAndReadFromStream(existingContainer, packagingFactoryWithIncIndex);
         }
     }
 
@@ -199,12 +199,12 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
                 FileInputStream stream = new FileInputStream(loadFile(CONTAINER_WITH_RANDOM_UUID_INDEXES));
                 Container existingContainer = packagingFactoryWithUuid.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-                ContainerDocument document = new StreamContainerDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc");
-                Container container = packagingFactoryWithUuid.create(existingContainer,
-                    Collections.singletonList(document),
-                    Collections.singletonList(STRING_CONTAINER_ANNOTATION))
+                ContainerDocument document = new StreamContainerDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
         ) {
-            writeContainerToAndReadFromStream(container, packagingFactoryWithUuid);
+            packagingFactoryWithUuid.addSignature(existingContainer,
+                    Collections.singletonList(document),
+                    Collections.singletonList(STRING_CONTAINER_ANNOTATION));
+            writeContainerToAndReadFromStream(existingContainer, packagingFactoryWithUuid);
         }
     }
 
@@ -214,12 +214,12 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
                 FileInputStream stream = new FileInputStream(loadFile(CONTAINER_WITH_MIXED_INDEX_TYPES));
                 Container existingContainer  = packagingFactoryWithUuid.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-                ContainerDocument document = new StreamContainerDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc");
-                Container container = packagingFactoryWithUuid.create(existingContainer,
-                    Collections.singletonList(document),
-                    Collections.singletonList(STRING_CONTAINER_ANNOTATION))
+                ContainerDocument document = new StreamContainerDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
         ) {
-            writeContainerToAndReadFromStream(container, packagingFactoryWithUuid);
+            packagingFactoryWithUuid.addSignature(existingContainer,
+                    Collections.singletonList(document),
+                    Collections.singletonList(STRING_CONTAINER_ANNOTATION));
+            writeContainerToAndReadFromStream(existingContainer, packagingFactoryWithUuid);
         }
     }
 
@@ -227,12 +227,12 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
     public void testCreateContainerFromExistingWithDifferentIndexesInContents_OK() throws Exception {
         try (
                 Container existingContainer = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(CONTAINER_WITH_MIXED_INDEX_TYPES_IN_CONTENTS)));
-                ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc");
-                Container container = packagingFactoryWithUuid.create(existingContainer,
-                    Collections.singletonList(document),
-                    Collections.singletonList(STRING_CONTAINER_ANNOTATION))
+                ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc")
         ) {
-            writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+            packagingFactoryWithUuid.addSignature(existingContainer,
+                    Collections.singletonList(document),
+                    Collections.singletonList(STRING_CONTAINER_ANNOTATION));
+            writeContainerToAndReadFromStream(existingContainer, packagingFactoryWithIncIndex);
         }
     }
 
@@ -241,12 +241,12 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
         try (
                 Container existingContainer = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(CONTAINER_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED)));
                 ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc");
-                ContainerAnnotation containerAnnotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime");
-                Container container = packagingFactoryWithIncIndex.create(existingContainer,
-                    Collections.singletonList(document),
-                    Collections.singletonList(containerAnnotation))
+                ContainerAnnotation containerAnnotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime")
         ) {
-            writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+            packagingFactoryWithIncIndex.addSignature(existingContainer,
+                    Collections.singletonList(document),
+                    Collections.singletonList(containerAnnotation));
+            writeContainerToAndReadFromStream(existingContainer, packagingFactoryWithIncIndex);
         }
     }
 
@@ -255,12 +255,12 @@ public abstract class AbstractZipContainerIntegrationTest extends AbstractCommon
         try (
                 Container existingContainer = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(CONTAINER_WITH_UNKNOWN_FILES)));
                 ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc");
-                ContainerAnnotation containerAnnotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime");
-                Container container = packagingFactoryWithIncIndex.create(existingContainer,
-                        Collections.singletonList(document),
-                        Collections.singletonList(containerAnnotation))
+                ContainerAnnotation containerAnnotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime")
         ) {
-            writeContainerToAndReadFromStream(container, packagingFactoryWithIncIndex);
+            packagingFactoryWithIncIndex.addSignature(existingContainer,
+                    Collections.singletonList(document),
+                    Collections.singletonList(containerAnnotation));
+            writeContainerToAndReadFromStream(existingContainer, packagingFactoryWithIncIndex);
         }
     }
 
