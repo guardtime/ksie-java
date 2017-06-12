@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.io.ByteArrayInputStream;
+import java.io.Closeable;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -56,7 +57,10 @@ public abstract class AbstractContentHandlerTest {
         mockStream.close();
         mockStream = new ByteArrayInputStream(unrequestedStreamContent.getBytes(StandardCharsets.UTF_8));
         handler.add(unrequestedFileName, mockStream);
-        handler.get(requestedFileName);
+        Object result = handler.get(requestedFileName);
+        if (result instanceof Closeable) { // Some handlers return a resource that needs to be closed
+            ((Closeable) result).close();
+        }
 
         List unrequested = handler.getUnrequestedFiles();
         assertEquals(1, unrequested.size());
