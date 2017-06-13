@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.container.document;
 
 import com.guardtime.container.AbstractContainerTest;
@@ -11,7 +30,8 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -27,8 +47,8 @@ public class EmptyContainerDocumentTest extends AbstractContainerTest {
 
     @Before
     public void setUp() {
-        hash = Util.hash(new ByteArrayInputStream("".getBytes()), HashAlgorithm.SHA2_256);
-        document = new EmptyContainerDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, Arrays.asList(hash));
+        hash = Util.hash(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)), HashAlgorithm.SHA2_256);
+        document = new EmptyContainerDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, Collections.singletonList(hash));
     }
 
     @Test
@@ -63,19 +83,19 @@ public class EmptyContainerDocumentTest extends AbstractContainerTest {
     public void testCreateEmptyDocumentWithoutFileName_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("File name must be present");
-        new EmptyContainerDocument(null, MIME_TYPE_APPLICATION_TXT, Arrays.asList(hash));
+        new EmptyContainerDocument(null, MIME_TYPE_APPLICATION_TXT, Collections.singletonList(hash));
     }
 
     @Test
     public void testCreateEmptyDocumentWithoutMimeType_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("MIME type must be present");
-        new EmptyContainerDocument(DOCUMENT_NAME, null, Arrays.asList(hash));
+        new EmptyContainerDocument(DOCUMENT_NAME, null, Collections.singletonList(hash));
     }
 
 
     @Test
-    public void testCreateEmptyDocumentWithoutDataHash_ThrowsIllegalArgumentException() throws Exception {
+    public void testCreateEmptyDocumentWithoutDataHash_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Data hash list must be present");
         new EmptyContainerDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, null);
@@ -83,17 +103,17 @@ public class EmptyContainerDocumentTest extends AbstractContainerTest {
 
     @Test
     public void testGetDataHashList() throws Exception {
-        List<DataHash> hashes = Arrays.asList(hash);
+        List<DataHash> hashes = Collections.singletonList(hash);
         ContainerDocument doc = new EmptyContainerDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, hashes);
-        assertEquals(hashes, doc.getDataHashList(Arrays.asList(hash.getAlgorithm())));
+        assertEquals(hashes, doc.getDataHashList(Collections.singletonList(hash.getAlgorithm())));
     }
 
     @Test
     public void testGetDataHashListForNotPresentAlgorithm() throws Exception {
         expectedException.expect(DataHashException.class);
         expectedException.expectMessage("Could not find any pre-generated hashes for requested algorithms!");
-        List<DataHash> hashes = Arrays.asList(Util.hash(new ByteArrayInputStream("".getBytes()), HashAlgorithm.SHA2_256));
+        List<DataHash> hashes = Collections.singletonList(Util.hash(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)), HashAlgorithm.SHA2_256));
         ContainerDocument doc = new EmptyContainerDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, hashes);
-        doc.getDataHashList(Arrays.asList(HashAlgorithm.RIPEMD_160));
+        doc.getDataHashList(Collections.singletonList(HashAlgorithm.RIPEMD_160));
     }
 }

@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.container.signature.ksi;
 
 import com.guardtime.container.AbstractContainerTest;
@@ -15,6 +34,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -49,7 +69,7 @@ public class KsiSignatureFactoryTest extends AbstractContainerTest {
     @Test
     public void testCreate() throws Exception {
         SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
-        DataHash testHash = new DataHash(HashAlgorithm.SHA2_256, "TestStringTestingStuffLongString".getBytes());
+        DataHash testHash = new DataHash(HashAlgorithm.SHA2_256, "TestStringTestingStuffLongString".getBytes(StandardCharsets.UTF_8));
         ContainerSignature signature = signatureFactory.create(testHash);
         assertNotNull(signature);
     }
@@ -57,7 +77,7 @@ public class KsiSignatureFactoryTest extends AbstractContainerTest {
     @Test
     public void testRead() throws Exception {
         SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
-        ContainerSignature signature = signatureFactory.read(new ByteArrayInputStream("".getBytes()));
+        ContainerSignature signature = signatureFactory.read(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)));
         assertNotNull(signature);
     }
 }

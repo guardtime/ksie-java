@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.document.ContainerDocument;
@@ -6,17 +25,27 @@ import com.guardtime.container.manifest.MultiHashElement;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.util.Pair;
 import com.guardtime.container.verification.result.ResultHolder;
+import com.guardtime.container.verification.result.RuleVerificationResult;
+import com.guardtime.container.verification.result.VerificationResultFilter;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
 import com.guardtime.container.verification.rule.RuleType;
 import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
+
+import static com.guardtime.container.verification.result.VerificationResult.OK;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_DATA_EXISTS;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_DATA_MANIFEST;
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_DATA_MANIFEST_EXISTS;
 
 /**
  * This rule verifies that the {@link ContainerDocument} being tested has not been corrupted.
+ * It expects to find successful results for rules verifying existence and integrity of
+ * {@link com.guardtime.container.manifest.DocumentsManifest} and document existence.
  */
-public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, SignatureContent>> {
+public class DocumentIntegrityRule extends AbstractRule<SignatureContent> {
 
     private static final String NAME = RuleType.KSIE_VERIFY_DATA_HASH.getName();
     private final MultiHashElementIntegrityRule integrityRule;
@@ -27,15 +56,21 @@ public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, Sign
     }
 
     @Override
-    protected void verifyRule(ResultHolder holder, Pair<FileReference, SignatureContent> verifiable) throws RuleTerminatingException {
-        FileReference documentReference = verifiable.getLeft();
-        Map<String, ContainerDocument> documents = verifiable.getRight().getDocuments();
-        MultiHashElement document = documents.get(documentReference.getUri());
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
+        for (FileReference documentReference : verifiable.getDocumentsManifest().getRight().getDocumentReferences()) {
+            String uri = documentReference.getUri();
+            if (existenceRuleFailed(holder, verifiable, uri)) continue;
 
-        try {
-            integrityRule.verify(holder, Pair.of(document, documentReference));
-        } catch (RuleTerminatingException e) {
-            LOGGER.info("Data file hash verification failed with message: '{}'", e.getMessage());
+            MultiHashElement document = verifiable.getDocuments().get(uri);
+
+            ResultHolder tempHolder = new ResultHolder();
+            try {
+                integrityRule.verify(tempHolder, Pair.of(document, documentReference));
+            } catch (RuleTerminatingException e) {
+                LOGGER.info("Data file hash verification failed with message: '{}'", e.getMessage());
+            } finally {
+                holder.addResults(verifiable, tempHolder.getResults());
+            }
         }
     }
 
@@ -48,4 +83,29 @@ public class DocumentIntegrityRule extends AbstractRule<Pair<FileReference, Sign
     public String getErrorMessage() {
         return "Data file hash mismatch.";
     }
+
+    @Override
+    protected VerificationResultFilter getFilter(ResultHolder holder, SignatureContent verifiable) {
+        final Set<RuleVerificationResult> results = new HashSet<>(holder.getResults(verifiable));
+        return new VerificationResultFilter() {
+            @Override
+            public boolean apply(RuleVerificationResult result) {
+                return results.contains(result) && (result.getRuleName().equals(KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName()) ||
+                        result.getRuleName().equals(KSIE_VERIFY_DATA_MANIFEST.getName()));
+            }
+        };
+    }
+
+    private boolean existenceRuleFailed(ResultHolder holder, SignatureContent verifiable, final String documentUri) {
+        final Set<RuleVerificationResult> results = new HashSet<>(holder.getResults(verifiable));
+        VerificationResultFilter filter = new VerificationResultFilter() {
+            @Override
+            public boolean apply(RuleVerificationResult result) {
+                return results.contains(result) && (result.getRuleName().equals(KSIE_VERIFY_DATA_EXISTS.getName()) &&
+                        result.getTestedElementPath().equals(documentUri));
+            }
+        };
+        return !holder.getFilteredAggregatedResult(filter, 1).equals(OK);
+    }
+
 }

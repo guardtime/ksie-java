@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.container.document;
 
 import com.guardtime.container.util.DataHashException;
@@ -81,10 +100,10 @@ public abstract class AbstractContainerDocument implements ContainerDocument {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
-            FileContainerDocument that = (FileContainerDocument) o;
+            ContainerDocument that = (ContainerDocument) o;
 
-            if (fileName != null ? !fileName.equals(that.fileName) : that.fileName != null) return false;
-            if (mimeType != null ? !mimeType.equals(that.mimeType) : that.mimeType != null) return false;
+            if (getFileName() != null ? !getFileName().equals(that.getFileName()) : that.getFileName()!= null) return false;
+            if (getMimeType() != null ? !getMimeType().equals(that.getMimeType()) : that.getMimeType() != null) return false;
             return this.getDataHash(HASH_ALGORITHM).equals(that.getDataHash(HASH_ALGORITHM));
         } catch (DataHashException e) {
             return false;

@@ -1,20 +1,54 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.container.verification.policy;
 
 import com.guardtime.container.manifest.DocumentsManifest;
+import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
-import com.guardtime.container.verification.rule.ContainerRule;
+import com.guardtime.container.packaging.SignatureContent;
+import com.guardtime.container.verification.rule.Rule;
+import com.guardtime.container.verification.rule.generic.AnnotationDataExistenceRule;
+import com.guardtime.container.verification.rule.generic.AnnotationDataIntegrityRule;
+import com.guardtime.container.verification.rule.generic.AnnotationsManifestExistenceRule;
+import com.guardtime.container.verification.rule.generic.AnnotationsManifestIntegrityRule;
+import com.guardtime.container.verification.rule.generic.DocumentExistenceRule;
+import com.guardtime.container.verification.rule.generic.DocumentIntegrityRule;
+import com.guardtime.container.verification.rule.generic.DocumentsManifestExistenceRule;
+import com.guardtime.container.verification.rule.generic.DocumentsManifestIntegrityRule;
 import com.guardtime.container.verification.rule.generic.MimeTypeIntegrityRule;
-import com.guardtime.container.verification.rule.generic.SignatureContentIntegrityRule;
+import com.guardtime.container.verification.rule.generic.SignatureExistenceRule;
+import com.guardtime.container.verification.rule.generic.SignatureIntegrityRule;
+import com.guardtime.container.verification.rule.generic.SignatureSignsManifestRule;
+import com.guardtime.container.verification.rule.generic.SingleAnnotationManifestExistenceRule;
+import com.guardtime.container.verification.rule.generic.SingleAnnotationManifestIntegrityRule;
 import com.guardtime.container.verification.rule.signature.SignatureVerifier;
+import com.guardtime.container.verification.rule.state.DefaultRuleStateProvider;
 import com.guardtime.container.verification.rule.state.RuleStateProvider;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Default implementation of {@link VerificationPolicy}
- * Contains containerRules for:
+ * Contains rules for:
  * <ol>
  *   <li>verifying MIME type</li>
  *   <li>verifying signature</li>
@@ -24,27 +58,55 @@ import java.util.List;
  *   <li>verifying {@link com.guardtime.container.manifest.SingleAnnotationManifest}s</li>
  *   <li>verifying {@link com.guardtime.container.annotation.ContainerAnnotation}s</li>
  * </ol>
- * May contain extra containerRules to add specialized verification requirements to the policy or to overwrite some of the
- * pre-existing containerRules.
+ * May contain extra rules to add specialized verification requirements to the policy or to overwrite some of the
+ * pre-existing rules.
  */
 public class DefaultVerificationPolicy implements VerificationPolicy {
-    private ArrayList<ContainerRule> containerRules = new ArrayList<>();
+    private ArrayList<Rule<SignatureContent>> signatureContentRules = new ArrayList<>();
+    private ArrayList<Rule<Container>> containerRules = new ArrayList<>();
 
     /**
      * @param signatureVerifier will be called for verifying each signature.
      * @param packagingFactory will be used to create the appropriate MIME type rule.
      */
-    public DefaultVerificationPolicy(RuleStateProvider stateProvider, SignatureVerifier signatureVerifier, ContainerPackagingFactory packagingFactory) {
-        this(stateProvider, signatureVerifier, packagingFactory, new LinkedList<ContainerRule>());
+    public DefaultVerificationPolicy(SignatureVerifier signatureVerifier,
+                                     ContainerPackagingFactory packagingFactory) {
+        this(
+                new DefaultRuleStateProvider(),
+                signatureVerifier,
+                packagingFactory,
+                Collections.<Rule<Container>>emptyList(),
+                Collections.<Rule<SignatureContent>>emptyList()
+        );
     }
 
-    public DefaultVerificationPolicy(RuleStateProvider stateProvider, SignatureVerifier signatureVerifier, ContainerPackagingFactory packagingFactory, List<ContainerRule> customRules) {
+    public DefaultVerificationPolicy(RuleStateProvider stateProvider, SignatureVerifier signatureVerifier,
+                                     ContainerPackagingFactory packagingFactory, List<Rule<Container>> customContainerRules,
+                                     List<Rule<SignatureContent>> customSignatureContentRules) {
         containerRules.add(new MimeTypeIntegrityRule(stateProvider, packagingFactory));
-        containerRules.add(new SignatureContentIntegrityRule(stateProvider, signatureVerifier)); // Nested rules inside
-        containerRules.addAll(customRules);
+        containerRules.addAll(customContainerRules);
+        signatureContentRules.add(new SignatureExistenceRule(stateProvider));
+        signatureContentRules.add(new SignatureSignsManifestRule(stateProvider));
+        signatureContentRules.add(new SignatureIntegrityRule(stateProvider, signatureVerifier));
+        signatureContentRules.add(new DocumentsManifestExistenceRule(stateProvider));
+        signatureContentRules.add(new DocumentsManifestIntegrityRule(stateProvider));
+        signatureContentRules.add(new DocumentExistenceRule(stateProvider));
+        signatureContentRules.add(new DocumentIntegrityRule(stateProvider));
+        signatureContentRules.add(new AnnotationsManifestExistenceRule(stateProvider));
+        signatureContentRules.add(new AnnotationsManifestIntegrityRule(stateProvider));
+        signatureContentRules.add(new SingleAnnotationManifestExistenceRule(stateProvider));
+        signatureContentRules.add(new SingleAnnotationManifestIntegrityRule(stateProvider));
+        signatureContentRules.add(new AnnotationDataExistenceRule(stateProvider));
+        signatureContentRules.add(new AnnotationDataIntegrityRule(stateProvider));
+        signatureContentRules.addAll(customSignatureContentRules);
     }
 
-    public List<ContainerRule> getContainerRules() {
+    public List<Rule<SignatureContent>> getSignatureContentRules() {
+        return signatureContentRules;
+    }
+
+    @Override
+    public List<Rule<Container>> getContainerRules() {
         return containerRules;
     }
 

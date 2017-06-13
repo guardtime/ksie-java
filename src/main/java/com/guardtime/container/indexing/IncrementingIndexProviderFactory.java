@@ -1,8 +1,30 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.container.indexing;
 
 import com.guardtime.container.manifest.Manifest;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,13 +35,15 @@ import java.util.Set;
  */
 public class IncrementingIndexProviderFactory implements IndexProviderFactory {
 
+    private static final Logger logger = LoggerFactory.getLogger(IncrementingIndexProviderFactory.class);
+
     @Override
     public IndexProvider create() {
         return new IncrementingIndexProvider();
     }
 
     @Override
-    public IndexProvider create(Container container) throws IndexingException {
+    public IndexProvider create(Container container) {
         int maxIndex = 0;
         int maxAnnotationIndex = 0;
         for (SignatureContent content : container.getSignatureContents()) {
@@ -42,7 +66,17 @@ public class IncrementingIndexProviderFactory implements IndexProviderFactory {
         return new IncrementingIndexProvider(maxIndex, maxIndex, maxIndex, maxIndex, maxAnnotationIndex, maxAnnotationIndex);
     }
 
-    private int compareAndUpdate(String str, int value) throws IndexingException {
+    private int compareAndUpdate(Set<String> set, int value) {
+        for (String str : set) {
+            value = compareAndUpdate(str, value);
+        }
+        if(value < 0) {
+            value = 0;
+        }
+        return value;
+    }
+
+    private int compareAndUpdate(String str, int value) {
         int tmp = getIndex(str);
         if (value < tmp) {
             return tmp;
@@ -50,18 +84,12 @@ public class IncrementingIndexProviderFactory implements IndexProviderFactory {
         return value;
     }
 
-    private int compareAndUpdate(Set<String> set, int value) throws IndexingException {
-        for (String str : set) {
-            value = compareAndUpdate(str, value);
-        }
-        return value;
-    }
-
-    private int getIndex(String str) throws IndexingException {
+    private int getIndex(String str)  {
         str = str.substring(str.lastIndexOf("/") + 1);
         String index = str.substring(str.indexOf("-") + 1, str.lastIndexOf("."));
         if (!index.equals(index.replaceAll("[^0-9]", ""))) {
-            throw new IndexingException("Not an integer based index");
+            logger.warn("Not an integer based index");
+            return Integer.MIN_VALUE;
         }
         return new Integer(index);
     }
@@ -78,7 +106,7 @@ public class IncrementingIndexProviderFactory implements IndexProviderFactory {
         }
 
         IncrementingIndexProvider(int documentsManifestIndex, int manifestIndex, int signatureIndex, int annotationsManifestIndex,
-                                  int singleAnnotationManifestIndex, int annotationIndex) throws IndexingException {
+                                  int singleAnnotationManifestIndex, int annotationIndex) {
             this.documentsManifestIndex = documentsManifestIndex;
             this.manifestIndex = manifestIndex;
             this.signatureIndex = signatureIndex;

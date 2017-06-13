@@ -1,12 +1,34 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.container.integration;
 
 import com.guardtime.container.extending.ContainerSignatureExtender;
+import com.guardtime.container.extending.ExtendedContainer;
+import com.guardtime.container.extending.ExtendedSignatureContent;
 import com.guardtime.container.extending.ExtendingPolicy;
 import com.guardtime.container.extending.ksi.KsiContainerSignatureExtendingPolicy;
 import com.guardtime.container.extending.ksi.PublicationKsiContainerSignatureExtendingPolicy;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.SignatureContent;
 import com.guardtime.container.signature.SignatureFactory;
+import com.guardtime.container.signature.ksi.KsiSignatureFactory;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.publication.PublicationData;
@@ -20,9 +42,38 @@ import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTest {
+
+    @Test
+    public void testVerifyOriginalContainerIsExtended() throws Exception {
+        try (Container container = getContainerIgnoreExceptions(CONTAINER_WITH_MULTIPLE_SIGNATURES)){
+            KsiContainerSignatureExtendingPolicy policy = new KsiContainerSignatureExtendingPolicy(ksi);
+            ContainerSignatureExtender extender = new ContainerSignatureExtender(new KsiSignatureFactory(ksi), policy);
+            extender.extend(container);
+            ExtendedContainer extendedContainer = new ExtendedContainer(container);
+            assertTrue(extendedContainer.isFullyExtended());
+        }
+    }
+
+    @Test
+    public void testExtendingContainerWithValidAndInvalidSignatures()throws Exception {
+        ExtendingPolicy policy = new KsiContainerSignatureExtendingPolicy(ksi);
+        ContainerSignatureExtender extender = new ContainerSignatureExtender(signatureFactory, policy);
+        try (Container container = getContainer(CONTAINER_WITH_MULTI_CONTENT_ONE_SIGNATURE_IS_INVALID)) {
+            assertSignaturesExtendedStatus(container, false);
+            ExtendedContainer extendedContainer = extender.extend(container);
+            for (ExtendedSignatureContent content : extendedContainer.getExtendedSignatureContents()) {
+                if (content.getManifest().getRight().getSignatureReference().getUri().equals("META-INF/signature-1.ksi")) {
+                    assertEquals(true, content.isExtended());
+                } else if (content.getManifest().getRight().getSignatureReference().getUri().equals("META-INF/signature-01-02-03-04-05.ksi")) {
+                    assertEquals(false, content.isExtended());
+                }
+            }
+        }
+    }
 
     @Test
     public void testExtendingWithKsiContainerSignatureExtender() throws Exception {
@@ -95,8 +146,9 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
         ContainerSignatureExtender extender = new ContainerSignatureExtender(factory, policy);
         try (Container container = getContainer(containerName)) {
             assertSignaturesExtendedStatus(container, false);
-            extender.extend(container);
-            assertSignaturesExtendedStatus(container, extendedStatusAfterExtending);
+            ExtendedContainer extendedContainer = extender.extend(container);
+            assertSignaturesExtendedStatus(extendedContainer, extendedStatusAfterExtending);
+            assertEquals(extendedStatusAfterExtending, extendedContainer.isFullyExtended());
         }
     }
 

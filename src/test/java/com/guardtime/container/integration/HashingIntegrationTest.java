@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.container.integration;
 
 import com.guardtime.container.ContainerBuilder;
@@ -25,6 +44,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,7 +60,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     private static final String CONTAINER_DOCUMENT_MIME_TYPE = "Stream";
     private static final String INPUT_STREAM_STRING = "Input from stream.";
     private final ContainerAnnotation CONTAINER_ANNOTATION = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, CONTAINER_ANNOTATION_CONTENT, CONTAINER_ANNOTATION_TYPE_DOMAIN);
-    private final ContainerDocument CONTAINER_DOCUMENT = new StreamContainerDocument(new ByteArrayInputStream(INPUT_STREAM_STRING.getBytes()), CONTAINER_DOCUMENT_MIME_TYPE, CONTAINER_DOCUMENT_FILE_NAME);
+    private final ContainerDocument CONTAINER_DOCUMENT = new StreamContainerDocument(new ByteArrayInputStream(INPUT_STREAM_STRING.getBytes(StandardCharsets.UTF_8)), CONTAINER_DOCUMENT_MIME_TYPE, CONTAINER_DOCUMENT_FILE_NAME);
     private Container container;
 
     @After
@@ -53,7 +73,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
-    public void testDocumentHashAlgorithmListIsEmpty_IllegalArgumentException() throws Exception {
+    public void testDocumentHashAlgorithmListIsEmpty_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Data hashes must not be empty");
 
@@ -64,7 +84,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
-    public void testFileReferenceHashAlgorithmListIsEmpty_IllegalArgumentException() throws Exception {
+    public void testFileReferenceHashAlgorithmListIsEmpty_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Data hashes must not be empty");
 
@@ -75,7 +95,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
-    public void testFileReferenceHashAlgorithmListContainsNullElement_IllegalArgumentException() throws Exception {
+    public void testFileReferenceHashAlgorithmListContainsNullElement_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Hash algorithm can not be null");
 
@@ -88,7 +108,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
-    public void testDocumentHashAlgorithmListContainsNullElement_IllegalArgumentException() throws Exception {
+    public void testDocumentHashAlgorithmListContainsNullElement_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Hash algorithm can not be null");
 
@@ -219,7 +239,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
-    public void testUsingNotImplementedHashingAlgorithm() throws Exception {
+    public void testUsingNotImplementedHashingAlgorithm_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Hash algorithm SHA3_512 is not implemented");
         HashAlgorithm hashAlgorithm = HashAlgorithm.SHA3_512;
@@ -231,7 +251,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
-     public void testUsingNotImplementedHashingAlgorithmInList() throws Exception {
+     public void testUsingNotImplementedHashingAlgorithmInList_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Hash algorithm SM3 is not implemented");
         List<HashAlgorithm> hashAlgorithmList = Arrays.asList(HashAlgorithm.SHA1, HashAlgorithm.SHA2_256, HashAlgorithm.SM3);
@@ -270,6 +290,6 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     private void checkDataHashList(HashAlgorithm expectedHashAlgorithm, List<DataHash> dataHashes) throws Exception {
-        checkDataHashList(Arrays.asList(expectedHashAlgorithm), dataHashes);
+        checkDataHashList(Collections.singletonList(expectedHashAlgorithm), dataHashes);
     }
 }

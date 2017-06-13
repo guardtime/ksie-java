@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.container.extending;
 
 import com.guardtime.container.AbstractContainerTest;
@@ -14,7 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -39,7 +58,7 @@ public class ContainerSignatureExtenderTest extends AbstractContainerTest {
         SignatureContent mockSignatureContent = mock(SignatureContent.class);
         Manifest mockManifest = mock(Manifest.class);
         doReturn(mockSignature).when(mockSignatureContent).getContainerSignature();
-        doReturn(Arrays.asList(mockSignatureContent)).when(mockContainer).getSignatureContents();
+        doReturn(Collections.singletonList(mockSignatureContent)).when(mockContainer).getSignatureContents();
         doReturn(mock(SignatureReference.class)).when(mockManifest).getSignatureReference();
         doReturn(Pair.of("str", mockManifest)).when(mockSignatureContent).getManifest();
         return mockContainer;
@@ -62,7 +81,7 @@ public class ContainerSignatureExtenderTest extends AbstractContainerTest {
     @Test
     public void testExtendingSuccess() throws Exception {
         doReturn(true).when(mockSignature).isExtended();
-        assertTrue(extender.extend(makeMockContainer()));
+        assertTrue(extender.extend(makeMockContainer()).getExtendedSignatureContents().get(0).isExtended());
     }
 
     @Test
@@ -70,13 +89,13 @@ public class ContainerSignatureExtenderTest extends AbstractContainerTest {
         doThrow(SignatureException.class)
                 .when(mockSignatureFactory)
                 .extend(Mockito.any(ContainerSignature.class), Mockito.any(ExtendingPolicy.class));
-        assertFalse(extender.extend(makeMockContainer()));
+        assertFalse(extender.extend(makeMockContainer()).getExtendedSignatureContents().get(0).isExtended());
     }
 
     @Test
     public void testExtendingIsNotDone() throws Exception {
         doReturn(false).when(mockSignature).isExtended();
-        assertFalse(extender.extend(makeMockContainer()));
+        assertFalse(extender.extend(makeMockContainer()).getExtendedSignatureContents().get(0).isExtended());
     }
 
 }

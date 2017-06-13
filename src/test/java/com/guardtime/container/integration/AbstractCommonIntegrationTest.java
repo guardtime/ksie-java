@@ -1,39 +1,51 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.container.integration;
 
 import com.guardtime.container.AbstractContainerTest;
 import com.guardtime.container.packaging.Container;
 import com.guardtime.container.packaging.ContainerPackagingFactory;
+import com.guardtime.container.packaging.exception.ContainerReadingException;
 import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder;
 import com.guardtime.container.signature.SignatureFactory;
 import com.guardtime.container.signature.ksi.KsiSignatureFactory;
-import com.guardtime.container.util.Pair;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.KSIBuilder;
 import com.guardtime.ksi.service.client.KSIServiceCredentials;
 import com.guardtime.ksi.service.client.http.HttpClientSettings;
 import com.guardtime.ksi.service.http.simple.SimpleHttpClient;
 import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
-import com.guardtime.ksi.util.Util;
 
 import org.junit.Before;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 public abstract class AbstractCommonIntegrationTest extends AbstractContainerTest {
 
+    private static final File TRUST_STORE_FILE;
+    private static final String TRUST_STORE_PASSWORD;
     protected ContainerPackagingFactory packagingFactory;
     protected SignatureFactory signatureFactory;
     protected KSI ksi;
@@ -53,6 +65,13 @@ public abstract class AbstractCommonIntegrationTest extends AbstractContainerTes
             TEST_EXTENDING_SERVICE = properties.getProperty("service.extending");
             GUARDTIME_PUBLICATIONS_FILE = properties.getProperty("publications.file.url");
             KSI_SERVICE_CREDENTIALS = new KSIServiceCredentials(properties.getProperty("credentials.id"), properties.getProperty("credentials.key"));
+            TRUST_STORE_FILE = new File(
+                    Thread.currentThread().
+                            getContextClassLoader().
+                            getResource("ksi-truststore.jks").
+                            toURI()
+            );
+            TRUST_STORE_PASSWORD = "changeit";
         } catch (URISyntaxException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -72,9 +91,13 @@ public abstract class AbstractCommonIntegrationTest extends AbstractContainerTes
                 .setKsiProtocolExtenderClient(httpClient)
                 .setKsiProtocolPublicationsFileClient(httpClient)
                 .setPublicationsFileTrustedCertSelector(new X509CertificateSubjectRdnSelector("E=publications@guardtime.com"))
+                .setPublicationsFilePkiTrustStore(TRUST_STORE_FILE, TRUST_STORE_PASSWORD)
                 .build();
         signatureFactory = new KsiSignatureFactory(ksi);
-        packagingFactory = new ZipContainerPackagingFactoryBuilder().withSignatureFactory(signatureFactory).build();
+        packagingFactory = new ZipContainerPackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .enableInternalVerification()
+                .build();
 
     }
 
@@ -90,35 +113,12 @@ public abstract class AbstractCommonIntegrationTest extends AbstractContainerTes
         }
     }
 
-    byte[] addDocumentsToExistingContainer_SkipDuplicate(byte[] zipFile, List<Pair<byte[], String>> files) throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try (
-                ZipInputStream zin = new ZipInputStream(new ByteArrayInputStream(zipFile));
-                ZipOutputStream out = new ZipOutputStream(bos)
-        ) {
-            ZipEntry entry;
-            List<String> filesInZip = new LinkedList<>();
-            while ((entry = zin.getNextEntry()) != null) {
-                filesInZip.add(entry.getName());
-                writeFromInputToZipOutput(out, zin, entry.getName());
-            }
-            for (Pair pair : files) {
-                if (!filesInZip.contains(pair.getRight())) {
-                    try (InputStream in = new ByteArrayInputStream((byte[]) pair.getLeft())) {
-                        writeFromInputToZipOutput(out, in, (String) pair.getRight());
-                    }
-                }
-            }
+    Container getContainerIgnoreExceptions(String container) throws Exception {
+        try {
+            return getContainer(container);
+        } catch (ContainerReadingException e) {
+            return e.getContainer();
         }
-        return bos.toByteArray();
     }
 
-    /*
-    Closes ZipOutputStream entry.
-     */
-    private void writeFromInputToZipOutput(ZipOutputStream out, InputStream in, String fileName) throws IOException {
-        out.putNextEntry(new ZipEntry(fileName));
-        Util.copyData(in, out);
-        out.closeEntry();
-    }
 }

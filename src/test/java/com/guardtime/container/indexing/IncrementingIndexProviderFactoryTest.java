@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.container.indexing;
 
 import com.guardtime.container.AbstractContainerTest;
@@ -8,7 +27,7 @@ import com.guardtime.container.packaging.zip.ZipContainerPackagingFactoryBuilder
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -23,25 +42,23 @@ public class IncrementingIndexProviderFactoryTest extends AbstractContainerTest 
                 withSignatureFactory(mockedSignatureFactory).
                 disableInternalVerification().
                 build();
-        try (Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(STRING_CONTAINER_ANNOTATION))) {
+        try (Container container = packagingFactory.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_CONTAINER_ANNOTATION))) {
             IndexProvider indexProvider = indexProviderFactory.create(container);
             Assert.assertEquals("2", indexProvider.getNextSignatureIndex());
         }
     }
 
     @Test
-    public void testCreateWithInvalidContainer() throws Exception {
-        expectedException.expect(IndexingException.class);
-        expectedException.expectMessage("Not an integer based index");
-
+    public void testCreateWithMixedContainer() throws Exception {
         ContainerPackagingFactory packagingFactory = new ZipContainerPackagingFactoryBuilder().
                 withSignatureFactory(mockedSignatureFactory).
                 withManifestFactory(mockedManifestFactory).
                 withIndexProviderFactory(new UuidIndexProviderFactory()).
                 disableInternalVerification().
                 build();
-        try (Container container = packagingFactory.create(Arrays.asList(TEST_DOCUMENT_HELLO_TEXT), Arrays.asList(STRING_CONTAINER_ANNOTATION))) {
-            indexProviderFactory.create(container);
+        try (Container container = packagingFactory.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_CONTAINER_ANNOTATION))) {
+            IndexProvider indexProvider = indexProviderFactory.create(container);
+            Assert.assertEquals("1", indexProvider.getNextSignatureIndex());
         }
     }
 

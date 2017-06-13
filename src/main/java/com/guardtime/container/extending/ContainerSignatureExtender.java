@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.container.extending;
 
 import com.guardtime.container.manifest.Manifest;
@@ -27,13 +46,11 @@ public class ContainerSignatureExtender {
     }
 
     /**
-     * Extends each signature in input container and returns the container.
+     * Extends each signature in input container and returns an {@link ExtendedContainer}.
      * If a signature extending fails it is logged at INFO level and skipped.
      * @param container    Container to be extended.
-     * @return True if all signatures were extended successfully, false otherwise.
      */
-    public boolean extend(Container container) {
-        boolean status = true;
+    public ExtendedContainer extend(Container container) {
         for (SignatureContent content : container.getSignatureContents()) {
             Manifest manifest = content.getManifest().getRight();
             String signatureUri = manifest.getSignatureReference().getUri();
@@ -42,15 +59,13 @@ public class ContainerSignatureExtender {
                 signatureFactory.extend(containerSignature, policy);
 
                 if (!containerSignature.isExtended()) {
-                    status = false;
-                    logger.info("Extending signature '{}' resulted in a non-extended signature without exception!", signatureUri);
+                    logger.warn("Extending signature '{}' resulted in a non-extended signature without exception!", signatureUri);
                 }
             } catch (SignatureException e) {
-                status = false;
-                logger.info("Failed to extend signature '{}' because: '{}'", signatureUri, e.getMessage());
+                logger.warn("Failed to extend signature '{}' because: '{}'", signatureUri, e.getMessage());
             }
         }
-        return status;
+        return new ExtendedContainer(container);
     }
 
 }

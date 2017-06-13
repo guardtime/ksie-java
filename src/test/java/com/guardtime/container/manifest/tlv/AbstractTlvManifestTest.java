@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.container.manifest.tlv;
 
 import com.guardtime.container.AbstractContainerTest;
@@ -20,7 +39,8 @@ import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 
 import static com.guardtime.container.util.Util.hash;
@@ -41,10 +61,10 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
     protected static final int ANNOTATION_REFERENCE_TYPE = 0xb05;
     protected static final int SIGNATURE_REFERENCE_TYPE = 0xb06;
 
-    protected static final byte[] SINGLE_ANNOTATION_MANIFEST_MAGIC = "KSIEANNT".getBytes();
-    protected static final byte[] ANNOTATIONS_MANIFEST_MAGIC = "KSIEANMF".getBytes();
-    protected static final byte[] DOCUMENTS_MANIFEST_MAGIC = "KSIEDAMF".getBytes();
-    protected static final byte[] SIGNATURE_MANIFEST_MAGIC = "KSIEMFST".getBytes();
+    protected static final byte[] SINGLE_ANNOTATION_MANIFEST_MAGIC = "KSIEANNT".getBytes(StandardCharsets.UTF_8);
+    protected static final byte[] ANNOTATIONS_MANIFEST_MAGIC = "KSIEANMF".getBytes(StandardCharsets.UTF_8);
+    protected static final byte[] DOCUMENTS_MANIFEST_MAGIC = "KSIEDAMF".getBytes(StandardCharsets.UTF_8);
+    protected static final byte[] SIGNATURE_MANIFEST_MAGIC = "KSIEMFST".getBytes(StandardCharsets.UTF_8);
 
     protected static final String ANNOTATIONS_MANIFEST_TYPE = "ksie10/annotmanifest";
     protected static final String DOCUMENTS_MANIFEST_TYPE = "ksie10/datamanifest";
@@ -106,7 +126,7 @@ public class AbstractTlvManifestTest extends AbstractContainerTest {
     }
 
     protected TLVElement createReference(int referenceType, String referenceUri, String referenceMime, DataHash dataHash) throws Exception {
-        return createReference(referenceType, referenceUri, referenceMime, Arrays.asList(dataHash));
+        return createReference(referenceType, referenceUri, referenceMime, Collections.singletonList(dataHash));
     }
 
     protected TLVElement createReference(int referenceType, String referenceUri, String referenceMime, List<DataHash> dataHashList) throws Exception {

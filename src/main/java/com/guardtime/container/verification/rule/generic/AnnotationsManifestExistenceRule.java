@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.container.verification.rule.generic;
 
 import com.guardtime.container.manifest.AnnotationsManifest;
@@ -10,8 +29,9 @@ import com.guardtime.container.verification.result.ResultHolder;
 import com.guardtime.container.verification.result.VerificationResult;
 import com.guardtime.container.verification.rule.AbstractRule;
 import com.guardtime.container.verification.rule.RuleTerminatingException;
-import com.guardtime.container.verification.rule.RuleType;
 import com.guardtime.container.verification.rule.state.RuleStateProvider;
+
+import static com.guardtime.container.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS;
 
 /**
  * This rule verifies that the annotations manifest is actually present in the {@link
@@ -19,7 +39,7 @@ import com.guardtime.container.verification.rule.state.RuleStateProvider;
  */
 public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureContent> {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName();
+    private static final String NAME = KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName();
 
     public AnnotationsManifestExistenceRule(RuleStateProvider stateProvider) {
         super(stateProvider.getStateForRule(NAME));
@@ -35,12 +55,10 @@ public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureCont
         if (annotationsManifest != null && annotationsManifest.getLeft().equals(annotationsManifestUri)) {
             verificationResult = VerificationResult.OK;
         }
-        holder.addResult(new GenericVerificationResult(verificationResult, this, annotationsManifestUri));
-
-
-        if (!verificationResult.equals(VerificationResult.OK)) {
-            throw new RuleTerminatingException("AnnotationsManifest integrity could not be verified for '" + annotationsManifestUri + "'");
-        }
+        holder.addResult(
+                verifiable,
+                new GenericVerificationResult(verificationResult, getName(), getErrorMessage(), annotationsManifestUri)
+        );
     }
 
     @Override

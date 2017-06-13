@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.container.integration;
 
 import com.guardtime.container.annotation.ContainerAnnotation;
@@ -5,9 +24,12 @@ import com.guardtime.container.annotation.ContainerAnnotationType;
 import com.guardtime.container.annotation.StringContainerAnnotation;
 import com.guardtime.container.document.ContainerDocument;
 import com.guardtime.container.document.StreamContainerDocument;
+import com.guardtime.container.extending.ExtendedContainer;
 import com.guardtime.container.packaging.Container;
-import com.guardtime.container.packaging.InvalidPackageException;
+import com.guardtime.container.packaging.exception.InvalidPackageException;
 import com.guardtime.container.util.Util;
+import com.guardtime.container.verification.VerifiedContainer;
+import com.guardtime.container.verification.result.ResultHolder;
 
 import org.junit.After;
 import org.junit.Before;
@@ -84,15 +106,15 @@ public class ContainerCloseableIntegrationTest extends AbstractCommonIntegration
         List<File> ksieTempFiles = getKsieTempFiles();
         try (
                 ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(new byte[313]), "byte inputstream", "byte-input-stream.bis");
-                ContainerAnnotation annotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "content", "domain.com");
-                Container container = packagingFactory.create(existingContainer, Collections.singletonList(document), Collections.singletonList(annotation));
+                ContainerAnnotation annotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "content", "domain.com")
         ) {
+            packagingFactory.addSignature(existingContainer, Collections.singletonList(document), Collections.singletonList(annotation));
             for (File doc : ksieTempFiles) {
                 if (isTempFile(doc)) {
                     Util.deleteFileOrDirectory(doc.toPath());
                 }
             }
-            container.close();
+            existingContainer.close();
             assertFalse(anyKsieTempFiles());
         } finally {
             existingContainer.close();
@@ -105,17 +127,16 @@ public class ContainerCloseableIntegrationTest extends AbstractCommonIntegration
         List<File> ksieTempFiles = getKsieTempFiles();
         try (
                 ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(new byte[313]), "byte inputstream", "byte-input-stream.bis");
-                ContainerAnnotation annotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "content", "domain.com");
-                Container container = packagingFactory.create(existingContainer, Collections.singletonList(document), Collections.singletonList(annotation))
+                ContainerAnnotation annotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "content", "domain.com")
         ) {
+            packagingFactory.addSignature(existingContainer, Collections.singletonList(document), Collections.singletonList(annotation));
             for (File doc : getKsieTempFiles()) {
                 if (isTempFile(doc) && !ksieTempFiles.contains(doc)) {
                     Util.deleteFileOrDirectory(doc.toPath());
                 }
             }
-            container.close();
-        } finally {
             assertTrue(ksieTempFiles.equals(getKsieTempFiles()));
+        } finally {
             existingContainer.close();
         }
         assertFalse(anyKsieTempFiles());
@@ -142,7 +163,7 @@ public class ContainerCloseableIntegrationTest extends AbstractCommonIntegration
                 ByteArrayOutputStream bos = new ByteArrayOutputStream()
         ) {
             List<File> tempFiles = getKsieTempFiles();
-            assertTrue(tempFiles.size() == 1);
+            assertTrue(tempFiles.size() == container.getSignatureContents().size() + 1);
             Util.deleteFileOrDirectory(tempFiles.get(0).toPath());
             container.writeTo(bos);
         }
@@ -151,15 +172,15 @@ public class ContainerCloseableIntegrationTest extends AbstractCommonIntegration
     @Test
     public void testCreateContainerFromExistingAndAlteredTempFile_ThrowsInvalidPackageException() throws Exception {
         expectedException.expect(InvalidPackageException.class);
-        expectedException.expectMessage("Created Container does not pass internal verification");
+        expectedException.expectMessage("Created Container did not pass internal verification");
         try (
                 ContainerDocument document = new StreamContainerDocument(new ByteArrayInputStream(new byte[3]), "qwerty", "qwert.file");
                 ContainerAnnotation annotation = new StringContainerAnnotation(ContainerAnnotationType.FULLY_REMOVABLE, "qwerty file", "qwerty.domain.com");
                 Container container = getContainer(CONTAINER_WITH_NON_REMOVABLE_ANNOTATION)
         ) {
             List<File> tempFiles = getKsieTempFiles();
-            //One KSIE directory for container and one KSIE...tmp file for annotation.
-            assertTrue("Temp dir contains more than one KSIE temporary files, test system is not clean.",tempFiles.size() == 2);
+            //One KSIE directory for container, one per signatureContent and one KSIE...tmp file for annotation.
+            assertTrue("Temp dir contains more than necessary KSIE temporary files, test system is not clean.",tempFiles.size() == container.getSignatureContents().size() + 2);
             for (File tmp : tempFiles) {
                 if (tmp.isDirectory()){
                     File[] files = tmp.listFiles();
@@ -170,8 +191,33 @@ public class ContainerCloseableIntegrationTest extends AbstractCommonIntegration
                     }
                 }
             }
-            packagingFactory.create(container, Collections.singletonList(document), Collections.singletonList(annotation));
+            packagingFactory.addSignature(container, Collections.singletonList(document), Collections.singletonList(annotation));
         }
+    }
+
+    @Test
+    public void testCloseSourceContainer() throws Exception {
+        Container container = getContainer();
+        VerifiedContainer verifiedContainer = new VerifiedContainer(container, new ResultHolder());
+        ExtendedContainer extendedContainer = new ExtendedContainer(container);
+        container.close();
+        assertFalse(anyKsieTempFiles());
+    }
+
+    @Test
+    public void testCloseVerifiedContainer() throws Exception {
+        Container container = getContainer();
+        VerifiedContainer verifiedContainer = new VerifiedContainer(container, new ResultHolder());
+        verifiedContainer.close();
+        assertFalse(anyKsieTempFiles());
+    }
+
+    @Test
+    public void testCloseExtendedContainer() throws Exception {
+        Container container = getContainer();
+        ExtendedContainer extendedContainer = new ExtendedContainer(container);
+        extendedContainer.close();
+        assertFalse(anyKsieTempFiles());
     }
 
     private boolean anyKsieTempFiles() {
