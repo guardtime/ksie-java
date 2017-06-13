@@ -20,6 +20,8 @@ If you need the latest version, download the source and build using Maven.
 
 ## Usage ##
 
+The API full reference is available here [http://guardtime.github.io/ksie-java-container/](http://guardtime.github.io/ksie-java-container/).
+
 For many activities you need to have composed a ContainerPackagingFactory which requires a SignatureFactory.
 
 Optionally other specifiers can be set:
