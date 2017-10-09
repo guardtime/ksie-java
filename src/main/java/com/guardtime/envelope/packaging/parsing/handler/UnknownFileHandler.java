@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.packaging.parsing.handler;
 
-import com.guardtime.envelope.document.ParsedEnvelopeDocument;
+import com.guardtime.envelope.document.ParsedDocument;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 
@@ -39,7 +39,7 @@ public class UnknownFileHandler extends ContentHandler<UnknownDocument> {
 
     @Override
     protected UnknownDocument getEntry(String name) throws ContentParsingException {
-        return new ParsedEnvelopeDocument(parsingStore, name, "unknown", name);
+        return new ParsedDocument(parsingStore, name, "unknown", name);
     }
 
 }

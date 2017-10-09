@@ -19,8 +19,8 @@
 
 package com.guardtime.envelope.manifest.tlv;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.util.Pair;
 
 import org.junit.Before;
@@ -37,7 +37,7 @@ import static org.junit.Assert.assertNotNull;
 public class TlvEnvelopeManifestFactoryTest extends AbstractTlvManifestTest {
 
     private TlvEnvelopeManifestFactory factory = new TlvEnvelopeManifestFactory();
-    private Pair<String, EnvelopeAnnotation> mockedAnnotationPair;
+    private Pair<String, Annotation> mockedAnnotationPair;
     private Pair<String, TlvDocumentsManifest> mockedDocumentsManifestPair;
 
     @Override
@@ -79,13 +79,13 @@ public class TlvEnvelopeManifestFactoryTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateAnnotationsManifestWithoutSingleAnnotationManifestsOK() throws Exception {
-        TlvAnnotationsManifest manifest = factory.createAnnotationsManifest(new HashMap<String, Pair<EnvelopeAnnotation, TlvSingleAnnotationManifest>>());
+        TlvAnnotationsManifest manifest = factory.createAnnotationsManifest(new HashMap<String, Pair<Annotation, TlvSingleAnnotationManifest>>());
         assertNotNull(manifest);
     }
 
     @Test
     public void testCreateAnnotationsManifestOK() throws Exception {
-        Map<String, Pair<EnvelopeAnnotation, TlvSingleAnnotationManifest>> annotationManifests = new HashMap();
+        Map<String, Pair<Annotation, TlvSingleAnnotationManifest>> annotationManifests = new HashMap();
         annotationManifests.put("Non-important-for-test", Pair.of(mockAnnotation, mockSingleAnnotationManifest));
         TlvAnnotationsManifest manifest = factory.createAnnotationsManifest(annotationManifests);
 
@@ -96,7 +96,7 @@ public class TlvEnvelopeManifestFactoryTest extends AbstractTlvManifestTest {
     public void testCreateDocumentsManifestWithEmptyDocumentsList_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Document files list must not be empty");
-        factory.createDocumentsManifest(new ArrayList<EnvelopeDocument>());
+        factory.createDocumentsManifest(new ArrayList<Document>());
     }
 
     @Test

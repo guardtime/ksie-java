@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.packaging.parsing.handler;
 
-import com.guardtime.envelope.document.ParsedEnvelopeDocument;
+import com.guardtime.envelope.document.ParsedDocument;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
@@ -71,7 +71,7 @@ public abstract class ContentHandler<T> {
     public List<UnknownDocument> getUnrequestedFiles() throws ParsingStoreException {
         List<UnknownDocument> returnable = new LinkedList<>();
         for (String name : unrequestedEntries) {
-            returnable.add(new ParsedEnvelopeDocument(parsingStore, name, "unknown", name));
+            returnable.add(new ParsedDocument(parsingStore, name, "unknown", name));
         }
         return returnable;
     }

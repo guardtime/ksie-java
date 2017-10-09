@@ -20,7 +20,7 @@
 package com.guardtime.envelope.verification.rule.generic;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
 import com.guardtime.envelope.manifest.AnnotationDataReference;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
@@ -93,7 +93,7 @@ public class AnnotationDataExistenceRuleTest extends AbstractEnvelopeTest {
         when(mockAnnotationManifestReference.getMimeType()).thenReturn(annotationType.getContent());
         when(mockAnnotationReference.getUri()).thenReturn(annotationPath);
         when(mockSignaleAnnotationManifest.getAnnotationReference()).thenReturn(mockAnnotationReference);
-        when(mockSignatureContent.getAnnotations()).thenReturn(Collections.singletonMap(annotationPath, Mockito.mock(EnvelopeAnnotation.class)));
+        when(mockSignatureContent.getAnnotations()).thenReturn(Collections.singletonMap(annotationPath, Mockito.mock(Annotation.class)));
         holder.addResult(mockSignatureContent, new GenericVerificationResult(VerificationResult.OK, KSIE_VERIFY_ANNOTATION_EXISTS.getName(), "", annotationManifestPath));
         when(mockSignatureContent.getSingleAnnotationManifests()).thenReturn(Collections.singletonMap(annotationManifestPath, mockSignaleAnnotationManifest));
         AnnotationsManifest mockAnnotationsManifest = mock(AnnotationsManifest.class);

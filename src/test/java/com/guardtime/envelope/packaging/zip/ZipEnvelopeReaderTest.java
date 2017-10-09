@@ -20,8 +20,8 @@
 package com.guardtime.envelope.packaging.zip;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.EmptyEnvelopeDocument;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.EmptyDocument;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.tlv.TlvEnvelopeManifestFactory;
@@ -40,10 +40,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -51,6 +51,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
@@ -67,8 +68,11 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
     public void setUpReader() throws Exception {
         EnvelopeManifestFactory manifestFactory = new TlvEnvelopeManifestFactory();
 
-        when(mockKsi.sign(Mockito.any(DataHash.class))).thenReturn(Mockito.mock(KSISignature.class));
-        when(mockKsi.extend(Mockito.any(KSISignature.class))).thenReturn(Mockito.mock(KSISignature.class));
+        when(mockKsi.sign(any(DataHash.class))).thenReturn(mock(KSISignature.class));
+        when(mockKsi.extend(any(KSISignature.class))).thenReturn(mock(KSISignature.class));
+        KSISignature mockKsiSignature = mock(KSISignature.class);
+        when(mockKsiSignature.getAggregationTime()).thenReturn(mock(Date.class));
+        when(mockKsi.read(any(InputStream.class))).thenReturn(mockKsiSignature);
         SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
         this.reader = new ZipEnvelopeReader(manifestFactory, signatureFactory, new TemporaryFileBasedParsingStoreFactory());
     }
@@ -131,8 +135,8 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
         assertNotNull(envelope);
         assertFalse(envelope.getSignatureContents().isEmpty());
         for (SignatureContent content : envelope.getSignatureContents()) {
-            for (EnvelopeDocument document : content.getDocuments().values()) {
-                assertTrue(document instanceof EmptyEnvelopeDocument);
+            for (Document document : content.getDocuments().values()) {
+                assertTrue(document instanceof EmptyDocument);
             }
         }
     }

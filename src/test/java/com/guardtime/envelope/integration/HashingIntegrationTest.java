@@ -20,11 +20,11 @@
 package com.guardtime.envelope.integration;
 
 import com.guardtime.envelope.EnvelopeBuilder;
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
-import com.guardtime.envelope.annotation.StringEnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.StreamEnvelopeDocument;
+import com.guardtime.envelope.annotation.StringAnnotation;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.Manifest;
@@ -59,8 +59,8 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     private static final String CONTAINER_DOCUMENT_FILE_NAME = "StreamFile.txt";
     private static final String CONTAINER_DOCUMENT_MIME_TYPE = "Stream";
     private static final String INPUT_STREAM_STRING = "Input from stream.";
-    private final EnvelopeAnnotation CONTAINER_ANNOTATION = new StringEnvelopeAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, CONTAINER_ANNOTATION_CONTENT, CONTAINER_ANNOTATION_TYPE_DOMAIN);
-    private final EnvelopeDocument CONTAINER_DOCUMENT = new StreamEnvelopeDocument(new ByteArrayInputStream(INPUT_STREAM_STRING.getBytes(StandardCharsets.UTF_8)), CONTAINER_DOCUMENT_MIME_TYPE, CONTAINER_DOCUMENT_FILE_NAME);
+    private final Annotation CONTAINER_ANNOTATION = new StringAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, CONTAINER_ANNOTATION_CONTENT, CONTAINER_ANNOTATION_TYPE_DOMAIN);
+    private final Document CONTAINER_DOCUMENT = new StreamDocument(new ByteArrayInputStream(INPUT_STREAM_STRING.getBytes(StandardCharsets.UTF_8)), CONTAINER_DOCUMENT_MIME_TYPE, CONTAINER_DOCUMENT_FILE_NAME);
     private Envelope envelope;
 
     @After

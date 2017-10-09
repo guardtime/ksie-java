@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.manifest.tlv;
 
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.manifest.DocumentsManifest;
 import com.guardtime.envelope.manifest.InvalidManifestException;
@@ -40,10 +40,10 @@ class TlvDocumentsManifest extends AbstractTlvManifestStructure implements Docum
 
     private List<TlvDocumentReference> documents = new LinkedList<>();
 
-    public TlvDocumentsManifest(List<EnvelopeDocument> documents, HashAlgorithmProvider algorithmProvider) throws InvalidManifestException {
+    public TlvDocumentsManifest(List<Document> documents, HashAlgorithmProvider algorithmProvider) throws InvalidManifestException {
         super(MAGIC);
         try {
-            for (EnvelopeDocument doc : documents) {
+            for (Document doc : documents) {
                 this.documents.add(new TlvDocumentReference(doc, algorithmProvider));
             }
         } catch (DataHashException | TLVParserException | IOException e) {

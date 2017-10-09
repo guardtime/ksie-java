@@ -19,10 +19,10 @@
 
 package com.guardtime.envelope;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.FileEnvelopeDocument;
-import com.guardtime.envelope.document.StreamEnvelopeDocument;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.FileDocument;
+import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.SignatureContent;
@@ -44,8 +44,8 @@ public class EnvelopeBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EnvelopeBuilder.class);
 
-    private final List<EnvelopeDocument> documents = new LinkedList<>();
-    private final List<EnvelopeAnnotation> annotations = new LinkedList<>();
+    private final List<Document> documents = new LinkedList<>();
+    private final List<Annotation> annotations = new LinkedList<>();
 
     private final EnvelopePackagingFactory packagingFactory;
     private Envelope existingEnvelope;
@@ -67,14 +67,14 @@ public class EnvelopeBuilder {
     }
 
     public EnvelopeBuilder withDocument(InputStream input, String name, String mimeType) {
-        return withDocument(new StreamEnvelopeDocument(input, mimeType, name));
+        return withDocument(new StreamDocument(input, mimeType, name));
     }
 
     public EnvelopeBuilder withDocument(File file, String mimeType) {
-        return withDocument(new FileEnvelopeDocument(file, mimeType));
+        return withDocument(new FileDocument(file, mimeType));
     }
 
-    public EnvelopeBuilder withDocument(EnvelopeDocument document) {
+    public EnvelopeBuilder withDocument(Document document) {
         notNull(document, "Data file ");
         checkDocumentNameExistence(document);
         documents.add(document);
@@ -84,7 +84,7 @@ public class EnvelopeBuilder {
         return this;
     }
 
-    public EnvelopeBuilder withAnnotation(EnvelopeAnnotation annotation) {
+    public EnvelopeBuilder withAnnotation(Annotation annotation) {
         notNull(annotations, "Annotation");
         annotations.add(annotation);
         if (LOGGER.isDebugEnabled()) {
@@ -107,16 +107,16 @@ public class EnvelopeBuilder {
         return envelope;
     }
 
-    List<EnvelopeDocument> getDocuments() {
+    List<Document> getDocuments() {
         return documents;
     }
 
-    List<EnvelopeAnnotation> getAnnotations() {
+    List<Annotation> getAnnotations() {
         return annotations;
     }
 
-    private void checkDocumentNameExistence(EnvelopeDocument document) {
-        for (EnvelopeDocument doc : getAddedDocuments()) {
+    private void checkDocumentNameExistence(Document document) {
+        for (Document doc : getAddedDocuments()) {
             if (doc.equals(document)) {
                 continue;
             }
@@ -126,8 +126,8 @@ public class EnvelopeBuilder {
         }
     }
 
-    private List<EnvelopeDocument> getAddedDocuments() {
-        List<EnvelopeDocument> documents = new LinkedList<>(this.documents);
+    private List<Document> getAddedDocuments() {
+        List<Document> documents = new LinkedList<>(this.documents);
         if (existingEnvelope != null) {
             for (SignatureContent content : existingEnvelope.getSignatureContents()) {
                 documents.addAll(content.getDocuments().values());

@@ -19,28 +19,33 @@
 
 package com.guardtime.envelope.annotation;
 
-import com.guardtime.envelope.util.Util;
+import com.guardtime.envelope.util.DataHashException;
+import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Annotation that is based on File as the data source.
+ * Represents annotations that can be used in envelope. Combines annotation data and annotation
+ * meta-data into one object.
  */
-public class FileEnvelopeAnnotation extends AbstractEnvelopeAnnotation {
+public interface Annotation extends AutoCloseable {
 
-    private final File file;
+    EnvelopeAnnotationType getAnnotationType();
 
-    public FileEnvelopeAnnotation(File file, String domain, EnvelopeAnnotationType type) {
-        super(domain, type);
-        Util.notNull(file, "File");
-        this.file = file;
-    }
+    String getDomain();
 
-    @Override
-    public InputStream getInputStream() throws IOException {
-        return new FileInputStream(file);
-    }
+    /**
+     * Returns {@link InputStream} containing the annotation data.
+     * @throws IOException when there is a problem creating or accessing the InputStream.
+     */
+    InputStream getInputStream() throws IOException;
+
+    /**
+     * Returns {@link DataHash} of annotation data for given algorithm.
+     * @throws DataHashException when there is a problem generating the hash.
+     */
+    DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException;
+
 }

@@ -24,33 +24,50 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import org.junit.Test;
 
+import java.io.File;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class StringEnvelopeAnnotationTest extends AbstractEnvelopeTest {
-
+public class FileAnnotationTest extends AbstractEnvelopeTest {
 
     @Test
-    public void testCreateStringAnnotationWithoutInputString_ThrowsNullPointerException() throws Exception {
+    public void testCreateFileAnnotationWithoutInputFile_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("Content must be present");
-        new StringEnvelopeAnnotation(EnvelopeAnnotationType.NON_REMOVABLE, null, ANNOTATION_DOMAIN_COM_GUARDTIME);
+        expectedException.expectMessage("File must be present");
+        new FileAnnotation(null, ANNOTATION_DOMAIN_COM_GUARDTIME, EnvelopeAnnotationType.NON_REMOVABLE);
     }
 
     @Test
-    public void testCreateStringAnnotationWithoutAnnotationType_ThrowsNullPointerException() throws Exception {
+    public void testCreateFileAnnotationWithoutDomain_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Domain must be present");
+        new FileAnnotation(new File(TEST_FILE_PATH_TEST_TXT), null, EnvelopeAnnotationType.NON_REMOVABLE);
+    }
+
+    @Test
+    public void testCreateFileAnnotationWithoutAnnotationType_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Annotation type must be present");
-        new StringEnvelopeAnnotation(null, "Example Content", ANNOTATION_DOMAIN_COM_GUARDTIME);
+        new FileAnnotation(new File(TEST_FILE_PATH_TEST_TXT), ANNOTATION_DOMAIN_COM_GUARDTIME, null);
     }
 
     @Test
     public void testCreateNewFileAnnotation() throws Exception {
-        StringEnvelopeAnnotation annotation = new StringEnvelopeAnnotation(EnvelopeAnnotationType.NON_REMOVABLE, "Example Content", ANNOTATION_DOMAIN_COM_GUARDTIME);
+        FileAnnotation annotation = new FileAnnotation(loadFile(TEST_FILE_PATH_TEST_TXT), ANNOTATION_DOMAIN_COM_GUARDTIME, EnvelopeAnnotationType.NON_REMOVABLE);
         assertEquals(ANNOTATION_DOMAIN_COM_GUARDTIME, annotation.getDomain());
         assertEquals(EnvelopeAnnotationType.NON_REMOVABLE, annotation.getAnnotationType());
         assertNotNull(annotation.getDataHash(HashAlgorithm.SHA2_256));
     }
 
+
+    @Test
+    public void testCloseDoesNotDeleteFile() throws Exception {
+        File file = loadFile(TEST_FILE_PATH_TEST_TXT);
+        FileAnnotation annotation = new FileAnnotation(file, ANNOTATION_DOMAIN_COM_GUARDTIME, EnvelopeAnnotationType.NON_REMOVABLE);
+        annotation.close();
+        assertTrue(file.exists());
+    }
 
 }

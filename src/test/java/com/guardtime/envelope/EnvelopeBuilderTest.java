@@ -19,8 +19,8 @@
 
 package com.guardtime.envelope;
 
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.StreamEnvelopeDocument;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.manifest.SignatureReference;
 import com.guardtime.envelope.packaging.Envelope;
@@ -82,7 +82,7 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
     @Test
     public void testAddDocumentToEnvelope() throws Exception {
         EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
-        try (StreamEnvelopeDocument document = new StreamEnvelopeDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)) {
+        try (StreamDocument document = new StreamDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)) {
             builder.withDocument(document);
             assertEquals(1, builder.getDocuments().size());
 
@@ -169,12 +169,12 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
         expectedException.expectMessage("Document with name '" + TEST_FILE_NAME_TEST_TXT + "' already exists!");
         expectedException.expect(IllegalArgumentException.class);
         try (
-                EnvelopeDocument document = new StreamEnvelopeDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
-                EnvelopeDocument streamEnvelopeDocument = new StreamEnvelopeDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)
+                Document document = new StreamDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
+                Document streamDocument = new StreamDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)
         ) {
             EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
             builder.withDocument(document);
-            builder.withDocument(streamEnvelopeDocument);
+            builder.withDocument(streamDocument);
             builder.build();
         }
     }
@@ -184,8 +184,8 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Found multiple documents with same name!");
         try (
-                EnvelopeDocument document = new StreamEnvelopeDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
-                EnvelopeDocument streamEnvelopeDocument = new StreamEnvelopeDocument(new ByteArrayInputStream("ImportantDocument-HAHA".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)
+                Document document = new StreamDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
+                Document streamDocument = new StreamDocument(new ByteArrayInputStream("ImportantDocument-HAHA".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)
         ) {
             EnvelopePackagingFactory packagingFactory = getEnvelopePackagingFactory();
             // build initial envelope
@@ -194,7 +194,7 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
             try (Envelope envelope = builder.build()) {
 
                 // add new documents to existing envelope
-                builder.withDocument(streamEnvelopeDocument);
+                builder.withDocument(streamDocument);
                 builder.withExistingEnvelope(envelope);
                 builder.build();
             }

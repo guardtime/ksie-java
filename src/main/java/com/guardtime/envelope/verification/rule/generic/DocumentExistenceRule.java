@@ -19,8 +19,8 @@
 
 package com.guardtime.envelope.verification.rule.generic;
 
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.EmptyEnvelopeDocument;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.EmptyDocument;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.SignatureContent;
@@ -41,7 +41,7 @@ import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_DATA
 import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_DATA_MANIFEST_EXISTS;
 
 /**
- * This rule verifies that the tested {@link EnvelopeDocument} is indeed present in the {@link
+ * This rule verifies that the tested {@link Document} is indeed present in the {@link
  * Envelope}
  * It expects to find successful results for rules verifying existence and integrity of
  * {@link com.guardtime.envelope.manifest.DocumentsManifest}.
@@ -59,8 +59,8 @@ public class DocumentExistenceRule extends AbstractRule<SignatureContent> {
         for (FileReference documentReference : verifiable.getDocumentsManifest().getRight().getDocumentReferences()) {
             VerificationResult result = getFailureVerificationResult();
             String documentUri = documentReference.getUri();
-            EnvelopeDocument document = verifiable.getDocuments().get(documentUri);
-            if (document != null && !(document instanceof EmptyEnvelopeDocument)) {
+            Document document = verifiable.getDocuments().get(documentUri);
+            if (document != null && !(document instanceof EmptyDocument)) {
                 result = VerificationResult.OK;
             }
             holder.addResult(verifiable, new GenericVerificationResult(result, getName(), getErrorMessage(), documentUri));

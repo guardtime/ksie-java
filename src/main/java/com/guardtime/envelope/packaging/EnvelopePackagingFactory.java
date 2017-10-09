@@ -19,8 +19,8 @@
 
 package com.guardtime.envelope.packaging;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.IndexProvider;
@@ -135,12 +135,12 @@ public class EnvelopePackagingFactory {
     /**
      * Creates a {@link Envelope} with the input documents and annotations and a signature covering them.
      *
-     * @param files          List of {@link EnvelopeDocument} to be added and signed. Can NOT be null.
-     * @param annotations    List of {@link EnvelopeAnnotation} to be added and signed. Can be null.
+     * @param files          List of {@link Document} to be added and signed. Can NOT be null.
+     * @param annotations    List of {@link Annotation} to be added and signed. Can be null.
      * @return A new {@link Envelope} which contains the documents and annotations and a signature covering them.
      * @throws InvalidPackageException  When the input data can not be processed or signing fails.
      */
-    public Envelope create(List<EnvelopeDocument> files, List<EnvelopeAnnotation> annotations) throws InvalidPackageException {
+    public Envelope create(List<Document> files, List<Annotation> annotations) throws InvalidPackageException {
         SignatureContent signatureContent = verifyAndSign(files, annotations, null);
         MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
         Envelope envelope = new Envelope(signatureContent, mimeType, envelopeWriter);
@@ -154,12 +154,12 @@ public class EnvelopePackagingFactory {
      *
      * @param existingEnvelope    An instance of {@link Envelope} which already has
      *                             {@link EnvelopeSignature}(s)
-     * @param files                List of {@link EnvelopeDocument} to be added and signed. Can NOT be null.
-     * @param annotations          List of {@link EnvelopeAnnotation} to be added and signed. Can be null.
+     * @param files                List of {@link Document} to be added and signed. Can NOT be null.
+     * @param annotations          List of {@link Annotation} to be added and signed. Can be null.
      * @throws InvalidPackageException When the input data can not be processed or signing fails.
      * @throws EnvelopeMergingException When there are issues adding the newly created {@link SignatureContent} to {@param existingEnvelope}.
      */
-    public void addSignature(Envelope existingEnvelope, List<EnvelopeDocument> files, List<EnvelopeAnnotation> annotations)
+    public void addSignature(Envelope existingEnvelope, List<Document> files, List<Annotation> annotations)
             throws InvalidPackageException, EnvelopeMergingException {
         Util.notNull(existingEnvelope, "Envelope");
         SignatureContent signatureContent = verifyAndSign(files, annotations, existingEnvelope);
@@ -167,10 +167,10 @@ public class EnvelopePackagingFactory {
         verifyEnvelope(existingEnvelope);
     }
 
-    private SignatureContent verifyAndSign(List<EnvelopeDocument> files, List<EnvelopeAnnotation> annotations,
+    private SignatureContent verifyAndSign(List<Document> files, List<Annotation> annotations,
                                            Envelope existingEnvelope) throws InvalidPackageException {
         Util.notEmpty(files, "Document files");
-        HashSet<EnvelopeDocument> documents = new HashSet<>(files);
+        HashSet<Document> documents = new HashSet<>(files);
 
         IndexProvider indexProvider;
         if (existingEnvelope != null) {
@@ -221,9 +221,9 @@ public class EnvelopePackagingFactory {
         }
     }
 
-    private void verifyNoDuplicateDocumentNames(Set<EnvelopeDocument> documents) throws IllegalArgumentException {
+    private void verifyNoDuplicateDocumentNames(Set<Document> documents) throws IllegalArgumentException {
         Set<String> uniqueDocumentNames = new HashSet<>();
-        for (EnvelopeDocument doc : documents) {
+        for (Document doc : documents) {
             uniqueDocumentNames.add(doc.getFileName());
         }
 
@@ -234,17 +234,17 @@ public class EnvelopePackagingFactory {
 
     private static class ContentSigner {
 
-        private List<EnvelopeDocument> documents;
-        private List<EnvelopeAnnotation> annotations;
+        private List<Document> documents;
+        private List<Annotation> annotations;
         private EntryNameProvider nameProvider;
         private EnvelopeManifestFactory manifestFactory;
         private SignatureFactory signatureFactory;
 
-        private List<Pair<String, EnvelopeAnnotation>> annotationPairs = new LinkedList<>();
+        private List<Pair<String, Annotation>> annotationPairs = new LinkedList<>();
         private List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifestPairs = new LinkedList<>();
-        private Map<String, Pair<EnvelopeAnnotation, SingleAnnotationManifest>> annotationsManifestContent = new HashMap<>();
+        private Map<String, Pair<Annotation, SingleAnnotationManifest>> annotationsManifestContent = new HashMap<>();
 
-        public ContentSigner(List<EnvelopeDocument> documents, List<EnvelopeAnnotation> annotations, IndexProvider indexProvider,
+        public ContentSigner(List<Document> documents, List<Annotation> annotations, IndexProvider indexProvider,
                              EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory) {
             this.documents = documents;
             this.annotations = annotations;
@@ -297,8 +297,8 @@ public class EnvelopePackagingFactory {
             if (annotations == null) {
                 return;
             }
-            for (EnvelopeAnnotation annotation : annotations) {
-                Pair<String, EnvelopeAnnotation> annotationPair =
+            for (Annotation annotation : annotations) {
+                Pair<String, Annotation> annotationPair =
                         Pair.of(nameProvider.nextAnnotationDataFileName(), annotation);
                 annotationPairs.add(annotationPair);
                 SingleAnnotationManifest singleAnnotationManifest =

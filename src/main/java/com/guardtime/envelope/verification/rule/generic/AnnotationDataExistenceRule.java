@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.verification.rule.generic;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
@@ -67,7 +67,7 @@ public class AnnotationDataExistenceRule extends AbstractRule<SignatureContent> 
             VerificationResult result = getFailureVerificationResult();
 
             String dataPath = getAnnotationDataPath(manifestUri, verifiable);
-            EnvelopeAnnotation annotation = verifiable.getAnnotations().get(dataPath);
+            Annotation annotation = verifiable.getAnnotations().get(dataPath);
             if (annotation != null) {
                 result = OK;
             }

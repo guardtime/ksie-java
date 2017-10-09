@@ -19,8 +19,8 @@
 
 package com.guardtime.envelope.packaging.zip;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.DocumentsManifest;
@@ -109,10 +109,10 @@ class ZipEnvelopeWriter implements EnvelopeWriter {
         }
     }
 
-    private void writeAnnotations(Map<String, EnvelopeAnnotation> annotations, ZipOutputStream output, Set<String> writtenFiles)
+    private void writeAnnotations(Map<String, Annotation> annotations, ZipOutputStream output, Set<String> writtenFiles)
             throws IOException {
         for (String uri : annotations.keySet()) {
-            EnvelopeAnnotation annotation = annotations.get(uri);
+            Annotation annotation = annotations.get(uri);
             try (InputStream inputStream = annotation.getInputStream()) {
                 writeEntry(uri, inputStream, output, writtenFiles);
             }
@@ -133,10 +133,10 @@ class ZipEnvelopeWriter implements EnvelopeWriter {
         writtenFiles.add(signatureUri);
     }
 
-    private void writeDocuments(Map<String, EnvelopeDocument> documents, ZipOutputStream zipOutputStream,
+    private void writeDocuments(Map<String, Document> documents, ZipOutputStream zipOutputStream,
                                 Set<String> writtenFiles) throws IOException {
         for (String uri : documents.keySet()) {
-            EnvelopeDocument document = documents.get(uri);
+            Document document = documents.get(uri);
             if (document.isWritable()) {
                 try (InputStream inputStream = document.getInputStream()) {
                     writeEntry(uri, inputStream, zipOutputStream, writtenFiles);

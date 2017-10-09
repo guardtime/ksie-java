@@ -19,11 +19,11 @@
 
 package com.guardtime.envelope.integration;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
-import com.guardtime.envelope.annotation.StringEnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.EmptyEnvelopeDocument;
+import com.guardtime.envelope.annotation.StringAnnotation;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.EmptyDocument;
 import com.guardtime.envelope.extending.ExtendedEnvelope;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.SignatureContent;
@@ -339,7 +339,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testAttachDocumentAndVerify_VerificationSuccessful() throws Exception {
         VerifiedEnvelope verifiedEnvelope = null;
-        EnvelopeDocument detached = null;
+        Document detached = null;
         InputStream inputStream = null;
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_ONE_DOCUMENT)) {
             SignatureContent content = envelope.getSignatureContents().get(0);
@@ -379,11 +379,11 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
         String documentName = "Document1.txt";
         try (
-                EnvelopeDocument document = new EmptyEnvelopeDocument(
+                Document document = new EmptyDocument(
                         documentName,
                         "txt",
                         Collections.singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(expectedDocumentContent).getHash()));
-                EnvelopeAnnotation annotation = new StringEnvelopeAnnotation(
+                Annotation annotation = new StringAnnotation(
                         EnvelopeAnnotationType.NON_REMOVABLE,
                         "Document is not with envelope. Envelope was created created with empty envelope document. Document itself can be added later on if needed.",
                         "com.guardtime.com");

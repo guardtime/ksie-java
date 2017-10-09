@@ -19,5 +19,5 @@
 
 package com.guardtime.envelope.document;
 
-public interface UnknownDocument extends EnvelopeDocument {
+public interface UnknownDocument extends Document {
 }

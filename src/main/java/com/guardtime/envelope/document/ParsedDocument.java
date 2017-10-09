@@ -27,15 +27,15 @@ import java.io.InputStream;
 import static com.guardtime.envelope.util.Util.notNull;
 
 /**
- * Represents a {@link EnvelopeDocument} that has been parsed in. Uses a {@link ParsingStore} from where to access the data of
- * the {@link EnvelopeDocument}
+ * Represents a {@link Document} that has been parsed in. Uses a {@link ParsingStore} from where to access the data of
+ * the {@link Document}
  */
-public class ParsedEnvelopeDocument extends AbstractEnvelopeDocument implements UnknownDocument {
+public class ParsedDocument extends AbstractDocument implements UnknownDocument {
 
     private final ParsingStore parsingStore;
     private final String key;
 
-    public ParsedEnvelopeDocument(ParsingStore store, String key, String mimeType, String fileName) {
+    public ParsedDocument(ParsingStore store, String key, String mimeType, String fileName) {
         super(mimeType, fileName);
         notNull(store, "Parsing store");
         notNull(key, "Parsing store key");

@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.manifest.tlv;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.InvalidManifestException;
 import com.guardtime.envelope.util.Pair;
@@ -40,7 +40,7 @@ public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateAnnotationsManifest() throws Exception {
-        Map<String, Pair<EnvelopeAnnotation, TlvSingleAnnotationManifest>> singleAnnotationManifests = new HashMap<>();
+        Map<String, Pair<Annotation, TlvSingleAnnotationManifest>> singleAnnotationManifests = new HashMap<>();
         singleAnnotationManifests.put(MOCK_URI, Pair.of(mockAnnotation, mockSingleAnnotationManifest));
         TlvAnnotationsManifest annotationsManifest = new TlvAnnotationsManifest(singleAnnotationManifests, DEFAULT_HASH_ALGORITHM_PROVIDER);
         assertArrayEquals(ANNOTATIONS_MANIFEST_MAGIC, annotationsManifest.getMagic());

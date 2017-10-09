@@ -19,41 +19,28 @@
 
 package com.guardtime.envelope.annotation;
 
-import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
+import com.guardtime.envelope.util.Util;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static com.guardtime.envelope.util.Util.notNull;
-
 /**
- * Represents a {@link EnvelopeAnnotation} that has been parsed in. Uses a {@link ParsingStore} from where to access the data of
- * the {@link EnvelopeAnnotation}
+ * Annotation that is based on File as the data source.
  */
-public class ParsedEnvelopeAnnotation extends AbstractEnvelopeAnnotation {
+public class FileAnnotation extends AbstractAnnotation {
 
-    private final ParsingStore parsingStore;
-    private final String key;
+    private final File file;
 
-    public ParsedEnvelopeAnnotation(ParsingStore store, String key, String domain, EnvelopeAnnotationType type) {
+    public FileAnnotation(File file, String domain, EnvelopeAnnotationType type) {
         super(domain, type);
-        notNull(store, "Parsing store");
-        notNull(key, "Parsing store key");
-        this.parsingStore = store;
-        this.key = key;
+        Util.notNull(file, "File");
+        this.file = file;
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        InputStream inputStream = parsingStore.get(key);
-        if (inputStream == null) {
-            throw new IOException("Failed to acquire input stream from parsing store for key '" + key + "'");
-        }
-        return inputStream;
-    }
-
-    @Override
-    public void close() throws Exception {
-        parsingStore.remove(key);
+        return new FileInputStream(file);
     }
 }

@@ -20,7 +20,7 @@
 package com.guardtime.envelope.verification.rule.generic;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.util.Pair;
@@ -52,7 +52,7 @@ public class DocumentExistenceRuleTest extends AbstractEnvelopeTest {
         SignatureContent mockSignatureContent = Mockito.mock(SignatureContent.class);
         String documentPath = "somePath";
         when(mockFileReference.getUri()).thenReturn(documentPath);
-        when(mockSignatureContent.getDocuments()).thenReturn(Collections.singletonMap(documentPath, Mockito.mock(EnvelopeDocument.class)));
+        when(mockSignatureContent.getDocuments()).thenReturn(Collections.singletonMap(documentPath, Mockito.mock(Document.class)));
         when(mockSignatureContent.getDocumentsManifest()).thenReturn(Pair.of("", mockedDocumentsManifest));
         when(mockedDocumentsManifest.getDocumentReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {
             @Override
@@ -74,7 +74,7 @@ public class DocumentExistenceRuleTest extends AbstractEnvelopeTest {
         SignatureContent mockSignatureContent = Mockito.mock(SignatureContent.class);
         String documentPath = "somePath";
         when(mockFileReference.getUri()).thenReturn(documentPath);
-        when(mockSignatureContent.getDocuments()).thenReturn(Collections.<String, EnvelopeDocument>emptyMap());
+        when(mockSignatureContent.getDocuments()).thenReturn(Collections.<String, Document>emptyMap());
         when(mockSignatureContent.getDocumentsManifest()).thenReturn(Pair.of("", mockedDocumentsManifest));
         when(mockedDocumentsManifest.getDocumentReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {
             @Override

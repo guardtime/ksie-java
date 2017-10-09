@@ -17,38 +17,30 @@
  * reserves and retains all trademark rights.
  */
 
-package com.guardtime.envelope.document;
+package com.guardtime.envelope.annotation;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import static com.guardtime.envelope.util.Util.notNull;
 
 /**
- * Document that is based on a {@link File}.
+ * Annotation that is based on a String as the data source.
  */
-public class FileEnvelopeDocument extends AbstractEnvelopeDocument {
+public class StringAnnotation extends AbstractAnnotation {
 
-    private final File file;
+    private final String content;
 
-    public FileEnvelopeDocument(File file, String mimeType) {
-        this(file, mimeType, null);
-    }
-
-    public FileEnvelopeDocument(File file, String mimeType, String fileName) {
-        super(mimeType, getFileName(file, fileName));
-        this.file = file;
-    }
-
-    private static String getFileName(File file, String fileName) {
-        notNull(file, "File");
-        return fileName == null ? file.getName() : fileName;
+    public StringAnnotation(EnvelopeAnnotationType type, String content, String domain) {
+        super(domain, type);
+        notNull(content, "Content");
+        this.content = content;
     }
 
     @Override
-    public InputStream getInputStream() throws IOException {
-        return new FileInputStream(file);
+    public InputStream getInputStream() {
+        return new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
     }
 }

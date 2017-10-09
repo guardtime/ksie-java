@@ -19,8 +19,8 @@
 
 package com.guardtime.envelope.packaging;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.DocumentsManifest;
@@ -163,17 +163,17 @@ public class EnvelopeMergingVerifier {
     private static void checkAnnotations(String fileName, UnknownDocument unknownDocument, SignatureContent content)
             throws EnvelopeMergingException, IOException {
         if (content.getAnnotations().containsKey(fileName)) {
-            EnvelopeAnnotation currentAnnotation = content.getAnnotations().get(fileName);
+            Annotation currentAnnotation = content.getAnnotations().get(fileName);
             if (!contentsMatch(currentAnnotation.getInputStream(), unknownDocument.getInputStream())) {
                 throw new EnvelopeAnnotationMergingException(fileName);
             }
         }
     }
 
-    private static void checkDocuments(String fileName, EnvelopeDocument newDocument,
-                                       Collection<? extends EnvelopeDocument> documents)
+    private static void checkDocuments(String fileName, Document newDocument,
+                                       Collection<? extends Document> documents)
             throws EnvelopeMergingException, IOException {
-        for (EnvelopeDocument doc : documents) {
+        for (Document doc : documents) {
             if (doc.getFileName().equals(fileName)) {
                 for (HashAlgorithm algorithm : HashAlgorithm.getImplementedHashAlgorithms()) {
                     try {
@@ -276,8 +276,8 @@ public class EnvelopeMergingVerifier {
             throws EnvelopeMergingException, IOException {
         for (String annotationPath : existingContent.getAnnotations().keySet()) {
             if (content.getAnnotations().containsKey(annotationPath)) {
-                EnvelopeAnnotation newAnnotation = content.getAnnotations().get(annotationPath);
-                EnvelopeAnnotation currentAnnotation = existingContent.getAnnotations().get(annotationPath);
+                Annotation newAnnotation = content.getAnnotations().get(annotationPath);
+                Annotation currentAnnotation = existingContent.getAnnotations().get(annotationPath);
                 if (!contentsMatch(currentAnnotation.getInputStream(), newAnnotation.getInputStream())) {
                     throw new EnvelopeAnnotationMergingException(annotationPath);
                 }
@@ -287,7 +287,7 @@ public class EnvelopeMergingVerifier {
 
     private static void verifyNonClashingEnvelopeDocuments(SignatureContent content, SignatureContent existingContent)
             throws EnvelopeMergingException, IOException {
-        for (Map.Entry<String, EnvelopeDocument> newDocument : content.getDocuments().entrySet()) {
+        for (Map.Entry<String, Document> newDocument : content.getDocuments().entrySet()) {
             checkDocuments(newDocument.getKey(), newDocument.getValue(), existingContent.getDocuments().values());
         }
     }

@@ -20,15 +20,18 @@
 package com.guardtime.envelope.packaging.zip;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.StreamEnvelopeDocument;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.UuidIndexProviderFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
+import com.guardtime.envelope.signature.EnvelopeSignature;
+import com.guardtime.ksi.hashing.DataHash;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -37,8 +40,17 @@ import java.util.ArrayList;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ZipEnvelopeTest extends AbstractEnvelopeTest {
+
+    @Before
+    public void setUpSignatureFactory() throws Exception {
+        EnvelopeSignature mockSignature = mock(EnvelopeSignature.class);
+        when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mockSignature);
+    }
 
     @Test
     public void testAddSingleSignatureContent_OK() throws Exception {
@@ -49,7 +61,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                 build();
         try (Envelope envelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_ENVELOPE_ANNOTATION))) {
             assertEquals(1, envelope.getSignatureContents().size());
-            try (Envelope newEnvelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<EnvelopeAnnotation>())) {
+            try (Envelope newEnvelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<Annotation>())) {
                 envelope.add(newEnvelope.getSignatureContents().get(0));
                 assertEquals(2, envelope.getSignatureContents().size());
             }
@@ -65,7 +77,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                 build();
         try (Envelope envelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_ENVELOPE_ANNOTATION))) {
             assertEquals(1, envelope.getSignatureContents().size());
-            try (Envelope newEnvelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<EnvelopeAnnotation>())) {
+            try (Envelope newEnvelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<Annotation>())) {
                 envelope.add(newEnvelope);
                 assertEquals(2, envelope.getSignatureContents().size());
             }
@@ -81,11 +93,11 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                 build();
         try (Envelope envelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_ENVELOPE_ANNOTATION))) {
             assertEquals(1, envelope.getSignatureContents().size());
-            try (Envelope newEnvelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<EnvelopeAnnotation>());
+            try (Envelope newEnvelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<Annotation>());
                  ByteArrayInputStream input = new ByteArrayInputStream("auh".getBytes(StandardCharsets.UTF_8));
-                 EnvelopeDocument envelopeDocument = new StreamEnvelopeDocument(input, "text/plain", "someTestFile.txt")
+                 Document document = new StreamDocument(input, "text/plain", "someTestFile.txt")
             ) {
-                packagingFactory.addSignature(newEnvelope, singletonList(envelopeDocument), new ArrayList<EnvelopeAnnotation>());
+                packagingFactory.addSignature(newEnvelope, singletonList(document), new ArrayList<Annotation>());
                 int expected = newEnvelope.getSignatureContents().size() + 1;
                 envelope.add(newEnvelope);
                 assertEquals(expected, envelope.getSignatureContents().size());
@@ -104,7 +116,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                 build();
         try (Envelope envelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_ENVELOPE_ANNOTATION))) {
             assertEquals(1, envelope.getSignatureContents().size());
-            try (Envelope newEnvelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<EnvelopeAnnotation>())) {
+            try (Envelope newEnvelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<Annotation>())) {
                 envelope.add(newEnvelope.getSignatureContents().get(0));
             }
         }
@@ -124,12 +136,12 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                 singletonList(STRING_ENVELOPE_ANNOTATION)
         )) {
             assertEquals(1, envelope.getSignatureContents().size());
-            try (EnvelopeDocument clashingDocument = new StreamEnvelopeDocument(
+            try (Document clashingDocument = new StreamDocument(
                     new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                     TEST_DOCUMENT_HELLO_PDF.getMimeType(),
                     TEST_DOCUMENT_HELLO_PDF.getFileName()
             );
-                 Envelope newEnvelope = packagingFactory.create(singletonList(clashingDocument), new ArrayList<EnvelopeAnnotation>())
+                 Envelope newEnvelope = packagingFactory.create(singletonList(clashingDocument), new ArrayList<Annotation>())
             ) {
                 envelope.add(newEnvelope.getSignatureContents().get(0));
             }

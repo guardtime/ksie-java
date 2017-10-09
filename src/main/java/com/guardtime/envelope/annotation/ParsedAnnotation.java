@@ -19,28 +19,41 @@
 
 package com.guardtime.envelope.annotation;
 
+import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 import static com.guardtime.envelope.util.Util.notNull;
 
 /**
- * Annotation that is based on a String as the data source.
+ * Represents a {@link Annotation} that has been parsed in. Uses a {@link ParsingStore} from where to access the data of
+ * the {@link Annotation}
  */
-public class StringEnvelopeAnnotation extends AbstractEnvelopeAnnotation {
+public class ParsedAnnotation extends AbstractAnnotation {
 
-    private final String content;
+    private final ParsingStore parsingStore;
+    private final String key;
 
-    public StringEnvelopeAnnotation(EnvelopeAnnotationType type, String content, String domain) {
+    public ParsedAnnotation(ParsingStore store, String key, String domain, EnvelopeAnnotationType type) {
         super(domain, type);
-        notNull(content, "Content");
-        this.content = content;
+        notNull(store, "Parsing store");
+        notNull(key, "Parsing store key");
+        this.parsingStore = store;
+        this.key = key;
     }
 
     @Override
-    public InputStream getInputStream() {
-        return new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+    public InputStream getInputStream() throws IOException {
+        InputStream inputStream = parsingStore.get(key);
+        if (inputStream == null) {
+            throw new IOException("Failed to acquire input stream from parsing store for key '" + key + "'");
+        }
+        return inputStream;
+    }
+
+    @Override
+    public void close() throws Exception {
+        parsingStore.remove(key);
     }
 }

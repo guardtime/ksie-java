@@ -74,4 +74,8 @@ class KsiEnvelopeSignature implements EnvelopeSignature<KSISignature> {
         this.signature = newSignature;
     }
 
+    @Override
+    public int compareTo(EnvelopeSignature<KSISignature> ksiSignatureEnvelopeSignature) {
+        return this.signature.getAggregationTime().compareTo(ksiSignatureEnvelopeSignature.getSignature().getAggregationTime());
+    }
 }

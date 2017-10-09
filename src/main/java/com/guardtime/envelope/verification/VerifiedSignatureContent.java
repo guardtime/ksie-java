@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.verification;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.util.Pair;
@@ -60,9 +60,9 @@ public class VerifiedSignatureContent extends SignatureContent {
         });
     }
 
-    private static List<Pair<String, EnvelopeAnnotation>> getAnnotations(SignatureContent original) {
-        List<Pair<String, EnvelopeAnnotation>> annotationPairs = new ArrayList<>(original.getAnnotations().size());
-        for (Map.Entry<String, EnvelopeAnnotation> entry : original.getAnnotations().entrySet()) {
+    private static List<Pair<String, Annotation>> getAnnotations(SignatureContent original) {
+        List<Pair<String, Annotation>> annotationPairs = new ArrayList<>(original.getAnnotations().size());
+        for (Map.Entry<String, Annotation> entry : original.getAnnotations().entrySet()) {
             annotationPairs.add(Pair.of(entry.getKey(), entry.getValue()));
         }
         return annotationPairs;

@@ -19,8 +19,8 @@
 
 package com.guardtime.envelope.verification.policy;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.manifest.DocumentsManifest;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
@@ -55,10 +55,10 @@ import java.util.List;
  *   <li>verifying MIME type</li>
  *   <li>verifying signature</li>
  *   <li>verifying {@link DocumentsManifest}</li>
- *   <li>verifying {@link EnvelopeDocument}s</li>
+ *   <li>verifying {@link Document}s</li>
  *   <li>verifying {@link com.guardtime.envelope.manifest.AnnotationsManifest}</li>
  *   <li>verifying {@link com.guardtime.envelope.manifest.SingleAnnotationManifest}s</li>
- *   <li>verifying {@link EnvelopeAnnotation}s</li>
+ *   <li>verifying {@link Annotation}s</li>
  * </ol>
  * May contain extra rules to add specialized verification requirements to the policy or to overwrite some of the
  * pre-existing rules.
