@@ -8,8 +8,6 @@ KSI Envelope (KSIE) is designed to contain data, meta-data and KSI signatures. T
 
 The KSIE Java SDK is a software development kit for developers who want to integrate KSIE with their Java based applications and systems. It provides an API for all KSIE functionality.
 
-> The term (ZIP) `container` used throughout the SDK corresponds to the `envelope` in the KSIE specification.
-
 Access to full KSIE specification can be requested from https://guardtime.com/blockchain-developers
 
 
@@ -20,7 +18,7 @@ In order to get the latest version of KSIE Java SDK, download the source and bui
 
 ## Usage
 
-The API full reference is available at: [http://guardtime.github.io/ksie-java-container/](http://guardtime.github.io/ksie-java-container/).
+The API full reference is available at: [http://guardtime.github.io/ksie-java/](http://guardtime.github.io/ksie-java/).
 
 For many activities you need to have previously composed the `EnvelopePackagingFactory` which requires the `SignatureFactory`.
 
@@ -128,7 +126,7 @@ List<Rule> implicitRules;
 Rule signatureRule = new KsiPolicyBasedSignatureIntegrityRule(ksi, KeyBasedVerificationPolicy());
 DefaultVerificationPolicy policy = new DefaultVerificationPolicy(signatureRule, new MimeTypeIntegrityRule(packagingFactory), implicitRules);
 EnvelopeVerifier verifier = new EnvelopeVerifier(policy);
-VerifiedEnvelope verifiedEnvelope = verifier.verify(container);
+VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
 VerificationResult verificationResult = verifiedEnvelope.getVerificationResult(); // OK/NOK/WARN
 VerificationResult verificationResult = verifiedEnvelope.getVerifiedSignatureContents().get(0).getVerificationResult(); // OK/NOK/WARN
 ```

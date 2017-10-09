@@ -44,11 +44,11 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 public class DocumentsIntegrityRuleTest extends AbstractEnvelopeTest {
-    private static final String CONTAINER_WITH_MISSING_DOCUMENTS_MANIFEST = "verification/documents/container-with-missing-documents-manifest.ksie";
-    private static final String CONTAINER_WITH_CORRUPT_DOCUMENTS_MANIFEST = "verification/documents/container-with-corrupt-documents-manifest.ksie";
-    private static final String CONTAINER_WITH_DOCUMENT = "verification/documents/container-with-document.ksie";
-    private static final String CONTAINER_WITH_MISSING_DOCUMENT = "verification/documents/container-with-missing-document.ksie";
-    private static final String CONTAINER_WITH_CORRUPT_DOCUMENT = "verification/documents/container-with-corrupt-document.ksie";
+    private static final String CONTAINER_WITH_MISSING_DOCUMENTS_MANIFEST = "verification/documents/envelope-with-missing-documents-manifest.ksie";
+    private static final String CONTAINER_WITH_CORRUPT_DOCUMENTS_MANIFEST = "verification/documents/envelope-with-corrupt-documents-manifest.ksie";
+    private static final String CONTAINER_WITH_DOCUMENT = "verification/documents/envelope-with-document.ksie";
+    private static final String CONTAINER_WITH_MISSING_DOCUMENT = "verification/documents/envelope-with-missing-document.ksie";
+    private static final String CONTAINER_WITH_CORRUPT_DOCUMENT = "verification/documents/envelope-with-corrupt-document.ksie";
 
     @Mock
     private KSISignature mockKsiSignature;

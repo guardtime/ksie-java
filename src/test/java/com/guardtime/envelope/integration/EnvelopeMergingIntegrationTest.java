@@ -63,22 +63,22 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     /**
      * Envelopes - for creating file conflicts when trying to merge envelopes.
      */
-    private static final String[] CONTAINERS_FOR_UNKNOWN_FILE_CONFLICT = {"containers/container-for-unknown-file-conflict.ksie", ENVELOPE_WITH_UNKNOWN_FILES};
-    private static final String[] CONTAINERS_FOR_DOCUMENTS_MANIFEST_CONFLICT = {"containers/container-for-documents-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_FOR_ANNOTATION_DATA_CONFLICT = {"containers/container-for-annotation-data-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_FOR_SINGLE_ANNOTATION_MANIFEST_CONFLICT = {"containers/container-for-annotation-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_FOR_ANNOTATIONS_MANIFEST_CONFLICT = {"containers/container-for-annotations-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_FOR_DOCUMENT_CONFLICT = {"containers/container-for-document-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_FOR_MANIFEST_CONFLICT = {"containers/container-for-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_FOR_SIGNATURE_CONFLICT = {"containers/container-for-signature-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_FOR_MIX_CONFLICT_1 = {"containers/container-for-mix-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_FOR_MIX_CONFLICT_2 = {ENVELOPE_WITH_MULTIPLE_ANNOTATIONS, "containers/container-for-mix-conflict.ksie"};
+    private static final String[] CONTAINERS_FOR_UNKNOWN_FILE_CONFLICT = {"envelopes/unknown-file-conflict.ksie", ENVELOPE_WITH_UNKNOWN_FILES};
+    private static final String[] CONTAINERS_FOR_DOCUMENTS_MANIFEST_CONFLICT = {"envelopes/documents-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_FOR_ANNOTATION_DATA_CONFLICT = {"envelopes/annotation-data-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_FOR_SINGLE_ANNOTATION_MANIFEST_CONFLICT = {"envelopes/annotation-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_FOR_ANNOTATIONS_MANIFEST_CONFLICT = {"envelopes/annotations-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_FOR_DOCUMENT_CONFLICT = {"envelopes/document-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_FOR_MANIFEST_CONFLICT = {"envelopes/manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_FOR_SIGNATURE_CONFLICT = {"envelopes/signature-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_FOR_MIX_CONFLICT_1 = {"envelopes/mix-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_FOR_MIX_CONFLICT_2 = {ENVELOPE_WITH_MULTIPLE_ANNOTATIONS, "envelopes/mix-conflict.ksie"};
 
     /**
      * Envelopes - merging those envelope should not yield any exception.
      */
-    private static final String[] CONTAINERS_FOR_SAME_DOCUMENT = {"containers/container-for-same-document-file.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_IDENTICAL = {"containers/container-multiple-annotations-copy.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_FOR_SAME_DOCUMENT = {"envelopes/same-document-file.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] CONTAINERS_IDENTICAL = {"envelopes/multiple-annotations-copy.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
 
     @Before
     public void setUp() throws Exception {

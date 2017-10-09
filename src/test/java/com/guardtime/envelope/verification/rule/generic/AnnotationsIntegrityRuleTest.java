@@ -44,23 +44,23 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 public class AnnotationsIntegrityRuleTest extends AbstractEnvelopeTest {
-    private static final String CONTAINER_WITH_FULLY_REMOVABLE_ANNOTATION = "verification/annotations/container-with-fully-removable-annotation.ksie";
-    private static final String CONTAINER_WITH_FULLY_REMOVABLE_MISSING_ANNOTATION = "verification/annotations/container-with-fully-removable-missing-annotation.ksie";
-    private static final String CONTAINER_WITH_FULLY_REMOVABLE_CORRUPT_ANNOTATION = "verification/annotations/container-with-fully-removable-corrupt-annotation.ksie";
-    private static final String CONTAINER_WITH_FULLY_REMOVABLE_MISSING_ANNOTATION_DATA = "verification/annotations/container-with-fully-removable-missing-annotation-data.ksie";
-    private static final String CONTAINER_WITH_FULLY_REMOVABLE_CORRUPT_ANNOTATION_DATA = "verification/annotations/container-with-fully-removable-corrupt-annotation-data.ksie";
-    private static final String CONTAINER_WITH_VALUE_REMOVABLE_ANNOTATION = "verification/annotations/container-with-value-removable-annotation.ksie";
-    private static final String CONTAINER_WITH_VALUE_REMOVABLE_CORRUPT_ANNOTATION = "verification/annotations/container-with-value-removable-corrupt-annotation.ksie";
-    private static final String CONTAINER_WITH_VALUE_REMOVABLE_MISSING_ANNOTATION = "verification/annotations/container-with-value-removable-missing-annotation.ksie";
-    private static final String CONTAINER_WITH_VALUE_REMOVABLE_MISSING_ANNOTATION_DATA = "verification/annotations/container-with-value-removable-missing-annotation-data.ksie";
-    private static final String CONTAINER_WITH_VALUE_REMOVABLE_CORRUPT_ANNOTATION_DATA = "verification/annotations/container-with-value-removable-corrupt-annotation-data.ksie";
-    private static final String CONTAINER_WITH_NON_REMOVABLE_ANNOTATION = "verification/annotations/container-with-non-removable-annotation.ksie";
-    private static final String CONTAINER_WITH_NON_REMOVABLE_MISSING_ANNOTATION_DATA = "verification/annotations/container-with-non-removable-missing-annotation-data.ksie";
-    private static final String CONTAINER_WITH_NON_REMOVABLE_CORRUPT_ANNOTATION_DATA = "verification/annotations/container-with-non-removable-corrupt-annotation-data.ksie";
-    private static final String CONTAINER_WITH_NON_REMOVABLE_MISSING_ANNOTATION = "verification/annotations/container-with-non-removable-missing-annotation.ksie";
-    private static final String CONTAINER_WITH_NON_REMOVABLE_CORRUPT_ANNOTATION = "verification/annotations/container-with-non-removable-corrupt-annotation.ksie";
-    private static final String CONTAINER_WITH_MISSING_ANNOTATIONS_MANIFEST = "verification/annotations/container-with-missing-annotmanifest.ksie";
-    private static final String CONTAINER_WITH_CORRUPT_ANNOTATIONS_MANIFEST = "verification/annotations/container-with-corrupt-annotmanifest.ksie";
+    private static final String CONTAINER_WITH_FULLY_REMOVABLE_ANNOTATION = "verification/annotations/envelope-with-fully-removable-annotation.ksie";
+    private static final String CONTAINER_WITH_FULLY_REMOVABLE_MISSING_ANNOTATION = "verification/annotations/envelope-with-fully-removable-missing-annotation.ksie";
+    private static final String CONTAINER_WITH_FULLY_REMOVABLE_CORRUPT_ANNOTATION = "verification/annotations/envelope-with-fully-removable-corrupt-annotation.ksie";
+    private static final String CONTAINER_WITH_FULLY_REMOVABLE_MISSING_ANNOTATION_DATA = "verification/annotations/envelope-with-fully-removable-missing-annotation-data.ksie";
+    private static final String CONTAINER_WITH_FULLY_REMOVABLE_CORRUPT_ANNOTATION_DATA = "verification/annotations/envelope-with-fully-removable-corrupt-annotation-data.ksie";
+    private static final String CONTAINER_WITH_VALUE_REMOVABLE_ANNOTATION = "verification/annotations/envelope-with-value-removable-annotation.ksie";
+    private static final String CONTAINER_WITH_VALUE_REMOVABLE_CORRUPT_ANNOTATION = "verification/annotations/envelope-with-value-removable-corrupt-annotation.ksie";
+    private static final String CONTAINER_WITH_VALUE_REMOVABLE_MISSING_ANNOTATION = "verification/annotations/envelope-with-value-removable-missing-annotation.ksie";
+    private static final String CONTAINER_WITH_VALUE_REMOVABLE_MISSING_ANNOTATION_DATA = "verification/annotations/envelope-with-value-removable-missing-annotation-data.ksie";
+    private static final String CONTAINER_WITH_VALUE_REMOVABLE_CORRUPT_ANNOTATION_DATA = "verification/annotations/envelope-with-value-removable-corrupt-annotation-data.ksie";
+    private static final String CONTAINER_WITH_NON_REMOVABLE_ANNOTATION = "verification/annotations/envelope-with-non-removable-annotation.ksie";
+    private static final String CONTAINER_WITH_NON_REMOVABLE_MISSING_ANNOTATION_DATA = "verification/annotations/envelope-with-non-removable-missing-annotation-data.ksie";
+    private static final String CONTAINER_WITH_NON_REMOVABLE_CORRUPT_ANNOTATION_DATA = "verification/annotations/envelope-with-non-removable-corrupt-annotation-data.ksie";
+    private static final String CONTAINER_WITH_NON_REMOVABLE_MISSING_ANNOTATION = "verification/annotations/envelope-with-non-removable-missing-annotation.ksie";
+    private static final String CONTAINER_WITH_NON_REMOVABLE_CORRUPT_ANNOTATION = "verification/annotations/envelope-with-non-removable-corrupt-annotation.ksie";
+    private static final String CONTAINER_WITH_MISSING_ANNOTATIONS_MANIFEST = "verification/annotations/envelope-with-missing-annotmanifest.ksie";
+    private static final String CONTAINER_WITH_CORRUPT_ANNOTATIONS_MANIFEST = "verification/annotations/envelope-with-corrupt-annotmanifest.ksie";
 
     @Mock
     private KSISignature mockKsiSignature;

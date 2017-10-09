@@ -62,49 +62,49 @@ public class AbstractEnvelopeTest {
     /**
      * Envelopes - Internally correct and does verify against anchors.
      */
-    protected static final String ENVELOPE_WITH_NO_DOCUMENTS = "containers/container-no-documents.ksie";
-    protected static final String ENVELOPE_WITH_ONE_DOCUMENT = "containers/container-one-document.ksie";
-    protected static final String ENVELOPE_WITH_UNKNOWN_FILES = "containers/container-unknown-files.ksie";
-    protected static final String ENVELOPE_WITH_MULTIPLE_SIGNATURES = "containers/container-multiple-signatures.ksie";
-    protected static final String ENVELOPE_WITH_RANDOM_UUID_INDEXES = "containers/container-random-uuid-indexes.ksie";
-    protected static final String ENVELOPE_WITH_MULTIPLE_ANNOTATIONS = "containers/container-multiple-annotations.ksie";
-    protected static final String ENVELOPE_WITH_MIXED_INDEX_TYPES = "containers/container-content-with-mixed-index-types.ksie";
-    protected static final String ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION = "containers/container-with-non-removable-annotation.ksie";
-    protected static final String ENVELOPE_WITH_RANDOM_INCREMENTING_INDEXES = "containers/multi-content-random-incrementing-indexes.ksie";
-    protected static final String ENVELOPE_WITH_MIXED_INDEX_TYPES_IN_CONTENTS = "containers/container-contents-with-different-index-types.ksie";
+    protected static final String ENVELOPE_WITH_NO_DOCUMENTS = "envelopes/no-documents.ksie";
+    protected static final String ENVELOPE_WITH_ONE_DOCUMENT = "envelopes/one-document.ksie";
+    protected static final String ENVELOPE_WITH_UNKNOWN_FILES = "envelopes/unknown-files.ksie";
+    protected static final String ENVELOPE_WITH_MULTIPLE_SIGNATURES = "envelopes/multiple-signatures.ksie";
+    protected static final String ENVELOPE_WITH_RANDOM_UUID_INDEXES = "envelopes/random-uuid-indexes.ksie";
+    protected static final String ENVELOPE_WITH_MULTIPLE_ANNOTATIONS = "envelopes/multiple-annotations.ksie";
+    protected static final String ENVELOPE_WITH_MIXED_INDEX_TYPES = "envelopes/with-mixed-index-types.ksie";
+    protected static final String ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION = "envelopes/non-removable-annotation.ksie";
+    protected static final String ENVELOPE_WITH_RANDOM_INCREMENTING_INDEXES = "envelopes/multi-content-random-incrementing-indexes.ksie";
+    protected static final String ENVELOPE_WITH_MIXED_INDEX_TYPES_IN_CONTENTS = "envelopes/contents-with-different-index-types.ksie";
 
     /**
      * Envelopes - Internally invalid or does not verify against anchors.
      */
-    protected static final String EMPTY_ENVELOPE = "containers/invalid/container-empty.ksie";
-    protected static final String ENVELOPE_WITH_MISSING_MANIFEST = "containers/invalid/container-missing-manifest.ksie";
-    protected static final String ENVELOPE_WITH_MISSING_MIMETYPE = "containers/invalid/container-missing-mimetype.ksie";
-    protected static final String ENVELOPE_WITH_CHANGED_DOCUMENT = "containers/invalid/container-changed-document.ksie";
-    protected static final String ENVELOPE_WITH_MISSING_SIGNATURE = "containers/invalid/container-missing-signature.ksie";
-    protected static final String ENVELOPE_WITH_MIMETYPE_IS_EMPTY = "containers/invalid/container-mimetype-is-empty.ksie";
-    protected static final String ENVELOPE_WITH_MISSING_ANNOTATION = "containers/invalid/container-missing-annotation.ksie";
-    protected static final String ENVELOPE_WITH_WRONG_SIGNATURE_FILE = "containers/invalid/container-wrong-signature-file.ksie";
-    protected static final String ENVELOPE_WITH_MISSING_DOCUMENTS_MANIFEST = "containers/container-with-missing-datamanifest.ksie";
-    protected static final String ENVELOPE_WITH_CONTAINS_ONLY_MANIFEST = "containers/invalid/container-contains-only-manifest.ksie";
-    protected static final String ENVELOPE_WITH_CHANGED_ANNOTATION_DATA = "containers/invalid/container-changed-annotation-data.ksie";
-    protected static final String ENVELOPE_WITH_MISSING_ANNOTATION_DATA = "containers/invalid/container-missing-annotation-data.ksie";
-    protected static final String ENVELOPE_WITH_INVALID_ANNOTATION_TYPE = "containers/invalid/container-invalid-annotation-type.ksie";
-    protected static final String ENVELOPE_WITH_BROKEN_SIGNATURE_CONTENT = "containers/invalid/container-broken-signature-content.ksie";
-    protected static final String ENVELOPE_WITH_DOCUMENT_MISSING_MIMETYPE = "containers/invalid/container-document-missing-mimetype.ksie";
-    protected static final String ENVELOPE_WITH_NO_DOCUMENT_URI_IN_MANIFEST = "containers/invalid/container-no-document-uri-in-manifest.ksie";
-    protected static final String ENVELOPE_WITH_MIMETYPE_CONTAINS_INVALID_VALUE = "containers/invalid/container-mimetype-contains-invalid-value.ksie";
-    protected static final String ENVELOPE_WITH_MULTIPLE_EXTENDABLE_SIGNATURES = "containers/invalid/container-multiple-signatures-non-verifying.ksie";
-    protected static final String ENVELOPE_WITH_MIMETYPE_CONTAINS_ADDITIONAL_VALUE = "containers/invalid/container-mimetype-contains-additional-value.ksie";
-    protected static final String ENVELOPE_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED = "containers/invalid/container-two-contents-one-manifest-removed.ksie";
-    protected static final String ENVELOPE_WITH_CHANGED_SIGNATURE_FILE = "containers/invalid/container-invalid-signature-from-last-aggregation-hash-chain.ksie";
-    protected static final String ENVELOPE_WITH_CHANGED_DATAMANIFEST_HASH_IN_MANIFEST = "containers/invalid/container-changed-datamanifest-hash-in-manifest.ksie";
-    protected static final String ENVELOPE_WITH_MULTI_CONTENT_ONE_SIGNATURE_IS_INVALID = "containers/invalid/container-multi-content-one-signature-is-invalid.ksie";
-    protected static final String ENVELOPE_WITH_MULTI_CONTENT_ONE_IS_MISSING_DATAMANIFEST = "containers/invalid/multi-content-one-content-is-missing-datamanifest.ksie";
-    protected static final String ENVELOPE_WITH_CHANGED_ANNOTATIONS_MANIFEST_HASH_IN_MANIFEST = "containers/invalid/container-changed-annotations-manifest-hash-in-manifest.ksie";
-    protected static final String ENVELOPE_WITH_CHANGED_AND_EXTENDED_SIGNATURE_FILE = "containers/invalid/container-invalid-signature-from-last-aggregation-hash-chain-extended.ksie";
-    protected static final String ENVELOPE_WITH_CHANGED_DATAMANIFEST_HASH_IN_ANNOTATION_MANIFEST = "containers/invalid/container-changed-datamanifest-hash-in-annotation-manifest.ksie";
-    protected static final String ENVELOPE_WITH_INVALID_DATAMANIFEST_HASH_IN_ANNOTATION_MANIFEST = "containers/invalid/container-invalid-datamanifest-in-single-annotation-manifest.ksie";
-    protected static final String ENVELOPE_WITH_CHANGED_ANNOTATION_MANIFEST_HASH_IN_ANNOTATIONS_MANIFEST = "containers/invalid/container-changed-annotation-manifest-hash-in-annotations-manifest.ksie";
+    protected static final String EMPTY_ENVELOPE = "envelopes/invalid/empty.ksie";
+    protected static final String ENVELOPE_WITH_MISSING_MANIFEST = "envelopes/invalid/missing-manifest.ksie";
+    protected static final String ENVELOPE_WITH_MISSING_MIMETYPE = "envelopes/invalid/missing-mimetype.ksie";
+    protected static final String ENVELOPE_WITH_CHANGED_DOCUMENT = "envelopes/invalid/changed-document.ksie";
+    protected static final String ENVELOPE_WITH_MISSING_SIGNATURE = "envelopes/invalid/missing-signature.ksie";
+    protected static final String ENVELOPE_WITH_MIMETYPE_IS_EMPTY = "envelopes/invalid/mimetype-is-empty.ksie";
+    protected static final String ENVELOPE_WITH_MISSING_ANNOTATION = "envelopes/invalid/missing-annotation.ksie";
+    protected static final String ENVELOPE_WITH_WRONG_SIGNATURE_FILE = "envelopes/invalid/wrong-signature-file.ksie";
+    protected static final String ENVELOPE_WITH_MISSING_DOCUMENTS_MANIFEST = "envelopes/missing-datamanifest.ksie";
+    protected static final String ENVELOPE_WITH_CONTAINS_ONLY_MANIFEST = "envelopes/invalid/contains-only-manifest.ksie";
+    protected static final String ENVELOPE_WITH_CHANGED_ANNOTATION_DATA = "envelopes/invalid/changed-annotation-data.ksie";
+    protected static final String ENVELOPE_WITH_MISSING_ANNOTATION_DATA = "envelopes/invalid/missing-annotation-data.ksie";
+    protected static final String ENVELOPE_WITH_INVALID_ANNOTATION_TYPE = "envelopes/invalid/invalid-annotation-type.ksie";
+    protected static final String ENVELOPE_WITH_BROKEN_SIGNATURE_CONTENT = "envelopes/invalid/broken-signature-content.ksie";
+    protected static final String ENVELOPE_WITH_DOCUMENT_MISSING_MIMETYPE = "envelopes/invalid/document-missing-mimetype.ksie";
+    protected static final String ENVELOPE_WITH_NO_DOCUMENT_URI_IN_MANIFEST = "envelopes/invalid/no-document-uri-in-manifest.ksie";
+    protected static final String ENVELOPE_WITH_MIMETYPE_CONTAINS_INVALID_VALUE = "envelopes/invalid/mimetype-contains-invalid-value.ksie";
+    protected static final String ENVELOPE_WITH_MULTIPLE_EXTENDABLE_SIGNATURES = "envelopes/invalid/multiple-signatures-non-verifying.ksie";
+    protected static final String ENVELOPE_WITH_MIMETYPE_CONTAINS_ADDITIONAL_VALUE = "envelopes/invalid/mimetype-contains-additional-value.ksie";
+    protected static final String ENVELOPE_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED = "envelopes/invalid/two-contents-one-manifest-removed.ksie";
+    protected static final String ENVELOPE_WITH_CHANGED_SIGNATURE_FILE = "envelopes/invalid/invalid-signature-from-last-aggregation-hash-chain.ksie";
+    protected static final String ENVELOPE_WITH_CHANGED_DATAMANIFEST_HASH_IN_MANIFEST = "envelopes/invalid/changed-datamanifest-hash-in-manifest.ksie";
+    protected static final String ENVELOPE_WITH_MULTI_CONTENT_ONE_SIGNATURE_IS_INVALID = "envelopes/invalid/multi-content-one-signature-is-invalid.ksie";
+    protected static final String ENVELOPE_WITH_MULTI_CONTENT_ONE_IS_MISSING_DATAMANIFEST = "envelopes/invalid/multi-content-one-content-is-missing-datamanifest.ksie";
+    protected static final String ENVELOPE_WITH_CHANGED_ANNOTATIONS_MANIFEST_HASH_IN_MANIFEST = "envelopes/invalid/changed-annotations-manifest-hash-in-manifest.ksie";
+    protected static final String ENVELOPE_WITH_CHANGED_AND_EXTENDED_SIGNATURE_FILE = "envelopes/invalid/invalid-signature-from-last-aggregation-hash-chain-extended.ksie";
+    protected static final String ENVELOPE_WITH_CHANGED_DATAMANIFEST_HASH_IN_ANNOTATION_MANIFEST = "envelopes/invalid/changed-datamanifest-hash-in-annotation-manifest.ksie";
+    protected static final String ENVELOPE_WITH_INVALID_DATAMANIFEST_HASH_IN_ANNOTATION_MANIFEST = "envelopes/invalid/invalid-datamanifest-in-single-annotation-manifest.ksie";
+    protected static final String ENVELOPE_WITH_CHANGED_ANNOTATION_MANIFEST_HASH_IN_ANNOTATIONS_MANIFEST = "envelopes/invalid/changed-annotation-manifest-hash-in-annotations-manifest.ksie";
 
     protected static final String MIME_TYPE_APPLICATION_TXT = "application/txt";
     protected static final String MIME_TYPE_APPLICATION_PDF = "application/pdf";
