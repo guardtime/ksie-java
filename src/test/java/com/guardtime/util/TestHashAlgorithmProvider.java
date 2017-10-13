@@ -19,7 +19,7 @@
 
 package com.guardtime.util;
 
-import com.guardtime.container.hash.HashAlgorithmProvider;
+import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.util.Collections;
