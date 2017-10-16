@@ -19,8 +19,8 @@
 
 package com.guardtime.envelope.packaging.parsing.handler;
 
-import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.DocumentsManifest;
+import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.InvalidManifestException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 

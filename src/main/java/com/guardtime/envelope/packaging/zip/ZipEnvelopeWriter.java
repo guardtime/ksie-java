@@ -28,7 +28,6 @@ import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopeWriter;
-import com.guardtime.envelope.packaging.MimeType;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.util.Pair;
@@ -53,16 +52,16 @@ class ZipEnvelopeWriter implements EnvelopeWriter {
     public void write(Envelope envelope, OutputStream output) throws IOException {
         Set<String> writtenFiles = new HashSet<>();
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(output))) {
-            writeMimeTypeEntry(envelope.getMimeType(), zipOutputStream, writtenFiles);
+            writeMimeTypeEntry(zipOutputStream, writtenFiles);
             writeSignatureContents(envelope.getSignatureContents(), zipOutputStream, writtenFiles);
             writeUnknownFiles(envelope.getUnknownFiles(), zipOutputStream, writtenFiles);
         }
     }
 
-    private void writeMimeTypeEntry(MimeType mimeType, ZipOutputStream zipOutputStream, Set<String> writtenFiles)
+    private void writeMimeTypeEntry(ZipOutputStream zipOutputStream, Set<String> writtenFiles)
             throws IOException {
-        ZipEntry mimeTypeEntry = new ZipEntry(mimeType.getUri());
-        byte[] data = Util.toByteArray(mimeType.getInputStream());
+        ZipEntry mimeTypeEntry = new ZipEntry(MIME_TYPE_ENTRY_NAME);
+        byte[] data = ZipEnvelopePackagingFactoryBuilder.MIME_TYPE.getBytes();
         mimeTypeEntry.setSize(data.length);
         mimeTypeEntry.setCompressedSize(data.length);
         Checksum checksum = new CRC32();
@@ -73,7 +72,7 @@ class ZipEnvelopeWriter implements EnvelopeWriter {
         zipOutputStream.putNextEntry(mimeTypeEntry);
         zipOutputStream.write(data);
         zipOutputStream.closeEntry();
-        writtenFiles.add(mimeType.getUri());
+        writtenFiles.add(MIME_TYPE_ENTRY_NAME);
     }
 
     private void writeSignatureContents(List<SignatureContent> signatureContents, ZipOutputStream output,

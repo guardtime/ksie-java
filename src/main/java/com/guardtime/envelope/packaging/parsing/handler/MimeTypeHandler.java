@@ -25,7 +25,7 @@ import com.guardtime.ksi.util.Util;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static com.guardtime.envelope.packaging.MimeType.MIME_TYPE_ENTRY_NAME;
+import static com.guardtime.envelope.packaging.EnvelopeWriter.MIME_TYPE_ENTRY_NAME;
 
 /**
  * This content holders is used for MIMETYPE file inside the envelope.

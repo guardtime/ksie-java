@@ -22,6 +22,7 @@ package com.guardtime.envelope.packaging;
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.document.ParsedDocument;
+import com.guardtime.envelope.document.SignedDocument;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
@@ -34,13 +35,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifyNewSignatureContentIsAcceptable;
-import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifySameMimeType;
 import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifyUniqueUnknownFiles;
 import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifyUniqueness;
 
@@ -53,21 +51,19 @@ public class Envelope implements AutoCloseable {
     private ParsingStore parsingStore;
     private final EnvelopeWriter writer;
     private List<SignatureContent> signatureContents = new SortedList<>();
-    private MimeType mimeType;
     private boolean closed = false;
     private List<UnknownDocument> unknownFiles = new LinkedList<>();
 
-    public Envelope(SignatureContent signatureContent, MimeType mimeType, EnvelopeWriter writer) {
-        this(Collections.singletonList(signatureContent), Collections.<UnknownDocument>emptyList(), mimeType, writer, null);
+    public Envelope(SignatureContent signatureContent, EnvelopeWriter writer) {
+        this(Collections.singletonList(signatureContent), Collections.<UnknownDocument>emptyList(), writer, null);
     }
 
-    public Envelope(Collection<SignatureContent> contents, List<UnknownDocument> unknownFiles, MimeType mimeType,
+    public Envelope(Collection<SignatureContent> contents, List<UnknownDocument> unknownFiles,
                     EnvelopeWriter writer, ParsingStore store) {
         Util.notNull(contents, "Signature contents");
         Util.notNull(unknownFiles, "Unknown files");
         this.signatureContents.addAll(contents);
         this.unknownFiles.addAll(unknownFiles);
-        this.mimeType = mimeType;
         this.parsingStore = store;
         this.writer = writer;
     }
@@ -76,7 +72,6 @@ public class Envelope implements AutoCloseable {
         this(
                 original.getSignatureContents(),
                 original.getUnknownFiles(),
-                original.getMimeType(),
                 original.getWriter(),
                 original.getParsingStore()
         );
@@ -106,10 +101,6 @@ public class Envelope implements AutoCloseable {
             throw new IOException("Can't write closed object!");
         }
         writer.write(this, output);
-    }
-
-    public MimeType getMimeType() {
-        return mimeType;
     }
 
     /**
@@ -159,7 +150,6 @@ public class Envelope implements AutoCloseable {
      * clashing file paths or any other reason.
      */
     public void add(Envelope envelope) throws EnvelopeMergingException {
-        verifySameMimeType(envelope, this);
         verifyUniqueUnknownFiles(envelope, this);
         int i = envelope.getSignatureContents().size();
         while (i > 0) {
@@ -209,6 +199,19 @@ public class Envelope implements AutoCloseable {
             this.signatureContents = original;
             throw e;
         }
+    }
+
+    /**
+     * Returns a list of all {@link Document}s that are signed.
+     */
+    public List<SignedDocument> getSignedDocuments() {
+        List<SignedDocument> signedDocuments = new ArrayList<>();
+        for (SignatureContent content : signatureContents) {
+            for (Document doc : content.getDocuments().values()) {
+                signedDocuments.add(new SignedDocument(doc, content));
+            }
+        }
+        return signedDocuments;
     }
 
     protected ParsingStore getParsingStore() {

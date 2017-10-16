@@ -19,13 +19,12 @@
 
 package com.guardtime.envelope.packaging.parsing;
 
+import com.guardtime.envelope.EnvelopeException;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.EnvelopeWriter;
-import com.guardtime.envelope.packaging.MimeType;
-import com.guardtime.envelope.packaging.MimeTypeEntry;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidPackageException;
@@ -56,7 +55,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static com.guardtime.envelope.packaging.MimeType.MIME_TYPE_ENTRY_NAME;
+import static com.guardtime.envelope.packaging.EnvelopeWriter.MIME_TYPE_ENTRY_NAME;
 
 /**
  * Provides stream parsing logic for {@link EnvelopePackagingFactory}
@@ -79,19 +78,19 @@ public abstract class EnvelopeReader {
         this.parsingStoreFactory = storeFactory;
     }
 
-    public Envelope read(InputStream input) throws IOException, EnvelopeReadingException, ParsingStoreException {
+    public Envelope read(InputStream input) throws IOException, InvalidPackageException, ParsingStoreException {
         EnvelopeReadingException readingException = new EnvelopeReadingException("Reading envelope encountered errors!");
         ParsingStore parsingStore = parsingStoreFactory.create();
         HandlerSet handlerSet = new HandlerSet(manifestFactory, signatureFactory, parsingStore);
         parseInputStream(input, handlerSet, readingException);
+        validateMimeType(handlerSet.mimeTypeHandler);
         List<SignatureContent> contents = buildSignatures(handlerSet, readingException);
-        MimeType mimeType = getMimeType(handlerSet);
         List<UnknownDocument> unknownFiles = getUnknownFiles(handlerSet, readingException);
         handlerSet.clearRequestedData();
-        Envelope envelope = new Envelope(contents, unknownFiles, mimeType, getWriter(), parsingStore);
+        Envelope envelope = new Envelope(contents, unknownFiles, getWriter(), parsingStore);
         readingException.setEnvelope(envelope);
 
-        if (!validMimeType(mimeType) || !containsValidContents(contents)) {
+        if (!containsValidContents(contents)) {
             readingException.addException(new InvalidPackageException("Parsed envelope was not valid"));
         }
 
@@ -130,27 +129,21 @@ public abstract class EnvelopeReader {
                 content.getAnnotationsManifest() != null;
     }
 
-    private boolean validMimeType(MimeType mimeType) {
-        if (mimeType == null) {
-            return false;
-        }
-        try (InputStream inputStream = mimeType.getInputStream()) {
-            return inputStream.available() > 0;
-        } catch (IOException e) {
-            return false;
+    private void validateMimeType(MimeTypeHandler handler) throws InvalidPackageException {
+        try {
+            String uri = MIME_TYPE_ENTRY_NAME;
+            byte[] content = handler.get(uri);
+            String parsedMimeType = new String(content);
+            if(!parsedMimeType.equals(getMimeType())) {
+                throw new InvalidPackageException("Parsed Envelope has invalid MIME type. Can't process it!"); // TODO: Maybe use a better exception class?
+            }
+        } catch (ContentParsingException e) {
+            LOGGER.debug("Failed to parse MIME type. Reason: '{}", e.getMessage());
+            throw new InvalidPackageException("No parsable MIME type.", e);
         }
     }
 
-    private MimeType getMimeType(HandlerSet handlerSet) {
-        try {
-            String uri = MIME_TYPE_ENTRY_NAME;
-            byte[] content = handlerSet.mimeTypeHandler.get(uri);
-            return new MimeTypeEntry(uri, content);
-        } catch (ContentParsingException e) {
-            LOGGER.debug("Failed to parse MIME type. Reason: '{}", e.getMessage());
-            return null;
-        }
-    }
+    protected abstract String getMimeType();
 
     private List<UnknownDocument> getUnknownFiles(HandlerSet handlerSet, EnvelopeReadingException readingException) {
         List<UnknownDocument> returnable = new LinkedList<>();

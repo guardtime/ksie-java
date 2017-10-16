@@ -28,12 +28,11 @@ import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.ManifestFactoryType;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.exception.AnnotationsManifestMergingException;
-import com.guardtime.envelope.packaging.exception.EnvelopeAnnotationMergingException;
-import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.exception.DocumentMergingException;
 import com.guardtime.envelope.packaging.exception.DocumentsManifestMergingException;
+import com.guardtime.envelope.packaging.exception.EnvelopeAnnotationMergingException;
+import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.exception.ManifestMergingException;
-import com.guardtime.envelope.packaging.exception.MimeTypeMergingException;
 import com.guardtime.envelope.packaging.exception.SignatureMergingException;
 import com.guardtime.envelope.packaging.exception.SingleAnnotationManifestMergingException;
 import com.guardtime.envelope.signature.EnvelopeSignature;
@@ -52,16 +51,6 @@ import java.util.List;
 import java.util.Map;
 
 public class EnvelopeMergingVerifier {
-
-    public static void verifySameMimeType(Envelope newEnvelope, Envelope existingEnvelope) throws EnvelopeMergingException {
-        try {
-            if (!contentsMatch(existingEnvelope.getMimeType().getInputStream(), newEnvelope.getMimeType().getInputStream())) {
-                throw new MimeTypeMergingException("Incompatible Envelope provided for merging!");
-            }
-        } catch (IOException e) {
-            throw new MimeTypeMergingException("Failed to verify envelope acceptability!", e);
-        }
-    }
 
     public static void verifyNewSignatureContentIsAcceptable(SignatureContent newContent, List<SignatureContent> existingContents)
             throws EnvelopeMergingException {

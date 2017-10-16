@@ -26,8 +26,8 @@ import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.IndexProvider;
 import com.guardtime.envelope.indexing.IndexProviderFactory;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
-import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.DocumentsManifest;
+import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.InvalidManifestException;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.ManifestFactoryType;
@@ -66,8 +66,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static com.guardtime.envelope.packaging.MimeType.MIME_TYPE_ENTRY_NAME;
 
 /**
  * Creates or parses {@link Envelope} instances.
@@ -142,8 +140,7 @@ public class EnvelopePackagingFactory {
      */
     public Envelope create(List<Document> files, List<Annotation> annotations) throws InvalidPackageException {
         SignatureContent signatureContent = verifyAndSign(files, annotations, null);
-        MimeTypeEntry mimeType = new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, getMimeTypeContent());
-        Envelope envelope = new Envelope(signatureContent, mimeType, envelopeWriter);
+        Envelope envelope = new Envelope(signatureContent, envelopeWriter);
         verifyEnvelope(envelope);
         return envelope;
     }
@@ -202,7 +199,7 @@ public class EnvelopePackagingFactory {
         if (disableVerification) {
             return;
         }
-        VerifiedEnvelope result = new EnvelopeVerifier(new InternalVerificationPolicy(this)).verify(envelope);
+        VerifiedEnvelope result = new EnvelopeVerifier(new InternalVerificationPolicy()).verify(envelope);
         if (!result.getVerificationResult().equals(VerificationResult.OK)) {
             try {
                 envelope.close();

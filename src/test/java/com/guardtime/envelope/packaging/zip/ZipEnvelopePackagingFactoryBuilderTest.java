@@ -29,18 +29,17 @@ import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.tlv.TlvEnvelopeManifestFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
-import com.guardtime.envelope.packaging.MimeTypeEntry;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.InvalidPackageException;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
+import com.guardtime.ksi.unisignature.KSISignature;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -52,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -104,7 +104,10 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
             }
         }).when(manifestFactorySpy).createManifest(any(Pair.class), any(Pair.class), any(Pair.class));
         EnvelopeSignature mockSignature = mock(EnvelopeSignature.class);
-        when(mockSignature.getSignature()).thenReturn("I decree this to be authentic!");
+        when(mockSignature.compareTo(any(EnvelopeSignature.class))).thenReturn(-1);
+        KSISignature mockKSISignature = mock(KSISignature.class);
+        when(mockKSISignature.getAggregationTime()).thenReturn(new Date());
+        when(mockSignature.getSignature()).thenReturn(mockKSISignature);
         when(mockSignature.getSignedDataHash()).thenReturn(nullDataHash);
         when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mockSignature);
         if (existingEnvelope != null) {
@@ -261,16 +264,6 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
         ) {
             assertNotNull(newEnvelope);
         }
-    }
-
-    @Test
-    public void testCreateWithExistingEnvelopeVerifiesInvalidEnvelope_NOK() throws Exception {
-        expectedException.expect(InvalidPackageException.class);
-        expectedException.expectMessage("Created envelope did not pass internal verification");
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().withSignatureFactory(mockedSignatureFactory).build();
-        Envelope mockEnvelope = Mockito.mock(Envelope.class);
-        when(mockEnvelope.getMimeType()).thenReturn(new MimeTypeEntry("MIMETYPE", "Ploomimoos".getBytes(StandardCharsets.UTF_8)));
-        packagingFactory.addSignature(mockEnvelope, documentList, annotationList);
     }
 
     @Test

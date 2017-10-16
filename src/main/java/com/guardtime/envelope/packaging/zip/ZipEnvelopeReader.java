@@ -62,6 +62,11 @@ class ZipEnvelopeReader extends EnvelopeReader {
         }
     }
 
+    @Override
+    protected String getMimeType() {
+        return ZipEnvelopePackagingFactoryBuilder.MIME_TYPE;
+    }
+
     private void readEntry(ZipInputStream zipInput, ZipEntry entry, HandlerSet handlerSet) throws ParsingStoreException {
         String name = entry.getName();
         for (ContentHandler handler : handlerSet.getHandlers()) {

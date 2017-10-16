@@ -92,7 +92,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     @Test
     public void testReadEnvelopeWithMissingMimetype() throws Exception {
         expectedException.expect(InvalidPackageException.class);
-        expectedException.expectMessage("Reading envelope encountered errors!");
+        expectedException.expectMessage("No parsable MIME type.");
         try (Envelope ignored = getEnvelope(ENVELOPE_WITH_MISSING_MIMETYPE)) {
         }
     }
@@ -100,7 +100,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     @Test
     public void testVerifyEnvelopeWithEmptyMimetype() throws Exception {
         expectedException.expect(InvalidPackageException.class);
-        expectedException.expectMessage("Reading envelope encountered errors!");
+        expectedException.expectMessage("Parsed Envelope has invalid MIME type. Can't process it!");
         try (Envelope ignored = getEnvelope(ENVELOPE_WITH_MIMETYPE_IS_EMPTY)) {}
     }
 

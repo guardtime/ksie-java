@@ -22,7 +22,7 @@ package com.guardtime.envelope.packaging.parsing.handler;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.guardtime.envelope.packaging.MimeType.MIME_TYPE_ENTRY_NAME;
+import static com.guardtime.envelope.packaging.EnvelopeWriter.MIME_TYPE_ENTRY_NAME;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 

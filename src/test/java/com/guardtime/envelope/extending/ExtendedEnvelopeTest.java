@@ -21,7 +21,6 @@ package com.guardtime.envelope.extending;
 
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.Envelope;
-import com.guardtime.envelope.packaging.MimeType;
 import com.guardtime.envelope.packaging.SignatureContent;
 
 import org.junit.Test;
@@ -42,7 +41,6 @@ public class ExtendedEnvelopeTest {
     public void testWrappedMethodsProvideAccessToOriginals() {
         Envelope originalEnvelope = setUpMockedEnvelope();
         ExtendedEnvelope extendedEnvelope = new ExtendedEnvelope(originalEnvelope);
-        assertEquals(originalEnvelope.getMimeType(), extendedEnvelope.getMimeType());
         assertEquals(originalEnvelope.getUnknownFiles(), extendedEnvelope.getUnknownFiles());
     }
 
@@ -56,7 +54,6 @@ public class ExtendedEnvelopeTest {
 
     private Envelope setUpMockedEnvelope() {
         Envelope mockedEnvelope = mock(Envelope.class);
-        when(mockedEnvelope.getMimeType()).thenReturn(mock(MimeType.class));
         when(mockedEnvelope.getUnknownFiles()).thenReturn(Collections.singletonList(mock(UnknownDocument.class)));
         when(mockedEnvelope.getSignatureContents()).thenAnswer(new Answer<List<? extends SignatureContent>>() {
             @Override

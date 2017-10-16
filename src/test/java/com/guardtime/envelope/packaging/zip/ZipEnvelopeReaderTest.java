@@ -28,6 +28,7 @@ import com.guardtime.envelope.manifest.tlv.TlvEnvelopeManifestFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
+import com.guardtime.envelope.packaging.exception.InvalidPackageException;
 import com.guardtime.envelope.packaging.parsing.store.TemporaryFileBasedParsingStoreFactory;
 import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.envelope.signature.SignatureFactory;
@@ -116,9 +117,23 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
 
     @Test
     public void testReadEmptyEnvelopeFile_ThrowsInvalidPackageException() throws Exception {
+        expectedException.expect(InvalidPackageException.class);
+        expectedException.expectMessage("No parsable MIME type");
         setUpEnvelope(EMPTY_ENVELOPE);
-        assertExceptionsContainMessage("Parsed envelope was not valid");
-        assertTrue(envelope.getSignatureContents().isEmpty());
+    }
+
+    @Test
+    public void testReadEnvelopeWithMimetypeContainingInvalidValue_ThrowsInvalidPackageException() throws Exception {
+        expectedException.expect(InvalidPackageException.class);
+        expectedException.expectMessage("Parsed Envelope has invalid MIME type. Can't process it!");
+        setUpEnvelope(ENVELOPE_WITH_MIMETYPE_CONTAINS_INVALID_VALUE);
+    }
+
+    @Test
+    public void testReadEnvelopeWithMimetypeContainingMoreThanNeeded_ThrowsInvalidPackageException() throws Exception {
+        expectedException.expect(InvalidPackageException.class);
+        expectedException.expectMessage("Parsed Envelope has invalid MIME type. Can't process it!");
+        setUpEnvelope(ENVELOPE_WITH_MIMETYPE_CONTAINS_ADDITIONAL_VALUE);
     }
 
     @Test

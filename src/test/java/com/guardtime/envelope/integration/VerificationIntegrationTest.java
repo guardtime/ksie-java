@@ -73,8 +73,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     @Before
     public void setUpVerifier() {
         VerificationPolicy defaultPolicy = new DefaultVerificationPolicy(
-                new KsiSignatureVerifier(ksi, new CalendarBasedVerificationPolicy()),
-                packagingFactory
+                new KsiSignatureVerifier(ksi, new CalendarBasedVerificationPolicy())
         );
         this.verifier = new EnvelopeVerifier(defaultPolicy);
     }
@@ -90,7 +89,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testEveryEnvelopeTypeVerifiesOk() throws Exception {
-        EnvelopeVerifier verifier = new EnvelopeVerifier(new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy()), packagingFactory));
+        EnvelopeVerifier verifier = new EnvelopeVerifier(new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy())));
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTIPLE_SIGNATURES)){
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             assertEquals(VerificationResult.OK, verifiedEnvelope.getVerificationResult());
@@ -109,7 +108,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testVerifyingEnvelopeWithValidAndInvalidSignatures() throws Exception {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTI_CONTENT_ONE_SIGNATURE_IS_INVALID)) {
-            EnvelopeVerifier verifier = new EnvelopeVerifier(new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy()), packagingFactory));
+            EnvelopeVerifier verifier = new EnvelopeVerifier(new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy())));
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             for (VerifiedSignatureContent content : verifiedEnvelope.getVerifiedSignatureContents()) {
                 if (content.getManifest().getRight().getSignatureReference().getUri().equals("META-INF/signature-1.ksi")) {
@@ -157,24 +156,6 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             Assert.assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
             verifyFailingRule(verifiedEnvelope.getResults(), "KSIE_VERIFY_ANNOTATION_DATA", "META-INF/annotation-1.dat", "Annotation data hash mismatch.");
-        }
-    }
-
-    @Test
-    public void testVerifyEnvelopeWithMimetypeContainingInvalidValue() throws Exception {
-        try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MIMETYPE_CONTAINS_INVALID_VALUE)) {
-            VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
-            Assert.assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
-            verifyFailingRule(verifiedEnvelope.getResults(), "KSIE_FORMAT", "mimetype", "Unsupported format.");
-        }
-    }
-
-    @Test
-    public void testVerifyEnvelopeWithMimetypeContainingMoreThanNeeded() throws Exception {
-        try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MIMETYPE_CONTAINS_ADDITIONAL_VALUE)) {
-            VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
-            Assert.assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
-            verifyFailingRule(verifiedEnvelope.getResults(), "KSIE_FORMAT", "mimetype", "Unsupported format.");
         }
     }
 
@@ -288,8 +269,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         Policy signatureVerificationPolicy = new UserProvidedPublicationBasedVerificationPolicy();
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_AND_EXTENDED_SIGNATURE_FILE)) {
             VerificationPolicy policy = new DefaultVerificationPolicy(
-                    new KsiSignatureVerifier(ksi, signatureVerificationPolicy, new PublicationData("AAAAAA-CX4K4D-6AMFWE-EMMHOH-WZT2ZR-Q5MUMQ-DGYCW5-LV5IID-GA672M-LHP5GW-GUGHQN-DA7CGV")),
-                    packagingFactory
+                    new KsiSignatureVerifier(ksi, signatureVerificationPolicy, new PublicationData("AAAAAA-CX4K4D-6AMFWE-EMMHOH-WZT2ZR-Q5MUMQ-DGYCW5-LV5IID-GA672M-LHP5GW-GUGHQN-DA7CGV"))
             );
             EnvelopeVerifier verifier = new EnvelopeVerifier(policy);
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
@@ -413,8 +393,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     private EnvelopeVerifier getEnvelopeVerifier(Policy policy) {
         VerificationPolicy envelopePolicy = new DefaultVerificationPolicy(
-                new KsiSignatureVerifier(ksi, policy),
-                packagingFactory
+                new KsiSignatureVerifier(ksi, policy)
         );
         return new EnvelopeVerifier(envelopePolicy);
     }

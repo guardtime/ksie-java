@@ -195,8 +195,8 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
     }
 
     @Override
-    public int compareTo(SignatureContent signatureContent) {
-        if (signatureContent == null || signatureContent.getEnvelopeSignature() == null) {
+    public int compareTo(SignatureContent other) {
+        if (other == null || other.getEnvelopeSignature() == null) {
             if (this.signature == null) {
                 return 0;
             }
@@ -206,7 +206,7 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
         if (this.signature == null) {
             return 1;
         }
-        return this.signature.compareTo(signatureContent.getEnvelopeSignature());
+        return this.signature.compareTo(other.getEnvelopeSignature());
     }
 
     public static class Builder {
