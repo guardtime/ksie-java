@@ -24,6 +24,9 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Keeps all records in list sorted. Performs sorting at every insert.
@@ -32,19 +35,16 @@ import java.util.Collections;
  *
  * NB! Does not allow inserting at specified index!
  */
-public class SortedList<E extends Comparable<? super E>> extends ArrayList<E> {
+public class SortedList<E extends Comparable<? super E>> implements List<E> {
+    private final List<E> delegate;
 
-    public SortedList(int i) {
-        super(i);
+    public SortedList(Collection<? extends E> collection) {
+        this.delegate = new ArrayList<>(collection);
+        sort();
     }
 
     public SortedList() {
-        super();
-    }
-
-    public SortedList(Collection<? extends E> collection) {
-        super(collection);
-        sort();
+        this.delegate = new ArrayList<>();
     }
 
     @Override
@@ -53,17 +53,57 @@ public class SortedList<E extends Comparable<? super E>> extends ArrayList<E> {
     }
 
     @Override
+    public int size() {
+        return delegate.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return delegate.isEmpty();
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return delegate.contains(o);
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return delegate.iterator();
+    }
+
+    @Override
+    public Object[] toArray() {
+        return delegate.toArray();
+    }
+
+    @Override
+    public <T> T[] toArray(T[] ts) {
+        return delegate.toArray(ts);
+    }
+
+    @Override
     public boolean add(E e) {
         if(contains(e)) {
             return false;
         }
-        int index = Collections.binarySearch(this, e);
+        int index = Collections.binarySearch(delegate, e);
         if (index >= 0) {
-            super.add(index, e);
+            delegate.add(index, e);
         } else {
-            super.add(-index - 1, e);
+            delegate.add(-index - 1, e);
         }
         return true;
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return delegate.remove(o);
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> collection) {
+        return delegate.containsAll(collection);
     }
 
     @Override
@@ -72,14 +112,43 @@ public class SortedList<E extends Comparable<? super E>> extends ArrayList<E> {
     }
 
     @Override
+    public E remove(int i) {
+        return delegate.remove(i);
+    }
+
+    @Override
+    public int indexOf(Object o) {
+        return delegate.indexOf(o);
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+        return delegate.lastIndexOf(o);
+    }
+
+    @Override
+    public ListIterator<E> listIterator() {
+        return delegate.listIterator();
+    }
+
+    @Override
+    public ListIterator<E> listIterator(int i) {
+        return delegate.listIterator(i);
+    }
+
+    @Override
+    public List<E> subList(int i, int i1) {
+        return delegate.subList(i, i1);
+    }
+
+    @Override
     public boolean addAll(Collection<? extends E> collection) {
-        Collection<E> toAdd = new ArrayList<>();
         for (E e : collection) {
-            if (!contains(e)) {
-                toAdd.add(e);
+            if (contains(e)) {
+                throw new IllegalArgumentException("Duplicates are not allowed!");
             }
         }
-        if (super.addAll(toAdd)) {
+        if (delegate.addAll(collection)) {
             sort();
             return true;
         }
@@ -91,7 +160,27 @@ public class SortedList<E extends Comparable<? super E>> extends ArrayList<E> {
         throw new NotImplementedException();
     }
 
+    @Override
+    public boolean removeAll(Collection<?> collection) {
+        return delegate.removeAll(collection);
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> collection) {
+        return delegate.retainAll(collection);
+    }
+
+    @Override
+    public void clear() {
+        delegate.clear();
+    }
+
+    @Override
+    public E get(int i) {
+        return delegate.get(i);
+    }
+
     private void sort() {
-        Collections.sort(this);
+        Collections.sort(delegate);
     }
 }
