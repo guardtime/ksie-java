@@ -24,7 +24,6 @@ import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.SignatureContent;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.result.GenericVerificationResult;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import com.guardtime.envelope.verification.result.VerificationResult;
@@ -49,11 +48,11 @@ public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureCont
     @Override
     protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
         VerificationResult verificationResult = getFailureVerificationResult();
-        Manifest manifest = verifiable.getManifest().getRight();
+        Manifest manifest = verifiable.getManifest();
         FileReference annotationsManifestReference = manifest.getAnnotationsManifestReference();
         String annotationsManifestUri = annotationsManifestReference.getUri();
-        Pair<String, AnnotationsManifest> annotationsManifest = verifiable.getAnnotationsManifest();
-        if (annotationsManifest != null && annotationsManifest.getLeft().equals(annotationsManifestUri)) {
+        AnnotationsManifest annotationsManifest = verifiable.getAnnotationsManifest();
+        if (annotationsManifest != null && annotationsManifest.getPath().equals(annotationsManifestUri)) {
             verificationResult = VerificationResult.OK;
         }
         holder.addResult(

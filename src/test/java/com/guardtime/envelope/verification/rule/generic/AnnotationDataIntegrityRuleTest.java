@@ -136,7 +136,7 @@ public class AnnotationDataIntegrityRuleTest {
         when(mockSignatureContent.getAnnotations()).thenReturn(Collections.singletonMap(annotationPath, mockAnnotation));
         when(mockSignatureContent.getSingleAnnotationManifests()).thenReturn(Collections.singletonMap(annotationManifestPath, mockSignaleAnnotationManifest));
         AnnotationsManifest mockAnnotationsManifest = mock(AnnotationsManifest.class);
-        when(mockSignatureContent.getAnnotationsManifest()).thenReturn(Pair.of("", mockAnnotationsManifest));
+        when(mockSignatureContent.getAnnotationsManifest()).thenReturn(mockAnnotationsManifest);
         when(mockAnnotationsManifest.getSingleAnnotationManifestReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {
             @Override
             public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) throws Throwable {

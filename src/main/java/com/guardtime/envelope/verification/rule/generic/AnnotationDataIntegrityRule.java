@@ -64,7 +64,7 @@ public class AnnotationDataIntegrityRule extends AbstractRule<SignatureContent> 
 
     @Override
     protected void verifyRule(ResultHolder holder, SignatureContent signatureContent) {
-        AnnotationsManifest annotationsManifest = signatureContent.getAnnotationsManifest().getRight();
+        AnnotationsManifest annotationsManifest = signatureContent.getAnnotationsManifest();
         for (FileReference reference : annotationsManifest.getSingleAnnotationManifestReferences()) {
             String manifestUri = reference.getUri();
 

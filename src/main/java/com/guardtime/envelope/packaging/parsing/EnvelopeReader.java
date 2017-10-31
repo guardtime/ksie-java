@@ -19,7 +19,6 @@
 
 package com.guardtime.envelope.packaging.parsing;
 
-import com.guardtime.envelope.EnvelopeException;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.packaging.Envelope;
@@ -116,11 +115,11 @@ public abstract class EnvelopeReader {
     }
 
     private boolean containsOrContainedDocuments(SignatureContent content) {
-        return content.getDocuments().size() > 0 || content.getDocumentsManifest().getRight().getDocumentReferences().size() > 0;
+        return content.getDocuments().size() > 0 || content.getDocumentsManifest().getDocumentReferences().size() > 0;
     }
 
     private boolean containsOrContainedAnnotations(SignatureContent content) {
-        return content.getAnnotations().size() > 0 || content.getAnnotationsManifest().getRight().getSingleAnnotationManifestReferences().size() > 0;
+        return content.getAnnotations().size() > 0 || content.getAnnotationsManifest().getSingleAnnotationManifestReferences().size() > 0;
     }
 
     private boolean containsManifest(SignatureContent content) {

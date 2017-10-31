@@ -55,11 +55,11 @@ public class SingleAnnotationManifestExistenceRule extends AbstractRule<Signatur
 
     @Override
     protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
-        for (FileReference annotationReference : verifiable.getAnnotationsManifest().getRight().getSingleAnnotationManifestReferences()) {
-            EnvelopeAnnotationType type = EnvelopeAnnotationType.fromContent(annotationReference.getMimeType());
+        for (FileReference annotationManifestReference : verifiable.getAnnotationsManifest().getSingleAnnotationManifestReferences()) {
+            EnvelopeAnnotationType type = EnvelopeAnnotationType.fromContent(annotationManifestReference.getMimeType());
             RuleState ruleState = type.equals(EnvelopeAnnotationType.FULLY_REMOVABLE) ? RuleState.IGNORE : state;
 
-            String manifestUri = annotationReference.getUri();
+            String manifestUri = annotationManifestReference.getUri();
             SingleAnnotationManifest manifest = verifiable.getSingleAnnotationManifests().get(manifestUri);
             VerificationResult result = getFailureVerificationResult();
             if (manifest != null) {

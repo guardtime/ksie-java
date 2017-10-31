@@ -128,4 +128,8 @@ public abstract class AbstractDocument implements Document {
         //Nothing to do here
     }
 
+    @Override
+    public String getPath() {
+        return fileName;
+    }
 }

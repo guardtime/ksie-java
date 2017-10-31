@@ -45,7 +45,6 @@ import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.envelope.signature.SignatureFactory;
 import com.guardtime.envelope.signature.SignatureFactoryType;
 import com.guardtime.envelope.util.DataHashException;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.util.Util;
 import com.guardtime.envelope.verification.EnvelopeVerifier;
 import com.guardtime.envelope.verification.VerifiedEnvelope;
@@ -59,10 +58,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,8 +72,6 @@ import java.util.Set;
 public class EnvelopePackagingFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(EnvelopePackagingFactory.class);
-
-    private final String envelopeMimeType;
 
     private final SignatureFactory signatureFactory;
     private final EnvelopeManifestFactory manifestFactory;
@@ -88,14 +85,12 @@ public class EnvelopePackagingFactory {
         Util.notNull(builder.manifestFactory, "Manifest factory");
         Util.notNull(builder.indexProviderFactory, "Index provider factory");
         Util.notNull(builder.parsingStoreFactory, "Parsing store factory");
-        Util.notNull(builder.mimeType, "MIME type");
         Util.notNull(builder.envelopeReader, "Envelope reader");
         Util.notNull(builder.envelopeWriter, "Envelope writer");
         this.signatureFactory = builder.signatureFactory;
         this.manifestFactory = builder.manifestFactory;
         this.indexProviderFactory = builder.indexProviderFactory;
         this.disableVerification = builder.disableInternalVerification;
-        this.envelopeMimeType = builder.mimeType;
         this.envelopeWriter = builder.envelopeWriter;
         this.envelopeReader = builder.envelopeReader;
         logger.info("Envelope factory initialized");
@@ -121,13 +116,6 @@ public class EnvelopePackagingFactory {
         } catch (ParsingStoreException e) {
             throw new InvalidPackageException("Failed to create parsing store for envelope data", e);
         }
-    }
-
-    /**
-     * Provides the MIMETYPE content for envelope.
-     */
-    public byte[] getMimeTypeContent() {
-        return envelopeMimeType.getBytes(StandardCharsets.UTF_8);
     }
 
     /**
@@ -237,9 +225,8 @@ public class EnvelopePackagingFactory {
         private EnvelopeManifestFactory manifestFactory;
         private SignatureFactory signatureFactory;
 
-        private List<Pair<String, Annotation>> annotationPairs = new LinkedList<>();
-        private List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifestPairs = new LinkedList<>();
-        private Map<String, Pair<Annotation, SingleAnnotationManifest>> annotationsManifestContent = new HashMap<>();
+        private Map<Annotation, SingleAnnotationManifest> annotationsManifestContent = new HashMap<>();
+        private List<SingleAnnotationManifest> singleAnnotationManifests = new ArrayList<>();
 
         public ContentSigner(List<Document> documents, List<Annotation> annotations, IndexProvider indexProvider,
                              EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory) {
@@ -260,15 +247,12 @@ public class EnvelopePackagingFactory {
             SignatureFactoryType signatureFactoryType = signatureFactory.getSignatureFactoryType();
             logger.info("'{}' is used to create and read envelope manifests", manifestFactoryType.getName());
             logger.info("'{}' is used to create and read envelope signatures", signatureFactoryType.getName());
-            Pair<String, DocumentsManifest> documentsManifest =
-                    Pair.of(nameProvider.nextDocumentsManifestName(), manifestFactory.createDocumentsManifest(documents));
+            DocumentsManifest documentsManifest = manifestFactory.createDocumentsManifest(documents, nameProvider.nextDocumentsManifestName());
             processAnnotations(documentsManifest);
-            AnnotationsManifest annotationsManifest = manifestFactory.createAnnotationsManifest(annotationsManifestContent);
-            Pair<String, AnnotationsManifest> annotationsManifestPair =
-                    Pair.of(nameProvider.nextAnnotationsManifestName(), annotationsManifest);
+            AnnotationsManifest annotationsManifest = manifestFactory.createAnnotationsManifest(annotationsManifestContent, nameProvider.nextAnnotationsManifestName());
 
-            Manifest manifest = manifestFactory.createManifest(documentsManifest, annotationsManifestPair,
-                    Pair.of(nameProvider.nextSignatureName(), signatureFactoryType.getSignatureMimeType()));
+            Manifest manifest = manifestFactory.createManifest(documentsManifest, annotationsManifest,
+                    signatureFactoryType, nameProvider.nextSignatureName(), nameProvider.nextManifestName());
 
 
             DataHash hash = getSignatureContentSigningHash(manifest);
@@ -276,10 +260,10 @@ public class EnvelopePackagingFactory {
             SignatureContent signatureContent = new SignatureContent.Builder()
                     .withDocuments(documents)
                     .withDocumentsManifest(documentsManifest)
-                    .withAnnotations(annotationPairs)
-                    .withSingleAnnotationManifests(singleAnnotationManifestPairs)
-                    .withAnnotationsManifest(annotationsManifestPair)
-                    .withManifest(Pair.of(nameProvider.nextManifestName(), manifest))
+                    .withAnnotations(annotations)
+                    .withSingleAnnotationManifests(singleAnnotationManifests)
+                    .withAnnotationsManifest(annotationsManifest)
+                    .withManifest(manifest)
                     .withSignature(signature)
                     .build();
             return signatureContent;
@@ -290,19 +274,20 @@ public class EnvelopePackagingFactory {
             return manifest.getDataHash(algorithmProvider.getSigningHashAlgorithm());
         }
 
-        private void processAnnotations(Pair<String, DocumentsManifest> documentsManifest) throws InvalidManifestException {
+        private void processAnnotations(DocumentsManifest documentsManifest) throws InvalidManifestException {
             if (annotations == null) {
+                annotations = Collections.emptyList();
                 return;
             }
             for (Annotation annotation : annotations) {
-                Pair<String, Annotation> annotationPair =
-                        Pair.of(nameProvider.nextAnnotationDataFileName(), annotation);
-                annotationPairs.add(annotationPair);
-                SingleAnnotationManifest singleAnnotationManifest =
-                        manifestFactory.createSingleAnnotationManifest(documentsManifest, annotationPair);
-                String annotationManifestName = nameProvider.nextSingleAnnotationManifestName();
-                singleAnnotationManifestPairs.add(Pair.of(annotationManifestName, singleAnnotationManifest));
-                annotationsManifestContent.put(annotationManifestName, Pair.of(annotation, singleAnnotationManifest));
+                annotation.setPath(nameProvider.nextAnnotationDataFileName());
+                SingleAnnotationManifest singleAnnotationManifest = manifestFactory.createSingleAnnotationManifest(
+                        documentsManifest,
+                        annotation,
+                        nameProvider.nextSingleAnnotationManifestName()
+                );
+                singleAnnotationManifests.add(singleAnnotationManifest);
+                annotationsManifestContent.put(annotation, singleAnnotationManifest);
             }
         }
 
@@ -315,7 +300,6 @@ public class EnvelopePackagingFactory {
         protected boolean disableInternalVerification = false;
         protected IndexProviderFactory indexProviderFactory = new IncrementingIndexProviderFactory();
         protected ParsingStoreFactory parsingStoreFactory = new TemporaryFileBasedParsingStoreFactory();
-        protected String mimeType;
         protected EnvelopeWriter envelopeWriter;
         protected EnvelopeReader envelopeReader;
 
@@ -341,11 +325,6 @@ public class EnvelopePackagingFactory {
 
         public Builder disableInternalVerification() {
             this.disableInternalVerification = true;
-            return this;
-        }
-
-        public Builder withMimeTypeString(String mimeType) {
-            this.mimeType = mimeType;
             return this;
         }
 

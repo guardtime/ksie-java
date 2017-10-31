@@ -29,6 +29,7 @@ import org.junit.Test;
 
 import java.util.Collections;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertNotEquals;
 
 public class UuidIndexProviderFactoryTest extends AbstractEnvelopeTest {
@@ -39,10 +40,12 @@ public class UuidIndexProviderFactoryTest extends AbstractEnvelopeTest {
     public void testCreateWithMixedEnvelope() throws Exception {
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
                 withSignatureFactory(mockedSignatureFactory).
-                withManifestFactory(mockedManifestFactory).
                 disableInternalVerification().
                 build();
-        try (Envelope envelope = packagingFactory.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_ENVELOPE_ANNOTATION))) {
+        try (Envelope envelope = packagingFactory.create(
+                singletonList(TEST_DOCUMENT_HELLO_TEXT),
+                singletonList(STRING_ENVELOPE_ANNOTATION)
+        )) {
             IndexProvider indexProvider = indexProviderFactory.create(envelope);
             Assert.assertNotNull(indexProvider);
         }

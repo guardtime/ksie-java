@@ -29,6 +29,7 @@ import org.junit.Test;
 
 import java.util.Collections;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -42,7 +43,10 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
                 withSignatureFactory(mockedSignatureFactory).
                 disableInternalVerification().
                 build();
-        try (Envelope envelope = packagingFactory.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_ENVELOPE_ANNOTATION))) {
+        try (Envelope envelope = packagingFactory.create(
+                singletonList(TEST_DOCUMENT_HELLO_TEXT),
+                singletonList(STRING_ENVELOPE_ANNOTATION)
+        )) {
             IndexProvider indexProvider = indexProviderFactory.create(envelope);
             Assert.assertEquals("2", indexProvider.getNextSignatureIndex());
         }
@@ -52,11 +56,13 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
     public void testCreateWithMixedEnvelope() throws Exception {
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
                 withSignatureFactory(mockedSignatureFactory).
-                withManifestFactory(mockedManifestFactory).
                 withIndexProviderFactory(new UuidIndexProviderFactory()).
                 disableInternalVerification().
                 build();
-        try (Envelope envelope = packagingFactory.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_ENVELOPE_ANNOTATION))) {
+        try (Envelope envelope = packagingFactory.create(
+                singletonList(TEST_DOCUMENT_HELLO_TEXT),
+                singletonList(STRING_ENVELOPE_ANNOTATION)
+        )) {
             IndexProvider indexProvider = indexProviderFactory.create(envelope);
             Assert.assertEquals("1", indexProvider.getNextSignatureIndex());
         }

@@ -19,8 +19,8 @@
 
 package com.guardtime.envelope.manifest.tlv;
 
+import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.envelope.manifest.FileReference;
-import com.guardtime.envelope.manifest.MultiHashElement;
 import com.guardtime.envelope.util.DataHashException;
 import com.guardtime.envelope.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
@@ -78,11 +78,12 @@ abstract class TlvFileReference extends TLVStructure implements FileReference {
                 .build();
     }
 
-    protected static List<DataHash> generateHashes(MultiHashElement multiHashElement, List<HashAlgorithm> hashAlgorithms) throws DataHashException {
+    protected static List<DataHash> generateHashes(EnvelopeElement envelopeElement, List<HashAlgorithm> hashAlgorithms)
+            throws DataHashException {
         Util.notNull(hashAlgorithms, "Hash algorithm list");
         List<DataHash> hashList = new ArrayList<>();
         for (HashAlgorithm algorithm : hashAlgorithms) {
-            hashList.add(multiHashElement.getDataHash(algorithm));
+            hashList.add(envelopeElement.getDataHash(algorithm));
         }
         return hashList;
     }

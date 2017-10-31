@@ -19,9 +19,9 @@
 
 package com.guardtime.envelope.verification.rule.generic;
 
+import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.Manifest;
-import com.guardtime.envelope.manifest.MultiHashElement;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.result.ResultHolder;
@@ -54,8 +54,8 @@ public class AnnotationsManifestIntegrityRule extends AbstractRule<SignatureCont
 
     @Override
     protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
-        MultiHashElement annotationsManifest = verifiable.getAnnotationsManifest().getRight();
-        Manifest manifest = verifiable.getManifest().getRight();
+        EnvelopeElement annotationsManifest = verifiable.getAnnotationsManifest();
+        Manifest manifest = verifiable.getManifest();
         FileReference annotationsManifestReference = manifest.getAnnotationsManifestReference();
         ResultHolder tempHolder = new ResultHolder();
         try {

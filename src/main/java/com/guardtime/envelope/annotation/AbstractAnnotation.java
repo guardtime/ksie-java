@@ -39,6 +39,7 @@ public abstract class AbstractAnnotation implements Annotation {
     protected final String domain;
     protected final EnvelopeAnnotationType type;
     private DataHash dataHash;
+    private String path;
 
     public AbstractAnnotation(String domain, EnvelopeAnnotationType type) {
         notNull(domain, "Domain");
@@ -91,5 +92,15 @@ public abstract class AbstractAnnotation implements Annotation {
             logger.warn("Failed to get content of annotation.", e);
             return "";
         }
+    }
+
+    @Override
+    public String getPath() {
+        return path;
+    }
+
+    @Override
+    public void setPath(String path) {
+        this.path = path;
     }
 }

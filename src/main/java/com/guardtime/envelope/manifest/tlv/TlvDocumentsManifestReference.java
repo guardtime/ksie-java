@@ -34,8 +34,13 @@ class TlvDocumentsManifestReference extends TlvFileReference {
         super(rootElement);
     }
 
-    public TlvDocumentsManifestReference(DocumentsManifest documentsManifest, String uri, HashAlgorithmProvider algorithmProvider) throws TLVParserException, DataHashException {
-        super(uri, generateHashes(documentsManifest, algorithmProvider.getFileReferenceHashAlgorithms()), DATA_FILES_MANIFEST);
+    public TlvDocumentsManifestReference(DocumentsManifest documentsManifest, HashAlgorithmProvider algorithmProvider)
+            throws TLVParserException, DataHashException {
+        super(
+                documentsManifest.getPath(),
+                generateHashes(documentsManifest, algorithmProvider.getFileReferenceHashAlgorithms()),
+                DATA_FILES_MANIFEST
+        );
     }
 
     @Override

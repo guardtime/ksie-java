@@ -19,6 +19,8 @@
 
 package com.guardtime.envelope.manifest;
 
+import com.guardtime.envelope.EnvelopeElement;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -26,7 +28,7 @@ import java.util.List;
 /**
  * Envelope structure manifest containing references to {@link SingleAnnotationManifest} contained in the envelope.
  */
-public interface AnnotationsManifest extends MultiHashElement {
+public interface AnnotationsManifest extends EnvelopeElement {
 
     List<? extends FileReference> getSingleAnnotationManifestReferences();
 

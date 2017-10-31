@@ -19,13 +19,15 @@
 
 package com.guardtime.envelope.manifest;
 
+import com.guardtime.envelope.EnvelopeElement;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
  * Envelope internal structure manifest that contains some meta-data and reference to annotation data.
  */
-public interface SingleAnnotationManifest extends MultiHashElement {
+public interface SingleAnnotationManifest extends EnvelopeElement {
 
     /**
      * Returns a reference pointing to annotation data in the envelope.

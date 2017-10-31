@@ -47,6 +47,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -108,7 +109,7 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
                 Document document = new StreamDocument(new ByteArrayInputStream(new byte[313]), "byte inputstream", "byte-input-stream.bis");
                 Annotation annotation = new StringAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "content", "domain.com")
         ) {
-            packagingFactory.addSignature(existingEnvelope, Collections.singletonList(document), Collections.singletonList(annotation));
+            packagingFactory.addSignature(existingEnvelope, singletonList(document), singletonList(annotation));
             for (File doc : ksieTempFiles) {
                 if (isTempFile(doc)) {
                     Util.deleteFileOrDirectory(doc.toPath());
@@ -129,7 +130,7 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
                 Document document = new StreamDocument(new ByteArrayInputStream(new byte[313]), "byte inputstream", "byte-input-stream.bis");
                 Annotation annotation = new StringAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "content", "domain.com")
         ) {
-            packagingFactory.addSignature(existingEnvelope, Collections.singletonList(document), Collections.singletonList(annotation));
+            packagingFactory.addSignature(existingEnvelope, singletonList(document), singletonList(annotation));
             for (File doc : getKsieTempFiles()) {
                 if (isTempFile(doc) && !ksieTempFiles.contains(doc)) {
                     Util.deleteFileOrDirectory(doc.toPath());
@@ -191,7 +192,7 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
                     }
                 }
             }
-            packagingFactory.addSignature(envelope, Collections.singletonList(document), Collections.singletonList(annotation));
+            packagingFactory.addSignature(envelope, singletonList(document), singletonList(annotation));
         }
     }
 

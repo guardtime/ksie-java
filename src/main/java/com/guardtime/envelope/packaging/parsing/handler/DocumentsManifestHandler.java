@@ -51,7 +51,7 @@ public class DocumentsManifestHandler extends ContentHandler<DocumentsManifest> 
     @Override
     protected DocumentsManifest getEntry(String name) throws ContentParsingException {
         try (InputStream input = fetchStreamFromEntries(name)) {
-            DocumentsManifest documentsManifest = manifestFactory.readDocumentsManifest(input);
+            DocumentsManifest documentsManifest = manifestFactory.readDocumentsManifest(input, name);
             parsingStore.remove(name);
             return documentsManifest;
         } catch (InvalidManifestException e) {

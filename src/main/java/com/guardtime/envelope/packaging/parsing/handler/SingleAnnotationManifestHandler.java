@@ -51,7 +51,7 @@ public class SingleAnnotationManifestHandler extends ContentHandler<SingleAnnota
     @Override
     protected SingleAnnotationManifest getEntry(String name) throws ContentParsingException {
         try (InputStream input = fetchStreamFromEntries(name)) {
-            SingleAnnotationManifest singleAnnotationManifest = manifestFactory.readSingleAnnotationManifest(input);
+            SingleAnnotationManifest singleAnnotationManifest = manifestFactory.readSingleAnnotationManifest(input, name);
             parsingStore.remove(name);
             return singleAnnotationManifest;
         } catch (InvalidManifestException e) {

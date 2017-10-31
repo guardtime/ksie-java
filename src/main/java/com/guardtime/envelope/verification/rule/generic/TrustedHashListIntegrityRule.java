@@ -19,8 +19,8 @@
 
 package com.guardtime.envelope.verification.rule.generic;
 
+import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.envelope.manifest.FileReference;
-import com.guardtime.envelope.manifest.MultiHashElement;
 import com.guardtime.envelope.util.DataHashException;
 import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.result.GenericVerificationResult;
@@ -36,9 +36,9 @@ import java.util.List;
 import static com.guardtime.envelope.verification.result.VerificationResult.OK;
 
 /**
- * Rule that checks whether {@link DataHash}es in {@link FileReference} match those in {@link MultiHashElement}.
+ * Rule that checks whether {@link DataHash}es in {@link FileReference} match those in {@link EnvelopeElement}.
  */
-public class TrustedHashListIntegrityRule extends AbstractRule<Pair<MultiHashElement, FileReference>> {
+public class TrustedHashListIntegrityRule extends AbstractRule<Pair<EnvelopeElement, FileReference>> {
     private final String ruleName;
 
     protected TrustedHashListIntegrityRule(RuleState state, String name) {
@@ -47,7 +47,7 @@ public class TrustedHashListIntegrityRule extends AbstractRule<Pair<MultiHashEle
     }
 
     @Override
-    protected void verifyRule(ResultHolder holder, Pair<MultiHashElement, FileReference> verifiable) throws RuleTerminatingException {
+    protected void verifyRule(ResultHolder holder, Pair<EnvelopeElement, FileReference> verifiable) throws RuleTerminatingException {
         FileReference reference = verifiable.getRight();
         VerificationResult verificationResult = getVerificationResult(reference.getHashList(), verifiable.getLeft());
         holder.addResult(new GenericVerificationResult(verificationResult, getName(), getErrorMessage(), reference.getUri()));
@@ -57,7 +57,7 @@ public class TrustedHashListIntegrityRule extends AbstractRule<Pair<MultiHashEle
         }
     }
 
-    private VerificationResult getVerificationResult(List<DataHash> hashList, MultiHashElement multiHashElement) {
+    private VerificationResult getVerificationResult(List<DataHash> hashList, EnvelopeElement multiHashElement) {
         VerificationResult failureVerificationResult = getFailureVerificationResult();
         try {
             for (DataHash hash : hashList) {

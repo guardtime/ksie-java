@@ -30,7 +30,6 @@ import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.signature.EnvelopeSignature;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.ksi.util.Util;
 
 import java.io.BufferedOutputStream;
@@ -78,13 +77,13 @@ class ZipEnvelopeWriter implements EnvelopeWriter {
     private void writeSignatureContents(List<SignatureContent> signatureContents, ZipOutputStream output,
                                         Set<String> writtenFiles) throws IOException {
         for (SignatureContent signatureContent : signatureContents) {
-            Pair<String, Manifest> manifest = signatureContent.getManifest();
-            Pair<String, DocumentsManifest> documentsManifest = signatureContent.getDocumentsManifest();
-            Pair<String, AnnotationsManifest> annotationsManifest = signatureContent.getAnnotationsManifest();
-            writeEntry(manifest.getLeft(), manifest.getRight().getInputStream(), output, writtenFiles);
-            writeEntry(documentsManifest.getLeft(), documentsManifest.getRight().getInputStream(), output, writtenFiles);
-            writeEntry(annotationsManifest.getLeft(), annotationsManifest.getRight().getInputStream(), output, writtenFiles);
-            writeSignature(signatureContent.getEnvelopeSignature(), manifest.getRight(), output, writtenFiles);
+            Manifest manifest = signatureContent.getManifest();
+            DocumentsManifest documentsManifest = signatureContent.getDocumentsManifest();
+            AnnotationsManifest annotationsManifest = signatureContent.getAnnotationsManifest();
+            writeEntry(manifest.getPath(), manifest.getInputStream(), output, writtenFiles);
+            writeEntry(documentsManifest.getPath(), documentsManifest.getInputStream(), output, writtenFiles);
+            writeEntry(annotationsManifest.getPath(), annotationsManifest.getInputStream(), output, writtenFiles);
+            writeSignature(signatureContent.getEnvelopeSignature(), manifest, output, writtenFiles);
             writeDocuments(signatureContent.getDocuments(), output, writtenFiles);
             writeSingleAnnotationManifests(signatureContent.getSingleAnnotationManifests(), output, writtenFiles);
             writeAnnotations(signatureContent.getAnnotations(), output, writtenFiles);

@@ -66,6 +66,11 @@ public class SignedDocument implements Document {
     }
 
     @Override
+    public String getPath() {
+        return delegated.getPath();
+    }
+
+    @Override
     public DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException {
         return delegated.getDataHash(algorithm);
     }

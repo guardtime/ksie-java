@@ -51,7 +51,7 @@ public class AnnotationsManifestHandler extends ContentHandler<AnnotationsManife
     @Override
     protected AnnotationsManifest getEntry(String name) throws ContentParsingException {
         try (InputStream input = fetchStreamFromEntries(name)) {
-            AnnotationsManifest annotationsManifest = manifestFactory.readAnnotationsManifest(input);
+            AnnotationsManifest annotationsManifest = manifestFactory.readAnnotationsManifest(input, name);
             parsingStore.remove(name);
             return annotationsManifest;
         } catch (InvalidManifestException e) {

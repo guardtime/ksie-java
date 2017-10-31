@@ -54,13 +54,13 @@ public class UuidIndexProviderFactory implements IndexProviderFactory {
     private Set<String> getUriSet(SignatureContent signatureContent) {
         Set<String> uris = new HashSet<>();
 
-        Manifest manifest = signatureContent.getManifest().getRight();
+        Manifest manifest = signatureContent.getManifest();
         if (manifest != null && manifest.getSignatureReference() != null) {
             uris.add(manifest.getSignatureReference().getUri());
         }
-        uris.add(signatureContent.getManifest().getLeft());
-        uris.add(signatureContent.getDocumentsManifest().getLeft());
-        uris.add(signatureContent.getAnnotationsManifest().getLeft());
+        uris.add(signatureContent.getManifest().getPath());
+        uris.add(signatureContent.getDocumentsManifest().getPath());
+        uris.add(signatureContent.getAnnotationsManifest().getPath());
         uris.addAll(signatureContent.getSingleAnnotationManifests().keySet());
         uris.addAll(signatureContent.getAnnotations().keySet());
         return uris;

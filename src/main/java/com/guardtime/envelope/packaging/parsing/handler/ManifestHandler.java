@@ -51,7 +51,7 @@ public class ManifestHandler extends ContentHandler<Manifest> {
     @Override
     protected Manifest getEntry(String name) throws ContentParsingException {
         try (InputStream input = fetchStreamFromEntries(name)) {
-            Manifest manifest = manifestFactory.readManifest(input);
+            Manifest manifest = manifestFactory.readManifest(input, name);
             parsingStore.remove(name);
             return manifest;
         } catch (InvalidManifestException e) {

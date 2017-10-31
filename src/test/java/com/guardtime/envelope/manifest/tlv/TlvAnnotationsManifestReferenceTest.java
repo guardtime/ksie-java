@@ -31,7 +31,8 @@ public class TlvAnnotationsManifestReferenceTest extends AbstractTlvManifestTest
 
     @Test
     public void testCreateAnnotationsManifestReference() throws Exception {
-        TlvAnnotationsManifestReference reference = new TlvAnnotationsManifestReference(MOCK_URI, mockAnnotationsManifest, DEFAULT_HASH_ALGORITHM_PROVIDER);
+        TlvAnnotationsManifestReference reference =
+                new TlvAnnotationsManifestReference(mockAnnotationsManifest, DEFAULT_HASH_ALGORITHM_PROVIDER);
         assertEquals(ANNOTATIONS_MANIFEST_REFERENCE_TYPE, reference.getElementType());
         assertEquals(ANNOTATIONS_MANIFEST_TYPE, getMimeType(reference));
         assertEquals(MOCK_URI, getUri(reference));

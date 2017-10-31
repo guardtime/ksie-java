@@ -32,7 +32,6 @@ import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.signature.EnvelopeSignature;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.InputStream;
@@ -50,9 +49,9 @@ import java.util.Map;
 public class SignatureContent implements AutoCloseable, Comparable<SignatureContent> {
 
     private final Map<String, Document> documents;
-    private final Pair<String, DocumentsManifest> documentsManifest;
-    private final Pair<String, Manifest> manifest;
-    private final Pair<String, AnnotationsManifest> annotationsManifest;
+    private final DocumentsManifest documentsManifest;
+    private final Manifest manifest;
+    private final AnnotationsManifest annotationsManifest;
     private final Map<String, SingleAnnotationManifest> singleAnnotationManifestMap;
     private final Map<String, Annotation> annotations;
     private EnvelopeSignature signature;
@@ -95,15 +94,15 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
     }
 
 
-    public Pair<String, DocumentsManifest> getDocumentsManifest() {
+    public DocumentsManifest getDocumentsManifest() {
         return documentsManifest;
     }
 
-    public Pair<String, AnnotationsManifest> getAnnotationsManifest() {
+    public AnnotationsManifest getAnnotationsManifest() {
         return annotationsManifest;
     }
 
-    public Pair<String, Manifest> getManifest() {
+    public Manifest getManifest() {
         return manifest;
     }
 
@@ -136,7 +135,7 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
         }
         Document removed = documents.remove(path);
         List<DataHash> removedDocumentHashes = null;
-        for (FileReference ref : documentsManifest.getRight().getDocumentReferences()) {
+        for (FileReference ref : documentsManifest.getDocumentReferences()) {
             if (ref.getUri().equals(path)) {
                 removedDocumentHashes = ref.getHashList();
                 break;
@@ -170,18 +169,18 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
         }
     }
 
-    private Map<String, SingleAnnotationManifest> formatSingleAnnotationManifestsListToMap(List<Pair<String, SingleAnnotationManifest>> annotationManifests) {
+    private Map<String, SingleAnnotationManifest> formatSingleAnnotationManifestsListToMap(List<SingleAnnotationManifest> annotationManifests) {
         Map<String, SingleAnnotationManifest> returnable = new HashMap<>();
-        for (Pair<String, SingleAnnotationManifest> manifestPair : annotationManifests) {
-            returnable.put(manifestPair.getLeft(), manifestPair.getRight());
+        for (SingleAnnotationManifest manifest : annotationManifests) {
+            returnable.put(manifest.getPath(), manifest);
         }
         return returnable;
     }
 
-    private Map<String, Annotation> formatAnnotationsListToMap(List<Pair<String, Annotation>> annotations) {
+    private Map<String, Annotation> formatAnnotationsListToMap(List<Annotation> annotations) {
         Map<String, Annotation> returnable = new HashMap<>();
-        for (Pair<String, Annotation> annotation : annotations) {
-            returnable.put(annotation.getLeft(), annotation.getRight());
+        for (Annotation annotation : annotations) {
+            returnable.put(annotation.getPath(), annotation);
         }
         return returnable;
     }
@@ -189,7 +188,7 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
     private Map<String, Document> formatDocumentsListToMap(List<Document> documents) {
         Map<String, Document> returnable = new HashMap<>();
         for (Document document : documents) {
-            returnable.put(document.getFileName(), document);
+            returnable.put(document.getPath(), document);
         }
         return returnable;
     }
@@ -212,11 +211,11 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
     public static class Builder {
 
         private List<Document> documents;
-        private List<Pair<String, Annotation>> annotations;
-        private Pair<String, DocumentsManifest> documentsManifest;
-        private Pair<String, AnnotationsManifest> annotationsManifest;
-        private Pair<String, Manifest> manifest;
-        private List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifests;
+        private List<Annotation> annotations;
+        private DocumentsManifest documentsManifest;
+        private AnnotationsManifest annotationsManifest;
+        private Manifest manifest;
+        private List<SingleAnnotationManifest> singleAnnotationManifests;
         private EnvelopeSignature signature;
         private ParsingStore store;
 
@@ -225,27 +224,27 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
             return this;
         }
 
-        public Builder withAnnotations(List<Pair<String, Annotation>> annotations) {
+        public Builder withAnnotations(List<Annotation> annotations) {
             this.annotations = annotations;
             return this;
         }
 
-        public Builder withDocumentsManifest(Pair<String, DocumentsManifest> documentsManifest) {
+        public Builder withDocumentsManifest(DocumentsManifest documentsManifest) {
             this.documentsManifest = documentsManifest;
             return this;
         }
 
-        public Builder withAnnotationsManifest(Pair<String, AnnotationsManifest> annotationsManifest) {
+        public Builder withAnnotationsManifest(AnnotationsManifest annotationsManifest) {
             this.annotationsManifest = annotationsManifest;
             return this;
         }
 
-        public Builder withManifest(Pair<String, Manifest> manifest) {
+        public Builder withManifest(Manifest manifest) {
             this.manifest = manifest;
             return this;
         }
 
-        public Builder withSingleAnnotationManifests(List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifests) {
+        public Builder withSingleAnnotationManifests(List<SingleAnnotationManifest> singleAnnotationManifests) {
             this.singleAnnotationManifests = singleAnnotationManifests;
             return this;
         }

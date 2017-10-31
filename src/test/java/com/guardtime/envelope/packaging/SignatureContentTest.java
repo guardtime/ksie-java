@@ -98,11 +98,12 @@ public class SignatureContentTest extends AbstractEnvelopeTest {
                 new EmptyDocument(TEST_FILE_NAME_TEST_DOC, "application/doc", singletonList(new DataHash(HashAlgorithm.SHA2_256, new byte[32])))
         );
         when(mockedDocumentsManifest.getDocumentReferences()).thenAnswer(makeFileReferenceList(documents));
+        when(mockedDocumentsManifest.getPath()).thenReturn("datamanifest.tlv");
         return new SignatureContent.Builder()
                 .withDocuments(documents)
-                .withAnnotations(Collections.<Pair<String, Annotation>>emptyList())
-                .withSingleAnnotationManifests(Collections.<Pair<String, SingleAnnotationManifest>>emptyList())
-                .withDocumentsManifest(Pair.of("datamanifest.tlv", mockedDocumentsManifest))
+                .withAnnotations(Collections.<Annotation>emptyList())
+                .withSingleAnnotationManifests(Collections.<SingleAnnotationManifest>emptyList())
+                .withDocumentsManifest(mockedDocumentsManifest)
                 .build();
     }
 

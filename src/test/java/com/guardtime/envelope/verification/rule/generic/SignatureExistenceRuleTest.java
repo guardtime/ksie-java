@@ -24,7 +24,6 @@ import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.SignatureReference;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.signature.EnvelopeSignature;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import com.guardtime.envelope.verification.result.RuleVerificationResult;
 import com.guardtime.envelope.verification.result.VerificationResult;
@@ -55,7 +54,7 @@ public class SignatureExistenceRuleTest extends AbstractEnvelopeTest {
         MockitoAnnotations.initMocks(this);
         when(mockSignatureReference.getUri()).thenReturn("uri");
         when(mockManifest.getSignatureReference()).thenReturn(mockSignatureReference);
-        when(mockSignatureContent.getManifest()).thenReturn(Pair.of("", mockManifest));
+        when(mockSignatureContent.getManifest()).thenReturn(mockManifest);
     }
 
     @Test

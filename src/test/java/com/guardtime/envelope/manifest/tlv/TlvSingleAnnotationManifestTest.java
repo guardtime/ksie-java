@@ -20,7 +20,6 @@
 package com.guardtime.envelope.manifest.tlv;
 
 import com.guardtime.envelope.manifest.InvalidManifestException;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.ksi.tlv.TLVElement;
 
 import org.junit.Before;
@@ -31,6 +30,7 @@ import java.io.ByteArrayInputStream;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
 
 public class TlvSingleAnnotationManifestTest extends AbstractTlvManifestTest {
 
@@ -47,12 +47,16 @@ public class TlvSingleAnnotationManifestTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateSingleAnnotationManifest() throws Exception {
-        TlvSingleAnnotationManifest annotationManifest = new TlvSingleAnnotationManifest(Pair.of(SINGLE_ANNOTATION_MANIFEST_URI, mockAnnotation), Pair.of(MOCK_URI, mockDocumentsManifest), DEFAULT_HASH_ALGORITHM_PROVIDER);
+        String annotationPath = "annotation1.dat";
+        when(mockAnnotation.getPath()).thenReturn(annotationPath);
+        when(mockDocumentsManifest.getPath()).thenReturn(MOCK_URI);
+        TlvSingleAnnotationManifest annotationManifest = new TlvSingleAnnotationManifest(mockAnnotation, mockDocumentsManifest, DEFAULT_HASH_ALGORITHM_PROVIDER, SINGLE_ANNOTATION_MANIFEST_URI);
 
         assertNotNull(annotationManifest.getAnnotationReference());
         assertNotNull(annotationManifest.getDocumentsManifestReference());
         assertEquals(ANNOTATION_DOMAIN_COM_GUARDTIME, annotationManifest.getAnnotationReference().getDomain());
-        assertEquals(SINGLE_ANNOTATION_MANIFEST_URI, annotationManifest.getAnnotationReference().getUri());
+        assertEquals(SINGLE_ANNOTATION_MANIFEST_URI, annotationManifest.getPath());
+        assertEquals(annotationPath, annotationManifest.getAnnotationReference().getUri());
         assertEquals(dataHash, annotationManifest.getAnnotationReference().getHash());
         assertEquals(MOCK_URI, annotationManifest.getDocumentsManifestReference().getUri());
         assertEquals(DOCUMENTS_MANIFEST_TYPE, annotationManifest.getDocumentsManifestReference().getMimeType());
@@ -62,7 +66,7 @@ public class TlvSingleAnnotationManifestTest extends AbstractTlvManifestTest {
     @Test
     public void testReadSingleAnnotationManifest() throws Exception {
         byte[] bytes = join(SINGLE_ANNOTATION_MANIFEST_MAGIC, annotationReference.getEncoded(), documentsManifestReference.getEncoded());
-        TlvSingleAnnotationManifest annotationInfoManifest = new TlvSingleAnnotationManifest(new ByteArrayInputStream(bytes));
+        TlvSingleAnnotationManifest annotationInfoManifest = new TlvSingleAnnotationManifest(new ByteArrayInputStream(bytes), "");
 
         assertArrayEquals(SINGLE_ANNOTATION_MANIFEST_MAGIC, annotationInfoManifest.getMagic());
         assertNotNull(annotationInfoManifest.getDocumentsManifestReference());
@@ -74,7 +78,7 @@ public class TlvSingleAnnotationManifestTest extends AbstractTlvManifestTest {
         expectedException.expect(InvalidManifestException.class);
         expectedException.expectMessage("Data manifest reference is mandatory manifest element");
         byte[] bytes = join(SINGLE_ANNOTATION_MANIFEST_MAGIC, annotationReference.getEncoded());
-        new TlvSingleAnnotationManifest(new ByteArrayInputStream(bytes));
+        new TlvSingleAnnotationManifest(new ByteArrayInputStream(bytes), "");
     }
 
     @Test
@@ -82,7 +86,7 @@ public class TlvSingleAnnotationManifestTest extends AbstractTlvManifestTest {
         expectedException.expect(InvalidManifestException.class);
         expectedException.expectMessage("Annotation reference is mandatory manifest element");
         byte[] bytes = join(SINGLE_ANNOTATION_MANIFEST_MAGIC, documentsManifestReference.getEncoded());
-        new TlvSingleAnnotationManifest(new ByteArrayInputStream(bytes));
+        new TlvSingleAnnotationManifest(new ByteArrayInputStream(bytes), "");
     }
 
 }

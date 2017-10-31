@@ -21,7 +21,7 @@ package com.guardtime.envelope.verification.rule.generic;
 
 import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.manifest.FileReference;
-import com.guardtime.envelope.manifest.MultiHashElement;
+import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.result.ResultHolder;
@@ -57,11 +57,11 @@ public class DocumentIntegrityRule extends AbstractRule<SignatureContent> {
 
     @Override
     protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
-        for (FileReference documentReference : verifiable.getDocumentsManifest().getRight().getDocumentReferences()) {
+        for (FileReference documentReference : verifiable.getDocumentsManifest().getDocumentReferences()) {
             String uri = documentReference.getUri();
             if (existenceRuleFailed(holder, verifiable, uri)) continue;
 
-            MultiHashElement document = verifiable.getDocuments().get(uri);
+            EnvelopeElement document = verifiable.getDocuments().get(uri);
 
             ResultHolder tempHolder = new ResultHolder();
             try {

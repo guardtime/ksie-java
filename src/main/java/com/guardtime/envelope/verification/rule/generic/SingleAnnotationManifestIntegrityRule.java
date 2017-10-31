@@ -19,10 +19,10 @@
 
 package com.guardtime.envelope.verification.rule.generic;
 
+import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
 import com.guardtime.envelope.manifest.DocumentsManifest;
 import com.guardtime.envelope.manifest.FileReference;
-import com.guardtime.envelope.manifest.MultiHashElement;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.util.Pair;
@@ -62,18 +62,18 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Signatur
 
     @Override
     protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
-        for (FileReference reference : verifiable.getAnnotationsManifest().getRight().getSingleAnnotationManifestReferences()) {
+        for (FileReference reference : verifiable.getAnnotationsManifest().getSingleAnnotationManifestReferences()) {
             String singleAnnotationManifestUri = reference.getUri();
             if (existenceRuleFailed(holder, singleAnnotationManifestUri)) continue;
 
             SingleAnnotationManifest manifest = verifiable.getSingleAnnotationManifests().get(singleAnnotationManifestUri);
-            Pair<String, DocumentsManifest> documentsManifestPair = verifiable.getDocumentsManifest();
+            DocumentsManifest documentsManifest = verifiable.getDocumentsManifest();
             FileReference documentsManifestReference = manifest.getDocumentsManifestReference();
             ResultHolder tempHolder = new ResultHolder();
             try {
-                multiHashElementIntegrityRule.verify(tempHolder, Pair.of((MultiHashElement) manifest, reference));
+                multiHashElementIntegrityRule.verify(tempHolder, Pair.of((EnvelopeElement) manifest, reference));
 
-                if (!documentsManifestPair.getLeft().equals(documentsManifestReference.getUri())) {
+                if (!documentsManifest.getPath().equals(documentsManifestReference.getUri())) {
                     tempHolder.addResult(
                             verifiable,
                             new GenericVerificationResult(NOK, getName(), getErrorMessage(), reference.getUri())
@@ -82,7 +82,7 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Signatur
                 }
                 multiHashElementIntegrityRule.verifyRule(
                         tempHolder,
-                        Pair.of((MultiHashElement) documentsManifestPair.getRight(), documentsManifestReference)
+                        Pair.of((EnvelopeElement) documentsManifest, documentsManifestReference)
                 );
             } catch (RuleTerminatingException e) {
                 // we do not let this through

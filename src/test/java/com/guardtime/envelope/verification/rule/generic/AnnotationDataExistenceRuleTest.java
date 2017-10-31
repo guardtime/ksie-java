@@ -27,7 +27,6 @@ import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.SignatureContent;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.result.GenericVerificationResult;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import com.guardtime.envelope.verification.result.RuleVerificationResult;
@@ -97,7 +96,7 @@ public class AnnotationDataExistenceRuleTest extends AbstractEnvelopeTest {
         holder.addResult(mockSignatureContent, new GenericVerificationResult(VerificationResult.OK, KSIE_VERIFY_ANNOTATION_EXISTS.getName(), "", annotationManifestPath));
         when(mockSignatureContent.getSingleAnnotationManifests()).thenReturn(Collections.singletonMap(annotationManifestPath, mockSignaleAnnotationManifest));
         AnnotationsManifest mockAnnotationsManifest = mock(AnnotationsManifest.class);
-        when(mockSignatureContent.getAnnotationsManifest()).thenReturn(Pair.of("", mockAnnotationsManifest));
+        when(mockSignatureContent.getAnnotationsManifest()).thenReturn(mockAnnotationsManifest);
         when(mockAnnotationsManifest.getSingleAnnotationManifestReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {
             @Override
             public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) throws Throwable {

@@ -19,9 +19,7 @@
 
 package com.guardtime.envelope.annotation;
 
-import com.guardtime.envelope.util.DataHashException;
-import com.guardtime.ksi.hashing.DataHash;
-import com.guardtime.ksi.hashing.HashAlgorithm;
+import com.guardtime.envelope.EnvelopeElement;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +28,7 @@ import java.io.InputStream;
  * Represents annotations that can be used in envelope. Combines annotation data and annotation
  * meta-data into one object.
  */
-public interface Annotation extends AutoCloseable {
+public interface Annotation extends AutoCloseable, EnvelopeElement {
 
     EnvelopeAnnotationType getAnnotationType();
 
@@ -43,9 +41,8 @@ public interface Annotation extends AutoCloseable {
     InputStream getInputStream() throws IOException;
 
     /**
-     * Returns {@link DataHash} of annotation data for given algorithm.
-     * @throws DataHashException when there is a problem generating the hash.
+     * Sets the path value used by {@link EnvelopeElement#getPath()}.
      */
-    DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException;
+    void setPath(String path);
 
 }
