@@ -167,7 +167,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
             int expectedSignatureContentCount =
                     parsedEnvelope.getSignatureContents().size() + secondParsedEnvelope.getSignatureContents().size();
             parsedEnvelope.add(secondParsedEnvelope);
-            parsedEnvelope.writeTo(outputStream);
+            envelopeWriter.write(parsedEnvelope, outputStream);
             assertNotNull(outputStream.toByteArray());
             assertTrue(outputStream.toByteArray().length > 0);
             try (Envelope mergedEnvelope = packagingFactory.read(new ByteArrayInputStream(outputStream.toByteArray()))) {
@@ -367,7 +367,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
 
     private void assertSignatureContentsCount(Envelope parsedEnvelope, int expectedSignatureContentsSize) throws Exception {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        parsedEnvelope.writeTo(bos);
+        envelopeWriter.write(parsedEnvelope, bos);
         try (Envelope envelopeFromBos = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
             assertEquals(expectedSignatureContentsSize, envelopeFromBos.getSignatureContents().size());
         }

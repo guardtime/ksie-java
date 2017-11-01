@@ -150,7 +150,7 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         Envelope envelope = getEnvelope(ENVELOPE_WITH_MULTIPLE_SIGNATURES);
         envelope.close();
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-            envelope.writeTo(bos);
+            envelopeWriter.write(envelope, bos);
         }
         assertFalse(anyKsieTempFiles());
     }
@@ -166,7 +166,7 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
             List<File> tempFiles = getKsieTempFiles();
             assertTrue(tempFiles.size() == envelope.getSignatureContents().size() + 1);
             Util.deleteFileOrDirectory(tempFiles.get(0).toPath());
-            envelope.writeTo(bos);
+            envelopeWriter.write(envelope, bos);
         }
     }
 

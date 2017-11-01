@@ -77,7 +77,6 @@ public class EnvelopePackagingFactory {
     private final EnvelopeManifestFactory manifestFactory;
     private final IndexProviderFactory indexProviderFactory;
     private final boolean disableVerification;
-    private final EnvelopeWriter envelopeWriter;
     private final EnvelopeReader envelopeReader;
 
     private EnvelopePackagingFactory(Builder builder) {
@@ -86,12 +85,10 @@ public class EnvelopePackagingFactory {
         Util.notNull(builder.indexProviderFactory, "Index provider factory");
         Util.notNull(builder.parsingStoreFactory, "Parsing store factory");
         Util.notNull(builder.envelopeReader, "Envelope reader");
-        Util.notNull(builder.envelopeWriter, "Envelope writer");
         this.signatureFactory = builder.signatureFactory;
         this.manifestFactory = builder.manifestFactory;
         this.indexProviderFactory = builder.indexProviderFactory;
         this.disableVerification = builder.disableInternalVerification;
-        this.envelopeWriter = builder.envelopeWriter;
         this.envelopeReader = builder.envelopeReader;
         logger.info("Envelope factory initialized");
     }
@@ -128,7 +125,7 @@ public class EnvelopePackagingFactory {
      */
     public Envelope create(List<Document> files, List<Annotation> annotations) throws InvalidPackageException {
         SignatureContent signatureContent = verifyAndSign(files, annotations, null);
-        Envelope envelope = new Envelope(signatureContent, envelopeWriter);
+        Envelope envelope = new Envelope(signatureContent);
         verifyEnvelope(envelope);
         return envelope;
     }
@@ -300,7 +297,6 @@ public class EnvelopePackagingFactory {
         protected boolean disableInternalVerification = false;
         protected IndexProviderFactory indexProviderFactory = new IncrementingIndexProviderFactory();
         protected ParsingStoreFactory parsingStoreFactory = new TemporaryFileBasedParsingStoreFactory();
-        protected EnvelopeWriter envelopeWriter;
         protected EnvelopeReader envelopeReader;
 
         public Builder withSignatureFactory(SignatureFactory factory) {
@@ -325,11 +321,6 @@ public class EnvelopePackagingFactory {
 
         public Builder disableInternalVerification() {
             this.disableInternalVerification = true;
-            return this;
-        }
-
-        public Builder withEnvelopeWriter(EnvelopeWriter writer) {
-            this.envelopeWriter = writer;
             return this;
         }
 

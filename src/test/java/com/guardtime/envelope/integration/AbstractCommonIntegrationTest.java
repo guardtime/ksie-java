@@ -22,8 +22,10 @@ package com.guardtime.envelope.integration;
 import com.guardtime.envelope.AbstractEnvelopeTest;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
+import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
+import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
 import com.guardtime.envelope.signature.SignatureFactory;
 import com.guardtime.envelope.signature.ksi.KsiSignatureFactory;
 import com.guardtime.ksi.KSI;
@@ -48,6 +50,7 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
     private static final String TRUST_STORE_PASSWORD;
     protected EnvelopePackagingFactory packagingFactory;
     protected SignatureFactory signatureFactory;
+    protected EnvelopeWriter envelopeWriter;
     protected KSI ksi;
 
     private static final KSIServiceCredentials KSI_SERVICE_CREDENTIALS;
@@ -98,7 +101,7 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
                 .withSignatureFactory(signatureFactory)
                 .enableInternalVerification()
                 .build();
-
+        envelopeWriter = new ZipEnvelopeWriter();
     }
 
     Envelope getEnvelope() throws Exception {

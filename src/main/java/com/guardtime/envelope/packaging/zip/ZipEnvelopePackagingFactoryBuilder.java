@@ -36,7 +36,6 @@ public class ZipEnvelopePackagingFactoryBuilder extends EnvelopePackagingFactory
     @Override
     public EnvelopePackagingFactory build() throws IOException {
         envelopeReader = new ZipEnvelopeReader(manifestFactory, signatureFactory, parsingStoreFactory);
-        envelopeWriter = new ZipEnvelopeWriter();
         return super.build();
     }
 }

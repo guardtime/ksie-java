@@ -45,10 +45,13 @@ import java.util.zip.Checksum;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-class ZipEnvelopeWriter implements EnvelopeWriter {
+public class ZipEnvelopeWriter implements EnvelopeWriter {
 
     @Override
     public void write(Envelope envelope, OutputStream output) throws IOException {
+        if (envelope.isClosed()) {
+            throw new IOException("Can't write closed object!");
+        }
         Set<String> writtenFiles = new HashSet<>();
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(output))) {
             writeMimeTypeEntry(zipOutputStream, writtenFiles);

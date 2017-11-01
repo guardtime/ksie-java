@@ -23,7 +23,6 @@ import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
-import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidPackageException;
@@ -86,7 +85,7 @@ public abstract class EnvelopeReader {
         List<SignatureContent> contents = buildSignatures(handlerSet, readingException);
         List<UnknownDocument> unknownFiles = getUnknownFiles(handlerSet, readingException);
         handlerSet.clearRequestedData();
-        Envelope envelope = new Envelope(contents, unknownFiles, getWriter(), parsingStore);
+        Envelope envelope = new Envelope(contents, unknownFiles, parsingStore);
         readingException.setEnvelope(envelope);
 
         if (!containsValidContents(contents)) {
@@ -98,8 +97,6 @@ public abstract class EnvelopeReader {
         }
         return envelope;
     }
-
-    protected abstract EnvelopeWriter getWriter();
 
     protected abstract void parseInputStream(InputStream input, HandlerSet handlerSet, EnvelopeReadingException readingException) throws IOException;
 
