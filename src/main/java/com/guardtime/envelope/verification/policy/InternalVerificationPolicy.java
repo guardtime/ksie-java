@@ -35,14 +35,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.guardtime.envelope.verification.rule.RuleType.KSIE_FORMAT;
 import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION;
 import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_DATA;
 import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_DATA_EXISTS;
 import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_EXISTS;
 import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST;
 import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS;
-import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_DATA_HASH;
 import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_DATA_MANIFEST;
 import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_DATA_MANIFEST_EXISTS;
 import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_MANIFEST_HASH;
@@ -50,8 +48,6 @@ import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_SIGN
 
 public class InternalVerificationPolicy extends DefaultVerificationPolicy {
 
-    /**
-     */
     public InternalVerificationPolicy() {
         super(
                 new InternalRuleStateProvider(),
@@ -63,10 +59,8 @@ public class InternalVerificationPolicy extends DefaultVerificationPolicy {
 
     private static class InternalRuleStateProvider implements RuleStateProvider {
         private final List<String> allowedRules = Arrays.asList(
-                KSIE_FORMAT.getName(),
                 KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName(),
                 KSIE_VERIFY_DATA_MANIFEST.getName(),
-                KSIE_VERIFY_DATA_HASH.getName(),
                 KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName(),
                 KSIE_VERIFY_ANNOTATION_MANIFEST.getName(),
                 KSIE_VERIFY_ANNOTATION_EXISTS.getName(),
