@@ -140,43 +140,20 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
 
     @Test
     public void testAddDocumentWithMIMEtypeName_ThrowsIOException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("File name is not valid!");
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                disableInternalVerification().
-                withIndexProviderFactory(new UuidIndexProviderFactory()).
-                build();
-        EnvelopeDocument testDocument = new StreamEnvelopeDocument(
-                new ByteArrayInputStream(new byte[0]),
-                "some type",
-                MimeType.MIME_TYPE_ENTRY_NAME
-        );
-        try (Envelope envelope = packagingFactory.create(singletonList(testDocument), singletonList(STRING_ENVELOPE_ANNOTATION))) {
-
-        }
+        performFilenameTest(MimeType.MIME_TYPE_ENTRY_NAME);
     }
 
     @Test
     public void testAddDocumentWithMETAINFDirInName_ThrowsIOException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("File name is not valid!");
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                disableInternalVerification().
-                withIndexProviderFactory(new UuidIndexProviderFactory()).
-                build();
-        EnvelopeDocument testDocument = new StreamEnvelopeDocument(
-                new ByteArrayInputStream(new byte[0]),
-                "some type",
-                META_INF + "/somefile.txt"
-        );
-        try (Envelope envelope = packagingFactory.create(singletonList(testDocument), singletonList(STRING_ENVELOPE_ANNOTATION))) {
-        }
+        performFilenameTest(META_INF + "/somefile.txt");
     }
 
     @Test
     public void testAddDocumentWithMETAINFName_ThrowsIOException() throws Exception {
+        performFilenameTest(META_INF);
+    }
+
+    private void performFilenameTest(String filename) throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("File name is not valid!");
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
@@ -187,7 +164,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
         EnvelopeDocument testDocument = new StreamEnvelopeDocument(
                 new ByteArrayInputStream(new byte[0]),
                 "some type",
-                META_INF
+                filename
         );
         try (Envelope envelope = packagingFactory.create(singletonList(testDocument), singletonList(STRING_ENVELOPE_ANNOTATION))) {
         }

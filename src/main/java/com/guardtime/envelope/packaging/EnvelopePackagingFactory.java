@@ -204,9 +204,9 @@ public class EnvelopePackagingFactory {
         for (EnvelopeDocument document : files) {
             String filename = document.getFileName();
             if (filename.equals(META_INF) ||
-                    filename.contains(META_INF + "/") ||
+                    filename.startsWith(META_INF + "/") ||
                     filename.equals(MimeType.MIME_TYPE_ENTRY_NAME)) {
-                throw new IllegalArgumentException("File name is not valid!");
+                throw new IllegalArgumentException("File name is not valid! File name: " + filename);
             }
         }
     }
