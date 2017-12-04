@@ -26,8 +26,8 @@ import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.IndexProvider;
 import com.guardtime.envelope.indexing.IndexProviderFactory;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
-import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.DocumentsManifest;
+import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.InvalidManifestException;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.ManifestFactoryType;
@@ -67,6 +67,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.guardtime.envelope.packaging.EntryNameProvider.META_INF;
 import static com.guardtime.envelope.packaging.MimeType.MIME_TYPE_ENTRY_NAME;
 
 /**
@@ -170,6 +171,7 @@ public class EnvelopePackagingFactory {
     private SignatureContent verifyAndSign(List<EnvelopeDocument> files, List<EnvelopeAnnotation> annotations,
                                            Envelope existingEnvelope) throws InvalidPackageException {
         Util.notEmpty(files, "Document files");
+        validateDocumentFilenames(files);
         HashSet<EnvelopeDocument> documents = new HashSet<>(files);
 
         IndexProvider indexProvider;
@@ -195,6 +197,17 @@ public class EnvelopePackagingFactory {
             throw new InvalidPackageException("Failed to create internal structure!", e);
         } catch (SignatureException e) {
             throw new InvalidPackageException("Failed to acquire signature!", e);
+        }
+    }
+
+    private void validateDocumentFilenames(List<EnvelopeDocument> files) {
+        for (EnvelopeDocument document : files) {
+            String filename = document.getFileName();
+            if (filename.equals(META_INF) ||
+                    filename.contains(META_INF + "/") ||
+                    filename.equals(MimeType.MIME_TYPE_ENTRY_NAME)) {
+                throw new IllegalArgumentException("File name is not valid!");
+            }
         }
     }
 
