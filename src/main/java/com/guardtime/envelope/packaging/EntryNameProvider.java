@@ -26,13 +26,13 @@ import com.guardtime.envelope.indexing.IndexProvider;
  */
 public class EntryNameProvider {
 
-    private static final String META_INF = "META-INF/";
-    public static final String DOCUMENTS_MANIFEST_FORMAT = META_INF + "datamanifest-%s.%s";
-    public static final String MANIFEST_FORMAT = META_INF + "manifest-%s.%s";
-    public static final String ANNOTATIONS_MANIFEST_FORMAT = META_INF + "annotmanifest-%s.%s";
-    public static final String SIGNATURE_FORMAT = META_INF + "signature-%s.%s";
-    public static final String SINGLE_ANNOTATION_MANIFEST_FORMAT = META_INF + "annotation-%s.%s";
-    public static final String ANNOTATION_DATA_FORMAT = META_INF + "annotation-%s.dat";
+    public static final String META_INF = "META-INF";
+    public static final String DOCUMENTS_MANIFEST_FORMAT = META_INF + "/" + "datamanifest-%s.%s";
+    public static final String MANIFEST_FORMAT = META_INF + "/" + "manifest-%s.%s";
+    public static final String ANNOTATIONS_MANIFEST_FORMAT = META_INF + "/" + "annotmanifest-%s.%s";
+    public static final String SIGNATURE_FORMAT = META_INF + "/" + "signature-%s.%s";
+    public static final String SINGLE_ANNOTATION_MANIFEST_FORMAT = META_INF + "/" + "annotation-%s.%s";
+    public static final String ANNOTATION_DATA_FORMAT = META_INF + "/" + "annotation-%s.dat";
     private final String manifestSuffix;
     private final String signatureSuffix;
     private final IndexProvider indexProvider;
