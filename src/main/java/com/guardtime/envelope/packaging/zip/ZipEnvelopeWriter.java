@@ -137,12 +137,22 @@ class ZipEnvelopeWriter implements EnvelopeWriter {
                                 Set<String> writtenFiles) throws IOException {
         for (String uri : documents.keySet()) {
             EnvelopeDocument document = documents.get(uri);
+            if(invalidDocumentName(document.getFileName())) {
+                throw new IOException(document.getFileName() + " is an invalid document file name!");
+            }
             if (document.isWritable()) {
                 try (InputStream inputStream = document.getInputStream()) {
                     writeEntry(uri, inputStream, zipOutputStream, writtenFiles);
                 }
             }
         }
+    }
+
+    /**
+     * Filename can't be directory for an {@link EnvelopeDocument}. KSIE-54
+     */
+    private boolean invalidDocumentName(String fileName) {
+        return fileName.endsWith("/");
     }
 
     private void writeEntry(String path, InputStream input, ZipOutputStream output, Set<String> writtenFiles) throws IOException {
