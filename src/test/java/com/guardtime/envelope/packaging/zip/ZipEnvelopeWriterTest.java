@@ -29,7 +29,7 @@ public class ZipEnvelopeWriterTest extends AbstractEnvelopeTest {
     @Test
     public void testAddDocumentWithDirectoryName_ThrowsIOException() throws Exception {
         expectedException.expect(IOException.class);
-        expectedException.expectMessage("Invalid document filename!");
+        expectedException.expectMessage(" is an invalid document file name!");
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
                 withSignatureFactory(mockedSignatureFactory).
                 disableInternalVerification().

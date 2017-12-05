@@ -138,7 +138,7 @@ class ZipEnvelopeWriter implements EnvelopeWriter {
         for (String uri : documents.keySet()) {
             EnvelopeDocument document = documents.get(uri);
             if(invalidDocumentName(document.getFileName())) {
-                throw new IOException("Invalid document filename!");
+                throw new IOException(document.getFileName() + " is an invalid document file name!");
             }
             if (document.isWritable()) {
                 try (InputStream inputStream = document.getInputStream()) {
