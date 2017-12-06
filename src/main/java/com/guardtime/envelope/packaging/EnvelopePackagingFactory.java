@@ -66,6 +66,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.guardtime.envelope.packaging.EntryNameProvider.META_INF;
+import static com.guardtime.envelope.packaging.EnvelopeWriter.MIME_TYPE_ENTRY_NAME;
+
 /**
  * Creates or parses {@link Envelope} instances.
  */
@@ -152,6 +155,7 @@ public class EnvelopePackagingFactory {
     private SignatureContent verifyAndSign(List<Document> files, List<Annotation> annotations,
                                            Envelope existingEnvelope) throws InvalidPackageException {
         Util.notEmpty(files, "Document files");
+        validateDocumentFilenames(files);
         HashSet<Document> documents = new HashSet<>(files);
 
         IndexProvider indexProvider;
@@ -177,6 +181,17 @@ public class EnvelopePackagingFactory {
             throw new InvalidPackageException("Failed to create internal structure!", e);
         } catch (SignatureException e) {
             throw new InvalidPackageException("Failed to acquire signature!", e);
+        }
+    }
+
+    private void validateDocumentFilenames(List<Document> files) {
+        for (Document document : files) {
+            String filename = document.getFileName();
+            if (filename.equals(META_INF) ||
+                    filename.startsWith(META_INF + "/") ||
+                    filename.equals(MIME_TYPE_ENTRY_NAME)) {
+                throw new IllegalArgumentException("File name is not valid! File name: " + filename);
+            }
         }
     }
 
