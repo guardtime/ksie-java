@@ -29,9 +29,9 @@ import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.AnnotationsManifestMergingException;
-import com.guardtime.envelope.packaging.exception.EnvelopeAnnotationMergingException;
 import com.guardtime.envelope.packaging.exception.DocumentMergingException;
 import com.guardtime.envelope.packaging.exception.DocumentsManifestMergingException;
+import com.guardtime.envelope.packaging.exception.EnvelopeAnnotationMergingException;
 import com.guardtime.envelope.packaging.exception.ManifestMergingException;
 import com.guardtime.envelope.packaging.exception.SignatureMergingException;
 import com.guardtime.envelope.packaging.exception.SingleAnnotationManifestMergingException;
@@ -190,7 +190,9 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     @Test
     public void testMergeEnvelopesUnknownFileConflict() throws Exception {
         expectedException.expect(DocumentMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for EnvelopeDocument! Path: META-INF/sun.txt");
+        expectedException.expectMessage(matchesRegex(
+                "New SignatureContent has clashing name for EnvelopeDocument! Path: (META-INF/sun.txt|sun.txt|sun/sun.txt)"
+        ));
         mergeEnvelopes(CONTAINERS_FOR_UNKNOWN_FILE_CONFLICT);
     }
 

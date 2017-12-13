@@ -22,9 +22,7 @@ package com.guardtime.envelope.packaging.parsing.handler;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.InvalidManifestException;
 import com.guardtime.envelope.manifest.Manifest;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import static com.guardtime.envelope.packaging.EntryNameProvider.MANIFEST_FORMAT;
@@ -32,32 +30,35 @@ import static com.guardtime.envelope.packaging.EntryNameProvider.MANIFEST_FORMAT
 /**
  * This content holders is used for manifests inside the envelope.
  */
-public class ManifestHandler extends ContentHandler<Manifest> {
+public class ManifestHandler implements ContentHandler<Manifest> {
 
     private final EnvelopeManifestFactory manifestFactory;
 
-    public ManifestHandler(EnvelopeManifestFactory manifestFactory, ParsingStore store) {
-        super(store);
+    public ManifestHandler(EnvelopeManifestFactory manifestFactory) {
         this.manifestFactory = manifestFactory;
     }
 
-    @Override
     public boolean isSupported(String name) {
         String regex = String.format(MANIFEST_FORMAT, ".+", manifestFactory.getManifestFactoryType().getManifestFileExtension());
         return matchesSingleDirectory(name, "META-INF") &&
                 fileNameMatches(name, regex);
     }
 
+    private boolean matchesSingleDirectory(String str, String dirName) {
+        return str.matches("/?" + dirName + "/[^/]*");
+    }
+
+    private boolean fileNameMatches(String str, String regex) {
+        int startingIndex = str.startsWith("/") ? 1 : 0;
+        return str.substring(startingIndex).matches(regex);
+    }
+
     @Override
-    protected Manifest getEntry(String name) throws ContentParsingException {
-        try (InputStream input = fetchStreamFromEntries(name)) {
-            Manifest manifest = manifestFactory.readManifest(input);
-            parsingStore.remove(name);
-            return manifest;
+    public Manifest parse(InputStream input) throws ContentParsingException {
+        try {
+            return manifestFactory.readManifest(input);
         } catch (InvalidManifestException e) {
-            throw new ContentParsingException("Failed to parse content of '" + name + "'", e);
-        } catch (IOException e) {
-            throw new ContentParsingException("Failed to read content of '" + name + "'", e);
+            throw new ContentParsingException("Failed to parse content of stream as a Manifest.", e);
         }
     }
 
