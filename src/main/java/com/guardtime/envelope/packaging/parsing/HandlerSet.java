@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.envelope.packaging.parsing;
 
 import com.guardtime.envelope.document.ParsedEnvelopeDocument;
@@ -29,6 +48,9 @@ import java.util.Set;
 
 import static com.guardtime.envelope.packaging.MimeType.MIME_TYPE_ENTRY_NAME;
 
+/**
+ * Helper that manages different {@link ContentHandler} instances and parsed in envelope content.
+ */
 public class HandlerSet {
     private final ParsingStore parsingStore;
     private final MimeTypeHandler mimeTypeHandler;
@@ -56,7 +78,7 @@ public class HandlerSet {
 
     public List<UnknownDocument> getUnrequestedFiles() {
         List<UnknownDocument> returnable = new ArrayList<>();
-        Set<String> keys = parsingStore.getStoredKeys();
+        Set<String> keys = new HashSet<>(parsingStore.getStoredKeys());
         keys.removeAll(requestedKeys);
         for (String key : keys) {
             returnable.add(new ParsedEnvelopeDocument(parsingStore, key, "unknown", key));
@@ -115,4 +137,5 @@ public class HandlerSet {
         }
         return parsingStore.get(path);
     }
+
 }

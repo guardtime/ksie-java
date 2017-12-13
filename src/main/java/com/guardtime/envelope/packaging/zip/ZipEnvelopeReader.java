@@ -51,12 +51,13 @@ class ZipEnvelopeReader extends EnvelopeReader {
         try (ZipInputStream zipInput = new ZipInputStream(input)) {
             ZipEntry entry;
             while ((entry = zipInput.getNextEntry()) != null) {
+                String name = entry.getName();
                 if (entry.isDirectory()) {
-                    LOGGER.trace("Skipping ZIP directory '{}'", entry.getName());
+                    LOGGER.trace("Skipping ZIP directory '{}'", name);
                     continue;
                 }
                 try {
-                    String name = entry.getName();
+                    LOGGER.debug("Reading ZIP entry '{}'.", name);
                     handlerSet.add(name, zipInput);
                 } catch (ParsingStoreException e) {
                     readingException.addException(e);

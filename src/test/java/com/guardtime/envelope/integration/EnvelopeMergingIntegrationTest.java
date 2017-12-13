@@ -190,9 +190,9 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     @Test
     public void testMergeEnvelopesUnknownFileConflict() throws Exception {
         expectedException.expect(DocumentMergingException.class);
-        expectedException.expectMessage(matchesRegex(
-                "New SignatureContent has clashing name for EnvelopeDocument! Path: (META-INF/sun.txt|sun.txt|sun/sun.txt)"
-        ));
+        expectedException.expectMessage(
+                matchesRegex("New SignatureContent has clashing name for EnvelopeDocument! Path: (META-INF/||sun/)sun.txt")
+        );
         mergeEnvelopes(CONTAINERS_FOR_UNKNOWN_FILE_CONFLICT);
     }
 

@@ -134,9 +134,8 @@ public abstract class EnvelopeReader {
 
     private MimeType getMimeType(HandlerSet handlerSet) {
         try {
-            String uri = MIME_TYPE_ENTRY_NAME;
             byte[] content = handlerSet.getMimeTypeContent();
-            return new MimeTypeEntry(uri, content);
+            return new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, content);
         } catch (ContentParsingException e) {
             LOGGER.debug("Failed to parse MIME type. Reason: '{}", e.getMessage());
             return null;
