@@ -54,19 +54,19 @@ import java.util.Map;
 
 public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
 
-    private static final String CONTAINER_ANNOTATION_TYPE_DOMAIN = "Some kind of domain";
-    private static final String CONTAINER_ANNOTATION_CONTENT = "StringEnvelopeAnnotationTypeIsFullyRemovable";
-    private static final String CONTAINER_DOCUMENT_FILE_NAME = "StreamFile.txt";
-    private static final String CONTAINER_DOCUMENT_MIME_TYPE = "Stream";
+    private static final String ENVELOPE_ANNOTATION_TYPE_DOMAIN = "Some kind of domain";
+    private static final String ENVELOPE_ANNOTATION_CONTENT = "StringEnvelopeAnnotationTypeIsFullyRemovable";
+    private static final String ENVELOPE_DOCUMENT_FILE_NAME = "StreamFile.txt";
+    private static final String ENVELOPE_DOCUMENT_MIME_TYPE = "Stream";
     private static final String INPUT_STREAM_STRING = "Input from stream.";
-    private final EnvelopeAnnotation CONTAINER_ANNOTATION = new StringEnvelopeAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, CONTAINER_ANNOTATION_CONTENT, CONTAINER_ANNOTATION_TYPE_DOMAIN);
-    private final EnvelopeDocument CONTAINER_DOCUMENT = new StreamEnvelopeDocument(new ByteArrayInputStream(INPUT_STREAM_STRING.getBytes(StandardCharsets.UTF_8)), CONTAINER_DOCUMENT_MIME_TYPE, CONTAINER_DOCUMENT_FILE_NAME);
+    private final EnvelopeAnnotation ENVELOPE_ANNOTATION = new StringEnvelopeAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, ENVELOPE_ANNOTATION_CONTENT, ENVELOPE_ANNOTATION_TYPE_DOMAIN);
+    private final EnvelopeDocument ENVELOPE_DOCUMENT = new StreamEnvelopeDocument(new ByteArrayInputStream(INPUT_STREAM_STRING.getBytes(StandardCharsets.UTF_8)), ENVELOPE_DOCUMENT_MIME_TYPE, ENVELOPE_DOCUMENT_FILE_NAME);
     private Envelope envelope;
 
     @After
     public void cleanUp() throws Exception {
-        CONTAINER_ANNOTATION.close();
-        CONTAINER_DOCUMENT.close();
+        ENVELOPE_ANNOTATION.close();
+        ENVELOPE_DOCUMENT.close();
         if (envelope != null) {
             envelope.close();
         }
@@ -245,8 +245,8 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
         HashAlgorithm hashAlgorithm = HashAlgorithm.SHA3_512;
         HashAlgorithmProvider hashAlgorithmProvider = new TestHashAlgorithmProvider(hashAlgorithm);
         EnvelopeBuilder builder = new EnvelopeBuilder(getEnvelopePackagingFactory(hashAlgorithmProvider));
-        builder.withAnnotation(CONTAINER_ANNOTATION);
-        builder.withDocument(CONTAINER_DOCUMENT);
+        builder.withAnnotation(ENVELOPE_ANNOTATION);
+        builder.withDocument(ENVELOPE_DOCUMENT);
         builder.build();
     }
 
@@ -258,8 +258,8 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
         HashAlgorithm hashAlgorithm = HashAlgorithm.SHA2_512;
         HashAlgorithmProvider hashAlgorithmProvider = new TestHashAlgorithmProvider(hashAlgorithmList, hashAlgorithmList, hashAlgorithm, hashAlgorithm);
         EnvelopeBuilder builder = new EnvelopeBuilder(getEnvelopePackagingFactory(hashAlgorithmProvider));
-        builder.withAnnotation(CONTAINER_ANNOTATION);
-        builder.withDocument(CONTAINER_DOCUMENT);
+        builder.withAnnotation(ENVELOPE_ANNOTATION);
+        builder.withDocument(ENVELOPE_DOCUMENT);
         builder.build();
     }
 
@@ -273,8 +273,8 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
 
     private void setUpEnvelope(HashAlgorithmProvider provider) throws Exception {
         EnvelopeBuilder builder = new EnvelopeBuilder(getEnvelopePackagingFactory(provider));
-        builder.withAnnotation(CONTAINER_ANNOTATION);
-        builder.withDocument(CONTAINER_DOCUMENT);
+        builder.withAnnotation(ENVELOPE_ANNOTATION);
+        builder.withDocument(ENVELOPE_DOCUMENT);
         this.envelope = builder.build();
     }
 

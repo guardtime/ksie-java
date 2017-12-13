@@ -44,23 +44,23 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 public class AnnotationsIntegrityRuleTest extends AbstractEnvelopeTest {
-    private static final String CONTAINER_WITH_FULLY_REMOVABLE_ANNOTATION = "verification/annotations/envelope-with-fully-removable-annotation.ksie";
-    private static final String CONTAINER_WITH_FULLY_REMOVABLE_MISSING_ANNOTATION = "verification/annotations/envelope-with-fully-removable-missing-annotation.ksie";
-    private static final String CONTAINER_WITH_FULLY_REMOVABLE_CORRUPT_ANNOTATION = "verification/annotations/envelope-with-fully-removable-corrupt-annotation.ksie";
-    private static final String CONTAINER_WITH_FULLY_REMOVABLE_MISSING_ANNOTATION_DATA = "verification/annotations/envelope-with-fully-removable-missing-annotation-data.ksie";
-    private static final String CONTAINER_WITH_FULLY_REMOVABLE_CORRUPT_ANNOTATION_DATA = "verification/annotations/envelope-with-fully-removable-corrupt-annotation-data.ksie";
-    private static final String CONTAINER_WITH_VALUE_REMOVABLE_ANNOTATION = "verification/annotations/envelope-with-value-removable-annotation.ksie";
-    private static final String CONTAINER_WITH_VALUE_REMOVABLE_CORRUPT_ANNOTATION = "verification/annotations/envelope-with-value-removable-corrupt-annotation.ksie";
-    private static final String CONTAINER_WITH_VALUE_REMOVABLE_MISSING_ANNOTATION = "verification/annotations/envelope-with-value-removable-missing-annotation.ksie";
-    private static final String CONTAINER_WITH_VALUE_REMOVABLE_MISSING_ANNOTATION_DATA = "verification/annotations/envelope-with-value-removable-missing-annotation-data.ksie";
-    private static final String CONTAINER_WITH_VALUE_REMOVABLE_CORRUPT_ANNOTATION_DATA = "verification/annotations/envelope-with-value-removable-corrupt-annotation-data.ksie";
-    private static final String CONTAINER_WITH_NON_REMOVABLE_ANNOTATION = "verification/annotations/envelope-with-non-removable-annotation.ksie";
-    private static final String CONTAINER_WITH_NON_REMOVABLE_MISSING_ANNOTATION_DATA = "verification/annotations/envelope-with-non-removable-missing-annotation-data.ksie";
-    private static final String CONTAINER_WITH_NON_REMOVABLE_CORRUPT_ANNOTATION_DATA = "verification/annotations/envelope-with-non-removable-corrupt-annotation-data.ksie";
-    private static final String CONTAINER_WITH_NON_REMOVABLE_MISSING_ANNOTATION = "verification/annotations/envelope-with-non-removable-missing-annotation.ksie";
-    private static final String CONTAINER_WITH_NON_REMOVABLE_CORRUPT_ANNOTATION = "verification/annotations/envelope-with-non-removable-corrupt-annotation.ksie";
-    private static final String CONTAINER_WITH_MISSING_ANNOTATIONS_MANIFEST = "verification/annotations/envelope-with-missing-annotmanifest.ksie";
-    private static final String CONTAINER_WITH_CORRUPT_ANNOTATIONS_MANIFEST = "verification/annotations/envelope-with-corrupt-annotmanifest.ksie";
+    private static final String ENVELOPE_WITH_FULLY_REMOVABLE_ANNOTATION = "verification/annotations/envelope-with-fully-removable-annotation.ksie";
+    private static final String ENVELOPE_WITH_FULLY_REMOVABLE_MISSING_ANNOTATION = "verification/annotations/envelope-with-fully-removable-missing-annotation.ksie";
+    private static final String ENVELOPE_WITH_FULLY_REMOVABLE_CORRUPT_ANNOTATION = "verification/annotations/envelope-with-fully-removable-corrupt-annotation.ksie";
+    private static final String ENVELOPE_WITH_FULLY_REMOVABLE_MISSING_ANNOTATION_DATA = "verification/annotations/envelope-with-fully-removable-missing-annotation-data.ksie";
+    private static final String ENVELOPE_WITH_FULLY_REMOVABLE_CORRUPT_ANNOTATION_DATA = "verification/annotations/envelope-with-fully-removable-corrupt-annotation-data.ksie";
+    private static final String ENVELOPE_WITH_VALUE_REMOVABLE_ANNOTATION = "verification/annotations/envelope-with-value-removable-annotation.ksie";
+    private static final String ENVELOPE_WITH_VALUE_REMOVABLE_CORRUPT_ANNOTATION = "verification/annotations/envelope-with-value-removable-corrupt-annotation.ksie";
+    private static final String ENVELOPE_WITH_VALUE_REMOVABLE_MISSING_ANNOTATION = "verification/annotations/envelope-with-value-removable-missing-annotation.ksie";
+    private static final String ENVELOPE_WITH_VALUE_REMOVABLE_MISSING_ANNOTATION_DATA = "verification/annotations/envelope-with-value-removable-missing-annotation-data.ksie";
+    private static final String ENVELOPE_WITH_VALUE_REMOVABLE_CORRUPT_ANNOTATION_DATA = "verification/annotations/envelope-with-value-removable-corrupt-annotation-data.ksie";
+    private static final String ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION_ = "verification/annotations/envelope-with-non-removable-annotation.ksie";
+    private static final String ENVELOPE_WITH_NON_REMOVABLE_MISSING_ANNOTATION_DATA = "verification/annotations/envelope-with-non-removable-missing-annotation-data.ksie";
+    private static final String ENVELOPE_WITH_NON_REMOVABLE_CORRUPT_ANNOTATION_DATA = "verification/annotations/envelope-with-non-removable-corrupt-annotation-data.ksie";
+    private static final String ENVELOPE_WITH_NON_REMOVABLE_MISSING_ANNOTATION = "verification/annotations/envelope-with-non-removable-missing-annotation.ksie";
+    private static final String ENVELOPE_WITH_NON_REMOVABLE_CORRUPT_ANNOTATION = "verification/annotations/envelope-with-non-removable-corrupt-annotation.ksie";
+    private static final String ENVELOPE_WITH_MISSING_ANNOTATIONS_MANIFEST = "verification/annotations/envelope-with-missing-annotmanifest.ksie";
+    private static final String ENVELOPE_WITH_CORRUPT_ANNOTATIONS_MANIFEST = "verification/annotations/envelope-with-corrupt-annotmanifest.ksie";
 
     @Mock
     private KSISignature mockKsiSignature;
@@ -114,126 +114,126 @@ public class AnnotationsIntegrityRuleTest extends AbstractEnvelopeTest {
 
     @Test
     public void testFullyRemovableAnnotationPresent_OK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_FULLY_REMOVABLE_ANNOTATION);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_FULLY_REMOVABLE_ANNOTATION);
 
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testFullyRemovableAnnotationFullyRemoved_OK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_FULLY_REMOVABLE_MISSING_ANNOTATION);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_FULLY_REMOVABLE_MISSING_ANNOTATION);
 
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testFullyRemovableAnnotationCorrupt_OK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_FULLY_REMOVABLE_CORRUPT_ANNOTATION);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_FULLY_REMOVABLE_CORRUPT_ANNOTATION);
 
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testFullyRemovableAnnotationDataRemoved_OK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_FULLY_REMOVABLE_MISSING_ANNOTATION_DATA);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_FULLY_REMOVABLE_MISSING_ANNOTATION_DATA);
 
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testFullyRemovableAnnotationDataCorrupt_OK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_FULLY_REMOVABLE_CORRUPT_ANNOTATION_DATA);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_FULLY_REMOVABLE_CORRUPT_ANNOTATION_DATA);
 
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testValueRemovableAnnotationDataPresent_OK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_VALUE_REMOVABLE_ANNOTATION);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_VALUE_REMOVABLE_ANNOTATION);
 
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testValueRemovableAnnotationDataRemoved_OK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_VALUE_REMOVABLE_MISSING_ANNOTATION_DATA);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_VALUE_REMOVABLE_MISSING_ANNOTATION_DATA);
 
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testValueRemovableAnnotationDataCorrupt_OK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_VALUE_REMOVABLE_CORRUPT_ANNOTATION_DATA);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_VALUE_REMOVABLE_CORRUPT_ANNOTATION_DATA);
 
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testValueRemovableAnnotationRemoved_NOK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_VALUE_REMOVABLE_MISSING_ANNOTATION);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_VALUE_REMOVABLE_MISSING_ANNOTATION);
 
         assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testValueRemovableAnnotationCorrupt_NOK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_VALUE_REMOVABLE_CORRUPT_ANNOTATION);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_VALUE_REMOVABLE_CORRUPT_ANNOTATION);
 
         assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testNonRemovableAnnotationDataPresent_OK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_NON_REMOVABLE_ANNOTATION);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION_);
 
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testNonRemovableAnnotationDataRemoved_NOK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_NON_REMOVABLE_MISSING_ANNOTATION_DATA);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_NON_REMOVABLE_MISSING_ANNOTATION_DATA);
 
         assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testNonRemovableAnnotationDataCorrupt_NOK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_NON_REMOVABLE_CORRUPT_ANNOTATION_DATA);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_NON_REMOVABLE_CORRUPT_ANNOTATION_DATA);
 
         assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testNonRemovableAnnotationRemoved_NOK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_NON_REMOVABLE_MISSING_ANNOTATION);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_NON_REMOVABLE_MISSING_ANNOTATION);
 
         assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testNonRemovableAnnotationCorrupt_NOK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_NON_REMOVABLE_CORRUPT_ANNOTATION);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_NON_REMOVABLE_CORRUPT_ANNOTATION);
 
         assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testAnnotationsManifestPresent_OK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_NON_REMOVABLE_ANNOTATION);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION_);
 
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testAnnotationsManifestRemoved_NOK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_MISSING_ANNOTATIONS_MANIFEST);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_MISSING_ANNOTATIONS_MANIFEST);
 
         assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testAnnotationsManifestCorrupt_NOK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(CONTAINER_WITH_CORRUPT_ANNOTATIONS_MANIFEST);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_CORRUPT_ANNOTATIONS_MANIFEST);
 
         assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
