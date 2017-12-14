@@ -63,22 +63,22 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     /**
      * Envelopes - for creating file conflicts when trying to merge envelopes.
      */
-    private static final String[] CONTAINERS_FOR_UNKNOWN_FILE_CONFLICT = {"envelopes/unknown-file-conflict.ksie", ENVELOPE_WITH_UNKNOWN_FILES};
-    private static final String[] CONTAINERS_FOR_DOCUMENTS_MANIFEST_CONFLICT = {"envelopes/documents-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_FOR_ANNOTATION_DATA_CONFLICT = {"envelopes/annotation-data-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_FOR_SINGLE_ANNOTATION_MANIFEST_CONFLICT = {"envelopes/annotation-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_FOR_ANNOTATIONS_MANIFEST_CONFLICT = {"envelopes/annotations-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_FOR_DOCUMENT_CONFLICT = {"envelopes/document-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_FOR_MANIFEST_CONFLICT = {"envelopes/manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_FOR_SIGNATURE_CONFLICT = {"envelopes/signature-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_FOR_MIX_CONFLICT_1 = {"envelopes/mix-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_FOR_MIX_CONFLICT_2 = {ENVELOPE_WITH_MULTIPLE_ANNOTATIONS, "envelopes/mix-conflict.ksie"};
+    private static final String[] ENVELOPES_FOR_UNKNOWN_FILE_CONFLICT = {"envelopes/unknown-file-conflict.ksie", ENVELOPE_WITH_UNKNOWN_FILES};
+    private static final String[] ENVELOPES_FOR_DOCUMENTS_MANIFEST_CONFLICT = {"envelopes/documents-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_ANNOTATION_DATA_CONFLICT = {"envelopes/annotation-data-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_SINGLE_ANNOTATION_MANIFEST_CONFLICT = {"envelopes/annotation-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_ANNOTATIONS_MANIFEST_CONFLICT = {"envelopes/annotations-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_DOCUMENT_CONFLICT = {"envelopes/document-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_MANIFEST_CONFLICT = {"envelopes/manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_SIGNATURE_CONFLICT = {"envelopes/signature-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_MIX_CONFLICT_1 = {"envelopes/mix-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_MIX_CONFLICT_2 = {ENVELOPE_WITH_MULTIPLE_ANNOTATIONS, "envelopes/mix-conflict.ksie"};
 
     /**
      * Envelopes - merging those envelope should not yield any exception.
      */
-    private static final String[] CONTAINERS_FOR_SAME_DOCUMENT = {"envelopes/same-document-file.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] CONTAINERS_IDENTICAL = {"envelopes/multiple-annotations-copy.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_SAME_DOCUMENT = {"envelopes/same-document-file.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_IDENTICAL = {"envelopes/multiple-annotations-copy.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
 
     @Before
     public void setUp() throws Exception {
@@ -191,82 +191,82 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     public void testMergeEnvelopesUnknownFileConflict() throws Exception {
         expectedException.expect(DocumentMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing name for EnvelopeDocument! Path: META-INF/sun.txt");
-        mergeEnvelopes(CONTAINERS_FOR_UNKNOWN_FILE_CONFLICT);
+        mergeEnvelopes(ENVELOPES_FOR_UNKNOWN_FILE_CONFLICT);
     }
 
     @Test
     public void testMergeEnvelopesDocumentManifestConflict() throws Exception {
         expectedException.expect(DocumentsManifestMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing DocumentsManifest! Path: META-INF/datamanifest-1.tlv");
-        mergeEnvelopes(CONTAINERS_FOR_DOCUMENTS_MANIFEST_CONFLICT);
+        mergeEnvelopes(ENVELOPES_FOR_DOCUMENTS_MANIFEST_CONFLICT);
     }
 
     @Test
     public void testMergeEnvelopesAnnotationDataConflict() throws Exception {
         expectedException.expect(AnnotationMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing Annotation data! Path: META-INF/annotation-1.dat");
-        mergeEnvelopes(CONTAINERS_FOR_ANNOTATION_DATA_CONFLICT);
+        mergeEnvelopes(ENVELOPES_FOR_ANNOTATION_DATA_CONFLICT);
     }
 
     @Test
     public void testMergeEnvelopesSingleAnnotationManifestConflict() throws Exception {
         expectedException.expect(SingleAnnotationManifestMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing SingleAnnotationManifest! Path: META-INF/annotation-1.tlv");
-        mergeEnvelopes(CONTAINERS_FOR_SINGLE_ANNOTATION_MANIFEST_CONFLICT);
+        mergeEnvelopes(ENVELOPES_FOR_SINGLE_ANNOTATION_MANIFEST_CONFLICT);
     }
 
     @Test
     public void testMergeEnvelopesAnnotationsManifestConflict() throws Exception {
         expectedException.expect(AnnotationsManifestMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing AnnotationsManifest! Path: META-INF/annotmanifest-1.tlv");
-        mergeEnvelopes(CONTAINERS_FOR_ANNOTATIONS_MANIFEST_CONFLICT);
+        mergeEnvelopes(ENVELOPES_FOR_ANNOTATIONS_MANIFEST_CONFLICT);
     }
 
     @Test
     public void testMergeEnvelopesSignatureConflict() throws Exception {
         expectedException.expect(SignatureMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing signature! Path: META-INF/signature-1.ksi");
-        mergeEnvelopes(CONTAINERS_FOR_SIGNATURE_CONFLICT);
+        mergeEnvelopes(ENVELOPES_FOR_SIGNATURE_CONFLICT);
     }
 
     @Test
     public void testMergeEnvelopesDocumentConflict() throws Exception {
         expectedException.expect(DocumentMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing name for EnvelopeDocument!");
-        mergeEnvelopes(CONTAINERS_FOR_DOCUMENT_CONFLICT);
+        mergeEnvelopes(ENVELOPES_FOR_DOCUMENT_CONFLICT);
     }
 
     @Test
     public void testMergeEnvelopesManifestConflict() throws Exception {
         expectedException.expect(ManifestMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing Manifest! Path: META-INF/manifest-1.tlv");
-        mergeEnvelopes(CONTAINERS_FOR_MANIFEST_CONFLICT);
+        mergeEnvelopes(ENVELOPES_FOR_MANIFEST_CONFLICT);
     }
 
     @Test
     public void testMergeEnvelopesUnknownConflictsWithEnvelopeFile1() throws Exception {
         expectedException.expect(AnnotationMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing Annotation data! Path: META-INF/annotation-2.dat");
-        mergeEnvelopes(CONTAINERS_FOR_MIX_CONFLICT_1);
+        mergeEnvelopes(ENVELOPES_FOR_MIX_CONFLICT_1);
     }
 
     @Test
     public void testMergeEnvelopesUnknownConflictsWithEnvelopeFile2() throws Exception {
         expectedException.expect(AnnotationMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing Annotation data! Path: META-INF/annotation-2.dat");
-        mergeEnvelopes(CONTAINERS_FOR_MIX_CONFLICT_2);
+        mergeEnvelopes(ENVELOPES_FOR_MIX_CONFLICT_2);
     }
 
     @Test
     public void testMergeEnvelopesWithExactSameDocument() throws Exception {
-        try (Envelope envelope = mergeEnvelopesUnclosed(CONTAINERS_FOR_SAME_DOCUMENT)) {
+        try (Envelope envelope = mergeEnvelopesUnclosed(ENVELOPES_FOR_SAME_DOCUMENT)) {
             assertEquals(2, envelope.getSignatureContents().size());
         }
     }
 
     @Test
     public void testMergeEnvelopeWithExactSameEnvelope() throws Exception {
-        try (Envelope envelope = mergeEnvelopesUnclosed(CONTAINERS_IDENTICAL)) {
+        try (Envelope envelope = mergeEnvelopesUnclosed(ENVELOPES_IDENTICAL)) {
             assertEquals(2, envelope.getSignatureContents().size());
             assertSignatureContentsCount(envelope, 1);
         }
