@@ -44,11 +44,11 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 public class DocumentsIntegrityRuleTest extends AbstractEnvelopeTest {
-    private static final String CONTAINER_WITH_MISSING_DOCUMENTS_MANIFEST = "verification/documents/envelope-with-missing-documents-manifest.ksie";
-    private static final String CONTAINER_WITH_CORRUPT_DOCUMENTS_MANIFEST = "verification/documents/envelope-with-corrupt-documents-manifest.ksie";
-    private static final String CONTAINER_WITH_DOCUMENT = "verification/documents/envelope-with-document.ksie";
-    private static final String CONTAINER_WITH_MISSING_DOCUMENT = "verification/documents/envelope-with-missing-document.ksie";
-    private static final String CONTAINER_WITH_CORRUPT_DOCUMENT = "verification/documents/envelope-with-corrupt-document.ksie";
+    private static final String ENVELOPE_WITH_MISSING_DOCUMENTS_MANIFEST_ = "verification/documents/envelope-with-missing-documents-manifest.ksie";
+    private static final String ENVELOPE_WITH_CORRUPT_DOCUMENTS_MANIFEST = "verification/documents/envelope-with-corrupt-documents-manifest.ksie";
+    private static final String ENVELOPE_WITH_DOCUMENT = "verification/documents/envelope-with-document.ksie";
+    private static final String ENVELOPE_WITH_MISSING_DOCUMENT = "verification/documents/envelope-with-missing-document.ksie";
+    private static final String ENVELOPE_WITH_CORRUPT_DOCUMENT = "verification/documents/envelope-with-corrupt-document.ksie";
 
     @Mock
     private KSISignature mockKsiSignature;
@@ -99,35 +99,35 @@ public class DocumentsIntegrityRuleTest extends AbstractEnvelopeTest {
 
     @Test
     public void testDocumentsManifestMissing_NOK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_MISSING_DOCUMENTS_MANIFEST);
+        RuleVerificationResult result = getRuleVerificationResult(ENVELOPE_WITH_MISSING_DOCUMENTS_MANIFEST_);
 
         assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testDocumentsManifestCorrupt_NOK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_CORRUPT_DOCUMENTS_MANIFEST);
+        RuleVerificationResult result = getRuleVerificationResult(ENVELOPE_WITH_CORRUPT_DOCUMENTS_MANIFEST);
 
         assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testDocumentPresent_OK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_DOCUMENT);
+        RuleVerificationResult result = getRuleVerificationResult(ENVELOPE_WITH_DOCUMENT);
 
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
     @Test
     public void testDocumentMissing_NOK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_MISSING_DOCUMENT);
+        RuleVerificationResult result = getRuleVerificationResult(ENVELOPE_WITH_MISSING_DOCUMENT);
 
         assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
 
     @Test
     public void testDocumentCorrupt_NOK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResult(CONTAINER_WITH_CORRUPT_DOCUMENT);
+        RuleVerificationResult result = getRuleVerificationResult(ENVELOPE_WITH_CORRUPT_DOCUMENT);
 
         assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }
