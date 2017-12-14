@@ -35,18 +35,18 @@ import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -108,7 +108,11 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     public void testCreateEnvelope() throws Exception {
         try (
                 Envelope envelope = new EnvelopeBuilder(defaultPackagingFactory)
-                        .withDocument(new ByteArrayInputStream("Test_Data".getBytes(StandardCharsets.UTF_8)), TEST_FILE_NAME_TEST_TXT, "application/txt")
+                        .withDocument(
+                                new ByteArrayInputStream("Test_Data".getBytes(StandardCharsets.UTF_8)),
+                                TEST_FILE_NAME_TEST_TXT,
+                                "application/txt"
+                        )
                         .build()
         ) {
             assertSingleContentsWithSingleDocumentWithName(envelope, TEST_FILE_NAME_TEST_TXT);
@@ -130,7 +134,11 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         try (
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 Envelope envelope = new EnvelopeBuilder(defaultPackagingFactory)
-                        .withDocument(new ByteArrayInputStream("Test_Data".getBytes(StandardCharsets.UTF_8)), TEST_FILE_NAME_TEST_TXT, "application/txt")
+                        .withDocument(
+                                new ByteArrayInputStream("Test_Data".getBytes(StandardCharsets.UTF_8)),
+                                TEST_FILE_NAME_TEST_TXT,
+                                "application/txt"
+                        )
                         .build()
             ) {
                 envelope.writeTo(bos);
@@ -146,34 +154,50 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
 
     @Test
     public void testReadEnvelopeWithDifferentIndexProviderCombination1_OK() throws Exception {
-        try (Envelope envelope = packagingFactoryWithUuid.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_ENVELOPE_ANNOTATION))) {
+        try (Envelope envelope = packagingFactoryWithUuid.create(
+                singletonList(TEST_DOCUMENT_HELLO_TEXT),
+                singletonList(STRING_ENVELOPE_ANNOTATION)
+        )) {
             writeEnvelopeToAndReadFromStream(envelope, packagingFactoryWithIncIndex);
         }
     }
 
     @Test
     public void testReadEnvelopeWithDifferentIndexProviderCombination2_OK() throws Exception {
-        try (Envelope envelope = packagingFactoryWithIncIndex.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_ENVELOPE_ANNOTATION))) {
+        try (Envelope envelope = packagingFactoryWithIncIndex.create(
+                singletonList(TEST_DOCUMENT_HELLO_TEXT),
+                singletonList(STRING_ENVELOPE_ANNOTATION)
+        )) {
             writeEnvelopeToAndReadFromStream(envelope, packagingFactoryWithUuid);
         }
     }
 
     @Test
     public void testCreateEnvelopeFromExistingWithDifferentIndexProviderCombination_OK() throws Exception {
-        try (
-                Envelope existingEnvelope = packagingFactoryWithIncIndex.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_ENVELOPE_ANNOTATION))
-        ){
-            packagingFactoryWithUuid.addSignature(existingEnvelope, Collections.singletonList(TEST_DOCUMENT_HELLO_PDF), Collections.singletonList(STRING_ENVELOPE_ANNOTATION));
+        try (Envelope existingEnvelope = packagingFactoryWithIncIndex.create(
+                singletonList(TEST_DOCUMENT_HELLO_TEXT),
+                singletonList(STRING_ENVELOPE_ANNOTATION)
+        )){
+            packagingFactoryWithUuid.addSignature(
+                    existingEnvelope,
+                    singletonList(TEST_DOCUMENT_HELLO_PDF),
+                    singletonList(STRING_ENVELOPE_ANNOTATION)
+            );
             writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithUuid);
         }
     }
 
     @Test
     public void testCreateEnvelopeFromExistingWithDifferentIndexProviderCombination2_OK() throws Exception {
-        try (
-                Envelope existingEnvelope = packagingFactoryWithUuid.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_ENVELOPE_ANNOTATION))
-            ){
-                packagingFactoryWithIncIndex.addSignature(existingEnvelope, Collections.singletonList(TEST_DOCUMENT_HELLO_PDF), Collections.singletonList(STRING_ENVELOPE_ANNOTATION));
+        try (Envelope existingEnvelope = packagingFactoryWithUuid.create(
+                singletonList(TEST_DOCUMENT_HELLO_TEXT),
+                singletonList(STRING_ENVELOPE_ANNOTATION)
+        )){
+                packagingFactoryWithIncIndex.addSignature(
+                        existingEnvelope,
+                        singletonList(TEST_DOCUMENT_HELLO_PDF),
+                        singletonList(STRING_ENVELOPE_ANNOTATION)
+                );
                 writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithIncIndex);
         }
     }
@@ -187,8 +211,8 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
                 EnvelopeDocument document = new StreamEnvelopeDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
         ) {
             defaultPackagingFactory.addSignature(existingEnvelope,
-                    Collections.singletonList(document),
-                    Collections.singletonList(STRING_ENVELOPE_ANNOTATION));
+                    singletonList(document),
+                    singletonList(STRING_ENVELOPE_ANNOTATION));
             writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithIncIndex);
         }
     }
@@ -202,8 +226,8 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
                 EnvelopeDocument document = new StreamEnvelopeDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
         ) {
             packagingFactoryWithUuid.addSignature(existingEnvelope,
-                    Collections.singletonList(document),
-                    Collections.singletonList(STRING_ENVELOPE_ANNOTATION));
+                    singletonList(document),
+                    singletonList(STRING_ENVELOPE_ANNOTATION));
             writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithUuid);
         }
     }
@@ -217,8 +241,8 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
                 EnvelopeDocument document = new StreamEnvelopeDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
         ) {
             packagingFactoryWithUuid.addSignature(existingEnvelope,
-                    Collections.singletonList(document),
-                    Collections.singletonList(STRING_ENVELOPE_ANNOTATION));
+                    singletonList(document),
+                    singletonList(STRING_ENVELOPE_ANNOTATION));
             writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithUuid);
         }
     }
@@ -226,12 +250,17 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     @Test
     public void testCreateEnvelopeFromExistingWithDifferentIndexesInContents_OK() throws Exception {
         try (
-                Envelope existingEnvelope = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(ENVELOPE_WITH_MIXED_INDEX_TYPES_IN_CONTENTS)));
-                EnvelopeDocument document = new StreamEnvelopeDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc")
+                Envelope existingEnvelope =
+                     packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(ENVELOPE_WITH_MIXED_INDEX_TYPES_IN_CONTENTS)));
+                EnvelopeDocument document = new StreamEnvelopeDocument(
+                        new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
+                        MIME_TYPE_APPLICATION_TXT,
+                        "Doc.doc"
+                )
         ) {
             packagingFactoryWithUuid.addSignature(existingEnvelope,
-                    Collections.singletonList(document),
-                    Collections.singletonList(STRING_ENVELOPE_ANNOTATION));
+                    singletonList(document),
+                    singletonList(STRING_ENVELOPE_ANNOTATION));
             writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithIncIndex);
         }
     }
@@ -239,13 +268,20 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     @Test
     public void testAddDocumentsToExistingEnvelopeWithOneContentRemoved_OK() throws Exception {
         try (
-                Envelope existingEnvelope = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(ENVELOPE_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED)));
-                EnvelopeDocument document = new StreamEnvelopeDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc");
-                EnvelopeAnnotation envelopeAnnotation = new StringEnvelopeAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime")
+                Envelope existingEnvelope = packagingFactoryWithIncIndex.read(
+                        new FileInputStream(loadFile(ENVELOPE_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED))
+                );
+                EnvelopeDocument document = new StreamEnvelopeDocument(
+                        new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
+                        MIME_TYPE_APPLICATION_TXT,
+                        "Doc.doc"
+                );
+                EnvelopeAnnotation envelopeAnnotation =
+                        new StringEnvelopeAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime")
         ) {
             packagingFactoryWithIncIndex.addSignature(existingEnvelope,
-                    Collections.singletonList(document),
-                    Collections.singletonList(envelopeAnnotation));
+                    singletonList(document),
+                    singletonList(envelopeAnnotation));
             writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithIncIndex);
         }
     }
@@ -253,82 +289,81 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     @Test
     public void testAddDocumentsToExistingEnvelopeUnknownFiles_OK() throws Exception {
         try (
-                Envelope existingEnvelope = packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(ENVELOPE_WITH_UNKNOWN_FILES)));
-                EnvelopeDocument document = new StreamEnvelopeDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, "Doc.doc");
-                EnvelopeAnnotation envelopeAnnotation = new StringEnvelopeAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime")
+                Envelope existingEnvelope =
+                        packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(ENVELOPE_WITH_UNKNOWN_FILES)));
+                EnvelopeDocument document = new StreamEnvelopeDocument(
+                        new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
+                        MIME_TYPE_APPLICATION_TXT,
+                        "Doc.doc"
+                );
+                EnvelopeAnnotation envelopeAnnotation = new StringEnvelopeAnnotation(
+                        EnvelopeAnnotationType.FULLY_REMOVABLE,
+                        "annotation 101",
+                        "com.guardtime"
+                )
         ) {
             packagingFactoryWithIncIndex.addSignature(existingEnvelope,
-                    Collections.singletonList(document),
-                    Collections.singletonList(envelopeAnnotation));
+                    singletonList(document),
+                    singletonList(envelopeAnnotation));
             writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithIncIndex);
         }
     }
 
-    @Ignore //TODO-53 Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
     @Test
-    public void testCreateEnvelopeWhereDocumentFileUriMatchesManifestUri_throws() throws Exception {
-        String item = "META-INF/manifest-1.tlv";
-        createEnvelopeWriteItToAndReadFromStream(item);
+    public void testCreateEnvelopeWhereDocumentFileUriMatchesManifestUri_throwsIllegalArgumentException() throws Exception {
+        createEnvelopeWriteItToAndReadFromStreamWithExceptionExpectation("META-INF/manifest-1.tlv");
     }
 
-    @Ignore //TODO-53 Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
     @Test
-    public void testCreateEnvelopeWhereDocumentFileUriMatchesDocumentManifestUri_throws() throws Exception {
-        String item = "META-INF/datamanifest-1.tlv";
-        createEnvelopeWriteItToAndReadFromStream(item);
+    public void testCreateEnvelopeWhereDocumentFileUriMatchesDocumentManifestUri_throwsIllegalArgumentException()
+            throws Exception {
+        createEnvelopeWriteItToAndReadFromStreamWithExceptionExpectation("META-INF/datamanifest-1.tlv");
     }
 
-    @Ignore //TODO-53 Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
     @Test
-    public void testCreateEnvelopeWhereDocumentFileUriMatchesAnnotationsManifestUri_throws() throws Exception {
-        String item = "META-INF/annotmanifest-1.tlv";
-        createEnvelopeWriteItToAndReadFromStream(item);
+    public void testCreateEnvelopeWhereDocumentFileUriMatchesAnnotationsManifestUri_throwsIllegalArgumentException()
+            throws Exception {
+        createEnvelopeWriteItToAndReadFromStreamWithExceptionExpectation("META-INF/annotmanifest-1.tlv");
     }
 
-    @Ignore //TODO-53 Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
     @Test
-    public void testCreateEnvelopeWhereDocumentFileUriMatchesSingleAnnotationManifestUri_throws() throws Exception {
-        String item = "META-INF/annotation-1.tlv";
-        createEnvelopeWriteItToAndReadFromStream(item);
+    public void testCreateEnvelopeWhereDocumentFileUriMatchesSingleAnnotationManifestUri_throwsIllegalArgumentException()
+            throws Exception {
+        createEnvelopeWriteItToAndReadFromStreamWithExceptionExpectation("META-INF/annotation-1.tlv");
     }
 
-    @Ignore //TODO-53 Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
     @Test
-    public void testCreateEnvelopeWhereDocumentFileUriMatchesAnnotationUri_throws() throws Exception {
-        String item = "META-INF/annotation-1.dat";
-        createEnvelopeWriteItToAndReadFromStream(item);
+    public void testCreateEnvelopeWhereDocumentFileUriMatchesAnnotationUri_throwsIllegalArgumentException() throws Exception {
+        createEnvelopeWriteItToAndReadFromStreamWithExceptionExpectation("META-INF/annotation-1.dat");
     }
 
-    @Ignore //TODO-53 Exception is expected because it should not be possible to add document with file ur is "mimetype". Not because of duplicate entry.
     @Test
-    public void testCreateEnvelopeWhereDocumentFileUriMatchesMimeTypeUri_throws() throws Exception {
-        String item = "mimetype";
-        createEnvelopeWriteItToAndReadFromStream(item);
+    public void testCreateEnvelopeWhereDocumentFileUriMatchesMimeTypeUri_throwsIllegalArgumentException() throws Exception {
+        createEnvelopeWriteItToAndReadFromStreamWithExceptionExpectation("mimetype");
     }
 
-    @Ignore //TODO-53 Exception is expected because it should not be possible to add documents to META-INF. Not because of duplicate entry.
     @Test
-    public void testCreateEnvelopeWhereDocumentFileUriMatchesSignatureUri_throws() throws Exception {
-        String item = "META-INF/signature-1.ksi";
-        createEnvelopeWriteItToAndReadFromStream(item);
+    public void testCreateEnvelopeWhereDocumentFileUriMatchesSignatureUri_throwsIllegalArgumentException() throws Exception {
+        createEnvelopeWriteItToAndReadFromStreamWithExceptionExpectation("META-INF/signature-1.ksi");
     }
 
-    @Ignore //TODO-54 Exception is expected because document file name is dir and it should not be possible to add documents to META-INF. Not because of duplicate entry.
     @Test
-    public void testCreateEnvelopeWhereDocumentIsWrittenAsMetaInfDirectory_throws() throws Exception {
-        createEnvelopeWriteItToAndReadFromStream("META-INF/");
+    public void testCreateEnvelopeWhereDocumentIsWrittenAsMetaInfDirectory_throwsIllegalArgumentException() throws Exception {
+        createEnvelopeWriteItToAndReadFromStreamWithExceptionExpectation("META-INF/");
     }
 
-    @Ignore //TODO-54 Exception is expected because document file name matches with META-INF directory name. Not because of duplicate entry.
     @Test
-    public void testCreateEnvelopeWhereDocumentFileUriMatchesMetaInfDirectoryName_throws() throws Exception {
-        createEnvelopeWriteItToAndReadFromStream("META-INF");
+    public void testCreateEnvelopeWhereDocumentFileUriMatchesMetaInfDirectoryName_throwsIllegalArgumentException()
+            throws Exception {
+        createEnvelopeWriteItToAndReadFromStreamWithExceptionExpectation("META-INF");
     }
 
-    @Ignore //TODO-54 Exception is expected because document file name is dir
     @Test
-    public void testCreateEnvelopeWhereDocumentIsWrittenAsDirectory_throws() throws Exception {
-        createEnvelopeWriteItToAndReadFromStream("SubDir/");
+    public void testCreateEnvelopeWhereDocumentIsWrittenAsDirectory_throwsIOException() throws Exception {
+        String documentFileName = "SubDir/";
+        expectedException.expect(IOException.class);
+        expectedException.expectMessage(documentFileName + " is an invalid document file name!");
+        createEnvelopeWriteItToAndReadFromStream(documentFileName);
     }
 
     @Test
@@ -337,7 +372,11 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     }
 
     private List<EnvelopeDocument> getEnvelopeDocument(String fileName) throws Exception {
-        return Collections.singletonList((EnvelopeDocument)new StreamEnvelopeDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, fileName));
+        return singletonList((EnvelopeDocument)new StreamEnvelopeDocument(
+                new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
+                MIME_TYPE_APPLICATION_TXT,
+                fileName
+        ));
     }
 
     private void assertSingleContentsWithSingleDocumentWithName(Envelope envelope, String testFileName) {
@@ -361,8 +400,17 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     /*
     Created envelope will be closed in the end.
      */
+    private void createEnvelopeWriteItToAndReadFromStreamWithExceptionExpectation(String documentFileName) throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("File name is not valid! File name: " + documentFileName);
+        createEnvelopeWriteItToAndReadFromStream(documentFileName);
+    }
+
     private void createEnvelopeWriteItToAndReadFromStream(String documentFileName) throws Exception {
-        try (Envelope envelope = defaultPackagingFactory.create(getEnvelopeDocument(documentFileName), Collections.singletonList(STRING_ENVELOPE_ANNOTATION))) {
+        try (Envelope envelope = defaultPackagingFactory.create(
+                getEnvelopeDocument(documentFileName),
+                singletonList(STRING_ENVELOPE_ANNOTATION)
+        )) {
             writeEnvelopeToAndReadFromStream(envelope, packagingFactoryWithIncIndex);
         }
     }
