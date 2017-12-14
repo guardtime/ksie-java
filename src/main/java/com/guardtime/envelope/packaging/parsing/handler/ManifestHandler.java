@@ -33,24 +33,19 @@ import static com.guardtime.envelope.packaging.EntryNameProvider.MANIFEST_FORMAT
 public class ManifestHandler implements ContentHandler<Manifest> {
 
     private final EnvelopeManifestFactory manifestFactory;
+    private final String regex;
 
     public ManifestHandler(EnvelopeManifestFactory manifestFactory) {
         this.manifestFactory = manifestFactory;
+        this.regex = String.format(
+                "/?" + MANIFEST_FORMAT,
+                ".+",
+                manifestFactory.getManifestFactoryType().getManifestFileExtension()
+        );
     }
 
     public boolean isSupported(String name) {
-        String regex = String.format(MANIFEST_FORMAT, ".+", manifestFactory.getManifestFactoryType().getManifestFileExtension());
-        return matchesSingleDirectory(name, "META-INF") &&
-                fileNameMatches(name, regex);
-    }
-
-    private boolean matchesSingleDirectory(String str, String dirName) {
-        return str.matches("/?" + dirName + "/[^/]*");
-    }
-
-    private boolean fileNameMatches(String str, String regex) {
-        int startingIndex = str.startsWith("/") ? 1 : 0;
-        return str.substring(startingIndex).matches(regex);
+        return name.matches(regex);
     }
 
     @Override
