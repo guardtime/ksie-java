@@ -67,7 +67,10 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
             TEST_SIGNING_SERVICE = properties.getProperty("service.signing");
             TEST_EXTENDING_SERVICE = properties.getProperty("service.extending");
             GUARDTIME_PUBLICATIONS_FILE = properties.getProperty("publications.file.url");
-            KSI_SERVICE_CREDENTIALS = new KSIServiceCredentials(properties.getProperty("credentials.id"), properties.getProperty("credentials.key"));
+            KSI_SERVICE_CREDENTIALS = new KSIServiceCredentials(
+                    properties.getProperty("credentials.id"),
+                    properties.getProperty("credentials.key")
+            );
             TRUST_STORE_FILE = new File(
                     Thread.currentThread().
                             getContextClassLoader().
@@ -99,7 +102,6 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
         signatureFactory = new KsiSignatureFactory(ksi);
         packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
-                .enableInternalVerification()
                 .build();
         envelopeWriter = new ZipEnvelopeWriter();
     }

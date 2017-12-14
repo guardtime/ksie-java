@@ -56,14 +56,20 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
 
     @Test
     public void testAddSingleSignatureContent_OK() throws Exception {
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                disableInternalVerification().
-                withIndexProviderFactory(new UuidIndexProviderFactory()).
-                build();
-        try (Envelope envelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_ENVELOPE_ANNOTATION))) {
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .withIndexProviderFactory(new UuidIndexProviderFactory())
+                .build();
+        try (
+                Envelope envelope =
+                     packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_ENVELOPE_ANNOTATION))
+        ) {
             assertEquals(1, envelope.getSignatureContents().size());
-            try (Envelope newEnvelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<Annotation>())) {
+            try (
+                    Envelope newEnvelope =
+                            packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<Annotation>())
+            ) {
                 envelope.add(newEnvelope.getSignatureContents().get(0));
                 assertEquals(2, envelope.getSignatureContents().size());
             }
@@ -72,14 +78,20 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
 
     @Test
     public void testAddEnvelope_OK() throws Exception {
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                disableInternalVerification().
-                withIndexProviderFactory(new UuidIndexProviderFactory()).
-                build();
-        try (Envelope envelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_ENVELOPE_ANNOTATION))) {
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .withIndexProviderFactory(new UuidIndexProviderFactory())
+                .build();
+        try (
+                Envelope envelope =
+                        packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_ENVELOPE_ANNOTATION))
+        ) {
             assertEquals(1, envelope.getSignatureContents().size());
-            try (Envelope newEnvelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<Annotation>())) {
+            try (
+                    Envelope newEnvelope =
+                            packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<Annotation>())
+            ) {
                 envelope.add(newEnvelope);
                 assertEquals(2, envelope.getSignatureContents().size());
             }
@@ -88,14 +100,19 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
 
     @Test
     public void testAddListOfSignatureContent_OK() throws Exception {
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                disableInternalVerification().
-                withIndexProviderFactory(new UuidIndexProviderFactory()).
-                build();
-        try (Envelope envelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_ENVELOPE_ANNOTATION))) {
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .withIndexProviderFactory(new UuidIndexProviderFactory())
+                .build();
+        try (
+                Envelope envelope =
+                        packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_ENVELOPE_ANNOTATION))
+        ) {
             assertEquals(1, envelope.getSignatureContents().size());
-            try (Envelope newEnvelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<Annotation>());
+            try (
+                    Envelope newEnvelope =
+                            packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<Annotation>());
                  ByteArrayInputStream input = new ByteArrayInputStream("auh".getBytes(StandardCharsets.UTF_8));
                  Document document = new StreamDocument(input, "text/plain", "someTestFile.txt")
             ) {
@@ -111,14 +128,20 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
     public void testAddWithSameManifestPath_ThrowsEnvelopeMergingException() throws Exception {
         expectedException.expect(EnvelopeMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing Manifest!");
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                disableInternalVerification().
-                withIndexProviderFactory(new IncrementingIndexProviderFactory()).
-                build();
-        try (Envelope envelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_ENVELOPE_ANNOTATION))) {
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .withIndexProviderFactory(new IncrementingIndexProviderFactory())
+                .build();
+        try (
+                Envelope envelope =
+                        packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_ENVELOPE_ANNOTATION))
+        ) {
             assertEquals(1, envelope.getSignatureContents().size());
-            try (Envelope newEnvelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<Annotation>())) {
+            try (
+                    Envelope newEnvelope =
+                            packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<Annotation>())
+            ) {
                 envelope.add(newEnvelope.getSignatureContents().get(0));
             }
         }
@@ -128,11 +151,11 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
     public void testAddWithSameEnvelopeDocumentPath_ThrowsEnvelopeMergingException() throws Exception {
         expectedException.expect(EnvelopeMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing name for EnvelopeDocument! Path: ");
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                disableInternalVerification().
-                withIndexProviderFactory(new UuidIndexProviderFactory()).
-                build();
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .withIndexProviderFactory(new UuidIndexProviderFactory())
+                .build();
         try (Envelope envelope = packagingFactory.create(
                 singletonList(TEST_DOCUMENT_HELLO_PDF),
                 singletonList(STRING_ENVELOPE_ANNOTATION)
@@ -168,17 +191,17 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
     private void performFilenameTest(String filename) throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("File name is not valid!");
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                disableInternalVerification().
-                withIndexProviderFactory(new UuidIndexProviderFactory()).
-                build();
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .withIndexProviderFactory(new UuidIndexProviderFactory())
+                .build();
         Document testDocument = new StreamDocument(
                 new ByteArrayInputStream(new byte[0]),
                 "some type",
                 filename
         );
-        try (Envelope envelope = packagingFactory.create(singletonList(testDocument), singletonList(STRING_ENVELOPE_ANNOTATION))) {
+        try (Envelope ignored = packagingFactory.create(singletonList(testDocument), singletonList(STRING_ENVELOPE_ANNOTATION))) {
         }
     }
 

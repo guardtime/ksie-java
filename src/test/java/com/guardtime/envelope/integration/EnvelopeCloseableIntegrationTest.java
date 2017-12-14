@@ -106,7 +106,11 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         Envelope existingEnvelope = getEnvelope(ENVELOPE_WITH_MULTIPLE_SIGNATURES);
         List<File> ksieTempFiles = getKsieTempFiles();
         try (
-                Document document = new StreamDocument(new ByteArrayInputStream(new byte[313]), "byte inputstream", "byte-input-stream.bis");
+                Document document = new StreamDocument(
+                        new ByteArrayInputStream(new byte[313]),
+                        "byte inputstream",
+                        "byte-input-stream.bis"
+                );
                 Annotation annotation = new StringAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "content", "domain.com")
         ) {
             packagingFactory.addSignature(existingEnvelope, singletonList(document), singletonList(annotation));
@@ -127,7 +131,11 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         Envelope existingEnvelope = getEnvelope(ENVELOPE_WITH_MULTIPLE_SIGNATURES);
         List<File> ksieTempFiles = getKsieTempFiles();
         try (
-                Document document = new StreamDocument(new ByteArrayInputStream(new byte[313]), "byte inputstream", "byte-input-stream.bis");
+                Document document = new StreamDocument(
+                        new ByteArrayInputStream(new byte[313]),
+                        "byte inputstream",
+                        "byte-input-stream.bis"
+                );
                 Annotation annotation = new StringAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "content", "domain.com")
         ) {
             packagingFactory.addSignature(existingEnvelope, singletonList(document), singletonList(annotation));
@@ -176,12 +184,19 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         expectedException.expectMessage("Created envelope did not pass internal verification");
         try (
                 Document document = new StreamDocument(new ByteArrayInputStream(new byte[3]), "qwerty", "qwert.file");
-                Annotation annotation = new StringAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "qwerty file", "qwerty.domain.com");
+                Annotation annotation = new StringAnnotation(
+                        EnvelopeAnnotationType.FULLY_REMOVABLE,
+                        "qwerty file",
+                        "qwerty.domain.com"
+                );
                 Envelope envelope = getEnvelope(ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION)
         ) {
             List<File> tempFiles = getKsieTempFiles();
             //One KSIE directory for envelope, one per signatureContent and one KSIE...tmp file for annotation.
-            assertTrue("Temp dir contains more than necessary KSIE temporary files, test system is not clean.",tempFiles.size() == envelope.getSignatureContents().size() + 2);
+            assertTrue(
+                    "Temp dir contains more than necessary KSIE temporary files, test system is not clean.",
+                    tempFiles.size() == envelope.getSignatureContents().size() + 2
+            );
             for (File tmp : tempFiles) {
                 if (tmp.isDirectory()){
                     File[] files = tmp.listFiles();

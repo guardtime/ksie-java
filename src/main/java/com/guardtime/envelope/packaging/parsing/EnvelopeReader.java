@@ -67,7 +67,8 @@ public abstract class EnvelopeReader {
     private final SignatureFactory signatureFactory;
     private final ParsingStoreFactory parsingStoreFactory;
 
-    public EnvelopeReader(EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory, ParsingStoreFactory storeFactory) throws IOException {
+    public EnvelopeReader(EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory,
+                          ParsingStoreFactory storeFactory) {
         Util.notNull(manifestFactory, "Manifest factory");
         Util.notNull(signatureFactory, "Signature factory");
         Util.notNull(storeFactory, "Parsing store factory");
@@ -98,7 +99,8 @@ public abstract class EnvelopeReader {
         return envelope;
     }
 
-    protected abstract void parseInputStream(InputStream input, HandlerSet handlerSet, EnvelopeReadingException readingException) throws IOException;
+    protected abstract void parseInputStream(InputStream input, HandlerSet handlerSet, EnvelopeReadingException readingException)
+            throws IOException;
 
     private boolean containsValidContents(List<SignatureContent> signatureContents) {
         for (SignatureContent content : signatureContents) {
@@ -116,7 +118,8 @@ public abstract class EnvelopeReader {
     }
 
     private boolean containsOrContainedAnnotations(SignatureContent content) {
-        return content.getAnnotations().size() > 0 || content.getAnnotationsManifest().getSingleAnnotationManifestReferences().size() > 0;
+        return content.getAnnotations().size() > 0 ||
+                content.getAnnotationsManifest().getSingleAnnotationManifestReferences().size() > 0;
     }
 
     private boolean containsManifest(SignatureContent content) {
@@ -131,7 +134,8 @@ public abstract class EnvelopeReader {
             byte[] content = handler.get(uri);
             String parsedMimeType = new String(content);
             if(!parsedMimeType.equals(getMimeType())) {
-                throw new InvalidPackageException("Parsed Envelope has invalid MIME type. Can't process it!"); // TODO: Maybe use a better exception class?
+                // TODO: Maybe use a better exception class?
+                throw new InvalidPackageException("Parsed Envelope has invalid MIME type. Can't process it!");
             }
         } catch (ContentParsingException e) {
             LOGGER.debug("Failed to parse MIME type. Reason: '{}", e.getMessage());
@@ -172,7 +176,8 @@ public abstract class EnvelopeReader {
         List<SignatureContent> signatures = new LinkedList<>();
         for (String manifestUri : parsedManifestUriSet) {
             try {
-                Pair<SignatureContent, List<Throwable>> signatureContentVectorPair = signatureContentHandler.get(manifestUri, parsingStoreFactory);
+                Pair<SignatureContent, List<Throwable>> signatureContentVectorPair =
+                        signatureContentHandler.get(manifestUri, parsingStoreFactory);
                 signatures.add(signatureContentVectorPair.getLeft());
                 readingException.addExceptions(signatureContentVectorPair.getRight());
             } catch (ContentParsingException | ParsingStoreException e) {
@@ -206,8 +211,9 @@ public abstract class EnvelopeReader {
             this.annotationsManifestHandler = new AnnotationsManifestHandler(manifestFactory, store);
             this.singleAnnotationManifestHandler = new SingleAnnotationManifestHandler(manifestFactory, store);
             this.signatureHandler = new SignatureHandler(signatureFactory, store);
-            this.handlers = new ContentHandler[]{mimeTypeHandler, documentHandler, annotationContentHandler, documentsManifestHandler,
-                    manifestHandler, annotationsManifestHandler, signatureHandler, singleAnnotationManifestHandler};
+            this.handlers = new ContentHandler[]{mimeTypeHandler, documentHandler, annotationContentHandler,
+                    documentsManifestHandler, manifestHandler, annotationsManifestHandler, signatureHandler,
+                    singleAnnotationManifestHandler};
         }
 
         public ContentHandler[] getHandlers() {
