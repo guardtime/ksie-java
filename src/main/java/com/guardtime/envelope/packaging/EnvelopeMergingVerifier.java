@@ -48,6 +48,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -171,11 +172,14 @@ public class EnvelopeMergingVerifier {
     }
 
     private static void checkDocuments(String fileName, EnvelopeDocument newDocument,
-                                       Collection<? extends EnvelopeDocument> documents)
-            throws EnvelopeMergingException, IOException {
+                                       Collection<? extends EnvelopeDocument> documents) throws EnvelopeMergingException {
         for (EnvelopeDocument doc : documents) {
             if (doc.getFileName().equals(fileName)) {
                 for (HashAlgorithm algorithm : HashAlgorithm.getImplementedHashAlgorithms()) {
+                    if(algorithm.isDeprecated(new Date())) {
+                        // TODO: Proper date management here!
+                        continue;
+                    }
                     try {
                         if (!newDocument.getDataHash(algorithm).equals(doc.getDataHash(algorithm))) {
                             throw new DocumentMergingException(fileName);

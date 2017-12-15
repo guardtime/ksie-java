@@ -28,6 +28,10 @@ import com.guardtime.ksi.unisignature.KSISignature;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.util.Date;
+
+import static org.mockito.Mockito.when;
+
 public class PublicationKsiEnvelopeSignatureExtendingPolicyTest extends AbstractEnvelopeTest {
 
     @Test
@@ -47,8 +51,12 @@ public class PublicationKsiEnvelopeSignatureExtendingPolicyTest extends Abstract
     @Test
     public void testExtendingDelegatesToKsi() throws Exception {
         KSI mockKsi = Mockito.mock(KSI.class);
-        ExtendingPolicy<KSISignature> extendingPolicy = new PublicationKsiEnvelopeSignatureExtendingPolicy(mockKsi, Mockito.mock(PublicationRecord.class));
-        extendingPolicy.getExtendedSignature(Mockito.mock(KSISignature.class));
+        PublicationRecord mockPublicationRecord = Mockito.mock(PublicationRecord.class);
+        when(mockPublicationRecord.getPublicationTime()).thenReturn(new Date(5000));
+        ExtendingPolicy<KSISignature> extendingPolicy = new PublicationKsiEnvelopeSignatureExtendingPolicy(mockKsi, mockPublicationRecord);
+        KSISignature mockSignature = Mockito.mock(KSISignature.class);
+        when(mockSignature.getAggregationTime()).thenReturn(new Date(1000));
+        extendingPolicy.getExtendedSignature(mockSignature);
         Mockito.verify(mockKsi, Mockito.times(1)).extend(Mockito.any(KSISignature.class), Mockito.any(PublicationRecord.class));
     }
 

@@ -14,7 +14,7 @@
         <junit.version>4.12</junit.version>
         <mockito.version>1.10.19</mockito.version>
         <slf4j.version>1.7.12</slf4j.version>
-        <ksi.sdk.version>4.4.67</ksi.sdk.version>
+        <ksi.sdk.version>4.11.143-SNAPSHOT</ksi.sdk.version>
     </properties>
 
     <dependencies>
@@ -59,6 +59,12 @@
         <dependency>
             <groupId>com.guardtime</groupId>
             <artifactId>ksi-service-client-simple-http</artifactId>
+            <version>${ksi.sdk.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.guardtime</groupId>
+            <artifactId>ksi-service-client-common-http</artifactId>
             <version>${ksi.sdk.version}</version>
             <scope>test</scope>
         </dependency>

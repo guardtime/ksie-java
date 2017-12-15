@@ -184,11 +184,12 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testUseSeveralHashingAlgorithms() throws Exception {
-        List<HashAlgorithm> hashes = Arrays.asList(HashAlgorithm.SHA1,
+        List<HashAlgorithm> hashes = Arrays.asList(
                 HashAlgorithm.RIPEMD_160,
                 HashAlgorithm.SHA2_256,
                 HashAlgorithm.SHA2_384,
-                HashAlgorithm.SHA2_512);
+                HashAlgorithm.SHA2_512
+        );
         HashAlgorithmProvider provider = new TestHashAlgorithmProvider(
                 hashes, hashes, HashAlgorithm.SHA2_256, HashAlgorithm.SHA2_256);
 
@@ -212,7 +213,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testDifferentHashingAlgorithmsForDifferentParts() throws Exception {
         List<HashAlgorithm> fileReferenceHashAlgorithms = Collections.singletonList(HashAlgorithm.RIPEMD_160);
-        List<HashAlgorithm> documentReferenceHashAlgorithms = Collections.singletonList(HashAlgorithm.SHA1);
+        List<HashAlgorithm> documentReferenceHashAlgorithms = Collections.singletonList(HashAlgorithm.SHA2_512);
         HashAlgorithm annotationDataReferenceHashAlgorithm = HashAlgorithm.SHA2_384;
         HashAlgorithm signingHashAlgorithm = HashAlgorithm.SHA2_512;
         HashAlgorithmProvider provider = new TestHashAlgorithmProvider(
@@ -254,7 +255,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
      public void testUsingNotImplementedHashingAlgorithmInList_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Hash algorithm SM3 is not implemented");
-        List<HashAlgorithm> hashAlgorithmList = Arrays.asList(HashAlgorithm.SHA1, HashAlgorithm.SHA2_256, HashAlgorithm.SM3);
+        List<HashAlgorithm> hashAlgorithmList = Arrays.asList(HashAlgorithm.SHA2_256, HashAlgorithm.SM3);
         HashAlgorithm hashAlgorithm = HashAlgorithm.SHA2_512;
         HashAlgorithmProvider hashAlgorithmProvider = new TestHashAlgorithmProvider(hashAlgorithmList, hashAlgorithmList, hashAlgorithm, hashAlgorithm);
         EnvelopeBuilder builder = new EnvelopeBuilder(getEnvelopePackagingFactory(hashAlgorithmProvider));

@@ -26,6 +26,7 @@ import com.guardtime.envelope.util.Util;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.publication.PublicationRecord;
+import com.guardtime.ksi.service.KSIExtendingService;
 import com.guardtime.ksi.unisignature.KSISignature;
 
 /**
@@ -45,6 +46,9 @@ public class PublicationKsiEnvelopeSignatureExtendingPolicy implements Extending
 
     public KSISignature getExtendedSignature(KSISignature ksiSignature) throws SignatureException {
         try {
+            if (ksiSignature.getAggregationTime().after(publicationRecord.getPublicationTime())) {
+                throw new SignatureException("Publication time is before signature!");
+            }
             return ksi.extend(ksiSignature, publicationRecord);
         } catch (KSIException e) {
             throw new SignatureException(e);
