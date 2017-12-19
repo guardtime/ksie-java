@@ -177,7 +177,6 @@ public class EnvelopeMergingVerifier {
             if (doc.getFileName().equals(fileName)) {
                 for (HashAlgorithm algorithm : HashAlgorithm.getImplementedHashAlgorithms()) {
                     if(algorithm.isDeprecated(new Date())) {
-                        // TODO: Proper date management here!
                         continue;
                     }
                     try {
