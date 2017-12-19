@@ -24,6 +24,7 @@ import com.guardtime.envelope.manifest.InvalidManifestException;
 import com.guardtime.envelope.manifest.Manifest;
 
 import java.io.InputStream;
+import java.util.regex.Pattern;
 
 import static com.guardtime.envelope.packaging.EntryNameProvider.MANIFEST_FORMAT;
 
@@ -33,19 +34,19 @@ import static com.guardtime.envelope.packaging.EntryNameProvider.MANIFEST_FORMAT
 public class ManifestHandler implements ContentHandler<Manifest> {
 
     private final EnvelopeManifestFactory manifestFactory;
-    private final String regex;
+    private final Pattern pattern;
 
     public ManifestHandler(EnvelopeManifestFactory manifestFactory) {
         this.manifestFactory = manifestFactory;
-        this.regex = String.format(
-                "/?" + MANIFEST_FORMAT,
+        this.pattern = Pattern.compile(String.format(
+                "/?" + MANIFEST_FORMAT.replaceAll("([\\.])","\\\\$1"),
                 ".+",
                 manifestFactory.getManifestFactoryType().getManifestFileExtension()
-        );
+        ));
     }
 
     public boolean isSupported(String name) {
-        return name.matches(regex);
+        return pattern.matcher(name).matches();
     }
 
     @Override
