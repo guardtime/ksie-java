@@ -197,6 +197,14 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
     }
 
     @Test
+    public void testReadEnvelopeFileWithDifferentSignatureExtension() throws Exception {
+        setUpEnvelope(ENVELOPE_WITH_DIFFERENT_SIGNATURE_EXTENSION);
+        assertNotNull(envelope);
+        assertFalse(envelope.getSignatureContents().isEmpty());
+        assertTrue(envelope.getUnknownFiles().isEmpty());
+    }
+
+    @Test
     public void testReadEnvelopeFileWithMissingAnnotationData() throws Exception {
         setUpEnvelope(ENVELOPE_WITH_MISSING_ANNOTATION_DATA);
         assertNotNull(envelope);
@@ -224,27 +232,27 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
     public void testReadInvalidDocumentsManifest() throws Exception {
         setUpEnvelope(ENVELOPE_WITH_MISSING_DOCUMENTS_MANIFEST);
         assertFalse(exceptions.isEmpty());
-        assertExceptionsContainMessage("Failed to fetch file 'META-INF/datamanifest-4.tlv' from parsingStore.");
+        assertExceptionsContainMessage("No content stored for entry 'META-INF/datamanifest-4.tlv'!");
     }
 
     @Test
     public void testReadInvalidAnnotationsManifest() throws Exception {
         setUpEnvelope(ENVELOPE_WITH_BROKEN_SIGNATURE_CONTENT);
-        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotmanifest-2.tlv' from parsingStore.");
+        assertExceptionsContainMessage("No content stored for entry 'META-INF/annotmanifest-2.tlv'!");
     }
 
 
     @Test
     public void testReadInvalidSingleAnnotationManifest() throws Exception {
         setUpEnvelope(ENVELOPE_WITH_MISSING_ANNOTATION);
-        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotation-1.tlv' from parsingStore.");
+        assertExceptionsContainMessage("No content stored for entry 'META-INF/annotation-1.tlv'!");
     }
 
     @Test
     public void testReadInvalidSignature() throws Exception {
         when(mockKsi.read(any(InputStream.class))).thenThrow(SignatureException.class);
         setUpEnvelope(ENVELOPE_WITH_BROKEN_SIGNATURE_CONTENT);
-        assertExceptionsContainMessage("Failed to parse content of 'META-INF/signature-1.ksi'");
+        assertExceptionsContainMessage("Failed to parse content of stream as EnvelopeSignature.");
     }
 
 
@@ -252,11 +260,11 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
     public void testReadInvalidEnvelopeProducesMultipleExceptions() throws Exception {
         when(mockKsi.read(any(InputStream.class))).thenThrow(SignatureException.class);
         setUpEnvelope(ENVELOPE_WITH_BROKEN_SIGNATURE_CONTENT);
-        assertExceptionsContainMessage("Failed to parse content of 'META-INF/signature-1.ksi'");
-        assertExceptionsContainMessage("Failed to parse content of 'META-INF/signature-2.ksi'");
-        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotation-1.tlv' from parsingStore.");
-        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotation-2.tlv' from parsingStore.");
-        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotmanifest-2.tlv' from parsingStore.");
+        assertExceptionsContainMessage("Failed to parse content of stream as EnvelopeSignature.");
+        assertExceptionsContainMessage("Failed to parse content of stream as EnvelopeSignature.");
+        assertExceptionsContainMessage("No content stored for entry 'META-INF/annotation-1.tlv'!");
+        assertExceptionsContainMessage("No content stored for entry 'META-INF/annotation-2.tlv'!");
+        assertExceptionsContainMessage("No content stored for entry 'META-INF/annotmanifest-2.tlv'!");
     }
 
 }

@@ -32,32 +32,20 @@ import static com.guardtime.envelope.packaging.EntryNameProvider.SINGLE_ANNOTATI
 /**
  * This content holders is used for annotation manifests inside the envelope.
  */
-public class SingleAnnotationManifestHandler extends ContentHandler<SingleAnnotationManifest> {
+public class SingleAnnotationManifestHandler implements ContentHandler<SingleAnnotationManifest> {
 
     private final EnvelopeManifestFactory manifestFactory;
 
-    public SingleAnnotationManifestHandler(EnvelopeManifestFactory manifestFactory, ParsingStore store) {
-        super(store);
+    public SingleAnnotationManifestHandler(EnvelopeManifestFactory manifestFactory) {
         this.manifestFactory = manifestFactory;
     }
 
     @Override
-    public boolean isSupported(String name) {
-        String regex = String.format(SINGLE_ANNOTATION_MANIFEST_FORMAT, ".+", manifestFactory.getManifestFactoryType().getManifestFileExtension());
-        return matchesSingleDirectory(name, "META-INF") &&
-                fileNameMatches(name, regex);
-    }
-
-    @Override
-    protected SingleAnnotationManifest getEntry(String name) throws ContentParsingException {
-        try (InputStream input = fetchStreamFromEntries(name)) {
-            SingleAnnotationManifest singleAnnotationManifest = manifestFactory.readSingleAnnotationManifest(input);
-            parsingStore.remove(name);
-            return singleAnnotationManifest;
+    public SingleAnnotationManifest parse(InputStream input) throws ContentParsingException {
+        try {
+            return manifestFactory.readSingleAnnotationManifest(input);
         } catch (InvalidManifestException e) {
-            throw new ContentParsingException("Failed to parse content of '" + name + "'", e);
-        } catch (IOException e) {
-            throw new ContentParsingException("Failed to read content of '" + name + "'", e);
+            throw new ContentParsingException("Failed to parse content of stream as SingleAnnotationManifest.", e);
         }
     }
 
