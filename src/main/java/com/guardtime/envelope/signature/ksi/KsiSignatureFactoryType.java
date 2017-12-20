@@ -24,7 +24,7 @@ import com.guardtime.envelope.signature.SignatureFactoryType;
 class KsiSignatureFactoryType implements SignatureFactoryType {
 
     private static final String KSI_SIGNATURE_MIME_TYPE = "application/ksi-signature";
-    private static final String KSI_SIGNATURE_FILE_EXTENSION = "ksi";
+    private static final String KSI_SIGNATURE_FILE_EXTENSION = "ksig";
     private static final String KSI_SIGNATURE_FACTORY_NAME = "KSI signature factory";
 
     @Override

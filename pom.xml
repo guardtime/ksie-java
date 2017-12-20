@@ -6,7 +6,7 @@
 
     <groupId>com.guardtime.envelope</groupId>
     <artifactId>ksie-java</artifactId>
-    <version>0.2.134-SNAPSHOT</version>
+    <version>0.2.136-SNAPSHOT</version>
 
     <name>KSIE Java SDK</name>
 
@@ -14,7 +14,7 @@
         <junit.version>4.12</junit.version>
         <mockito.version>1.10.19</mockito.version>
         <slf4j.version>1.7.12</slf4j.version>
-        <ksi.sdk.version>4.4.67</ksi.sdk.version>
+        <ksi.sdk.version>4.5.71</ksi.sdk.version>
     </properties>
 
     <dependencies>

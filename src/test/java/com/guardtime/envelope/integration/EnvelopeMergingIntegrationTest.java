@@ -63,22 +63,34 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     /**
      * Envelopes - for creating file conflicts when trying to merge envelopes.
      */
-    private static final String[] ENVELOPES_FOR_UNKNOWN_FILE_CONFLICT = {"envelopes/unknown-file-conflict.ksie", ENVELOPE_WITH_UNKNOWN_FILES};
-    private static final String[] ENVELOPES_FOR_DOCUMENTS_MANIFEST_CONFLICT = {"envelopes/documents-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] ENVELOPES_FOR_ANNOTATION_DATA_CONFLICT = {"envelopes/annotation-data-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] ENVELOPES_FOR_SINGLE_ANNOTATION_MANIFEST_CONFLICT = {"envelopes/annotation-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] ENVELOPES_FOR_ANNOTATIONS_MANIFEST_CONFLICT = {"envelopes/annotations-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] ENVELOPES_FOR_DOCUMENT_CONFLICT = {"envelopes/document-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] ENVELOPES_FOR_MANIFEST_CONFLICT = {"envelopes/manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] ENVELOPES_FOR_SIGNATURE_CONFLICT = {"envelopes/signature-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] ENVELOPES_FOR_MIX_CONFLICT_1 = {"envelopes/mix-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] ENVELOPES_FOR_MIX_CONFLICT_2 = {ENVELOPE_WITH_MULTIPLE_ANNOTATIONS, "envelopes/mix-conflict.ksie"};
+    private static final String[] ENVELOPES_FOR_UNKNOWN_FILE_CONFLICT =
+            {"envelopes/unknown-file-conflict.ksie", ENVELOPE_WITH_UNKNOWN_FILES};
+    private static final String[] ENVELOPES_FOR_DOCUMENTS_MANIFEST_CONFLICT =
+            {"envelopes/documents-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_ANNOTATION_DATA_CONFLICT =
+            {"envelopes/annotation-data-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_SINGLE_ANNOTATION_MANIFEST_CONFLICT =
+            {"envelopes/annotation-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_ANNOTATIONS_MANIFEST_CONFLICT =
+            {"envelopes/annotations-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_DOCUMENT_CONFLICT =
+            {"envelopes/document-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_MANIFEST_CONFLICT =
+            {"envelopes/manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_SIGNATURE_CONFLICT =
+            {"envelopes/signature-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_MIX_CONFLICT_1 =
+            {"envelopes/mix-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_MIX_CONFLICT_2 =
+            {ENVELOPE_WITH_MULTIPLE_ANNOTATIONS, "envelopes/mix-conflict.ksie"};
 
     /**
      * Envelopes - merging those envelope should not yield any exception.
      */
-    private static final String[] ENVELOPES_FOR_SAME_DOCUMENT = {"envelopes/same-document-file.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] ENVELOPES_IDENTICAL = {"envelopes/multiple-annotations-copy.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_FOR_SAME_DOCUMENT =
+            {"envelopes/same-document-file.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
+    private static final String[] ENVELOPES_IDENTICAL =
+            {"envelopes/multiple-annotations-copy.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
 
     @Before
     public void setUp() throws Exception {
@@ -96,7 +108,10 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     @Test
     public void testMergeParsedEnvelopeWithCreatedEnvelope() throws Exception {
         try (Envelope parsedEnvelope = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES);
-             Envelope newEnvelope = packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new LinkedList<Annotation>())) {
+             Envelope newEnvelope = packagingFactory.create(
+                     singletonList(TEST_DOCUMENT_HELLO_TEXT),
+                     new LinkedList<Annotation>()
+             )) {
             int expectedSignatureContentsSize =
                     parsedEnvelope.getSignatureContents().size() + newEnvelope.getSignatureContents().size();
             parsedEnvelope.add(newEnvelope);
@@ -148,10 +163,18 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
 
     @Test
     public void testAddNewContentToMergedEnvelope1() throws Exception {
-        try (Document document = new StreamDocument(new ByteArrayInputStream("".getBytes()), "textDoc", "1-" + Long.toString(new Date().getTime()));
+        try (Document document = new StreamDocument(
+                new ByteArrayInputStream("".getBytes()),
+                "textDoc",
+                "1-" + Long.toString(new Date().getTime())
+        );
              Envelope uuidEnvelope = packagingFactory.create(singletonList(document), singletonList(STRING_ENVELOPE_ANNOTATION));
              Envelope incEnvelope = getEnvelope(ENVELOPE_WITH_RANDOM_INCREMENTING_INDEXES);
-             Document document2 = new StreamDocument(new ByteArrayInputStream("".getBytes()), "textDoc", "2-" + Long.toString(new Date().getTime()))) {
+             Document document2 = new StreamDocument(
+                     new ByteArrayInputStream("".getBytes()),
+                     "textDoc",
+                     "2-" + Long.toString(new Date().getTime())
+             )) {
             uuidEnvelope.add(incEnvelope);
             packagingFactory.addSignature(uuidEnvelope, singletonList(document2), singletonList(STRING_ENVELOPE_ANNOTATION));
             assertEquals(uuidEnvelope.getSignatureContents().size(), 4);
@@ -179,8 +202,15 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     @Test
     public void testAddNewContentToMergedEnvelope2() throws Exception {
         try (Envelope uuidEnvelope = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES);
-             Envelope incEnvelope = incPackagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), singletonList(STRING_ENVELOPE_ANNOTATION));
-             Document document = new StreamDocument(new ByteArrayInputStream("".getBytes()), "textDoc", Long.toString(new Date().getTime()))) {
+             Envelope incEnvelope = incPackagingFactory.create(
+                     singletonList(TEST_DOCUMENT_HELLO_TEXT),
+                     singletonList(STRING_ENVELOPE_ANNOTATION)
+             );
+             Document document = new StreamDocument(
+                     new ByteArrayInputStream("".getBytes()),
+                     "textDoc",
+                     Long.toString(new Date().getTime())
+             )) {
             incEnvelope.add(uuidEnvelope);
             incPackagingFactory.addSignature(incEnvelope, singletonList(document), singletonList(STRING_ENVELOPE_ANNOTATION));
             assertEquals(incEnvelope.getSignatureContents().size(), 3);
@@ -190,7 +220,9 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     @Test
     public void testMergeEnvelopesUnknownFileConflict() throws Exception {
         expectedException.expect(DocumentMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for EnvelopeDocument! Path: META-INF/sun.txt");
+        expectedException.expectMessage(
+                matchesRegex("New SignatureContent has clashing name for Document! Path: (META-INF/||sun/)sun.txt")
+        );
         mergeEnvelopes(ENVELOPES_FOR_UNKNOWN_FILE_CONFLICT);
     }
 
@@ -211,14 +243,18 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     @Test
     public void testMergeEnvelopesSingleAnnotationManifestConflict() throws Exception {
         expectedException.expect(SingleAnnotationManifestMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing SingleAnnotationManifest! Path: META-INF/annotation-1.tlv");
+        expectedException.expectMessage(
+                "New SignatureContent has clashing SingleAnnotationManifest! Path: META-INF/annotation-1.tlv"
+        );
         mergeEnvelopes(ENVELOPES_FOR_SINGLE_ANNOTATION_MANIFEST_CONFLICT);
     }
 
     @Test
     public void testMergeEnvelopesAnnotationsManifestConflict() throws Exception {
         expectedException.expect(AnnotationsManifestMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing AnnotationsManifest! Path: META-INF/annotmanifest-1.tlv");
+        expectedException.expectMessage(
+                "New SignatureContent has clashing AnnotationsManifest! Path: META-INF/annotmanifest-1.tlv"
+        );
         mergeEnvelopes(ENVELOPES_FOR_ANNOTATIONS_MANIFEST_CONFLICT);
     }
 
@@ -232,7 +268,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     @Test
     public void testMergeEnvelopesDocumentConflict() throws Exception {
         expectedException.expect(DocumentMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for EnvelopeDocument!");
+        expectedException.expectMessage("New SignatureContent has clashing name for Document!");
         mergeEnvelopes(ENVELOPES_FOR_DOCUMENT_CONFLICT);
     }
 
@@ -274,21 +310,24 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
 
     @Test
     public void testAddContentToVerifiedEnvelope() throws Exception {
-        try (VerifiedEnvelope verifiedEnvelope = new VerifiedEnvelope(getEnvelopeIgnoreExceptions(ENVELOPE_WITH_ONE_DOCUMENT), new ResultHolder())) {
+        try (VerifiedEnvelope verifiedEnvelope =
+                     new VerifiedEnvelope(getEnvelopeIgnoreExceptions(ENVELOPE_WITH_ONE_DOCUMENT), new ResultHolder())) {
             addContent(verifiedEnvelope, 2);
         }
     }
 
     @Test
     public void testAddEnvelopeToVerifiedEnvelope() throws Exception {
-        try (VerifiedEnvelope verifiedEnvelope = new VerifiedEnvelope(getEnvelopeIgnoreExceptions(ENVELOPE_WITH_ONE_DOCUMENT), new ResultHolder())) {
+        try (VerifiedEnvelope verifiedEnvelope =
+                     new VerifiedEnvelope(getEnvelopeIgnoreExceptions(ENVELOPE_WITH_ONE_DOCUMENT), new ResultHolder())) {
             addEnvelope(verifiedEnvelope, 2);
         }
     }
 
     @Test
     public void testAddAllContentsToVerifiedEnvelope() throws Exception {
-        try (VerifiedEnvelope verifiedEnvelope = new VerifiedEnvelope(getEnvelopeIgnoreExceptions(ENVELOPE_WITH_ONE_DOCUMENT), new ResultHolder())) {
+        try (VerifiedEnvelope verifiedEnvelope =
+                     new VerifiedEnvelope(getEnvelopeIgnoreExceptions(ENVELOPE_WITH_ONE_DOCUMENT), new ResultHolder())) {
             addAllContents(verifiedEnvelope, 4);
         }
     }

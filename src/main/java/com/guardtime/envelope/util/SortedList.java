@@ -49,7 +49,7 @@ public class SortedList<E extends Comparable<? super E>> implements List<E> {
 
     @Override
     public E set(int i, E e) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -108,7 +108,7 @@ public class SortedList<E extends Comparable<? super E>> implements List<E> {
 
     @Override
     public void add(int i, E e) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -157,7 +157,7 @@ public class SortedList<E extends Comparable<? super E>> implements List<E> {
 
     @Override
     public boolean addAll(int i, Collection<? extends E> collection) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -125,9 +125,9 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testAddWithSameEnvelopeDocumentPath_ThrowsEnvelopeMergingException() throws Exception {
+    public void testAddWithSameDocumentPath_ThrowsEnvelopeMergingException() throws Exception {
         expectedException.expect(EnvelopeMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for EnvelopeDocument! Path: ");
+        expectedException.expectMessage("New SignatureContent has clashing name for Document! Path: ");
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
                 withSignatureFactory(mockedSignatureFactory).
                 disableInternalVerification().
