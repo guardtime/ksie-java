@@ -37,6 +37,8 @@ import com.guardtime.envelope.signature.SignatureFactoryType;
 import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.rule.state.DefaultRuleStateProvider;
 
+import org.hamcrest.CustomTypeSafeMatcher;
+import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -91,6 +93,7 @@ public class AbstractEnvelopeTest {
     protected static final String ENVELOPE_WITH_INVALID_ANNOTATION_TYPE = "envelopes/invalid/invalid-annotation-type.ksie";
     protected static final String ENVELOPE_WITH_BROKEN_SIGNATURE_CONTENT = "envelopes/invalid/broken-signature-content.ksie";
     protected static final String ENVELOPE_WITH_DOCUMENT_MISSING_MIMETYPE = "envelopes/invalid/document-missing-mimetype.ksie";
+    protected static final String ENVELOPE_WITH_DIFFERENT_SIGNATURE_EXTENSION = "envelopes/different-signature-extension.ksie";
     protected static final String ENVELOPE_WITH_NO_DOCUMENT_URI_IN_MANIFEST = "envelopes/invalid/no-document-uri-in-manifest.ksie";
     protected static final String ENVELOPE_WITH_MIMETYPE_CONTAINS_INVALID_VALUE = "envelopes/invalid/mimetype-contains-invalid-value.ksie";
     protected static final String ENVELOPE_WITH_MULTIPLE_EXTENDABLE_SIGNATURES = "envelopes/invalid/multiple-signatures-non-verifying.ksie";
@@ -202,4 +205,14 @@ public class AbstractEnvelopeTest {
         URL url = Thread.currentThread().getContextClassLoader().getResource(filePath);
         return new File(url.toURI());
     }
+
+    protected Matcher<String> matchesRegex(final String regex) {
+        return new CustomTypeSafeMatcher<String>("") {
+            @Override
+            protected boolean matchesSafely(final String item) {
+                return item.matches(regex);
+            }
+        };
+    }
+
 }

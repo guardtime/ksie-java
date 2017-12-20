@@ -22,7 +22,7 @@ package com.guardtime.envelope.packaging.zip;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.parsing.EnvelopeReader;
-import com.guardtime.envelope.packaging.parsing.handler.ContentHandler;
+import com.guardtime.envelope.packaging.parsing.HandlerSet;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
 import com.guardtime.envelope.signature.SignatureFactory;
@@ -37,7 +37,8 @@ import java.util.zip.ZipInputStream;
  */
 class ZipEnvelopeReader extends EnvelopeReader {
 
-    ZipEnvelopeReader(EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory, ParsingStoreFactory storeFactory) throws IOException {
+    ZipEnvelopeReader(EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory,
+                      ParsingStoreFactory storeFactory) throws IOException {
         super(manifestFactory, signatureFactory, storeFactory);
     }
 
@@ -45,16 +46,19 @@ class ZipEnvelopeReader extends EnvelopeReader {
         return new ZipEnvelopeWriter();
     }
 
-    protected void parseInputStream(InputStream input, HandlerSet handlerSet, EnvelopeReadingException readingException) throws IOException {
+    protected void parseInputStream(InputStream input, HandlerSet handlerSet, EnvelopeReadingException readingException)
+            throws IOException {
         try (ZipInputStream zipInput = new ZipInputStream(input)) {
             ZipEntry entry;
             while ((entry = zipInput.getNextEntry()) != null) {
+                String name = entry.getName();
                 if (entry.isDirectory()) {
-                    LOGGER.trace("Skipping ZIP directory '{}'", entry.getName());
+                    LOGGER.trace("Skipping ZIP directory '{}'", name);
                     continue;
                 }
                 try {
-                    readEntry(zipInput, entry, handlerSet);
+                    LOGGER.debug("Reading ZIP entry '{}'.", name);
+                    handlerSet.add(name, zipInput);
                 } catch (ParsingStoreException e) {
                     readingException.addException(e);
                 }
@@ -65,18 +69,6 @@ class ZipEnvelopeReader extends EnvelopeReader {
     @Override
     protected String getMimeType() {
         return ZipEnvelopePackagingFactoryBuilder.MIME_TYPE;
-    }
-
-    private void readEntry(ZipInputStream zipInput, ZipEntry entry, HandlerSet handlerSet) throws ParsingStoreException {
-        String name = entry.getName();
-        for (ContentHandler handler : handlerSet.getHandlers()) {
-            if (handler.isSupported(name)) {
-                LOGGER.debug("Reading ZIP entry '{}'. Using handler '{}' ", name, handler.getClass().getName());
-                handler.add(name, zipInput);
-                return;
-            }
-        }
-        handlerSet.getUnknownFileHandler().add(name, zipInput);
     }
 
 }

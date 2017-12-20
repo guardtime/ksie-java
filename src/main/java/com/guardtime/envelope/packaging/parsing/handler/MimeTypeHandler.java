@@ -19,36 +19,22 @@
 
 package com.guardtime.envelope.packaging.parsing.handler;
 
-import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.ksi.util.Util;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import static com.guardtime.envelope.packaging.EnvelopeWriter.MIME_TYPE_ENTRY_NAME;
-
 /**
  * This content holders is used for MIMETYPE file inside the envelope.
  */
-public class MimeTypeHandler extends ContentHandler<byte[]> {
-
-    public MimeTypeHandler(ParsingStore store) {
-        super(store);
-    }
+public class MimeTypeHandler implements ContentHandler<byte[]> {
 
     @Override
-    public boolean isSupported(String name) {
-        return name.equals(MIME_TYPE_ENTRY_NAME);
-    }
-
-    @Override
-    protected byte[] getEntry(String name) throws ContentParsingException {
-        try (InputStream input = fetchStreamFromEntries(name)) {
-            byte[] bytes = Util.toByteArray(input);
-            parsingStore.remove(name);
-            return bytes;
+    public byte[] parse(InputStream input) throws ContentParsingException {
+        try {
+            return Util.toByteArray(input);
         } catch (IOException e) {
-            throw new ContentParsingException("Failed to read content of '" + name + "'", e);
+            throw new ContentParsingException("Failed to read content of stream", e);
         }
     }
 }
