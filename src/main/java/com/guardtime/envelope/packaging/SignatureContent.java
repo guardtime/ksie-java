@@ -206,7 +206,13 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
         if (this.signature == null) {
             return 1;
         }
-        return this.signature.compareTo(other.getEnvelopeSignature());
+        int compared = this.signature.compareTo(other.getEnvelopeSignature());
+        if (compared == 0) {
+            String signatureUri = this.getManifest().getRight().getSignatureReference().getUri();
+            String otherSignatureUri = other.getManifest().getRight().getSignatureReference().getUri();
+            return signatureUri.compareTo(otherSignatureUri);
+        }
+        return compared;
     }
 
     public static class Builder {
