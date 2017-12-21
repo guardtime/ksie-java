@@ -26,17 +26,7 @@ import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidPackageException;
-import com.guardtime.envelope.packaging.parsing.handler.AnnotationContentHandler;
-import com.guardtime.envelope.packaging.parsing.handler.AnnotationsManifestHandler;
-import com.guardtime.envelope.packaging.parsing.handler.ContentHandler;
 import com.guardtime.envelope.packaging.parsing.handler.ContentParsingException;
-import com.guardtime.envelope.packaging.parsing.handler.DocumentContentHandler;
-import com.guardtime.envelope.packaging.parsing.handler.DocumentsManifestHandler;
-import com.guardtime.envelope.packaging.parsing.handler.ManifestHandler;
-import com.guardtime.envelope.packaging.parsing.handler.MimeTypeHandler;
-import com.guardtime.envelope.packaging.parsing.handler.SignatureHandler;
-import com.guardtime.envelope.packaging.parsing.handler.SingleAnnotationManifestHandler;
-import com.guardtime.envelope.packaging.parsing.handler.UnknownFileHandler;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
@@ -52,8 +42,6 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import static com.guardtime.envelope.packaging.EnvelopeWriter.MIME_TYPE_ENTRY_NAME;
 
 /**
  * Provides stream parsing logic for {@link EnvelopePackagingFactory}
@@ -81,11 +69,12 @@ public abstract class EnvelopeReader {
         EnvelopeReadingException readingException = new EnvelopeReadingException("Reading envelope encountered errors!");
         ParsingStore parsingStore = parsingStoreFactory.create();
         HandlerSet handlerSet = new HandlerSet(manifestFactory, signatureFactory, parsingStore);
+
         parseInputStream(input, handlerSet, readingException);
-        validateMimeType(handlerSet.mimeTypeHandler);
+
         List<SignatureContent> contents = buildSignatures(handlerSet, readingException);
-        List<UnknownDocument> unknownFiles = getUnknownFiles(handlerSet, readingException);
-        handlerSet.clearRequestedData();
+        validateMimeType(handlerSet);
+        List<UnknownDocument> unknownFiles = handlerSet.getUnrequestedFiles();
         Envelope envelope = new Envelope(contents, unknownFiles, parsingStore);
         readingException.setEnvelope(envelope);
 
@@ -128,10 +117,9 @@ public abstract class EnvelopeReader {
                 content.getAnnotationsManifest() != null;
     }
 
-    private void validateMimeType(MimeTypeHandler handler) throws InvalidPackageException {
+    private void validateMimeType(HandlerSet handlerSet) throws InvalidPackageException {
         try {
-            String uri = MIME_TYPE_ENTRY_NAME;
-            byte[] content = handler.get(uri);
+            byte[] content = handlerSet.getMimeTypeContent();
             String parsedMimeType = new String(content);
             if(!parsedMimeType.equals(getMimeType())) {
                 // TODO: Maybe use a better exception class?
@@ -145,34 +133,9 @@ public abstract class EnvelopeReader {
 
     protected abstract String getMimeType();
 
-    private List<UnknownDocument> getUnknownFiles(HandlerSet handlerSet, EnvelopeReadingException readingException) {
-        List<UnknownDocument> returnable = new LinkedList<>();
-        try {
-            returnable.addAll(handlerSet.unknownFileHandler.getUnrequestedFiles());
-        } catch (ParsingStoreException e) {
-            readingException.addException(e);
-        }
-        for (ContentHandler handler : handlerSet.handlers) {
-            try {
-                returnable.addAll(handler.getUnrequestedFiles());
-            } catch (ParsingStoreException e) {
-                readingException.addException(e);
-            }
-        }
-        return returnable;
-    }
-
     private List<SignatureContent> buildSignatures(HandlerSet handlerSet, EnvelopeReadingException readingException) {
-        Set<String> parsedManifestUriSet = handlerSet.manifestHandler.getNames();
-        SignatureContentHandler signatureContentHandler = new SignatureContentHandler(
-                handlerSet.documentHandler,
-                handlerSet.annotationContentHandler,
-                handlerSet.manifestHandler,
-                handlerSet.documentsManifestHandler,
-                handlerSet.annotationsManifestHandler,
-                handlerSet.singleAnnotationManifestHandler,
-                handlerSet.signatureHandler
-        );
+        Set<String> parsedManifestUriSet = handlerSet.getManifestUris();
+        SignatureContentHandler signatureContentHandler = new SignatureContentHandler(handlerSet);
         List<SignatureContent> signatures = new LinkedList<>();
         for (String manifestUri : parsedManifestUriSet) {
             try {
@@ -186,49 +149,6 @@ public abstract class EnvelopeReader {
             }
         }
         return signatures;
-    }
-
-    protected class HandlerSet {
-        private final DocumentContentHandler documentHandler;
-        private final AnnotationContentHandler annotationContentHandler;
-        private final UnknownFileHandler unknownFileHandler;
-        private final MimeTypeHandler mimeTypeHandler;
-        private final ManifestHandler manifestHandler;
-        private final DocumentsManifestHandler documentsManifestHandler;
-        private final AnnotationsManifestHandler annotationsManifestHandler;
-        private final SingleAnnotationManifestHandler singleAnnotationManifestHandler;
-        private final SignatureHandler signatureHandler;
-
-        private ContentHandler[] handlers;
-
-        HandlerSet(EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory, ParsingStore store) {
-            this.documentHandler = new DocumentContentHandler(store);
-            this.annotationContentHandler = new AnnotationContentHandler(store);
-            this.unknownFileHandler = new UnknownFileHandler(store);
-            this.mimeTypeHandler = new MimeTypeHandler(store);
-            this.manifestHandler = new ManifestHandler(manifestFactory, store);
-            this.documentsManifestHandler = new DocumentsManifestHandler(manifestFactory, store);
-            this.annotationsManifestHandler = new AnnotationsManifestHandler(manifestFactory, store);
-            this.singleAnnotationManifestHandler = new SingleAnnotationManifestHandler(manifestFactory, store);
-            this.signatureHandler = new SignatureHandler(signatureFactory, store);
-            this.handlers = new ContentHandler[]{mimeTypeHandler, documentHandler, annotationContentHandler,
-                    documentsManifestHandler, manifestHandler, annotationsManifestHandler, signatureHandler,
-                    singleAnnotationManifestHandler};
-        }
-
-        public ContentHandler[] getHandlers() {
-            return handlers;
-        }
-
-        public UnknownFileHandler getUnknownFileHandler() {
-            return unknownFileHandler;
-        }
-
-        public void clearRequestedData() {
-            for(ContentHandler handler : handlers) {
-                handler.clearRequestedData();
-            }
-        }
     }
 
 }

@@ -30,6 +30,7 @@ import com.guardtime.envelope.signature.SignatureFactory;
 import com.guardtime.envelope.signature.ksi.KsiSignatureFactory;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.KSIBuilder;
+import com.guardtime.ksi.pdu.PduVersion;
 import com.guardtime.ksi.service.client.KSIServiceCredentials;
 import com.guardtime.ksi.service.client.http.HttpClientSettings;
 import com.guardtime.ksi.service.http.simple.SimpleHttpClient;
@@ -89,7 +90,8 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
                 TEST_SIGNING_SERVICE,
                 TEST_EXTENDING_SERVICE,
                 GUARDTIME_PUBLICATIONS_FILE,
-                KSI_SERVICE_CREDENTIALS
+                KSI_SERVICE_CREDENTIALS,
+                PduVersion.V2
         );
         SimpleHttpClient httpClient = new SimpleHttpClient(settings);
         ksi = new KSIBuilder()

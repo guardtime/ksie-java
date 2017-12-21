@@ -19,20 +19,35 @@
 
 package com.guardtime.envelope.packaging.parsing.handler;
 
+import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
+import com.guardtime.envelope.manifest.ManifestFactoryType;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
-public class ManifestHandlerTest extends AbstractContentHandlerTest {
+public class ManifestHandlerTest {
 
     private static final String VALID_MANIFEST_PATH = "/META-INF/manifest-7.tlv";
     private static final String INVALID_MANIFEST_PATH = "funky_music.mp3";
+    private ManifestHandler handler;
+
+    @Mock
+    protected EnvelopeManifestFactory mockManifestFactory;
+    @Mock
+    private ManifestFactoryType mockManifestFactoryType;
 
     @Before
-    public void setUpHandler() {
-        handler = new ManifestHandler(mockManifestFactory, store);
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+        when(mockManifestFactoryType.getManifestFileExtension()).thenReturn("tlv");
+        when(mockManifestFactory.getManifestFactoryType()).thenReturn(mockManifestFactoryType);
+        handler = new ManifestHandler(mockManifestFactory);
     }
 
     @Test

@@ -81,8 +81,8 @@ public class Envelope implements AutoCloseable {
     /**
      * Returns the {@link SignatureContent} at {@param index} and removes it from this {@link Envelope}.
      */
-    public SignatureContent removeSignatureContent(int index) {
-        return signatureContents.remove(index);
+    public boolean removeSignatureContent(SignatureContent content) {
+        return signatureContents.remove(content);
     }
 
     /**
@@ -133,10 +133,11 @@ public class Envelope implements AutoCloseable {
      */
     public void add(Envelope envelope) throws EnvelopeMergingException {
         verifyUniqueUnknownFiles(envelope, this);
-        int i = envelope.getSignatureContents().size();
-        while (i > 0) {
-            add(envelope.removeSignatureContent(0));
-            i--;
+        List<SignatureContent> signatureContents = new ArrayList<>(envelope.getSignatureContents());
+        for (SignatureContent content : signatureContents) {
+            if(envelope.removeSignatureContent(content)) {
+                add(content);
+            }
         }
 
         if (parsingStore != null && envelope.getParsingStore() != null) {

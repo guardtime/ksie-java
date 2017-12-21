@@ -55,27 +55,27 @@ import static java.util.Collections.singletonList;
 
 public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
 
-    private static final String CONTAINER_ANNOTATION_TYPE_DOMAIN = "Some kind of domain";
-    private static final String CONTAINER_ANNOTATION_CONTENT = "StringEnvelopeAnnotationTypeIsFullyRemovable";
-    private static final String CONTAINER_DOCUMENT_FILE_NAME = "StreamFile.txt";
-    private static final String CONTAINER_DOCUMENT_MIME_TYPE = "Stream";
+    private static final String ENVELOPE_ANNOTATION_TYPE_DOMAIN = "Some kind of domain";
+    private static final String ENVELOPE_ANNOTATION_CONTENT = "StringEnvelopeAnnotationTypeIsFullyRemovable";
+    private static final String ENVELOPE_DOCUMENT_FILE_NAME = "StreamFile.txt";
+    private static final String ENVELOPE_DOCUMENT_MIME_TYPE = "Stream";
     private static final String INPUT_STREAM_STRING = "Input from stream.";
-    private final Annotation CONTAINER_ANNOTATION = new StringAnnotation(
+    private final Annotation ENVELOPE_ANNOTATION = new StringAnnotation(
             EnvelopeAnnotationType.FULLY_REMOVABLE,
-            CONTAINER_ANNOTATION_CONTENT,
-            CONTAINER_ANNOTATION_TYPE_DOMAIN
+            ENVELOPE_ANNOTATION_CONTENT,
+            ENVELOPE_ANNOTATION_TYPE_DOMAIN
     );
-    private final Document CONTAINER_DOCUMENT = new StreamDocument(
+    private final Document ENVELOPE_DOCUMENT = new StreamDocument(
             new ByteArrayInputStream(INPUT_STREAM_STRING.getBytes(StandardCharsets.UTF_8)),
-            CONTAINER_DOCUMENT_MIME_TYPE,
-            CONTAINER_DOCUMENT_FILE_NAME
+            ENVELOPE_DOCUMENT_MIME_TYPE,
+            ENVELOPE_DOCUMENT_FILE_NAME
     );
     private Envelope envelope;
 
     @After
     public void cleanUp() throws Exception {
-        CONTAINER_ANNOTATION.close();
-        CONTAINER_DOCUMENT.close();
+        ENVELOPE_ANNOTATION.close();
+        ENVELOPE_DOCUMENT.close();
         if (envelope != null) {
             envelope.close();
         }
@@ -88,8 +88,12 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
 
         HashAlgorithm hashingAlgorithm = HashAlgorithm.SHA2_256;
         LinkedList<HashAlgorithm> list = new LinkedList<>();
-        HashAlgorithmProvider provider =
-                new TestHashAlgorithmProvider(singletonList(hashingAlgorithm), list, hashingAlgorithm, hashingAlgorithm);
+        HashAlgorithmProvider provider = new TestHashAlgorithmProvider(
+                singletonList(hashingAlgorithm),
+                list,
+                hashingAlgorithm,
+                hashingAlgorithm
+        );
         setUpEnvelope(provider);
     }
 
@@ -100,8 +104,12 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
 
         HashAlgorithm hashingAlgorithm = HashAlgorithm.SHA2_256;
         LinkedList<HashAlgorithm> list = new LinkedList<>();
-        HashAlgorithmProvider provider =
-                new TestHashAlgorithmProvider(list, singletonList(hashingAlgorithm), hashingAlgorithm, hashingAlgorithm);
+        HashAlgorithmProvider provider = new TestHashAlgorithmProvider(
+                list,
+                singletonList(hashingAlgorithm),
+                hashingAlgorithm,
+                hashingAlgorithm
+        );
         setUpEnvelope(provider);
     }
 
@@ -114,8 +122,12 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
         LinkedList<HashAlgorithm> list = new LinkedList<>();
         list.add(hashingAlgorithm);
         list.add(null);
-        HashAlgorithmProvider provider =
-                new TestHashAlgorithmProvider(list, singletonList(hashingAlgorithm), hashingAlgorithm, hashingAlgorithm);
+        HashAlgorithmProvider provider = new TestHashAlgorithmProvider(
+                list,
+                singletonList(hashingAlgorithm),
+                hashingAlgorithm,
+                hashingAlgorithm
+        );
         setUpEnvelope(provider);
     }
 
@@ -128,8 +140,12 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
         LinkedList<HashAlgorithm> list = new LinkedList<>();
         list.add(hashingAlgorithm);
         list.add(null);
-        HashAlgorithmProvider provider =
-                new TestHashAlgorithmProvider(list, singletonList(hashingAlgorithm), hashingAlgorithm, hashingAlgorithm);
+        HashAlgorithmProvider provider = new TestHashAlgorithmProvider(
+                list,
+                singletonList(hashingAlgorithm),
+                hashingAlgorithm,
+                hashingAlgorithm
+        );
         setUpEnvelope(provider);
     }
 
@@ -139,8 +155,12 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
         expectedException.expectMessage("Hash algorithm list must be present");
 
         HashAlgorithm hashingAlgorithm = HashAlgorithm.SHA2_256;
-        HashAlgorithmProvider provider =
-                new TestHashAlgorithmProvider(singletonList(hashingAlgorithm), null, hashingAlgorithm, hashingAlgorithm);
+        HashAlgorithmProvider provider = new TestHashAlgorithmProvider(
+                singletonList(hashingAlgorithm),
+                null,
+                hashingAlgorithm,
+                hashingAlgorithm
+        );
         setUpEnvelope(provider);
     }
 
@@ -150,8 +170,12 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
         expectedException.expectMessage("Hash algorithm list must be present");
 
         HashAlgorithm hashingAlgorithm = HashAlgorithm.SHA2_256;
-        HashAlgorithmProvider provider =
-                new TestHashAlgorithmProvider(null, singletonList(hashingAlgorithm), hashingAlgorithm, hashingAlgorithm);
+        HashAlgorithmProvider provider = new TestHashAlgorithmProvider(
+                null,
+                singletonList(hashingAlgorithm),
+                hashingAlgorithm,
+                hashingAlgorithm
+        );
         setUpEnvelope(provider);
     }
 
@@ -296,8 +320,8 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
         HashAlgorithm hashAlgorithm = HashAlgorithm.SHA3_512;
         HashAlgorithmProvider hashAlgorithmProvider = new TestHashAlgorithmProvider(hashAlgorithm);
         EnvelopeBuilder builder = new EnvelopeBuilder(getEnvelopePackagingFactory(hashAlgorithmProvider));
-        builder.withAnnotation(CONTAINER_ANNOTATION);
-        builder.withDocument(CONTAINER_DOCUMENT);
+        builder.withAnnotation(ENVELOPE_ANNOTATION);
+        builder.withDocument(ENVELOPE_DOCUMENT);
         builder.build();
     }
 
@@ -307,11 +331,15 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
         expectedException.expectMessage("Hash algorithm SM3 is not implemented");
         List<HashAlgorithm> hashAlgorithmList = Arrays.asList(HashAlgorithm.SHA1, HashAlgorithm.SHA2_256, HashAlgorithm.SM3);
         HashAlgorithm hashAlgorithm = HashAlgorithm.SHA2_512;
-        HashAlgorithmProvider hashAlgorithmProvider =
-                new TestHashAlgorithmProvider(hashAlgorithmList, hashAlgorithmList, hashAlgorithm, hashAlgorithm);
+        HashAlgorithmProvider hashAlgorithmProvider = new TestHashAlgorithmProvider(
+                hashAlgorithmList,
+                hashAlgorithmList,
+                hashAlgorithm,
+                hashAlgorithm
+        );
         EnvelopeBuilder builder = new EnvelopeBuilder(getEnvelopePackagingFactory(hashAlgorithmProvider));
-        builder.withAnnotation(CONTAINER_ANNOTATION);
-        builder.withDocument(CONTAINER_DOCUMENT);
+        builder.withAnnotation(ENVELOPE_ANNOTATION);
+        builder.withDocument(ENVELOPE_DOCUMENT);
         builder.build();
     }
 
@@ -325,8 +353,8 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
 
     private void setUpEnvelope(HashAlgorithmProvider provider) throws Exception {
         EnvelopeBuilder builder = new EnvelopeBuilder(getEnvelopePackagingFactory(provider));
-        builder.withAnnotation(CONTAINER_ANNOTATION);
-        builder.withDocument(CONTAINER_DOCUMENT);
+        builder.withAnnotation(ENVELOPE_ANNOTATION);
+        builder.withDocument(ENVELOPE_DOCUMENT);
         this.envelope = builder.build();
     }
 
