@@ -32,14 +32,7 @@ import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.SignatureContent;
-import com.guardtime.envelope.packaging.parsing.handler.AnnotationContentHandler;
-import com.guardtime.envelope.packaging.parsing.handler.AnnotationsManifestHandler;
 import com.guardtime.envelope.packaging.parsing.handler.ContentParsingException;
-import com.guardtime.envelope.packaging.parsing.handler.DocumentContentHandler;
-import com.guardtime.envelope.packaging.parsing.handler.DocumentsManifestHandler;
-import com.guardtime.envelope.packaging.parsing.handler.ManifestHandler;
-import com.guardtime.envelope.packaging.parsing.handler.SignatureHandler;
-import com.guardtime.envelope.packaging.parsing.handler.SingleAnnotationManifestHandler;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
@@ -54,25 +47,11 @@ import java.util.List;
 
 public class SignatureContentHandler {
 
-    private final DocumentContentHandler documentHandler;
-    private final AnnotationContentHandler annotationContentHandler;
-    private final ManifestHandler manifestHandler;
-    private final DocumentsManifestHandler documentsManifestHandler;
-    private final AnnotationsManifestHandler annotationsManifestHandler;
-    private final SingleAnnotationManifestHandler singleAnnotationManifestHandler;
-    private final SignatureHandler signatureHandler;
 
-    public SignatureContentHandler(DocumentContentHandler documentHandler, AnnotationContentHandler annotationContentHandler,
-                                   ManifestHandler manifestHandler, DocumentsManifestHandler documentsManifestHandler,
-                                   AnnotationsManifestHandler annotationsManifestHandler, SingleAnnotationManifestHandler singleAnnotationManifestHandler,
-                                   SignatureHandler signatureHandler) {
-        this.documentHandler = documentHandler;
-        this.annotationContentHandler = annotationContentHandler;
-        this.manifestHandler = manifestHandler;
-        this.documentsManifestHandler = documentsManifestHandler;
-        this.annotationsManifestHandler = annotationsManifestHandler;
-        this.singleAnnotationManifestHandler = singleAnnotationManifestHandler;
-        this.signatureHandler = signatureHandler;
+    private final HandlerSet handler;
+
+    public SignatureContentHandler(HandlerSet handlerSet) {
+        this.handler = handlerSet;
     }
 
     public Pair<SignatureContent, List<Throwable>> get(String manifestPath, ParsingStoreFactory parsingStoreFactory)
@@ -107,7 +86,7 @@ public class SignatureContentHandler {
 
         public SignatureContentGroup(String manifestPath, ParsingStore parsingStore) throws ContentParsingException {
             this.parsingStore = parsingStore;
-            this.manifest = manifestHandler.get(manifestPath);
+            this.manifest = getManifest(manifestPath);
             this.documentsManifest = getDocumentsManifest();
             this.annotationsManifest = getAnnotationsManifest();
 
@@ -116,10 +95,14 @@ public class SignatureContentHandler {
             fetchSignature();
         }
 
+        private Manifest getManifest(String manifestPath) throws ContentParsingException {
+            return handler.getManifest(manifestPath);
+        }
+
         private AnnotationsManifest getAnnotationsManifest() {
             FileReference annotationsManifestReference = manifest.getAnnotationsManifestReference();
             try {
-                return annotationsManifestHandler.get(annotationsManifestReference.getUri());
+                return handler.getAnnotationsManifest(annotationsManifestReference.getUri());
             } catch (ContentParsingException e) {
                 exceptions.add(e);
                 return null;
@@ -129,7 +112,7 @@ public class SignatureContentHandler {
         private DocumentsManifest getDocumentsManifest() {
             FileReference documentsManifestReference = manifest.getDocumentsManifestReference();
             try {
-                return documentsManifestHandler.get(documentsManifestReference.getUri());
+                return handler.getDocumentsManifest(documentsManifestReference.getUri());
             } catch (ContentParsingException e) {
                 exceptions.add(e);
                 return null;
@@ -147,7 +130,7 @@ public class SignatureContentHandler {
         private Document fetchDocumentFromHandler(FileReference reference) {
             if (invalidReference(reference)) return null;
             String documentUri = reference.getUri();
-            try (InputStream stream = documentHandler.get(documentUri)) {
+            try (InputStream stream = handler.getInputStream(documentUri)) {
                 parsingStore.store(documentUri, stream);
                 return new ParsedDocument(parsingStore, documentUri, reference.getMimeType(), documentUri);
             } catch (ContentParsingException | ParsingStoreException | IOException e) {
@@ -177,8 +160,8 @@ public class SignatureContentHandler {
 
         private SingleAnnotationManifest getSingleAnnotationManifest(FileReference manifestReference) {
             try {
-                String manifestReferenceUri = manifestReference.getUri();
-                return singleAnnotationManifestHandler.get(manifestReferenceUri);
+                String manifestUri = manifestReference.getUri();
+                return handler.getSingleAnnotationManifest(manifestUri);
             } catch (ContentParsingException e) {
                 exceptions.add(e);
                 return null;
@@ -198,7 +181,7 @@ public class SignatureContentHandler {
             }
             AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
             String uri = annotationDataReference.getUri();
-            try (InputStream stream = annotationContentHandler.get(uri)) {
+            try (InputStream stream = handler.getInputStream(uri)) {
                 parsingStore.store(uri, stream);
                 Annotation annotation = new ParsedAnnotation(parsingStore, uri, annotationDataReference.getDomain(), type);
                 annotation.setPath(uri);
@@ -212,7 +195,7 @@ public class SignatureContentHandler {
         private void fetchSignature() {
             String signatureUri = manifest.getSignatureReference().getUri();
             try {
-                signature = signatureHandler.get(signatureUri);
+                signature = handler.getEnvelopeSignature(signatureUri);
             } catch (ContentParsingException e) {
                 exceptions.add(e);
                 signature = null;

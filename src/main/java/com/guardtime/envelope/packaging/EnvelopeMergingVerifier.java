@@ -71,7 +71,7 @@ public class EnvelopeMergingVerifier {
                 verifyNonClashingSignatures(newContent, existingContent);
                 verifyNonClashingSingleAnnotationManifests(newContent, existingContent);
                 verifyNonClashingAnnotations(newContent, existingContent);
-                verifyNonClashingEnvelopeDocuments(newContent, existingContent);
+                verifyNonClashingDocuments(newContent, existingContent);
             }
         } catch (IOException e) {
             throw new EnvelopeMergingException("Failed to verify uniqueness!", e);
@@ -160,7 +160,7 @@ public class EnvelopeMergingVerifier {
 
     private static void checkDocuments(String path, Document newDocument,
                                        Collection<? extends Document> documents)
-            throws EnvelopeMergingException, IOException {
+            throws EnvelopeMergingException {
         for (Document doc : documents) {
             if (doc.getPath().equals(path)) {
                 for (HashAlgorithm algorithm : HashAlgorithm.getImplementedHashAlgorithms()) {
@@ -169,7 +169,7 @@ public class EnvelopeMergingVerifier {
                             throw new DocumentMergingException(path);
                         }
                     } catch (DataHashException e) {
-                        // ignore since it is an EmptyEnvelopeDocument that can't generate new hash
+                        // ignore since it is an EmptyDocument that can't generate new hash
                     }
                 }
             }
@@ -273,8 +273,8 @@ public class EnvelopeMergingVerifier {
         }
     }
 
-    private static void verifyNonClashingEnvelopeDocuments(SignatureContent content, SignatureContent existingContent)
-            throws EnvelopeMergingException, IOException {
+    private static void verifyNonClashingDocuments(SignatureContent content, SignatureContent existingContent)
+            throws EnvelopeMergingException {
         for (Map.Entry<String, Document> newDocument : content.getDocuments().entrySet()) {
             checkDocuments(newDocument.getKey(), newDocument.getValue(), existingContent.getDocuments().values());
         }

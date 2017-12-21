@@ -21,6 +21,6 @@ package com.guardtime.envelope.packaging.exception;
 
 public class DocumentMergingException extends EnvelopeMergingException {
     public DocumentMergingException(String path) {
-        super("New SignatureContent has clashing name for EnvelopeDocument! Path: " + path);
+        super("New SignatureContent has clashing name for Document! Path: " + path);
     }
 }

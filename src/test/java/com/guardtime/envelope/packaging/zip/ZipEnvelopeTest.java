@@ -38,6 +38,8 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
+import static com.guardtime.envelope.packaging.EntryNameProvider.META_INF;
+import static com.guardtime.envelope.packaging.EnvelopeWriter.MIME_TYPE_ENTRY_NAME;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -123,9 +125,9 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testAddWithSameEnvelopeDocumentPath_ThrowsEnvelopeMergingException() throws Exception {
+    public void testAddWithSameDocumentPath_ThrowsEnvelopeMergingException() throws Exception {
         expectedException.expect(EnvelopeMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for EnvelopeDocument! Path: ");
+        expectedException.expectMessage("New SignatureContent has clashing name for Document! Path: ");
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
                 withSignatureFactory(mockedSignatureFactory).
                 disableInternalVerification().
@@ -147,4 +149,37 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
             }
         }
     }
+
+    @Test
+    public void testAddDocumentWithMIMEtypeName_ThrowsIOException() throws Exception {
+        performFilenameTest(MIME_TYPE_ENTRY_NAME);
+    }
+
+    @Test
+    public void testAddDocumentWithMETAINFDirInName_ThrowsIOException() throws Exception {
+        performFilenameTest(META_INF + "/somefile.txt");
+    }
+
+    @Test
+    public void testAddDocumentWithMETAINFName_ThrowsIOException() throws Exception {
+        performFilenameTest(META_INF);
+    }
+
+    private void performFilenameTest(String filename) throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("File name is not valid!");
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                disableInternalVerification().
+                withIndexProviderFactory(new UuidIndexProviderFactory()).
+                build();
+        Document testDocument = new StreamDocument(
+                new ByteArrayInputStream(new byte[0]),
+                "some type",
+                filename
+        );
+        try (Envelope envelope = packagingFactory.create(singletonList(testDocument), singletonList(STRING_ENVELOPE_ANNOTATION))) {
+        }
+    }
+
 }
