@@ -19,16 +19,16 @@
 
 package com.guardtime.envelope;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
-import com.guardtime.envelope.annotation.StringEnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.StreamEnvelopeDocument;
+import com.guardtime.envelope.annotation.StringAnnotation;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.indexing.IndexProviderFactory;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
-import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.DocumentsManifest;
+import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.ManifestFactoryType;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
@@ -128,16 +128,16 @@ public class AbstractEnvelopeTest {
 
     protected final DefaultRuleStateProvider defaultRuleStateProvider = new DefaultRuleStateProvider();
 
-    protected EnvelopeAnnotation STRING_ENVELOPE_ANNOTATION;
-    protected EnvelopeDocument TEST_DOCUMENT_HELLO_TEXT;
-    protected EnvelopeDocument TEST_DOCUMENT_HELLO_PDF;
+    protected Annotation STRING_ENVELOPE_ANNOTATION;
+    protected Document TEST_DOCUMENT_HELLO_TEXT;
+    protected Document TEST_DOCUMENT_HELLO_PDF;
     protected final List<AutoCloseable> envelopeElements = new LinkedList<>();
 
     @Before
     public void setUpDocumentsAndAnnotations() {
-        STRING_ENVELOPE_ANNOTATION = new StringEnvelopeAnnotation(EnvelopeAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME);
-        TEST_DOCUMENT_HELLO_TEXT = new StreamEnvelopeDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
-        TEST_DOCUMENT_HELLO_PDF = new StreamEnvelopeDocument(new ByteArrayInputStream(TEST_DATA_PDF_CONTENT), MIME_TYPE_APPLICATION_PDF, TEST_FILE_NAME_TEST_PDF);
+        STRING_ENVELOPE_ANNOTATION = new StringAnnotation(EnvelopeAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME);
+        TEST_DOCUMENT_HELLO_TEXT = new StreamDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
+        TEST_DOCUMENT_HELLO_PDF = new StreamDocument(new ByteArrayInputStream(TEST_DATA_PDF_CONTENT), MIME_TYPE_APPLICATION_PDF, TEST_FILE_NAME_TEST_PDF);
         envelopeElements.addAll(Arrays.asList(
                 TEST_DOCUMENT_HELLO_PDF,
                 TEST_DOCUMENT_HELLO_TEXT,
@@ -182,7 +182,7 @@ public class AbstractEnvelopeTest {
         MockitoAnnotations.initMocks(this);
         when(mockedManifestFactory.getManifestFactoryType()).thenReturn(mockedManifestFactoryType);
         when(mockedManifestFactory.getHashAlgorithmProvider()).thenReturn(mockHashAlgorithmProvider);
-        when(mockedManifestFactory.createDocumentsManifest(anyListOf(EnvelopeDocument.class))).thenReturn(mockedDocumentsManifest);
+        when(mockedManifestFactory.createDocumentsManifest(anyListOf(Document.class))).thenReturn(mockedDocumentsManifest);
         when(mockedManifestFactory.createAnnotationsManifest(anyMap())).thenReturn(mockedAnnotationsManifest);
         when(mockedManifestFactory.createSingleAnnotationManifest(Mockito.any(Pair.class), Mockito.any(Pair.class))).thenReturn(mockedSingleAnnotationManifest);
         when(mockedManifestFactory.createManifest(Mockito.any(Pair.class), Mockito.any(Pair.class), Mockito.any(Pair.class))).thenReturn(mockedManifest);

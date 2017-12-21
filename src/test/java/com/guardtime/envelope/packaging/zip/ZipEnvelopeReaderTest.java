@@ -20,14 +20,15 @@
 package com.guardtime.envelope.packaging.zip;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.EmptyEnvelopeDocument;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.EmptyDocument;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.tlv.TlvEnvelopeManifestFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
+import com.guardtime.envelope.packaging.exception.InvalidPackageException;
 import com.guardtime.envelope.packaging.parsing.store.TemporaryFileBasedParsingStoreFactory;
 import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.envelope.signature.SignatureFactory;
@@ -40,10 +41,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -51,6 +52,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
@@ -67,8 +69,11 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
     public void setUpReader() throws Exception {
         EnvelopeManifestFactory manifestFactory = new TlvEnvelopeManifestFactory();
 
-        when(mockKsi.sign(Mockito.any(DataHash.class))).thenReturn(Mockito.mock(KSISignature.class));
-        when(mockKsi.extend(Mockito.any(KSISignature.class))).thenReturn(Mockito.mock(KSISignature.class));
+        when(mockKsi.sign(any(DataHash.class))).thenReturn(mock(KSISignature.class));
+        when(mockKsi.extend(any(KSISignature.class))).thenReturn(mock(KSISignature.class));
+        KSISignature mockKsiSignature = mock(KSISignature.class);
+        when(mockKsiSignature.getAggregationTime()).thenReturn(mock(Date.class));
+        when(mockKsi.read(any(InputStream.class))).thenReturn(mockKsiSignature);
         SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
         this.reader = new ZipEnvelopeReader(manifestFactory, signatureFactory, new TemporaryFileBasedParsingStoreFactory());
     }
@@ -112,9 +117,23 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
 
     @Test
     public void testReadEmptyEnvelopeFile_ThrowsInvalidPackageException() throws Exception {
+        expectedException.expect(InvalidPackageException.class);
+        expectedException.expectMessage("No parsable MIME type");
         setUpEnvelope(EMPTY_ENVELOPE);
-        assertExceptionsContainMessage("Parsed envelope was not valid");
-        assertTrue(envelope.getSignatureContents().isEmpty());
+    }
+
+    @Test
+    public void testReadEnvelopeWithMimetypeContainingInvalidValue_ThrowsInvalidPackageException() throws Exception {
+        expectedException.expect(InvalidPackageException.class);
+        expectedException.expectMessage("Parsed Envelope has invalid MIME type. Can't process it!");
+        setUpEnvelope(ENVELOPE_WITH_MIMETYPE_CONTAINS_INVALID_VALUE);
+    }
+
+    @Test
+    public void testReadEnvelopeWithMimetypeContainingMoreThanNeeded_ThrowsInvalidPackageException() throws Exception {
+        expectedException.expect(InvalidPackageException.class);
+        expectedException.expectMessage("Parsed Envelope has invalid MIME type. Can't process it!");
+        setUpEnvelope(ENVELOPE_WITH_MIMETYPE_CONTAINS_ADDITIONAL_VALUE);
     }
 
     @Test
@@ -131,8 +150,8 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
         assertNotNull(envelope);
         assertFalse(envelope.getSignatureContents().isEmpty());
         for (SignatureContent content : envelope.getSignatureContents()) {
-            for (EnvelopeDocument document : content.getDocuments().values()) {
-                assertTrue(document instanceof EmptyEnvelopeDocument);
+            for (Document document : content.getDocuments().values()) {
+                assertTrue(document instanceof EmptyDocument);
             }
         }
     }

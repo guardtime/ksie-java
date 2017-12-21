@@ -29,11 +29,11 @@ import java.io.InputStream;
 /**
  * Annotation that is based on File as the data source.
  */
-public class FileEnvelopeAnnotation extends AbstractEnvelopeAnnotation {
+public class FileAnnotation extends AbstractAnnotation {
 
     private final File file;
 
-    public FileEnvelopeAnnotation(File file, String domain, EnvelopeAnnotationType type) {
+    public FileAnnotation(File file, String domain, EnvelopeAnnotationType type) {
         super(domain, type);
         Util.notNull(file, "File");
         this.file = file;

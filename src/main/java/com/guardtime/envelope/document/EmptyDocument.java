@@ -33,10 +33,10 @@ import java.util.Map;
 /**
  * Represents a document in a envelope which doesn't store the document data in the envelope.
  */
-public class EmptyEnvelopeDocument extends AbstractEnvelopeDocument {
+public class EmptyDocument extends AbstractDocument {
     private final Map<HashAlgorithm, DataHash> dataHashMap;
 
-    public EmptyEnvelopeDocument(String fileName, String mimeType, List<DataHash> hashes) {
+    public EmptyDocument(String fileName, String mimeType, List<DataHash> hashes) {
         super(mimeType, fileName);
         Util.notEmpty(hashes, "Data hash list");
         this.dataHashMap = mapHashes(hashes);

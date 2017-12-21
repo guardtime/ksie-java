@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.manifest.tlv;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.FileReference;
@@ -44,12 +44,12 @@ class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements Ann
 
     private List<TlvSingleAnnotationManifestReference> singleAnnotationManifestReferences = new LinkedList<>();
 
-    public TlvAnnotationsManifest(Map<String, Pair<EnvelopeAnnotation, TlvSingleAnnotationManifest>> singleAnnotationManifests, HashAlgorithmProvider algorithmProvider) throws InvalidManifestException {
+    public TlvAnnotationsManifest(Map<String, Pair<Annotation, TlvSingleAnnotationManifest>> singleAnnotationManifests, HashAlgorithmProvider algorithmProvider) throws InvalidManifestException {
         super(MAGIC);
         try {
             Set<String> uris = singleAnnotationManifests.keySet();
             for (String uri : uris) {
-                Pair<EnvelopeAnnotation, TlvSingleAnnotationManifest> pair = singleAnnotationManifests.get(uri);
+                Pair<Annotation, TlvSingleAnnotationManifest> pair = singleAnnotationManifests.get(uri);
                 this.singleAnnotationManifestReferences.add(new TlvSingleAnnotationManifestReference(uri, pair.getRight(), pair.getLeft().getAnnotationType(), algorithmProvider));
             }
         } catch (TLVParserException | DataHashException e) {

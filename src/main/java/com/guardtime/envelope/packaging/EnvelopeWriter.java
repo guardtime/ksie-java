@@ -27,5 +27,8 @@ import java.io.OutputStream;
  * Implementations of this interface must be stateless and reusable.
  */
 public interface EnvelopeWriter {
+
+    String MIME_TYPE_ENTRY_NAME = "mimetype";
+
     void write(Envelope envelope, OutputStream output) throws IOException;
 }

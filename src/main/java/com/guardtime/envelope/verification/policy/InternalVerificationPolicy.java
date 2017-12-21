@@ -21,7 +21,6 @@ package com.guardtime.envelope.verification.policy;
 
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.packaging.Envelope;
-import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.verification.result.SignatureResult;
@@ -52,13 +51,11 @@ import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_SIGN
 public class InternalVerificationPolicy extends DefaultVerificationPolicy {
 
     /**
-     * @param packagingFactory    will be used to create the appropriate MIME type rule.
      */
-    public InternalVerificationPolicy(EnvelopePackagingFactory packagingFactory) {
+    public InternalVerificationPolicy() {
         super(
                 new InternalRuleStateProvider(),
                 new InternalSignatureVerifier(),
-                packagingFactory,
                 Collections.<Rule<Envelope>>emptyList(),
                 Collections.<Rule<SignatureContent>>emptyList()
         );

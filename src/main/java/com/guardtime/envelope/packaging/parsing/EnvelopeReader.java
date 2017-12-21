@@ -24,8 +24,6 @@ import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.EnvelopeWriter;
-import com.guardtime.envelope.packaging.MimeType;
-import com.guardtime.envelope.packaging.MimeTypeEntry;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidPackageException;
@@ -45,8 +43,6 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import static com.guardtime.envelope.packaging.MimeType.MIME_TYPE_ENTRY_NAME;
 
 /**
  * Provides stream parsing logic for {@link EnvelopePackagingFactory}
@@ -69,7 +65,7 @@ public abstract class EnvelopeReader {
         this.parsingStoreFactory = storeFactory;
     }
 
-    public Envelope read(InputStream input) throws IOException, EnvelopeReadingException, ParsingStoreException {
+    public Envelope read(InputStream input) throws IOException, InvalidPackageException, ParsingStoreException {
         EnvelopeReadingException readingException = new EnvelopeReadingException("Reading envelope encountered errors!");
         ParsingStore parsingStore = parsingStoreFactory.create();
         HandlerSet handlerSet = new HandlerSet(manifestFactory, signatureFactory, parsingStore);
@@ -77,12 +73,12 @@ public abstract class EnvelopeReader {
         parseInputStream(input, handlerSet, readingException);
 
         List<SignatureContent> contents = buildSignatures(handlerSet, readingException);
-        MimeType mimeType = getMimeType(handlerSet);
+        validateMimeType(handlerSet);
         List<UnknownDocument> unknownFiles = handlerSet.getUnrequestedFiles();
-        Envelope envelope = new Envelope(contents, unknownFiles, mimeType, getWriter(), parsingStore);
+        Envelope envelope = new Envelope(contents, unknownFiles, getWriter(), parsingStore);
         readingException.setEnvelope(envelope);
 
-        if (!validMimeType(mimeType) || !containsValidContents(contents)) {
+        if (!containsValidContents(contents)) {
             readingException.addException(new InvalidPackageException("Parsed envelope was not valid"));
         }
 
@@ -94,7 +90,8 @@ public abstract class EnvelopeReader {
 
     protected abstract EnvelopeWriter getWriter();
 
-    protected abstract void parseInputStream(InputStream input, HandlerSet handlerSet, EnvelopeReadingException readingException) throws IOException;
+    protected abstract void parseInputStream(InputStream input, HandlerSet handlerSet, EnvelopeReadingException readingException)
+            throws IOException;
 
     private boolean containsValidContents(List<SignatureContent> signatureContents) {
         for (SignatureContent content : signatureContents) {
@@ -112,7 +109,8 @@ public abstract class EnvelopeReader {
     }
 
     private boolean containsOrContainedAnnotations(SignatureContent content) {
-        return content.getAnnotations().size() > 0 || content.getAnnotationsManifest().getRight().getSingleAnnotationManifestReferences().size() > 0;
+        return content.getAnnotations().size() > 0 ||
+                content.getAnnotationsManifest().getRight().getSingleAnnotationManifestReferences().size() > 0;
     }
 
     private boolean containsManifest(SignatureContent content) {
@@ -121,26 +119,21 @@ public abstract class EnvelopeReader {
                 content.getAnnotationsManifest() != null;
     }
 
-    private boolean validMimeType(MimeType mimeType) {
-        if (mimeType == null) {
-            return false;
-        }
-        try (InputStream inputStream = mimeType.getInputStream()) {
-            return inputStream.available() > 0;
-        } catch (IOException e) {
-            return false;
+    private void validateMimeType(HandlerSet handlerSet) throws InvalidPackageException {
+        try {
+            byte[] content = handlerSet.getMimeTypeContent();
+            String parsedMimeType = new String(content);
+            if(!parsedMimeType.equals(getMimeType())) {
+                // TODO: Maybe use a better exception class?
+                throw new InvalidPackageException("Parsed Envelope has invalid MIME type. Can't process it!");
+            }
+        } catch (ContentParsingException e) {
+            LOGGER.debug("Failed to parse MIME type. Reason: '{}", e.getMessage());
+            throw new InvalidPackageException("No parsable MIME type.", e);
         }
     }
 
-    private MimeType getMimeType(HandlerSet handlerSet) {
-        try {
-            byte[] content = handlerSet.getMimeTypeContent();
-            return new MimeTypeEntry(MIME_TYPE_ENTRY_NAME, content);
-        } catch (ContentParsingException e) {
-            LOGGER.debug("Failed to parse MIME type. Reason: '{}", e.getMessage());
-            return null;
-        }
-    }
+    protected abstract String getMimeType();
 
     private List<SignatureContent> buildSignatures(HandlerSet handlerSet, EnvelopeReadingException readingException) {
         Set<String> parsedManifestUriSet = handlerSet.getManifestUris();
@@ -148,7 +141,8 @@ public abstract class EnvelopeReader {
         List<SignatureContent> signatures = new LinkedList<>();
         for (String manifestUri : parsedManifestUriSet) {
             try {
-                Pair<SignatureContent, List<Throwable>> signatureContentVectorPair = signatureContentHandler.get(manifestUri, parsingStoreFactory);
+                Pair<SignatureContent, List<Throwable>> signatureContentVectorPair =
+                        signatureContentHandler.get(manifestUri, parsingStoreFactory);
                 signatures.add(signatureContentVectorPair.getLeft());
                 readingException.addExceptions(signatureContentVectorPair.getRight());
             } catch (ContentParsingException | ParsingStoreException e) {

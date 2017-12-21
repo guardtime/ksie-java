@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.manifest.tlv;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.manifest.AnnotationDataReference;
 import com.guardtime.envelope.manifest.FileReference;
@@ -46,7 +46,7 @@ class TlvSingleAnnotationManifest extends AbstractTlvManifestStructure implement
     private TlvAnnotationDataReference annotationReference;
     private TlvDocumentsManifestReference documentsManifestReference;
 
-    public TlvSingleAnnotationManifest(Pair<String, EnvelopeAnnotation> annotation, Pair<String, TlvDocumentsManifest> documentsManifest, HashAlgorithmProvider algorithmProvider) throws InvalidManifestException {
+    public TlvSingleAnnotationManifest(Pair<String, Annotation> annotation, Pair<String, TlvDocumentsManifest> documentsManifest, HashAlgorithmProvider algorithmProvider) throws InvalidManifestException {
         super(MAGIC);
         try {
             this.annotationReference = new TlvAnnotationDataReference(annotation, algorithmProvider);

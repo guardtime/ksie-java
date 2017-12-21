@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.packaging.parsing;
 
-import com.guardtime.envelope.document.ParsedEnvelopeDocument;
+import com.guardtime.envelope.document.ParsedDocument;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.DocumentsManifest;
@@ -46,7 +46,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.guardtime.envelope.packaging.MimeType.MIME_TYPE_ENTRY_NAME;
+import static com.guardtime.envelope.packaging.EnvelopeWriter.MIME_TYPE_ENTRY_NAME;
+
 
 /**
  * Helper that manages different {@link ContentHandler} instances and parsed in envelope content.
@@ -81,7 +82,7 @@ public class HandlerSet {
         Set<String> keys = new HashSet<>(parsingStore.getStoredKeys());
         keys.removeAll(requestedKeys);
         for (String key : keys) {
-            returnable.add(new ParsedEnvelopeDocument(parsingStore, key, "unknown", key));
+            returnable.add(new ParsedDocument(parsingStore, key, "unknown", key));
         }
         return returnable;
     }

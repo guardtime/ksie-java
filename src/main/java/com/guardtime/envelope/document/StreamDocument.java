@@ -36,18 +36,18 @@ import static com.guardtime.envelope.util.Util.notNull;
 /**
  * Document that is based on a {@link InputStream}.
  */
-public class StreamEnvelopeDocument implements EnvelopeDocument {
+public class StreamDocument implements Document {
 
     private final File tempFile;
-    private FileEnvelopeDocument envelopeDocument;
+    private FileDocument envelopeDocument;
     private boolean closed;
 
-    public StreamEnvelopeDocument(InputStream input, String mimeType, String fileName) {
+    public StreamDocument(InputStream input, String mimeType, String fileName) {
         notNull(input, "Input stream");
         notNull(mimeType, "MIME type");
         notNull(fileName, "File name");
         this.tempFile = copy(input);
-        this.envelopeDocument = new FileEnvelopeDocument(tempFile, mimeType, fileName);
+        this.envelopeDocument = new FileDocument(tempFile, mimeType, fileName);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class StreamEnvelopeDocument implements EnvelopeDocument {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        StreamEnvelopeDocument that = (StreamEnvelopeDocument) o;
+        StreamDocument that = (StreamDocument) o;
 
         return envelopeDocument != null ? envelopeDocument.equals(that.envelopeDocument) : that.envelopeDocument == null;
 

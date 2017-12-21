@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.manifest.tlv;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.manifest.AnnotationDataReference;
 import com.guardtime.envelope.util.DataHashException;
@@ -56,8 +56,8 @@ class TlvAnnotationDataReference extends TLVStructure implements AnnotationDataR
         }
     }
 
-    public TlvAnnotationDataReference(Pair<String, EnvelopeAnnotation> annotationPair, HashAlgorithmProvider algorithmProvider) throws TLVParserException, DataHashException {
-        EnvelopeAnnotation annotation = annotationPair.getRight();
+    public TlvAnnotationDataReference(Pair<String, Annotation> annotationPair, HashAlgorithmProvider algorithmProvider) throws TLVParserException, DataHashException {
+        Annotation annotation = annotationPair.getRight();
         this.uri = annotationPair.getLeft();
         this.hash = annotation.getDataHash(algorithmProvider.getAnnotationDataReferenceHashAlgorithm());
         this.domain = annotation.getDomain();

@@ -19,8 +19,8 @@
 
 package com.guardtime.envelope.manifest.tlv;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.hash.SingleHashAlgorithmProvider;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
@@ -69,19 +69,19 @@ public class TlvEnvelopeManifestFactory implements EnvelopeManifestFactory<TlvMa
     }
 
     @Override
-    public TlvDocumentsManifest createDocumentsManifest(List<EnvelopeDocument> files) throws InvalidManifestException {
+    public TlvDocumentsManifest createDocumentsManifest(List<Document> files) throws InvalidManifestException {
         Util.notNull(files, "Document files list");
         Util.notEmpty(files, "Document files list");
         return new TlvDocumentsManifest(files, algorithmProvider);
     }
 
     @Override
-    public TlvAnnotationsManifest createAnnotationsManifest(Map<String, Pair<EnvelopeAnnotation, TlvSingleAnnotationManifest>> annotationManifest) throws InvalidManifestException {
+    public TlvAnnotationsManifest createAnnotationsManifest(Map<String, Pair<Annotation, TlvSingleAnnotationManifest>> annotationManifest) throws InvalidManifestException {
         return new TlvAnnotationsManifest(annotationManifest, algorithmProvider);
     }
 
     @Override
-    public TlvSingleAnnotationManifest createSingleAnnotationManifest(Pair<String, TlvDocumentsManifest> documentsManifest, Pair<String, EnvelopeAnnotation> annotation) throws InvalidManifestException {
+    public TlvSingleAnnotationManifest createSingleAnnotationManifest(Pair<String, TlvDocumentsManifest> documentsManifest, Pair<String, Annotation> annotation) throws InvalidManifestException {
         Util.notNull(documentsManifest, "Documents manifest");
         Util.notNull(annotation, "Annotation");
         return new TlvSingleAnnotationManifest(annotation, documentsManifest, algorithmProvider);

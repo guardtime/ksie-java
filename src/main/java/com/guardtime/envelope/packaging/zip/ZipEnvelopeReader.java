@@ -66,4 +66,9 @@ class ZipEnvelopeReader extends EnvelopeReader {
         }
     }
 
+    @Override
+    protected String getMimeType() {
+        return ZipEnvelopePackagingFactoryBuilder.MIME_TYPE;
+    }
+
 }

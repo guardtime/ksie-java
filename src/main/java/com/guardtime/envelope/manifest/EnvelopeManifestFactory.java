@@ -19,8 +19,8 @@
 
 package com.guardtime.envelope.manifest;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.util.Pair;
 
@@ -41,11 +41,11 @@ public interface EnvelopeManifestFactory<M extends Manifest, D extends Documents
 
     M createManifest(Pair<String, D> documentsManifest, Pair<String, A> annotationManifest, Pair<String, String> signatureReference) throws InvalidManifestException;
 
-    D createDocumentsManifest(List<EnvelopeDocument> files) throws InvalidManifestException;
+    D createDocumentsManifest(List<Document> files) throws InvalidManifestException;
 
-    A createAnnotationsManifest(Map<String, Pair<EnvelopeAnnotation, SA>> annotationManifests) throws InvalidManifestException;
+    A createAnnotationsManifest(Map<String, Pair<Annotation, SA>> annotationManifests) throws InvalidManifestException;
 
-    SA createSingleAnnotationManifest(Pair<String, D> documentsManifest, Pair<String, EnvelopeAnnotation> annotation) throws InvalidManifestException;
+    SA createSingleAnnotationManifest(Pair<String, D> documentsManifest, Pair<String, Annotation> annotation) throws InvalidManifestException;
 
     M readManifest(InputStream input) throws InvalidManifestException;
 

@@ -19,8 +19,8 @@
 
 package com.guardtime.envelope.packaging.zip;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.DocumentsManifest;
@@ -28,7 +28,6 @@ import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopeWriter;
-import com.guardtime.envelope.packaging.MimeType;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.util.Pair;
@@ -53,16 +52,16 @@ class ZipEnvelopeWriter implements EnvelopeWriter {
     public void write(Envelope envelope, OutputStream output) throws IOException {
         Set<String> writtenFiles = new HashSet<>();
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(output))) {
-            writeMimeTypeEntry(envelope.getMimeType(), zipOutputStream, writtenFiles);
+            writeMimeTypeEntry(zipOutputStream, writtenFiles);
             writeSignatureContents(envelope.getSignatureContents(), zipOutputStream, writtenFiles);
             writeUnknownFiles(envelope.getUnknownFiles(), zipOutputStream, writtenFiles);
         }
     }
 
-    private void writeMimeTypeEntry(MimeType mimeType, ZipOutputStream zipOutputStream, Set<String> writtenFiles)
+    private void writeMimeTypeEntry(ZipOutputStream zipOutputStream, Set<String> writtenFiles)
             throws IOException {
-        ZipEntry mimeTypeEntry = new ZipEntry(mimeType.getUri());
-        byte[] data = Util.toByteArray(mimeType.getInputStream());
+        ZipEntry mimeTypeEntry = new ZipEntry(MIME_TYPE_ENTRY_NAME);
+        byte[] data = ZipEnvelopePackagingFactoryBuilder.MIME_TYPE.getBytes();
         mimeTypeEntry.setSize(data.length);
         mimeTypeEntry.setCompressedSize(data.length);
         Checksum checksum = new CRC32();
@@ -73,7 +72,7 @@ class ZipEnvelopeWriter implements EnvelopeWriter {
         zipOutputStream.putNextEntry(mimeTypeEntry);
         zipOutputStream.write(data);
         zipOutputStream.closeEntry();
-        writtenFiles.add(mimeType.getUri());
+        writtenFiles.add(MIME_TYPE_ENTRY_NAME);
     }
 
     private void writeSignatureContents(List<SignatureContent> signatureContents, ZipOutputStream output,
@@ -109,10 +108,10 @@ class ZipEnvelopeWriter implements EnvelopeWriter {
         }
     }
 
-    private void writeAnnotations(Map<String, EnvelopeAnnotation> annotations, ZipOutputStream output, Set<String> writtenFiles)
+    private void writeAnnotations(Map<String, Annotation> annotations, ZipOutputStream output, Set<String> writtenFiles)
             throws IOException {
         for (String uri : annotations.keySet()) {
-            EnvelopeAnnotation annotation = annotations.get(uri);
+            Annotation annotation = annotations.get(uri);
             try (InputStream inputStream = annotation.getInputStream()) {
                 writeEntry(uri, inputStream, output, writtenFiles);
             }
@@ -133,10 +132,10 @@ class ZipEnvelopeWriter implements EnvelopeWriter {
         writtenFiles.add(signatureUri);
     }
 
-    private void writeDocuments(Map<String, EnvelopeDocument> documents, ZipOutputStream zipOutputStream,
+    private void writeDocuments(Map<String, Document> documents, ZipOutputStream zipOutputStream,
                                 Set<String> writtenFiles) throws IOException {
         for (String uri : documents.keySet()) {
-            EnvelopeDocument document = documents.get(uri);
+            Document document = documents.get(uri);
             if(invalidDocumentName(document.getFileName())) {
                 throw new IOException(document.getFileName() + " is an invalid document file name!");
             }
@@ -149,7 +148,7 @@ class ZipEnvelopeWriter implements EnvelopeWriter {
     }
 
     /**
-     * Filename can't be directory for an {@link EnvelopeDocument}. KSIE-54
+     * Filename can't be directory for an {@link Document}. KSIE-54
      */
     private boolean invalidDocumentName(String fileName) {
         return fileName.endsWith("/");

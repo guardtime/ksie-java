@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.manifest.tlv;
 
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.util.DataHashException;
 import com.guardtime.ksi.tlv.TLVElement;
@@ -35,7 +35,7 @@ class TlvDocumentReference extends TlvFileReference {
         super(root);
     }
 
-    public TlvDocumentReference(EnvelopeDocument document, HashAlgorithmProvider algorithmProvider) throws TLVParserException, IOException, DataHashException {
+    public TlvDocumentReference(Document document, HashAlgorithmProvider algorithmProvider) throws TLVParserException, IOException, DataHashException {
         super(document.getFileName(), document.getDataHashList(algorithmProvider.getDocumentReferenceHashAlgorithms()), document.getMimeType());
     }
 

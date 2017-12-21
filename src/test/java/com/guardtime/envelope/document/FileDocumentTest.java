@@ -30,25 +30,25 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class FileEnvelopeDocumentTest extends AbstractEnvelopeTest {
+public class FileDocumentTest extends AbstractEnvelopeTest {
 
     @Test
     public void testCreateFileDocumentWithoutInputFile_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("File must be present");
-        new FileEnvelopeDocument(null, MIME_TYPE_APPLICATION_TXT);
+        new FileDocument(null, MIME_TYPE_APPLICATION_TXT);
     }
 
     @Test
     public void testCreateFileDocumentWithoutMimeType_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("MIME type must be present");
-        new FileEnvelopeDocument(new File(TEST_FILE_PATH_TEST_TXT), null);
+        new FileDocument(new File(TEST_FILE_PATH_TEST_TXT), null);
     }
 
     @Test
     public void testCreateNewFileBasedDocument() throws Exception {
-        FileEnvelopeDocument fileDocument = new FileEnvelopeDocument(loadFile(TEST_FILE_PATH_TEST_TXT), MIME_TYPE_APPLICATION_TXT);
+        FileDocument fileDocument = new FileDocument(loadFile(TEST_FILE_PATH_TEST_TXT), MIME_TYPE_APPLICATION_TXT);
         assertEquals(TEST_FILE_NAME_TEST_TXT, fileDocument.getFileName());
         assertEquals(MIME_TYPE_APPLICATION_TXT, fileDocument.getMimeType());
         assertNotNull(fileDocument.getDataHash(HashAlgorithm.SHA2_256));
@@ -56,14 +56,14 @@ public class FileEnvelopeDocumentTest extends AbstractEnvelopeTest {
 
     @Test
     public void testOverrideDocumentName() throws Exception {
-        FileEnvelopeDocument fileDocument = new FileEnvelopeDocument(loadFile(TEST_FILE_PATH_TEST_TXT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_DOC);
+        FileDocument fileDocument = new FileDocument(loadFile(TEST_FILE_PATH_TEST_TXT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_DOC);
         assertEquals(TEST_FILE_NAME_TEST_DOC, fileDocument.getFileName());
     }
 
     @Test
     public void testCloseDoesNotDeleteFile() throws Exception {
         File file = loadFile(TEST_FILE_PATH_TEST_TXT);
-        FileEnvelopeDocument fileDocument = new FileEnvelopeDocument(file, MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_DOC);
+        FileDocument fileDocument = new FileDocument(file, MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_DOC);
         fileDocument.close();
         assertTrue(file.exists());
     }

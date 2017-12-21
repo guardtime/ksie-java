@@ -20,9 +20,9 @@
 package com.guardtime.envelope.manifest.tlv;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.hash.SingleHashAlgorithmProvider;
 import com.guardtime.envelope.manifest.AnnotationDataReference;
@@ -81,13 +81,13 @@ public class AbstractTlvManifestTest extends AbstractEnvelopeTest {
     protected TlvAnnotationsManifest mockAnnotationsManifest;
 
     @Mock
-    protected EnvelopeAnnotation mockAnnotation;
+    protected Annotation mockAnnotation;
 
     @Mock
     protected TlvSingleAnnotationManifest mockSingleAnnotationManifest;
 
     @Mock
-    protected EnvelopeDocument mockDocument;
+    protected Document mockDocument;
     protected DataHash dataHash;
     @Mock
     private AnnotationDataReference mockAnnotationDataReference;

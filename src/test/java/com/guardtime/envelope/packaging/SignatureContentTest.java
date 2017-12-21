@@ -20,9 +20,9 @@
 package com.guardtime.envelope.packaging;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.EmptyEnvelopeDocument;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.EmptyDocument;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
@@ -57,8 +57,8 @@ public class SignatureContentTest extends AbstractEnvelopeTest {
         SignatureContent testable = getTestableContent();
         byte[] bytes = "testData".getBytes();
         assertTrue(testable.attachDetachedDocument(TEST_FILE_NAME_TEST_DOC, new ByteArrayInputStream(bytes)));
-        EnvelopeDocument reAttachedDocument = testable.getDocuments().get(TEST_FILE_NAME_TEST_DOC);
-        assertFalse(reAttachedDocument instanceof EmptyEnvelopeDocument);
+        Document reAttachedDocument = testable.getDocuments().get(TEST_FILE_NAME_TEST_DOC);
+        assertFalse(reAttachedDocument instanceof EmptyDocument);
         try (InputStream inputStream = reAttachedDocument.getInputStream()) {
             assertNotNull(inputStream);
             byte[] documentBytes = Util.toByteArray(inputStream);
@@ -76,40 +76,40 @@ public class SignatureContentTest extends AbstractEnvelopeTest {
     public void testDetachDocumentData_OK() throws ParsingStoreException {
         SignatureContent testable = getTestableContent();
         int documentsCount = testable.getDocuments().size();
-        EnvelopeDocument detached = testable.detachDocument(TEST_FILE_NAME_TEST_PDF);
+        Document detached = testable.detachDocument(TEST_FILE_NAME_TEST_PDF);
         assertEquals(documentsCount, testable.getDocuments().size());
         assertNotNull(detached);
-        assertFalse(detached instanceof EmptyEnvelopeDocument);
+        assertFalse(detached instanceof EmptyDocument);
         assertNotNull(testable.getDocuments().get(TEST_FILE_NAME_TEST_PDF));
-        assertTrue(testable.getDocuments().get(TEST_FILE_NAME_TEST_PDF) instanceof EmptyEnvelopeDocument);
+        assertTrue(testable.getDocuments().get(TEST_FILE_NAME_TEST_PDF) instanceof EmptyDocument);
     }
 
     @Test
     public void testDetachDocumentDataForNonExistentDocument_ReturnsNull() throws ParsingStoreException {
         SignatureContent testable = getTestableContent();
-        EnvelopeDocument detached = testable.detachDocument("ThisFileIsNotInTheSignatureContent");
+        Document detached = testable.detachDocument("ThisFileIsNotInTheSignatureContent");
         assertNull(detached);
     }
 
     private SignatureContent getTestableContent() {
-        List<EnvelopeDocument> documents = Arrays.asList(
+        List<Document> documents = Arrays.asList(
                 TEST_DOCUMENT_HELLO_TEXT,
                 TEST_DOCUMENT_HELLO_PDF,
-                new EmptyEnvelopeDocument(TEST_FILE_NAME_TEST_DOC, "application/doc", singletonList(new DataHash(HashAlgorithm.SHA2_256, new byte[32])))
+                new EmptyDocument(TEST_FILE_NAME_TEST_DOC, "application/doc", singletonList(new DataHash(HashAlgorithm.SHA2_256, new byte[32])))
         );
         when(mockedDocumentsManifest.getDocumentReferences()).thenAnswer(makeFileReferenceList(documents));
         return new SignatureContent.Builder()
                 .withDocuments(documents)
-                .withAnnotations(Collections.<Pair<String, EnvelopeAnnotation>>emptyList())
+                .withAnnotations(Collections.<Pair<String, Annotation>>emptyList())
                 .withSingleAnnotationManifests(Collections.<Pair<String, SingleAnnotationManifest>>emptyList())
                 .withDocumentsManifest(Pair.of("datamanifest.tlv", mockedDocumentsManifest))
                 .build();
     }
 
-    private Answer<List<? extends FileReference>> makeFileReferenceList(List<EnvelopeDocument> documents) {
+    private Answer<List<? extends FileReference>> makeFileReferenceList(List<Document> documents) {
 
         final List<FileReference> fileReferenceList = new ArrayList<>();
-        for (final EnvelopeDocument doc : documents) {
+        for (final Document doc : documents) {
             fileReferenceList.add(new FileReference() {
                 @Override
                 public String getUri() {

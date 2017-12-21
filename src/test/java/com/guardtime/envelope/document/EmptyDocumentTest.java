@@ -39,16 +39,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-public class EmptyEnvelopeDocumentTest extends AbstractEnvelopeTest {
+public class EmptyDocumentTest extends AbstractEnvelopeTest {
 
     private static final String DOCUMENT_NAME = "Not_added_document_doc";
     private DataHash hash;
-    private EmptyEnvelopeDocument document;
+    private EmptyDocument document;
 
     @Before
     public void setUp() {
         hash = Util.hash(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)), HashAlgorithm.SHA2_256);
-        document = new EmptyEnvelopeDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, Collections.singletonList(hash));
+        document = new EmptyDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, Collections.singletonList(hash));
     }
 
     @Test
@@ -83,14 +83,14 @@ public class EmptyEnvelopeDocumentTest extends AbstractEnvelopeTest {
     public void testCreateEmptyDocumentWithoutFileName_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("File name must be present");
-        new EmptyEnvelopeDocument(null, MIME_TYPE_APPLICATION_TXT, Collections.singletonList(hash));
+        new EmptyDocument(null, MIME_TYPE_APPLICATION_TXT, Collections.singletonList(hash));
     }
 
     @Test
     public void testCreateEmptyDocumentWithoutMimeType_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("MIME type must be present");
-        new EmptyEnvelopeDocument(DOCUMENT_NAME, null, Collections.singletonList(hash));
+        new EmptyDocument(DOCUMENT_NAME, null, Collections.singletonList(hash));
     }
 
 
@@ -98,13 +98,13 @@ public class EmptyEnvelopeDocumentTest extends AbstractEnvelopeTest {
     public void testCreateEmptyDocumentWithoutDataHash_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Data hash list must be present");
-        new EmptyEnvelopeDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, null);
+        new EmptyDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, null);
     }
 
     @Test
     public void testGetDataHashList() throws Exception {
         List<DataHash> hashes = Collections.singletonList(hash);
-        EnvelopeDocument doc = new EmptyEnvelopeDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, hashes);
+        Document doc = new EmptyDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, hashes);
         assertEquals(hashes, doc.getDataHashList(Collections.singletonList(hash.getAlgorithm())));
     }
 
@@ -113,7 +113,7 @@ public class EmptyEnvelopeDocumentTest extends AbstractEnvelopeTest {
         expectedException.expect(DataHashException.class);
         expectedException.expectMessage("Could not find any pre-generated hashes for requested algorithms!");
         List<DataHash> hashes = Collections.singletonList(Util.hash(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)), HashAlgorithm.SHA2_256));
-        EnvelopeDocument doc = new EmptyEnvelopeDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, hashes);
+        Document doc = new EmptyDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, hashes);
         doc.getDataHashList(Collections.singletonList(HashAlgorithm.RIPEMD_160));
     }
 }

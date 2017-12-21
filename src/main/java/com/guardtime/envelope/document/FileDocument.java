@@ -17,35 +17,38 @@
  * reserves and retains all trademark rights.
  */
 
-package com.guardtime.envelope.annotation;
+package com.guardtime.envelope.document;
 
-import com.guardtime.envelope.util.DataHashException;
-import com.guardtime.ksi.hashing.DataHash;
-import com.guardtime.ksi.hashing.HashAlgorithm;
-
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static com.guardtime.envelope.util.Util.notNull;
+
 /**
- * Represents annotations that can be used in envelope. Combines annotation data and annotation
- * meta-data into one object.
+ * Document that is based on a {@link File}.
  */
-public interface EnvelopeAnnotation extends AutoCloseable {
+public class FileDocument extends AbstractDocument {
 
-    EnvelopeAnnotationType getAnnotationType();
+    private final File file;
 
-    String getDomain();
+    public FileDocument(File file, String mimeType) {
+        this(file, mimeType, null);
+    }
 
-    /**
-     * Returns {@link InputStream} containing the annotation data.
-     * @throws IOException when there is a problem creating or accessing the InputStream.
-     */
-    InputStream getInputStream() throws IOException;
+    public FileDocument(File file, String mimeType, String fileName) {
+        super(mimeType, getFileName(file, fileName));
+        this.file = file;
+    }
 
-    /**
-     * Returns {@link DataHash} of annotation data for given algorithm.
-     * @throws DataHashException when there is a problem generating the hash.
-     */
-    DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException;
+    private static String getFileName(File file, String fileName) {
+        notNull(file, "File");
+        return fileName == null ? file.getName() : fileName;
+    }
 
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return new FileInputStream(file);
+    }
 }

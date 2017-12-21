@@ -20,11 +20,11 @@
 package com.guardtime.envelope.integration;
 
 import com.guardtime.envelope.EnvelopeBuilder;
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
-import com.guardtime.envelope.annotation.StringEnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.StreamEnvelopeDocument;
+import com.guardtime.envelope.annotation.StringAnnotation;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.UuidIndexProviderFactory;
 import com.guardtime.envelope.packaging.Envelope;
@@ -92,7 +92,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     @Test
     public void testReadEnvelopeWithMissingMimetype() throws Exception {
         expectedException.expect(InvalidPackageException.class);
-        expectedException.expectMessage("Reading envelope encountered errors!");
+        expectedException.expectMessage("No parsable MIME type.");
         try (Envelope ignored = getEnvelope(ENVELOPE_WITH_MISSING_MIMETYPE)) {
         }
     }
@@ -100,7 +100,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     @Test
     public void testVerifyEnvelopeWithEmptyMimetype() throws Exception {
         expectedException.expect(InvalidPackageException.class);
-        expectedException.expectMessage("Reading envelope encountered errors!");
+        expectedException.expectMessage("Parsed Envelope has invalid MIME type. Can't process it!");
         try (Envelope ignored = getEnvelope(ENVELOPE_WITH_MIMETYPE_IS_EMPTY)) {}
     }
 
@@ -208,7 +208,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
                 FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_RANDOM_INCREMENTING_INDEXES));
                 Envelope existingEnvelope = defaultPackagingFactory.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-                EnvelopeDocument document = new StreamEnvelopeDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
+                Document document = new StreamDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
         ) {
             defaultPackagingFactory.addSignature(existingEnvelope,
                     singletonList(document),
@@ -223,7 +223,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
                 FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_RANDOM_UUID_INDEXES));
                 Envelope existingEnvelope = packagingFactoryWithUuid.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-                EnvelopeDocument document = new StreamEnvelopeDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
+                Document document = new StreamDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
         ) {
             packagingFactoryWithUuid.addSignature(existingEnvelope,
                     singletonList(document),
@@ -238,7 +238,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
                 FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_MIXED_INDEX_TYPES));
                 Envelope existingEnvelope = packagingFactoryWithUuid.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-                EnvelopeDocument document = new StreamEnvelopeDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
+                Document document = new StreamDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
         ) {
             packagingFactoryWithUuid.addSignature(existingEnvelope,
                     singletonList(document),
@@ -251,13 +251,12 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     public void testCreateEnvelopeFromExistingWithDifferentIndexesInContents_OK() throws Exception {
         try (
                 Envelope existingEnvelope =
-                     packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(ENVELOPE_WITH_MIXED_INDEX_TYPES_IN_CONTENTS)));
-                EnvelopeDocument document = new StreamEnvelopeDocument(
+                        packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(ENVELOPE_WITH_MIXED_INDEX_TYPES_IN_CONTENTS)));
+                Document document = new StreamDocument(
                         new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                         MIME_TYPE_APPLICATION_TXT,
                         "Doc.doc"
-                )
-        ) {
+        )) {
             packagingFactoryWithUuid.addSignature(existingEnvelope,
                     singletonList(document),
                     singletonList(STRING_ENVELOPE_ANNOTATION));
@@ -271,13 +270,13 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
                 Envelope existingEnvelope = packagingFactoryWithIncIndex.read(
                         new FileInputStream(loadFile(ENVELOPE_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED))
                 );
-                EnvelopeDocument document = new StreamEnvelopeDocument(
+                Document document = new StreamDocument(
                         new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                         MIME_TYPE_APPLICATION_TXT,
                         "Doc.doc"
                 );
-                EnvelopeAnnotation envelopeAnnotation =
-                        new StringEnvelopeAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime")
+                Annotation envelopeAnnotation =
+                        new StringAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime")
         ) {
             packagingFactoryWithIncIndex.addSignature(existingEnvelope,
                     singletonList(document),
@@ -291,12 +290,12 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         try (
                 Envelope existingEnvelope =
                         packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(ENVELOPE_WITH_UNKNOWN_FILES)));
-                EnvelopeDocument document = new StreamEnvelopeDocument(
+                Document document = new StreamDocument(
                         new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                         MIME_TYPE_APPLICATION_TXT,
                         "Doc.doc"
                 );
-                EnvelopeAnnotation envelopeAnnotation = new StringEnvelopeAnnotation(
+                Annotation envelopeAnnotation = new StringAnnotation(
                         EnvelopeAnnotationType.FULLY_REMOVABLE,
                         "annotation 101",
                         "com.guardtime"
@@ -371,8 +370,8 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         createEnvelopeWriteItToAndReadFromStream("SubDir/AddedDocument.txt");
     }
 
-    private List<EnvelopeDocument> getEnvelopeDocument(String fileName) throws Exception {
-        return singletonList((EnvelopeDocument)new StreamEnvelopeDocument(
+    private List<Document> getEnvelopeDocument(String fileName) throws Exception {
+        return singletonList((Document)new StreamDocument(
                 new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                 MIME_TYPE_APPLICATION_TXT,
                 fileName
@@ -386,7 +385,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
 
         SignatureContent content = contents.get(0);
         assertNotNull(content);
-        Map<String, EnvelopeDocument> documents = content.getDocuments();
+        Map<String, Document> documents = content.getDocuments();
         assertEquals(1, documents.size());
         if (testFileName != null) {
             assertNotNull(documents.get(testFileName));

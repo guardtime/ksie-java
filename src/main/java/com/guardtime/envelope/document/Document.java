@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * Represents document data that is to be used in a envelope.
  */
-public interface EnvelopeDocument extends MultiHashElement, AutoCloseable {
+public interface Document extends MultiHashElement, AutoCloseable {
 
     String getFileName();
 

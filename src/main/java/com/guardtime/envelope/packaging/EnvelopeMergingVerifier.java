@@ -19,8 +19,8 @@
 
 package com.guardtime.envelope.packaging;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.DocumentsManifest;
@@ -28,12 +28,11 @@ import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.ManifestFactoryType;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.exception.AnnotationsManifestMergingException;
-import com.guardtime.envelope.packaging.exception.EnvelopeAnnotationMergingException;
-import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.exception.DocumentMergingException;
 import com.guardtime.envelope.packaging.exception.DocumentsManifestMergingException;
+import com.guardtime.envelope.packaging.exception.EnvelopeAnnotationMergingException;
+import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.exception.ManifestMergingException;
-import com.guardtime.envelope.packaging.exception.MimeTypeMergingException;
 import com.guardtime.envelope.packaging.exception.SignatureMergingException;
 import com.guardtime.envelope.packaging.exception.SingleAnnotationManifestMergingException;
 import com.guardtime.envelope.signature.EnvelopeSignature;
@@ -52,16 +51,6 @@ import java.util.List;
 import java.util.Map;
 
 public class EnvelopeMergingVerifier {
-
-    public static void verifySameMimeType(Envelope newEnvelope, Envelope existingEnvelope) throws EnvelopeMergingException {
-        try {
-            if (!contentsMatch(existingEnvelope.getMimeType().getInputStream(), newEnvelope.getMimeType().getInputStream())) {
-                throw new MimeTypeMergingException("Incompatible Envelope provided for merging!");
-            }
-        } catch (IOException e) {
-            throw new MimeTypeMergingException("Failed to verify envelope acceptability!", e);
-        }
-    }
 
     public static void verifyNewSignatureContentIsAcceptable(SignatureContent newContent, List<SignatureContent> existingContents)
             throws EnvelopeMergingException {
@@ -83,7 +72,7 @@ public class EnvelopeMergingVerifier {
                 verifyNonClashingSignatures(newContent, existingContent);
                 verifyNonClashingSingleAnnotationManifests(newContent, existingContent);
                 verifyNonClashingAnnotations(newContent, existingContent);
-                verifyNonClashingEnvelopeDocuments(newContent, existingContent);
+                verifyNonClashingDocuments(newContent, existingContent);
             }
         } catch (IOException e) {
             throw new EnvelopeMergingException("Failed to verify uniqueness!", e);
@@ -163,17 +152,17 @@ public class EnvelopeMergingVerifier {
     private static void checkAnnotations(String fileName, UnknownDocument unknownDocument, SignatureContent content)
             throws EnvelopeMergingException, IOException {
         if (content.getAnnotations().containsKey(fileName)) {
-            EnvelopeAnnotation currentAnnotation = content.getAnnotations().get(fileName);
+            Annotation currentAnnotation = content.getAnnotations().get(fileName);
             if (!contentsMatch(currentAnnotation.getInputStream(), unknownDocument.getInputStream())) {
                 throw new EnvelopeAnnotationMergingException(fileName);
             }
         }
     }
 
-    private static void checkDocuments(String fileName, EnvelopeDocument newDocument,
-                                       Collection<? extends EnvelopeDocument> documents)
-            throws EnvelopeMergingException, IOException {
-        for (EnvelopeDocument doc : documents) {
+    private static void checkDocuments(String fileName, Document newDocument,
+                                       Collection<? extends Document> documents)
+            throws EnvelopeMergingException {
+        for (Document doc : documents) {
             if (doc.getFileName().equals(fileName)) {
                 for (HashAlgorithm algorithm : HashAlgorithm.getImplementedHashAlgorithms()) {
                     try {
@@ -181,7 +170,7 @@ public class EnvelopeMergingVerifier {
                             throw new DocumentMergingException(fileName);
                         }
                     } catch (DataHashException e) {
-                        // ignore since it is an EmptyEnvelopeDocument that can't generate new hash
+                        // ignore since it is an EmptyDocument that can't generate new hash
                     }
                 }
             }
@@ -276,8 +265,8 @@ public class EnvelopeMergingVerifier {
             throws EnvelopeMergingException, IOException {
         for (String annotationPath : existingContent.getAnnotations().keySet()) {
             if (content.getAnnotations().containsKey(annotationPath)) {
-                EnvelopeAnnotation newAnnotation = content.getAnnotations().get(annotationPath);
-                EnvelopeAnnotation currentAnnotation = existingContent.getAnnotations().get(annotationPath);
+                Annotation newAnnotation = content.getAnnotations().get(annotationPath);
+                Annotation currentAnnotation = existingContent.getAnnotations().get(annotationPath);
                 if (!contentsMatch(currentAnnotation.getInputStream(), newAnnotation.getInputStream())) {
                     throw new EnvelopeAnnotationMergingException(annotationPath);
                 }
@@ -285,9 +274,9 @@ public class EnvelopeMergingVerifier {
         }
     }
 
-    private static void verifyNonClashingEnvelopeDocuments(SignatureContent content, SignatureContent existingContent)
-            throws EnvelopeMergingException, IOException {
-        for (Map.Entry<String, EnvelopeDocument> newDocument : content.getDocuments().entrySet()) {
+    private static void verifyNonClashingDocuments(SignatureContent content, SignatureContent existingContent)
+            throws EnvelopeMergingException {
+        for (Map.Entry<String, Document> newDocument : content.getDocuments().entrySet()) {
             checkDocuments(newDocument.getKey(), newDocument.getValue(), existingContent.getDocuments().values());
         }
     }

@@ -19,9 +19,9 @@
 
 package com.guardtime.envelope.integration;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.StreamEnvelopeDocument;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.extending.ExtendedEnvelope;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.UuidIndexProviderFactory;
@@ -110,7 +110,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
         try (Envelope parsedEnvelope = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES);
              Envelope newEnvelope = packagingFactory.create(
                      singletonList(TEST_DOCUMENT_HELLO_TEXT),
-                     new LinkedList<EnvelopeAnnotation>()
+                     new LinkedList<Annotation>()
              )) {
             int expectedSignatureContentsSize =
                     parsedEnvelope.getSignatureContents().size() + newEnvelope.getSignatureContents().size();
@@ -163,14 +163,14 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
 
     @Test
     public void testAddNewContentToMergedEnvelope1() throws Exception {
-        try (EnvelopeDocument document = new StreamEnvelopeDocument(
+        try (Document document = new StreamDocument(
                 new ByteArrayInputStream("".getBytes()),
                 "textDoc",
                 "1-" + Long.toString(new Date().getTime())
         );
              Envelope uuidEnvelope = packagingFactory.create(singletonList(document), singletonList(STRING_ENVELOPE_ANNOTATION));
              Envelope incEnvelope = getEnvelope(ENVELOPE_WITH_RANDOM_INCREMENTING_INDEXES);
-             EnvelopeDocument document2 = new StreamEnvelopeDocument(
+             Document document2 = new StreamDocument(
                      new ByteArrayInputStream("".getBytes()),
                      "textDoc",
                      "2-" + Long.toString(new Date().getTime())
@@ -206,7 +206,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
                      singletonList(TEST_DOCUMENT_HELLO_TEXT),
                      singletonList(STRING_ENVELOPE_ANNOTATION)
              );
-             EnvelopeDocument document = new StreamEnvelopeDocument(
+             Document document = new StreamDocument(
                      new ByteArrayInputStream("".getBytes()),
                      "textDoc",
                      Long.toString(new Date().getTime())
@@ -221,7 +221,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     public void testMergeEnvelopesUnknownFileConflict() throws Exception {
         expectedException.expect(DocumentMergingException.class);
         expectedException.expectMessage(
-                matchesRegex("New SignatureContent has clashing name for EnvelopeDocument! Path: (META-INF/||sun/)sun.txt")
+                matchesRegex("New SignatureContent has clashing name for Document! Path: (META-INF/||sun/)sun.txt")
         );
         mergeEnvelopes(ENVELOPES_FOR_UNKNOWN_FILE_CONFLICT);
     }
@@ -268,7 +268,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     @Test
     public void testMergeEnvelopesDocumentConflict() throws Exception {
         expectedException.expect(DocumentMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing name for EnvelopeDocument!");
+        expectedException.expectMessage("New SignatureContent has clashing name for Document!");
         mergeEnvelopes(ENVELOPES_FOR_DOCUMENT_CONFLICT);
     }
 
@@ -386,16 +386,16 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
         return envelope1;
     }
 
-    private SignatureContent createSignatureContent(EnvelopeDocument existingDocument) throws Exception {
-        EnvelopeDocument envelopeDocument = existingDocument;
-        if (envelopeDocument == null) {
-            envelopeDocument = new StreamEnvelopeDocument(
+    private SignatureContent createSignatureContent(Document existingDocument) throws Exception {
+        Document document = existingDocument;
+        if (document == null) {
+            document = new StreamDocument(
                     new ByteArrayInputStream(UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8)),
                     "text/plain",
                     UUID.randomUUID().toString()
             );
         }
-        try (Envelope temp = packagingFactory.create(singletonList(envelopeDocument), new LinkedList<EnvelopeAnnotation>())) {
+        try (Envelope temp = packagingFactory.create(singletonList(document), new LinkedList<Annotation>())) {
             return temp.getSignatureContents().get(0);
         }
     }
