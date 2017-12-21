@@ -20,7 +20,7 @@
 package com.guardtime.envelope.indexing;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
-import com.guardtime.envelope.document.ParsedEnvelopeDocument;
+import com.guardtime.envelope.document.ParsedDocument;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
@@ -96,7 +96,7 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
     public void testWithClashingUnkownFiles() {
         Envelope mockEnvelope = mock(Envelope.class);
         List<UnknownDocument> unknownFileList = new ArrayList<>();
-        unknownFileList.add(new ParsedEnvelopeDocument(mock(ParsingStore.class), "k", "m", META_INF + "/manifest-8.tlv"));
+        unknownFileList.add(new ParsedDocument(mock(ParsingStore.class), "k", "m", META_INF + "/manifest-8.tlv"));
         when(mockEnvelope.getUnknownFiles()).thenReturn(unknownFileList);
         IndexProvider indexProvider = indexProviderFactory.create(mockEnvelope);
         Assert.assertEquals("9", indexProvider.getNextSignatureIndex());
