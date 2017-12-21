@@ -19,6 +19,7 @@
 
 package com.guardtime.envelope.indexing;
 
+import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.SignatureContent;
@@ -28,6 +29,14 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
+
+import static com.guardtime.envelope.packaging.EntryNameProvider.ANNOTATIONS_MANIFEST_FORMAT;
+import static com.guardtime.envelope.packaging.EntryNameProvider.ANNOTATION_DATA_FORMAT;
+import static com.guardtime.envelope.packaging.EntryNameProvider.DOCUMENTS_MANIFEST_FORMAT;
+import static com.guardtime.envelope.packaging.EntryNameProvider.MANIFEST_FORMAT;
+import static com.guardtime.envelope.packaging.EntryNameProvider.SIGNATURE_FORMAT;
+import static com.guardtime.envelope.packaging.EntryNameProvider.SINGLE_ANNOTATION_MANIFEST_FORMAT;
 
 /**
  * Produces {@link IndexProvider} that provides integer values that increment for each index. Continues from last used index of
@@ -36,6 +45,13 @@ import java.util.Set;
 public class IncrementingIndexProviderFactory implements IndexProviderFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(IncrementingIndexProviderFactory.class);
+    private final Pattern manifestMatcher = Pattern.compile(String.format(MANIFEST_FORMAT, "[0-9]+", "*"));
+    private final Pattern annotationsManifestMatcher = Pattern.compile(String.format(ANNOTATIONS_MANIFEST_FORMAT, "[0-9]+", "*"));
+    private final Pattern documentsManifestMatcher = Pattern.compile(String.format(DOCUMENTS_MANIFEST_FORMAT, "[0-9]+", "*"));
+    private final Pattern signatureMatcher = Pattern.compile(String.format(SIGNATURE_FORMAT, "[0-9]+", "*"));
+    private final Pattern singleAnnotationManifestMatcher =
+            Pattern.compile(String.format(SINGLE_ANNOTATION_MANIFEST_FORMAT, "[0-9]+", "*"));
+    private final Pattern annotationMatcher = Pattern.compile(String.format(ANNOTATION_DATA_FORMAT, "[0-9]+", "*"));
 
     @Override
     public IndexProvider create() {
@@ -44,10 +60,9 @@ public class IncrementingIndexProviderFactory implements IndexProviderFactory {
 
     @Override
     public IndexProvider create(Envelope envelope) {
-        int maxIndex = 0;
-        int maxAnnotationIndex = 0;
+        Set<String> manifestUriSet = new HashSet<>();
+        Set<String> annotationUriSet = new HashSet<>();
         for (SignatureContent content : envelope.getSignatureContents()) {
-            Set<String> manifestUriSet = new HashSet<>();
             {
                 manifestUriSet.add(content.getManifest().getLeft());
                 manifestUriSet.add(content.getDocumentsManifest().getLeft());
@@ -57,29 +72,29 @@ public class IncrementingIndexProviderFactory implements IndexProviderFactory {
             if (manifest != null && manifest.getSignatureReference() != null) {
                 manifestUriSet.add(manifest.getSignatureReference().getUri());
             }
-            Set<String> annotationUriSet = new HashSet<>(content.getSingleAnnotationManifests().keySet());
+            annotationUriSet.addAll(content.getSingleAnnotationManifests().keySet());
             annotationUriSet.addAll(content.getAnnotations().keySet());
-            maxIndex = compareAndUpdate(manifestUriSet, maxIndex);
-            maxAnnotationIndex = compareAndUpdate(annotationUriSet, maxAnnotationIndex);
         }
+        for (UnknownDocument doc : envelope.getUnknownFiles()) {
+            String fileName = doc.getFileName();
+            if(manifestMatcher.matcher(fileName).matches() || documentsManifestMatcher.matcher(fileName).matches() ||
+                    annotationsManifestMatcher.matcher(fileName).matches() || signatureMatcher.matcher(fileName).matches()) {
+                manifestUriSet.add(fileName);
+            }
+            if(annotationMatcher.matcher(fileName).matches() || singleAnnotationManifestMatcher.matcher(fileName).matches()) {
+                annotationUriSet.add(fileName);
+            }
+        }
+        int maxIndex = findMaxFromSet(manifestUriSet);
+        int maxAnnotationIndex = findMaxFromSet(annotationUriSet);
 
         return new IncrementingIndexProvider(maxIndex, maxIndex, maxIndex, maxIndex, maxAnnotationIndex, maxAnnotationIndex);
     }
 
-    private int compareAndUpdate(Set<String> set, int value) {
+    private int findMaxFromSet(Set<String> set) {
+        int value = 0;
         for (String str : set) {
-            value = compareAndUpdate(str, value);
-        }
-        if(value < 0) {
-            value = 0;
-        }
-        return value;
-    }
-
-    private int compareAndUpdate(String str, int value) {
-        int tmp = getIndex(str);
-        if (value < tmp) {
-            return tmp;
+            value = Math.max(getIndex(str), value);
         }
         return value;
     }
