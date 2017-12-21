@@ -29,10 +29,12 @@ import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.UuidIndexProviderFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
+import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.InvalidPackageException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
+import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +57,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     private EnvelopePackagingFactory packagingFactoryWithUuid;
     private EnvelopePackagingFactory defaultPackagingFactory;
     private ParsingStoreFactory parsingStoreFactory;
+    private EnvelopeWriter envelopeWriter = new ZipEnvelopeWriter();
 
 
     protected abstract ParsingStoreFactory getParsingStoreFactory();
@@ -141,7 +144,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
                         )
                         .build()
             ) {
-                envelope.writeTo(bos);
+                envelopeWriter.write(envelope, bos);
 
                 try (
                         InputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
@@ -420,7 +423,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     private void writeEnvelopeToAndReadFromStream(Envelope envelope, EnvelopePackagingFactory packagingFactory) throws Exception {
         assertNotNull(envelope);
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-            envelope.writeTo(bos);
+            envelopeWriter.write(envelope, bos);
             try (
                     ByteArrayInputStream stream = new ByteArrayInputStream(bos.toByteArray());
                     Envelope inputEnvelope = packagingFactory.read(stream)) {

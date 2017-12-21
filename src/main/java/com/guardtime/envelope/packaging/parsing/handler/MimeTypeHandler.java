@@ -30,7 +30,7 @@ import java.io.InputStream;
 public class MimeTypeHandler implements ContentHandler<byte[]> {
 
     @Override
-    public byte[] parse(InputStream input) throws ContentParsingException {
+    public byte[] parse(InputStream input, String path) throws ContentParsingException {
         try {
             return Util.toByteArray(input);
         } catch (IOException e) {

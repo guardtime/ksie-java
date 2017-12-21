@@ -111,9 +111,9 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             EnvelopeVerifier verifier = new EnvelopeVerifier(new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy())));
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             for (VerifiedSignatureContent content : verifiedEnvelope.getVerifiedSignatureContents()) {
-                if (content.getManifest().getRight().getSignatureReference().getUri().equals("META-INF/signature-1.ksi")) {
+                if (content.getManifest().getSignatureReference().getUri().equals("META-INF/signature-1.ksi")) {
                     Assert.assertEquals(VerificationResult.OK, content.getVerificationResult());
-                } else if (content.getManifest().getRight().getSignatureReference().getUri().equals("META-INF/signature-01-02-03-04-05.ksi")) {
+                } else if (content.getManifest().getSignatureReference().getUri().equals("META-INF/signature-01-02-03-04-05.ksi")) {
                     verifyFailingRule(content.getResults(), "KSIE_VERIFY_MANIFEST", "META-INF/signature-01-02-03-04-05.ksi", "Signature mismatch.");
                     Assert.assertEquals(VerificationResult.NOK, content.getVerificationResult());
                 } else {

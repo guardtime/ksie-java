@@ -67,6 +67,11 @@ public class StreamDocument implements Document {
     }
 
     @Override
+    public String getPath() {
+        return envelopeDocument.getPath();
+    }
+
+    @Override
     public DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException {
         checkClosed();
         return envelopeDocument.getDataHash(algorithm);

@@ -48,7 +48,7 @@ public class SignatureIntegrityRule extends AbstractRule<SignatureContent> {
 
     @Override
     protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
-        Manifest manifest = verifiable.getManifest().getRight();
+        Manifest manifest = verifiable.getManifest();
         String signatureUri = manifest.getSignatureReference().getUri();
         EnvelopeSignature envelopeSignature = verifiable.getEnvelopeSignature();
         VerificationResult result = getFailureVerificationResult();

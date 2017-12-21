@@ -23,7 +23,6 @@ import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
-import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidPackageException;
@@ -56,7 +55,8 @@ public abstract class EnvelopeReader {
     private final SignatureFactory signatureFactory;
     private final ParsingStoreFactory parsingStoreFactory;
 
-    public EnvelopeReader(EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory, ParsingStoreFactory storeFactory) throws IOException {
+    public EnvelopeReader(EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory,
+                          ParsingStoreFactory storeFactory) {
         Util.notNull(manifestFactory, "Manifest factory");
         Util.notNull(signatureFactory, "Signature factory");
         Util.notNull(storeFactory, "Parsing store factory");
@@ -75,7 +75,7 @@ public abstract class EnvelopeReader {
         List<SignatureContent> contents = buildSignatures(handlerSet, readingException);
         validateMimeType(handlerSet);
         List<UnknownDocument> unknownFiles = handlerSet.getUnrequestedFiles();
-        Envelope envelope = new Envelope(contents, unknownFiles, getWriter(), parsingStore);
+        Envelope envelope = new Envelope(contents, unknownFiles, parsingStore);
         readingException.setEnvelope(envelope);
 
         if (!containsValidContents(contents)) {
@@ -87,8 +87,6 @@ public abstract class EnvelopeReader {
         }
         return envelope;
     }
-
-    protected abstract EnvelopeWriter getWriter();
 
     protected abstract void parseInputStream(InputStream input, HandlerSet handlerSet, EnvelopeReadingException readingException)
             throws IOException;
@@ -105,12 +103,12 @@ public abstract class EnvelopeReader {
     }
 
     private boolean containsOrContainedDocuments(SignatureContent content) {
-        return content.getDocuments().size() > 0 || content.getDocumentsManifest().getRight().getDocumentReferences().size() > 0;
+        return content.getDocuments().size() > 0 || content.getDocumentsManifest().getDocumentReferences().size() > 0;
     }
 
     private boolean containsOrContainedAnnotations(SignatureContent content) {
         return content.getAnnotations().size() > 0 ||
-                content.getAnnotationsManifest().getRight().getSingleAnnotationManifestReferences().size() > 0;
+                content.getAnnotationsManifest().getSingleAnnotationManifestReferences().size() > 0;
     }
 
     private boolean containsManifest(SignatureContent content) {

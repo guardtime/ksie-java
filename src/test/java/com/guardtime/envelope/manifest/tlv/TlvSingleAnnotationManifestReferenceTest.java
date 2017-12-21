@@ -27,12 +27,18 @@ import com.guardtime.ksi.tlv.TLVElement;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 public class TlvSingleAnnotationManifestReferenceTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateSingleAnnotationManifestReference() throws Exception {
-        TlvSingleAnnotationManifestReference reference = new TlvSingleAnnotationManifestReference(MOCK_URI, mockSingleAnnotationManifest, EnvelopeAnnotationType.FULLY_REMOVABLE, DEFAULT_HASH_ALGORITHM_PROVIDER);
+        when(mockAnnotation.getAnnotationType()).thenReturn(EnvelopeAnnotationType.FULLY_REMOVABLE);
+        TlvSingleAnnotationManifestReference reference = new TlvSingleAnnotationManifestReference(
+                mockAnnotation,
+                mockSingleAnnotationManifest,
+                DEFAULT_HASH_ALGORITHM_PROVIDER
+        );
         assertEquals(ANNOTATION_INFO_REFERENCE_TYPE, reference.getElementType());
         assertEquals(EnvelopeAnnotationType.FULLY_REMOVABLE.getContent(), getMimeType(reference));
         assertEquals(MOCK_URI, getUri(reference));

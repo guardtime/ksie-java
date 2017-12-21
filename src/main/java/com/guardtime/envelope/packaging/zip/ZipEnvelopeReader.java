@@ -42,10 +42,6 @@ class ZipEnvelopeReader extends EnvelopeReader {
         super(manifestFactory, signatureFactory, storeFactory);
     }
 
-    protected ZipEnvelopeWriter getWriter() {
-        return new ZipEnvelopeWriter();
-    }
-
     protected void parseInputStream(InputStream input, HandlerSet handlerSet, EnvelopeReadingException readingException)
             throws IOException {
         try (ZipInputStream zipInput = new ZipInputStream(input)) {

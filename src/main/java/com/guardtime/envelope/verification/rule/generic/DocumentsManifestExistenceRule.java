@@ -19,12 +19,10 @@
 
 package com.guardtime.envelope.verification.rule.generic;
 
-import com.guardtime.envelope.manifest.DocumentsManifest;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.SignatureContent;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.result.GenericVerificationResult;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import com.guardtime.envelope.verification.result.VerificationResult;
@@ -49,10 +47,9 @@ public class DocumentsManifestExistenceRule extends AbstractRule<SignatureConten
     protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
 
         VerificationResult verificationResult = getFailureVerificationResult();
-        Manifest manifest = verifiable.getManifest().getRight();
+        Manifest manifest = verifiable.getManifest();
         FileReference documentsManifestReference = manifest.getDocumentsManifestReference();
-        Pair<String, DocumentsManifest> documentsManifest = verifiable.getDocumentsManifest();
-        if (documentsManifest != null) {
+        if (verifiable.getDocumentsManifest() != null) {
             verificationResult = VerificationResult.OK;
         }
         String manifestUri = documentsManifestReference.getUri();

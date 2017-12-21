@@ -30,8 +30,6 @@ import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.util.SortedList;
 import com.guardtime.envelope.util.Util;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,30 +47,26 @@ import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifyUni
 public class Envelope implements AutoCloseable {
 
     private ParsingStore parsingStore;
-    private final EnvelopeWriter writer;
     private List<SignatureContent> signatureContents = new SortedList<>();
     private boolean closed = false;
     private List<UnknownDocument> unknownFiles = new LinkedList<>();
 
-    public Envelope(SignatureContent signatureContent, EnvelopeWriter writer) {
-        this(Collections.singletonList(signatureContent), Collections.<UnknownDocument>emptyList(), writer, null);
+    public Envelope(SignatureContent signatureContent) {
+        this(Collections.singletonList(signatureContent), Collections.<UnknownDocument>emptyList(), null);
     }
 
-    public Envelope(Collection<SignatureContent> contents, List<UnknownDocument> unknownFiles,
-                    EnvelopeWriter writer, ParsingStore store) {
+    public Envelope(Collection<SignatureContent> contents, List<UnknownDocument> unknownFiles, ParsingStore store) {
         Util.notNull(contents, "Signature contents");
         Util.notNull(unknownFiles, "Unknown files");
         this.signatureContents.addAll(contents);
         this.unknownFiles.addAll(unknownFiles);
         this.parsingStore = store;
-        this.writer = writer;
     }
 
     protected Envelope(Envelope original) {
         this(
                 original.getSignatureContents(),
                 original.getUnknownFiles(),
-                original.getWriter(),
                 original.getParsingStore()
         );
     }
@@ -89,18 +83,6 @@ public class Envelope implements AutoCloseable {
      */
     public boolean removeSignatureContent(SignatureContent content) {
         return signatureContents.remove(content);
-    }
-
-    /**
-     * Writes data to provided stream.
-     * @param output    OutputStream to write to. This stream will be closed after writing data to it.
-     * @throws IOException When writing to the stream fails for any reason.
-     */
-    public void writeTo(OutputStream output) throws IOException {
-        if (closed) {
-            throw new IOException("Can't write closed object!");
-        }
-        writer.write(this, output);
     }
 
     /**
@@ -219,7 +201,7 @@ public class Envelope implements AutoCloseable {
         return parsingStore;
     }
 
-    protected EnvelopeWriter getWriter() {
-        return writer;
+    public boolean isClosed() {
+        return closed;
     }
 }

@@ -64,11 +64,11 @@ public class IncrementingIndexProviderFactory implements IndexProviderFactory {
         Set<String> annotationUriSet = new HashSet<>();
         for (SignatureContent content : envelope.getSignatureContents()) {
             {
-                manifestUriSet.add(content.getManifest().getLeft());
-                manifestUriSet.add(content.getDocumentsManifest().getLeft());
-                manifestUriSet.add(content.getAnnotationsManifest().getLeft());
+                manifestUriSet.add(content.getManifest().getPath());
+                manifestUriSet.add(content.getDocumentsManifest().getPath());
+                manifestUriSet.add(content.getAnnotationsManifest().getPath());
             }
-            Manifest manifest = content.getManifest().getRight();
+            Manifest manifest = content.getManifest();
             if (manifest != null && manifest.getSignatureReference() != null) {
                 manifestUriSet.add(manifest.getSignatureReference().getUri());
             }

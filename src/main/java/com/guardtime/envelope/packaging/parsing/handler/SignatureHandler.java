@@ -37,7 +37,7 @@ public class SignatureHandler implements ContentHandler<EnvelopeSignature> {
     }
 
     @Override
-    public EnvelopeSignature parse(InputStream stream) throws ContentParsingException {
+    public EnvelopeSignature parse(InputStream stream, String path) throws ContentParsingException {
         try {
             return signatureFactory.read(stream);
         } catch (SignatureException e) {

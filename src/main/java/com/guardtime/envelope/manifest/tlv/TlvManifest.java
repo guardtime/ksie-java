@@ -20,12 +20,14 @@
 package com.guardtime.envelope.manifest.tlv;
 
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
+import com.guardtime.envelope.manifest.AnnotationsManifest;
+import com.guardtime.envelope.manifest.DocumentsManifest;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.InvalidManifestException;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.ManifestFactoryType;
+import com.guardtime.envelope.signature.SignatureFactoryType;
 import com.guardtime.envelope.util.DataHashException;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVInputStream;
 import com.guardtime.ksi.tlv.TLVParserException;
@@ -45,20 +47,25 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
     private TlvDocumentsManifestReference documentsManifestReference;
     private TlvSignatureReference signatureReference;
     private TlvAnnotationsManifestReference annotationsManifestReference;
+    private String path;
 
-    public TlvManifest(Pair<String, TlvDocumentsManifest> documentsManifest, Pair<String, TlvAnnotationsManifest> annotationsManifest, Pair<String, String> signatureReference, HashAlgorithmProvider algorithmProvider) throws InvalidManifestException {
+    public TlvManifest(DocumentsManifest documentsManifest, AnnotationsManifest annotationsManifest,
+                       String signatureReferenceUri, SignatureFactoryType factoryType, HashAlgorithmProvider algorithmProvider,
+                       String path) throws InvalidManifestException {
         super(MAGIC);
+        this.path = path;
         try {
-            this.documentsManifestReference = new TlvDocumentsManifestReference(documentsManifest.getRight(), documentsManifest.getLeft(), algorithmProvider);
-            this.signatureReference = new TlvSignatureReference(signatureReference.getLeft(), signatureReference.getRight());
-            this.annotationsManifestReference = new TlvAnnotationsManifestReference(annotationsManifest.getLeft(), annotationsManifest.getRight(), algorithmProvider);
+            this.documentsManifestReference = new TlvDocumentsManifestReference(documentsManifest, algorithmProvider);
+            this.signatureReference = new TlvSignatureReference(signatureReferenceUri, factoryType.getSignatureMimeType());
+            this.annotationsManifestReference = new TlvAnnotationsManifestReference(annotationsManifest, algorithmProvider);
         } catch (TLVParserException | DataHashException e) {
             throw new InvalidManifestException("Failed to generate file reference TLVElement", e);
         }
     }
 
-    public TlvManifest(InputStream stream) throws InvalidManifestException {
+    public TlvManifest(InputStream stream, String path) throws InvalidManifestException {
         super(MAGIC, stream);
+        this.path = path;
         try {
             TLVInputStream inputStream = toTlvInputStream(stream);
             read(inputStream);
@@ -116,4 +123,8 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
         }
     }
 
+    @Override
+    public String getPath() {
+        return path;
+    }
 }

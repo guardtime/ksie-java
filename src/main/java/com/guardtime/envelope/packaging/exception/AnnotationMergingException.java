@@ -17,16 +17,10 @@
  * reserves and retains all trademark rights.
  */
 
-package com.guardtime.envelope.manifest;
+package com.guardtime.envelope.packaging.exception;
 
-import com.guardtime.envelope.util.DataHashException;
-import com.guardtime.ksi.hashing.DataHash;
-import com.guardtime.ksi.hashing.HashAlgorithm;
-
-public interface MultiHashElement {
-    /**
-     * Returns {@link DataHash} of MultiHashElement for given algorithm.
-     * @throws DataHashException when the given algorithm can't be used for generating a hash or the data can't be accessed.
-     */
-    DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException;
+public class AnnotationMergingException extends EnvelopeMergingException {
+    public AnnotationMergingException(String path) {
+        super("New SignatureContent has clashing Annotation data! Path: " + path);
+    }
 }

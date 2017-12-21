@@ -60,7 +60,7 @@ public class AnnotationDataExistenceRule extends AbstractRule<SignatureContent> 
 
     @Override
     protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
-        for (FileReference reference : verifiable.getAnnotationsManifest().getRight().getSingleAnnotationManifestReferences()) {
+        for (FileReference reference : verifiable.getAnnotationsManifest().getSingleAnnotationManifestReferences()) {
             String manifestUri = reference.getUri();
             if (anyRuleFailed(holder, manifestUri)) continue;
             RuleState ruleState = getRuleState(reference);
@@ -104,8 +104,11 @@ public class AnnotationDataExistenceRule extends AbstractRule<SignatureContent> 
         return new VerificationResultFilter() {
             @Override
             public boolean apply(RuleVerificationResult result) {
-                return results.contains(result) && (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName()) ||
-                        result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST.getName()));
+                return results.contains(result) &&
+                        (
+                                result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName()) ||
+                                result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST.getName())
+                        );
             }
         };
     }
@@ -115,8 +118,10 @@ public class AnnotationDataExistenceRule extends AbstractRule<SignatureContent> 
             @Override
             public boolean apply(RuleVerificationResult result) {
                 return result.getTestedElementPath().equals(uri) &&
-                        (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_EXISTS.getName()) ||
-                                result.getRuleName().equals(KSIE_VERIFY_ANNOTATION.getName()));
+                        (
+                                result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_EXISTS.getName()) ||
+                                result.getRuleName().equals(KSIE_VERIFY_ANNOTATION.getName())
+                        );
             }
         };
         return !holder.getFilteredAggregatedResult(filter, 2).equals(OK);

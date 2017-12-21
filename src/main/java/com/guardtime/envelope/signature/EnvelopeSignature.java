@@ -19,6 +19,7 @@
 
 package com.guardtime.envelope.signature;
 
+import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.IOException;

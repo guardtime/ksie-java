@@ -20,6 +20,8 @@
 package com.guardtime.envelope.manifest;
 
 
+import com.guardtime.envelope.EnvelopeElement;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -27,7 +29,7 @@ import java.util.List;
 /**
  * Envelope structure manifest containing references to documents contained in the envelope.
  */
-public interface DocumentsManifest extends MultiHashElement {
+public interface DocumentsManifest extends EnvelopeElement {
 
     /**
      * Returns InputStream containing this manifest.

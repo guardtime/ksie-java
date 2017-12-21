@@ -47,7 +47,6 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -218,16 +217,16 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
 
         SignatureContent signatureContent = envelope.getSignatureContents().get(0);
 
-        Manifest manifest = signatureContent.getManifest().getRight();
+        Manifest manifest = signatureContent.getManifest();
         checkDataHashList(hashingAlgorithm, manifest.getDocumentsManifestReference().getHashList());
         checkDataHashList(hashingAlgorithm, manifest.getAnnotationsManifestReference().getHashList());
         checkDataHashList(
                 hashingAlgorithm,
-                signatureContent.getDocumentsManifest().getRight().getDocumentReferences().get(0).getHashList()
+                signatureContent.getDocumentsManifest().getDocumentReferences().get(0).getHashList()
         );
         checkDataHashList(
                 hashingAlgorithm,
-                signatureContent.getAnnotationsManifest().getRight().getSingleAnnotationManifestReferences().get(0).getHashList()
+                signatureContent.getAnnotationsManifest().getSingleAnnotationManifestReferences().get(0).getHashList()
         );
         Map<String, SingleAnnotationManifest> singleAnnotationManifestMap = signatureContent.getSingleAnnotationManifests();
         for (String key : singleAnnotationManifestMap.keySet()) {
@@ -256,18 +255,19 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
 
         setUpEnvelope(provider);
         SignatureContent signatureContent = envelope.getSignatureContents().get(0);
-        Manifest manifest = signatureContent.getManifest().getRight();
-        Collection<SingleAnnotationManifest> singleAnnotationManifestValues = signatureContent.getSingleAnnotationManifests().values();
+        Manifest manifest = signatureContent.getManifest();
+        Collection<SingleAnnotationManifest> singleAnnotationManifestValues =
+                signatureContent.getSingleAnnotationManifests().values();
 
         checkDataHashList(hashes, manifest.getDocumentsManifestReference().getHashList());
         checkDataHashList(hashes, manifest.getAnnotationsManifestReference().getHashList());
         checkDataHashList(
                 hashes,
-                signatureContent.getDocumentsManifest().getRight().getDocumentReferences().get(0).getHashList()
+                signatureContent.getDocumentsManifest().getDocumentReferences().get(0).getHashList()
         );
         checkDataHashList(
                 hashes,
-                signatureContent.getAnnotationsManifest().getRight().getSingleAnnotationManifestReferences().get(0).getHashList()
+                signatureContent.getAnnotationsManifest().getSingleAnnotationManifestReferences().get(0).getHashList()
         );
         for (SingleAnnotationManifest value : singleAnnotationManifestValues) {
             checkDataHashList(hashes, value.getDocumentsManifestReference().getHashList());
@@ -291,7 +291,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
 
         setUpEnvelope(provider);
         SignatureContent signatureContent = envelope.getSignatureContents().get(0);
-        Manifest manifest = signatureContent.getManifest().getRight();
+        Manifest manifest = signatureContent.getManifest();
         Collection<SingleAnnotationManifest> singleAnnotationManifestValues =
                 signatureContent.getSingleAnnotationManifests().values();
 
@@ -299,11 +299,11 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
         checkDataHashList(fileReferenceHashAlgorithms, manifest.getAnnotationsManifestReference().getHashList());
         checkDataHashList(
                 documentReferenceHashAlgorithms,
-                signatureContent.getDocumentsManifest().getRight().getDocumentReferences().get(0).getHashList()
+                signatureContent.getDocumentsManifest().getDocumentReferences().get(0).getHashList()
         );
         checkDataHashList(
                 fileReferenceHashAlgorithms,
-                signatureContent.getAnnotationsManifest().getRight().getSingleAnnotationManifestReferences().get(0).getHashList()
+                signatureContent.getAnnotationsManifest().getSingleAnnotationManifestReferences().get(0).getHashList()
         );
         for (SingleAnnotationManifest value : singleAnnotationManifestValues) {
             checkDataHashList(fileReferenceHashAlgorithms, value.getDocumentsManifestReference().getHashList());

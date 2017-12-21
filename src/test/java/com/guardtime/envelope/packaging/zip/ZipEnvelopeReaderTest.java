@@ -163,7 +163,7 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
         assertFalse(envelope.getSignatureContents().isEmpty());
         for (SignatureContent content : envelope.getSignatureContents()) {
             assertTrue(content.getDocuments().isEmpty());
-            assertFalse(content.getDocumentsManifest().getRight().getDocumentReferences().isEmpty());
+            assertFalse(content.getDocumentsManifest().getDocumentReferences().isEmpty());
         }
     }
 
@@ -193,7 +193,7 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
         assertNotNull(envelope);
         assertFalse(envelope.getSignatureContents().isEmpty());
         for (SignatureContent content : envelope.getSignatureContents()) {
-            AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
+            AnnotationsManifest annotationsManifest = content.getAnnotationsManifest();
             int insertedAnnotationsCount = annotationsManifest.getSingleAnnotationManifestReferences().size();
             int parsableAnnotationsCount = content.getAnnotations().size();
             assertTrue(parsableAnnotationsCount < insertedAnnotationsCount);
@@ -228,7 +228,7 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
         setUpEnvelope(ENVELOPE_WITH_MISSING_ANNOTATION_DATA);
         assertNotNull(envelope);
         SignatureContent signatureContent = envelope.getSignatureContents().get(0);
-        AnnotationsManifest annotationsManifest = signatureContent.getAnnotationsManifest().getRight();
+        AnnotationsManifest annotationsManifest = signatureContent.getAnnotationsManifest();
         assertFalse(envelope.getSignatureContents().isEmpty());
         assertTrue(signatureContent.getAnnotations().isEmpty());
         assertFalse(signatureContent.getSingleAnnotationManifests().isEmpty());
@@ -236,11 +236,11 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testReadCEnvelopeFileWithMissingAnnotation() throws Exception {
+    public void testReadEnvelopeFileWithMissingAnnotation() throws Exception {
         setUpEnvelope(ENVELOPE_WITH_MISSING_ANNOTATION);
         assertNotNull(envelope);
         SignatureContent signatureContent = envelope.getSignatureContents().get(0);
-        AnnotationsManifest annotationsManifest = signatureContent.getAnnotationsManifest().getRight();
+        AnnotationsManifest annotationsManifest = signatureContent.getAnnotationsManifest();
         assertFalse(envelope.getSignatureContents().isEmpty());
         assertTrue(signatureContent.getAnnotations().isEmpty());
         assertTrue(signatureContent.getSingleAnnotationManifests().isEmpty());

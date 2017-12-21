@@ -56,9 +56,9 @@ class TlvAnnotationDataReference extends TLVStructure implements AnnotationDataR
         }
     }
 
-    public TlvAnnotationDataReference(Pair<String, Annotation> annotationPair, HashAlgorithmProvider algorithmProvider) throws TLVParserException, DataHashException {
-        Annotation annotation = annotationPair.getRight();
-        this.uri = annotationPair.getLeft();
+    public TlvAnnotationDataReference(Annotation annotation, HashAlgorithmProvider algorithmProvider)
+            throws TLVParserException, DataHashException {
+        this.uri = annotation.getPath();
         this.hash = annotation.getDataHash(algorithmProvider.getAnnotationDataReferenceHashAlgorithm());
         this.domain = annotation.getDomain();
         this.rootElement = new TlvReferenceBuilder().

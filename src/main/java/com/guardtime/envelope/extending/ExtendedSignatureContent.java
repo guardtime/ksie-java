@@ -23,11 +23,9 @@ import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.signature.EnvelopeSignature;
-import com.guardtime.envelope.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Wrapper for a {@link SignatureContent} that has been processed by {@link EnvelopeSignatureExtender}.
@@ -55,21 +53,12 @@ public class ExtendedSignatureContent extends SignatureContent {
         return getEnvelopeSignature().isExtended();
     }
 
-    private static List<Pair<String, Annotation>> getAnnotations(SignatureContent original) {
-        List<Pair<String, Annotation>> annotationPairs = new ArrayList<>(original.getAnnotations().size());
-        for (Map.Entry<String, Annotation> entry : original.getAnnotations().entrySet()) {
-            annotationPairs.add(Pair.of(entry.getKey(), entry.getValue()));
-        }
-        return annotationPairs;
+    private static List<Annotation> getAnnotations(SignatureContent original) {
+        return new ArrayList<>(original.getAnnotations().values());
     }
 
-    private static List<Pair<String, SingleAnnotationManifest>> getSingleAnnotationManifests(SignatureContent original) {
-        Map<String, SingleAnnotationManifest> singleAnnotationManifests = original.getSingleAnnotationManifests();
-        List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifestPairs = new ArrayList<>(singleAnnotationManifests.size());
-        for (Map.Entry<String, SingleAnnotationManifest> entry : singleAnnotationManifests.entrySet()) {
-            singleAnnotationManifestPairs.add(Pair.of(entry.getKey(), entry.getValue()));
-        }
-        return singleAnnotationManifestPairs;
+    private static List<SingleAnnotationManifest> getSingleAnnotationManifests(SignatureContent original) {
+        return new ArrayList<>(original.getSingleAnnotationManifests().values());
     }
 
 }

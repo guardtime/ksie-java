@@ -37,9 +37,9 @@ public class DocumentsManifestHandler implements ContentHandler<DocumentsManifes
     }
 
     @Override
-    public DocumentsManifest parse(InputStream input) throws ContentParsingException {
+    public DocumentsManifest parse(InputStream input, String path) throws ContentParsingException {
         try {
-            return manifestFactory.readDocumentsManifest(input);
+            return manifestFactory.readDocumentsManifest(input, path);
         } catch (InvalidManifestException e) {
             throw new ContentParsingException("Failed to parse content of stream as DocumentsManifest.", e);
         }

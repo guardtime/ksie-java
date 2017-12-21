@@ -31,10 +31,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static com.guardtime.envelope.packaging.EntryNameProvider.META_INF;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -51,8 +51,8 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
                 disableInternalVerification().
                 build();
         try (Envelope envelope = packagingFactory.create(
-                Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT),
-                Collections.singletonList(STRING_ENVELOPE_ANNOTATION)
+                singletonList(TEST_DOCUMENT_HELLO_TEXT),
+                singletonList(STRING_ENVELOPE_ANNOTATION)
         )) {
             IndexProvider indexProvider = indexProviderFactory.create(envelope);
             Assert.assertEquals("2", indexProvider.getNextSignatureIndex());
@@ -63,13 +63,12 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
     public void testCreateWithMixedEnvelope() throws Exception {
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
                 withSignatureFactory(mockedSignatureFactory).
-                withManifestFactory(mockedManifestFactory).
                 withIndexProviderFactory(new UuidIndexProviderFactory()).
                 disableInternalVerification().
                 build();
         try (Envelope envelope = packagingFactory.create(
-                Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT),
-                Collections.singletonList(STRING_ENVELOPE_ANNOTATION)
+                singletonList(TEST_DOCUMENT_HELLO_TEXT),
+                singletonList(STRING_ENVELOPE_ANNOTATION)
         )) {
             IndexProvider indexProvider = indexProviderFactory.create(envelope);
             Assert.assertEquals("1", indexProvider.getNextSignatureIndex());

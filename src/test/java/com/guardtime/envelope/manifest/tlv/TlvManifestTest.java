@@ -20,7 +20,6 @@
 package com.guardtime.envelope.manifest.tlv;
 
 import com.guardtime.envelope.manifest.InvalidManifestException;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.ksi.tlv.TLVElement;
 
 import org.junit.Before;
@@ -32,6 +31,7 @@ import java.util.List;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
 
 public class TlvManifestTest extends AbstractTlvManifestTest {
 
@@ -43,17 +43,39 @@ public class TlvManifestTest extends AbstractTlvManifestTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        this.annotationsManifestReference = createReference(ANNOTATIONS_MANIFEST_REFERENCE_TYPE, ANNOTATIONS_MANIFEST_URI, ANNOTATIONS_MANIFEST_TYPE, dataHash);
-        this.documentsManifestReference = createReference(DOCUMENTS_MANIFEST_REFERENCE_TYPE, DOCUMENTS_MANIFEST_URI, MIME_TYPE_APPLICATION_TXT, dataHash);
-        this.signatureReference = createReference(SIGNATURE_REFERENCE_TYPE, SIGNATURE_URI, SIGNATURE_TYPE, (List) null);
+        this.annotationsManifestReference = createReference(
+                ANNOTATIONS_MANIFEST_REFERENCE_TYPE,
+                ANNOTATIONS_MANIFEST_URI,
+                ANNOTATIONS_MANIFEST_TYPE,
+                dataHash
+        );
+        this.documentsManifestReference = createReference(
+                DOCUMENTS_MANIFEST_REFERENCE_TYPE,
+                DOCUMENTS_MANIFEST_URI,
+                MIME_TYPE_APPLICATION_TXT,
+                dataHash
+        );
+        this.signatureReference = createReference(
+                SIGNATURE_REFERENCE_TYPE,
+                SIGNATURE_URI,
+                SIGNATURE_TYPE,
+                (List) null
+        );
     }
 
     @Test
     public void testCreateManifest() throws Exception {
-        Pair<String, TlvDocumentsManifest> documentsManifest = Pair.of(DOCUMENTS_MANIFEST_URI, mockDocumentsManifest);
-        Pair<String, TlvAnnotationsManifest> annotationsManifest = Pair.of(ANNOTATIONS_MANIFEST_URI, mockAnnotationsManifest);
-        Pair<String, String> signatureReference = Pair.of(SIGNATURE_URI, SIGNATURE_TYPE);
-        TlvManifest manifest = new TlvManifest(documentsManifest, annotationsManifest, signatureReference, DEFAULT_HASH_ALGORITHM_PROVIDER);
+        when(mockDocumentsManifest.getPath()).thenReturn(DOCUMENTS_MANIFEST_URI);
+        when(mockAnnotationsManifest.getPath()).thenReturn(ANNOTATIONS_MANIFEST_URI);
+        when(mockedSignatureFactoryType.getSignatureMimeType()).thenReturn(SIGNATURE_TYPE);
+        TlvManifest manifest = new TlvManifest(
+                mockDocumentsManifest,
+                mockAnnotationsManifest,
+                SIGNATURE_URI,
+                mockedSignatureFactoryType,
+                DEFAULT_HASH_ALGORITHM_PROVIDER,
+                "path"
+        );
 
         assertArrayEquals(SIGNATURE_MANIFEST_MAGIC, manifest.getMagic());
         assertNotNull(manifest.getDocumentsManifestReference());
@@ -66,9 +88,14 @@ public class TlvManifestTest extends AbstractTlvManifestTest {
 
     @Test
     public void testReadManifest() throws Exception {
-        byte[] manifestBytes = join(SIGNATURE_MANIFEST_MAGIC, annotationsManifestReference.getEncoded(), documentsManifestReference.getEncoded(), signatureReference.getEncoded());
+        byte[] manifestBytes = join(
+                SIGNATURE_MANIFEST_MAGIC,
+                annotationsManifestReference.getEncoded(),
+                documentsManifestReference.getEncoded(),
+                signatureReference.getEncoded()
+        );
 
-        TlvManifest manifest = new TlvManifest(new ByteArrayInputStream(manifestBytes));
+        TlvManifest manifest = new TlvManifest(new ByteArrayInputStream(manifestBytes), "");
         assertArrayEquals(SIGNATURE_MANIFEST_MAGIC, manifest.getMagic());
         assertNotNull(manifest.getDocumentsManifestReference());
         assertNotNull(manifest.getAnnotationsManifestReference());
@@ -85,24 +112,36 @@ public class TlvManifestTest extends AbstractTlvManifestTest {
     public void testReadManifestWithoutSingleAnnotationManifestReference_ThrowsInvalidManifestException() throws Exception {
         expectedException.expect(InvalidManifestException.class);
         expectedException.expectMessage("Annotations manifest reference is mandatory");
-        byte[] manifestBytes = join(SIGNATURE_MANIFEST_MAGIC, documentsManifestReference.getEncoded(), signatureReference.getEncoded());
-        new TlvManifest(new ByteArrayInputStream(manifestBytes));
+        byte[] manifestBytes = join(
+                SIGNATURE_MANIFEST_MAGIC,
+                documentsManifestReference.getEncoded(),
+                signatureReference.getEncoded()
+        );
+        new TlvManifest(new ByteArrayInputStream(manifestBytes), "");
     }
 
     @Test
     public void testReadManifestWithoutSignatureManifestReference_ThrowsInvalidManifestException() throws Exception {
         expectedException.expect(InvalidManifestException.class);
         expectedException.expectMessage("Signature reference is mandatory");
-        byte[] manifestBytes = join(SIGNATURE_MANIFEST_MAGIC, annotationsManifestReference.getEncoded(), documentsManifestReference.getEncoded());
-        new TlvManifest(new ByteArrayInputStream(manifestBytes));
+        byte[] manifestBytes = join(
+                SIGNATURE_MANIFEST_MAGIC,
+                annotationsManifestReference.getEncoded(),
+                documentsManifestReference.getEncoded()
+        );
+        new TlvManifest(new ByteArrayInputStream(manifestBytes), "");
     }
 
     @Test
     public void testReadManifestWithoutDocumentsManifestReference_ThrowsInvalidManifestException() throws Exception {
         expectedException.expect(InvalidManifestException.class);
         expectedException.expectMessage("Documents manifest reference is mandatory");
-        byte[] manifestBytes = join(SIGNATURE_MANIFEST_MAGIC, annotationsManifestReference.getEncoded(), signatureReference.getEncoded());
-        new TlvManifest(new ByteArrayInputStream(manifestBytes));
+        byte[] manifestBytes = join(
+                SIGNATURE_MANIFEST_MAGIC,
+                annotationsManifestReference.getEncoded(),
+                signatureReference.getEncoded()
+        );
+        new TlvManifest(new ByteArrayInputStream(manifestBytes), "");
     }
 
 }

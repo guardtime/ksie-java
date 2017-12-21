@@ -45,6 +45,8 @@ import java.util.List;
 
 import static com.guardtime.envelope.util.Util.hash;
 import static org.junit.Assert.assertArrayEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 public class AbstractTlvManifestTest extends AbstractEnvelopeTest {
@@ -101,14 +103,17 @@ public class AbstractTlvManifestTest extends AbstractEnvelopeTest {
         when(mockDocumentsManifest.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHashForEmptyData);
         when(mockAnnotationsManifest.getInputStream()).thenReturn(EMPTY_INPUT_STREAM);
         when(mockAnnotationsManifest.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHashForEmptyData);
+        when(mockAnnotationsManifest.getPath()).thenReturn(MOCK_URI);
 
         when(mockAnnotation.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHash);
         when(mockAnnotation.getAnnotationType()).thenReturn(EnvelopeAnnotationType.NON_REMOVABLE);
         when(mockAnnotation.getDomain()).thenReturn(ANNOTATION_DOMAIN_COM_GUARDTIME);
+        when(mockAnnotation.getPath()).thenReturn(MOCK_URI);
 
         when(mockSingleAnnotationManifest.getInputStream()).thenReturn(EMPTY_INPUT_STREAM);
         when(mockSingleAnnotationManifest.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(dataHashForEmptyData);
         when(mockSingleAnnotationManifest.getAnnotationReference()).thenReturn(mockAnnotationDataReference);
+        when(mockSingleAnnotationManifest.getPath()).thenReturn(MOCK_URI);
 
         when(mockAnnotationDataReference.getDomain()).thenReturn(ANNOTATION_DOMAIN_COM_GUARDTIME);
         when(mockAnnotationDataReference.getUri()).thenReturn(MOCK_URI);

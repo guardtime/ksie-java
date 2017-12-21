@@ -34,8 +34,13 @@ class TlvAnnotationsManifestReference extends TlvFileReference {
         super(rootElement);
     }
 
-    public TlvAnnotationsManifestReference(String uri, AnnotationsManifest annotationsManifest, HashAlgorithmProvider algorithmProvider) throws TLVParserException, DataHashException {
-        super(uri, generateHashes(annotationsManifest, algorithmProvider.getFileReferenceHashAlgorithms()), ANNOTATIONS_MANIFEST_TYPE);
+    public TlvAnnotationsManifestReference(AnnotationsManifest annotationsManifest, HashAlgorithmProvider algorithmProvider)
+            throws TLVParserException, DataHashException {
+        super(
+                annotationsManifest.getPath(),
+                generateHashes(annotationsManifest, algorithmProvider.getFileReferenceHashAlgorithms()),
+                ANNOTATIONS_MANIFEST_TYPE
+        );
     }
 
     @Override

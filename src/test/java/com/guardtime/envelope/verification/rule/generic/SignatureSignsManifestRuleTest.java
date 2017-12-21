@@ -22,7 +22,6 @@ package com.guardtime.envelope.verification.rule.generic;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.signature.EnvelopeSignature;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import com.guardtime.envelope.verification.result.RuleVerificationResult;
 import com.guardtime.envelope.verification.result.VerificationResult;
@@ -60,7 +59,7 @@ public class SignatureSignsManifestRuleTest {
         MockitoAnnotations.initMocks(this);
         when(mockManifest.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(nullDataHash);
         when(mockEnvelopeSignature.getSignedDataHash()).thenReturn(nullDataHash);
-        when(mockSignatureContent.getManifest()).thenReturn(Pair.of("", mockManifest));
+        when(mockSignatureContent.getManifest()).thenReturn(mockManifest);
         when(mockSignatureContent.getEnvelopeSignature()).thenReturn(mockEnvelopeSignature);
     }
 

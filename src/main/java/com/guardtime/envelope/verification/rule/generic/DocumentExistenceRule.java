@@ -56,7 +56,7 @@ public class DocumentExistenceRule extends AbstractRule<SignatureContent> {
 
     @Override
     protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
-        for (FileReference documentReference : verifiable.getDocumentsManifest().getRight().getDocumentReferences()) {
+        for (FileReference documentReference : verifiable.getDocumentsManifest().getDocumentReferences()) {
             VerificationResult result = getFailureVerificationResult();
             String documentUri = documentReference.getUri();
             Document document = verifiable.getDocuments().get(documentUri);

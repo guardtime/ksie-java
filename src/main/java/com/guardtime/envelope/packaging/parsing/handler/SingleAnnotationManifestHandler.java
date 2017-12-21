@@ -22,12 +22,8 @@ package com.guardtime.envelope.packaging.parsing.handler;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.InvalidManifestException;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 
-import java.io.IOException;
 import java.io.InputStream;
-
-import static com.guardtime.envelope.packaging.EntryNameProvider.SINGLE_ANNOTATION_MANIFEST_FORMAT;
 
 /**
  * This content holders is used for annotation manifests inside the envelope.
@@ -41,9 +37,9 @@ public class SingleAnnotationManifestHandler implements ContentHandler<SingleAnn
     }
 
     @Override
-    public SingleAnnotationManifest parse(InputStream input) throws ContentParsingException {
+    public SingleAnnotationManifest parse(InputStream input, String path) throws ContentParsingException {
         try {
-            return manifestFactory.readSingleAnnotationManifest(input);
+            return manifestFactory.readSingleAnnotationManifest(input, path);
         } catch (InvalidManifestException e) {
             throw new ContentParsingException("Failed to parse content of stream as SingleAnnotationManifest.", e);
         }

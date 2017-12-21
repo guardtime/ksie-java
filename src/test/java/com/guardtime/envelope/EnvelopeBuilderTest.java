@@ -22,6 +22,9 @@ package com.guardtime.envelope;
 import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
+import com.guardtime.envelope.manifest.AnnotationsManifest;
+import com.guardtime.envelope.manifest.DocumentsManifest;
+import com.guardtime.envelope.manifest.InvalidManifestException;
 import com.guardtime.envelope.manifest.SignatureReference;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
@@ -29,7 +32,7 @@ import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.signature.SignatureException;
-import com.guardtime.envelope.util.Pair;
+import com.guardtime.envelope.signature.SignatureFactoryType;
 import com.guardtime.ksi.hashing.DataHash;
 
 import org.junit.Before;
@@ -50,6 +53,8 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -82,11 +87,19 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
     @Test
     public void testAddDocumentToEnvelope() throws Exception {
         EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
-        try (StreamDocument document = new StreamDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)) {
+        try (StreamDocument document = new StreamDocument(
+                new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
+                MIME_TYPE_APPLICATION_TXT,
+                TEST_FILE_NAME_TEST_TXT
+        )) {
             builder.withDocument(document);
             assertEquals(1, builder.getDocuments().size());
 
-            builder.withDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), TEST_FILE_NAME_TEST_DOC, MIME_TYPE_APPLICATION_TXT);
+            builder.withDocument(
+                    new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
+                    TEST_FILE_NAME_TEST_DOC,
+                    MIME_TYPE_APPLICATION_TXT
+            );
             assertEquals(2, builder.getDocuments().size());
 
             File mockFile = Mockito.mock(File.class);
@@ -137,21 +150,14 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
         }
     }
 
-    private EnvelopePackagingFactory getEnvelopePackagingFactory() throws IOException, com.guardtime.envelope.manifest.InvalidManifestException, SignatureException {
+    private EnvelopePackagingFactory getEnvelopePackagingFactory()
+            throws IOException, InvalidManifestException, SignatureException {
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
                 withSignatureFactory(mockedSignatureFactory).
-                withManifestFactory(mockedManifestFactory).
                 withIndexProviderFactory(new IncrementingIndexProviderFactory()).
                 disableInternalVerification().
                 build();
 
-        when(mockedManifestFactory.createManifest(Mockito.any(Pair.class), Mockito.any(Pair.class), Mockito.any(Pair.class))).thenReturn(mockedManifest);
-        when(mockedManifest.getManifestFactoryType()).thenReturn(mockedManifestFactoryType);
-        when(mockedManifestFactoryType.getManifestFileExtension()).thenReturn("tlv");
-        SignatureReference mockedSignatureReference = mock(SignatureReference.class);
-        when(mockedManifest.getSignatureReference()).thenReturn(mockedSignatureReference);
-        when(mockedSignatureReference.getType()).thenReturn("signatureType");
-        when(mockedSignatureReference.getUri()).thenReturn("META-INF/signature-1.ksig");
         EnvelopeSignature mockedSignature = mock(EnvelopeSignature.class);
         when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mockedSignature);
         doAnswer(new Answer() {
@@ -169,8 +175,16 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
         expectedException.expectMessage("Document with name '" + TEST_FILE_NAME_TEST_TXT + "' already exists!");
         expectedException.expect(IllegalArgumentException.class);
         try (
-                Document document = new StreamDocument(new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
-                Document streamDocument = new StreamDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)
+                Document document = new StreamDocument(
+                        new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)),
+                        MIME_TYPE_APPLICATION_TXT,
+                        TEST_FILE_NAME_TEST_TXT
+                );
+                Document streamDocument = new StreamDocument(
+                        new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)),
+                        MIME_TYPE_APPLICATION_TXT,
+                        TEST_FILE_NAME_TEST_TXT
+                )
         ) {
             EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
             builder.withDocument(document);
@@ -180,12 +194,21 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testCreateWithExistingEnvelopeWithMultipleDocumentsWithSameFileName_ThrowsIllegalArgumentException() throws Exception {
+    public void testCreateWithExistingEnvelopeWithMultipleDocumentsWithSameFileName_ThrowsIllegalArgumentException()
+            throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Found multiple documents with same name!");
         try (
-                Document document = new StreamDocument(new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
-                Document streamDocument = new StreamDocument(new ByteArrayInputStream("ImportantDocument-HAHA".getBytes(StandardCharsets.UTF_8)), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)
+                Document document = new StreamDocument(
+                        new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)),
+                        MIME_TYPE_APPLICATION_TXT,
+                        TEST_FILE_NAME_TEST_TXT
+                );
+                Document streamDocument = new StreamDocument(
+                        new ByteArrayInputStream("ImportantDocument-HAHA".getBytes(StandardCharsets.UTF_8)),
+                        MIME_TYPE_APPLICATION_TXT,
+                        TEST_FILE_NAME_TEST_TXT
+                )
         ) {
             EnvelopePackagingFactory packagingFactory = getEnvelopePackagingFactory();
             // build initial envelope

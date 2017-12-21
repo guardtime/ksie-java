@@ -23,7 +23,6 @@ import com.guardtime.envelope.AbstractEnvelopeTest;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.packaging.SignatureContent;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.envelope.verification.rule.Rule;
@@ -46,8 +45,10 @@ public class AnnotationsManifestExistenceRuleTest extends AbstractEnvelopeTest {
 
         when(mockFileReference.getUri()).thenReturn(annotManifestPath);
         when(mockedManifest.getAnnotationsManifestReference()).thenReturn(mockFileReference);
-        when(mockSignatureContent.getManifest()).thenReturn(Pair.of("path", mockedManifest));
-        when(mockSignatureContent.getAnnotationsManifest()).thenReturn(Pair.of(annotManifestPath, Mockito.mock(AnnotationsManifest.class)));
+        when(mockSignatureContent.getManifest()).thenReturn(mockedManifest);
+        AnnotationsManifest mockAnnotationsManifest = Mockito.mock(AnnotationsManifest.class);
+        when(mockAnnotationsManifest.getPath()).thenReturn(annotManifestPath);
+        when(mockSignatureContent.getAnnotationsManifest()).thenReturn(mockAnnotationsManifest);
 
         ResultHolder holder = new ResultHolder();
         rule.verify(holder, mockSignatureContent);
@@ -63,7 +64,7 @@ public class AnnotationsManifestExistenceRuleTest extends AbstractEnvelopeTest {
 
         when(mockFileReference.getUri()).thenReturn(annotManifestPath);
         when(mockedManifest.getAnnotationsManifestReference()).thenReturn(mockFileReference);
-        when(mockSignatureContent.getManifest()).thenReturn(Pair.of("path", mockedManifest));
+        when(mockSignatureContent.getManifest()).thenReturn(mockedManifest);
         when(mockSignatureContent.getAnnotationsManifest()).thenReturn(null);
 
         ResultHolder holder = new ResultHolder();

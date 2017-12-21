@@ -19,8 +19,9 @@
 
 package com.guardtime.envelope.manifest.tlv;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
+import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.util.DataHashException;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
@@ -33,8 +34,14 @@ class TlvSingleAnnotationManifestReference extends TlvFileReference {
         super(rootElement);
     }
 
-    public TlvSingleAnnotationManifestReference(String uri, TlvSingleAnnotationManifest singleAnnotationManifest, EnvelopeAnnotationType annotationType, HashAlgorithmProvider algorithmProvider) throws TLVParserException, DataHashException {
-        super(uri, generateHashes(singleAnnotationManifest, algorithmProvider.getFileReferenceHashAlgorithms()), annotationType.getContent());
+    public TlvSingleAnnotationManifestReference(Annotation annotation, SingleAnnotationManifest singleAnnotationManifest,
+                                                HashAlgorithmProvider algorithmProvider)
+            throws TLVParserException, DataHashException {
+        super(
+                singleAnnotationManifest.getPath(),
+                generateHashes(singleAnnotationManifest, algorithmProvider.getFileReferenceHashAlgorithms()),
+                annotation.getAnnotationType().getContent()
+        );
     }
 
     @Override

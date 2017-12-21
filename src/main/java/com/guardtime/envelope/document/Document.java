@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.document;
 
-import com.guardtime.envelope.manifest.MultiHashElement;
+import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.envelope.util.DataHashException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * Represents document data that is to be used in a envelope.
  */
-public interface Document extends MultiHashElement, AutoCloseable {
+public interface Document extends EnvelopeElement, AutoCloseable {
 
     String getFileName();
 

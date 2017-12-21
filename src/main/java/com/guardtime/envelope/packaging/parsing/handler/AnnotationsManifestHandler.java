@@ -37,9 +37,9 @@ public class AnnotationsManifestHandler implements ContentHandler<AnnotationsMan
     }
 
     @Override
-    public AnnotationsManifest parse(InputStream stream) throws ContentParsingException {
+    public AnnotationsManifest parse(InputStream stream, String path) throws ContentParsingException {
         try {
-            return manifestFactory.readAnnotationsManifest(stream);
+            return manifestFactory.readAnnotationsManifest(stream, path);
         } catch (InvalidManifestException e) {
             throw new ContentParsingException("Failed to parse content of stream as AnnotationsManifest.", e);
         }

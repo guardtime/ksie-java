@@ -50,9 +50,9 @@ public class ManifestHandler implements ContentHandler<Manifest> {
     }
 
     @Override
-    public Manifest parse(InputStream input) throws ContentParsingException {
+    public Manifest parse(InputStream input, String path) throws ContentParsingException {
         try {
-            return manifestFactory.readManifest(input);
+            return manifestFactory.readManifest(input, path);
         } catch (InvalidManifestException e) {
             throw new ContentParsingException("Failed to parse content of stream as a Manifest.", e);
         }

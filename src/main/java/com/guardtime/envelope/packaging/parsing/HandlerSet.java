@@ -123,7 +123,7 @@ public class HandlerSet {
 
     private  <T> T parse(ContentHandler<T> handler, String path) throws ContentParsingException {
         try(InputStream stream = getInputStream(path)) {
-            return handler.parse(stream);
+            return handler.parse(stream, path);
         } catch (IOException e) {
             throw new ContentParsingException("Failed to access data for '" + path + "'!");
         } finally {

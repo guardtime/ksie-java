@@ -31,7 +31,7 @@ import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.AnnotationsManifestMergingException;
 import com.guardtime.envelope.packaging.exception.DocumentMergingException;
 import com.guardtime.envelope.packaging.exception.DocumentsManifestMergingException;
-import com.guardtime.envelope.packaging.exception.EnvelopeAnnotationMergingException;
+import com.guardtime.envelope.packaging.exception.AnnotationMergingException;
 import com.guardtime.envelope.packaging.exception.ManifestMergingException;
 import com.guardtime.envelope.packaging.exception.SignatureMergingException;
 import com.guardtime.envelope.packaging.exception.SingleAnnotationManifestMergingException;
@@ -190,7 +190,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
             int expectedSignatureContentCount =
                     parsedEnvelope.getSignatureContents().size() + secondParsedEnvelope.getSignatureContents().size();
             parsedEnvelope.add(secondParsedEnvelope);
-            parsedEnvelope.writeTo(outputStream);
+            envelopeWriter.write(parsedEnvelope, outputStream);
             assertNotNull(outputStream.toByteArray());
             assertTrue(outputStream.toByteArray().length > 0);
             try (Envelope mergedEnvelope = packagingFactory.read(new ByteArrayInputStream(outputStream.toByteArray()))) {
@@ -235,7 +235,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
 
     @Test
     public void testMergeEnvelopesAnnotationDataConflict() throws Exception {
-        expectedException.expect(EnvelopeAnnotationMergingException.class);
+        expectedException.expect(AnnotationMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing Annotation data! Path: META-INF/annotation-1.dat");
         mergeEnvelopes(ENVELOPES_FOR_ANNOTATION_DATA_CONFLICT);
     }
@@ -281,14 +281,14 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
 
     @Test
     public void testMergeEnvelopesUnknownConflictsWithEnvelopeFile1() throws Exception {
-        expectedException.expect(EnvelopeAnnotationMergingException.class);
+        expectedException.expect(AnnotationMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing Annotation data! Path: META-INF/annotation-2.dat");
         mergeEnvelopes(ENVELOPES_FOR_MIX_CONFLICT_1);
     }
 
     @Test
     public void testMergeEnvelopesUnknownConflictsWithEnvelopeFile2() throws Exception {
-        expectedException.expect(EnvelopeAnnotationMergingException.class);
+        expectedException.expect(AnnotationMergingException.class);
         expectedException.expectMessage("New SignatureContent has clashing Annotation data! Path: META-INF/annotation-2.dat");
         mergeEnvelopes(ENVELOPES_FOR_MIX_CONFLICT_2);
     }
@@ -406,7 +406,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
 
     private void assertSignatureContentsCount(Envelope parsedEnvelope, int expectedSignatureContentsSize) throws Exception {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        parsedEnvelope.writeTo(bos);
+        envelopeWriter.write(parsedEnvelope, bos);
         try (Envelope envelopeFromBos = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
             assertEquals(expectedSignatureContentsSize, envelopeFromBos.getSignatureContents().size());
         }
