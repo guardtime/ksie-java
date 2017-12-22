@@ -26,11 +26,11 @@ public class ZipEnvelopeWriterTest extends AbstractEnvelopeTest {
     public void testAddDocumentWithDirectoryName_ThrowsIOException() throws Exception {
         expectedException.expect(IOException.class);
         expectedException.expectMessage(" is an invalid document file name!");
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                disableInternalVerification().
-                withIndexProviderFactory(new UuidIndexProviderFactory()).
-                build();
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .withIndexProviderFactory(new UuidIndexProviderFactory())
+                .build();
         when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mock(EnvelopeSignature.class));
         Document testDocument = new StreamDocument(new ByteArrayInputStream(new byte[0]), "some type", "folder/");
         try (Envelope envelope = packagingFactory.create(singletonList(testDocument), singletonList(STRING_ENVELOPE_ANNOTATION))) {

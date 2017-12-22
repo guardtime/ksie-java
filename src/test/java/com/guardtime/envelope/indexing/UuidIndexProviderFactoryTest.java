@@ -38,10 +38,10 @@ public class UuidIndexProviderFactoryTest extends AbstractEnvelopeTest {
 
     @Test
     public void testCreateWithMixedEnvelope() throws Exception {
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                disableInternalVerification().
-                build();
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .build();
         try (Envelope envelope = packagingFactory.create(
                 singletonList(TEST_DOCUMENT_HELLO_TEXT),
                 singletonList(STRING_ENVELOPE_ANNOTATION)

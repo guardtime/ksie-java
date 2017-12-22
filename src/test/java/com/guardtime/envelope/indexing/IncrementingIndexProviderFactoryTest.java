@@ -46,10 +46,10 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
 
     @Test
     public void testCreateWithValidEnvelope() throws Exception {
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                disableInternalVerification().
-                build();
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .build();
         try (Envelope envelope = packagingFactory.create(
                 singletonList(TEST_DOCUMENT_HELLO_TEXT),
                 singletonList(STRING_ENVELOPE_ANNOTATION)
@@ -61,11 +61,11 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
 
     @Test
     public void testCreateWithMixedEnvelope() throws Exception {
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withIndexProviderFactory(new UuidIndexProviderFactory()).
-                disableInternalVerification().
-                build();
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .withIndexProviderFactory(new UuidIndexProviderFactory())
+                .build();
         try (Envelope envelope = packagingFactory.create(
                 singletonList(TEST_DOCUMENT_HELLO_TEXT),
                 singletonList(STRING_ENVELOPE_ANNOTATION)
