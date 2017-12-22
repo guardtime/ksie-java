@@ -49,6 +49,7 @@ import com.guardtime.envelope.util.Util;
 import com.guardtime.envelope.verification.EnvelopeVerifier;
 import com.guardtime.envelope.verification.VerifiedEnvelope;
 import com.guardtime.envelope.verification.policy.InternalVerificationPolicy;
+import com.guardtime.envelope.verification.policy.VerificationPolicy;
 import com.guardtime.envelope.verification.result.RuleVerificationResult;
 import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.ksi.hashing.DataHash;
@@ -79,8 +80,8 @@ public class EnvelopePackagingFactory {
     private final SignatureFactory signatureFactory;
     private final EnvelopeManifestFactory manifestFactory;
     private final IndexProviderFactory indexProviderFactory;
-    private final boolean disableVerification;
     private final EnvelopeReader envelopeReader;
+    private final VerificationPolicy verificationPolicy;
 
     private EnvelopePackagingFactory(Builder builder) {
         Util.notNull(builder.signatureFactory, "Signature factory");
@@ -91,7 +92,7 @@ public class EnvelopePackagingFactory {
         this.signatureFactory = builder.signatureFactory;
         this.manifestFactory = builder.manifestFactory;
         this.indexProviderFactory = builder.indexProviderFactory;
-        this.disableVerification = builder.disableInternalVerification;
+        this.verificationPolicy = builder.verificationPolicy;
         this.envelopeReader = builder.envelopeReader;
         logger.info("Envelope factory initialized");
     }
@@ -142,7 +143,8 @@ public class EnvelopePackagingFactory {
      * @param files                List of {@link Document} to be added and signed. Can NOT be null.
      * @param annotations          List of {@link Annotation} to be added and signed. Can be null.
      * @throws InvalidPackageException When the input data can not be processed or signing fails.
-     * @throws EnvelopeMergingException When there are issues adding the newly created {@link SignatureContent} to {@param existingEnvelope}.
+     * @throws EnvelopeMergingException When there are issues adding the newly created {@link SignatureContent} to
+     * {@param existingEnvelope}.
      */
     public void addSignature(Envelope existingEnvelope, List<Document> files, List<Annotation> annotations)
             throws InvalidPackageException, EnvelopeMergingException {
@@ -196,10 +198,10 @@ public class EnvelopePackagingFactory {
     }
 
     private void verifyEnvelope(Envelope envelope) throws InvalidPackageException {
-        if (disableVerification) {
+        if (this.verificationPolicy == null) {
             return;
         }
-        VerifiedEnvelope result = new EnvelopeVerifier(new InternalVerificationPolicy()).verify(envelope);
+        VerifiedEnvelope result = new EnvelopeVerifier(this.verificationPolicy).verify(envelope);
         if (!result.getVerificationResult().equals(VerificationResult.OK)) {
             try {
                 envelope.close();
@@ -259,9 +261,13 @@ public class EnvelopePackagingFactory {
             SignatureFactoryType signatureFactoryType = signatureFactory.getSignatureFactoryType();
             logger.info("'{}' is used to create and read envelope manifests", manifestFactoryType.getName());
             logger.info("'{}' is used to create and read envelope signatures", signatureFactoryType.getName());
-            DocumentsManifest documentsManifest = manifestFactory.createDocumentsManifest(documents, nameProvider.nextDocumentsManifestName());
+            DocumentsManifest documentsManifest =
+                    manifestFactory.createDocumentsManifest(documents, nameProvider.nextDocumentsManifestName());
             processAnnotations(documentsManifest);
-            AnnotationsManifest annotationsManifest = manifestFactory.createAnnotationsManifest(annotationsManifestContent, nameProvider.nextAnnotationsManifestName());
+            AnnotationsManifest annotationsManifest = manifestFactory.createAnnotationsManifest(
+                    annotationsManifestContent,
+                    nameProvider.nextAnnotationsManifestName()
+            );
 
             Manifest manifest = manifestFactory.createManifest(documentsManifest, annotationsManifest,
                     signatureFactoryType, nameProvider.nextSignatureName(), nameProvider.nextManifestName());
@@ -309,10 +315,10 @@ public class EnvelopePackagingFactory {
 
         protected SignatureFactory signatureFactory;
         protected EnvelopeManifestFactory manifestFactory = new TlvEnvelopeManifestFactory();
-        protected boolean disableInternalVerification = false;
         protected IndexProviderFactory indexProviderFactory = new IncrementingIndexProviderFactory();
         protected ParsingStoreFactory parsingStoreFactory = new TemporaryFileBasedParsingStoreFactory();
         protected EnvelopeReader envelopeReader;
+        protected VerificationPolicy verificationPolicy = new InternalVerificationPolicy();
 
         public Builder withSignatureFactory(SignatureFactory factory) {
             this.signatureFactory = factory;
@@ -334,18 +340,19 @@ public class EnvelopePackagingFactory {
             return this;
         }
 
-        public Builder disableInternalVerification() {
-            this.disableInternalVerification = true;
-            return this;
-        }
-
         public Builder withEnvelopeReader(EnvelopeReader reader) {
             this.envelopeReader = reader;
             return this;
         }
 
-        public Builder enableInternalVerification() {
-            this.disableInternalVerification = false;
+        /**
+         * Passes provided verification policy to built packaging factory instead of the default
+         * {@link InternalVerificationPolicy}.
+         *
+         * NB! 'null' is valid and disables verification.
+         */
+        public Builder withVerificationPolicy(VerificationPolicy verificationPolicy) {
+            this.verificationPolicy = verificationPolicy;
             return this;
         }
 

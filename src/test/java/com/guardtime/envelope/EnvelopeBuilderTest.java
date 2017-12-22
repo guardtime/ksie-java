@@ -150,13 +150,12 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
         }
     }
 
-    private EnvelopePackagingFactory getEnvelopePackagingFactory()
-            throws IOException, InvalidManifestException, SignatureException {
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withIndexProviderFactory(new IncrementingIndexProviderFactory()).
-                disableInternalVerification().
-                build();
+    private EnvelopePackagingFactory getEnvelopePackagingFactory() throws IOException, SignatureException {
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .withIndexProviderFactory(new IncrementingIndexProviderFactory())
+                .build();
 
         EnvelopeSignature mockedSignature = mock(EnvelopeSignature.class);
         when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mockedSignature);
