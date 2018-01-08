@@ -33,6 +33,7 @@ import com.guardtime.envelope.verification.EnvelopeVerifier;
 import com.guardtime.envelope.verification.VerifiedEnvelope;
 import com.guardtime.envelope.verification.VerifiedSignatureContent;
 import com.guardtime.envelope.verification.policy.DefaultVerificationPolicy;
+import com.guardtime.envelope.verification.policy.InternalVerificationPolicy;
 import com.guardtime.envelope.verification.policy.LimitedInternalVerificationPolicy;
 import com.guardtime.envelope.verification.policy.VerificationPolicy;
 import com.guardtime.envelope.verification.result.ResultHolder;
@@ -47,7 +48,6 @@ import com.guardtime.ksi.unisignature.verifier.PolicyVerificationResult;
 import com.guardtime.ksi.unisignature.verifier.VerificationErrorCode;
 import com.guardtime.ksi.unisignature.verifier.VerificationResultCode;
 import com.guardtime.ksi.unisignature.verifier.policies.CalendarBasedVerificationPolicy;
-import com.guardtime.ksi.unisignature.verifier.policies.InternalVerificationPolicy;
 import com.guardtime.ksi.unisignature.verifier.policies.KeyBasedVerificationPolicy;
 import com.guardtime.ksi.unisignature.verifier.policies.Policy;
 import com.guardtime.ksi.unisignature.verifier.policies.PublicationsFileBasedVerificationPolicy;
@@ -139,6 +139,8 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testVerifyEnvelopeWithChangedDocument() throws Exception {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_DOCUMENT)) {
+            EnvelopeVerifier verifier = new EnvelopeVerifier(
+                    new InternalVerificationPolicy());
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             Assert.assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
             verifyFailingRule(verifiedEnvelope.getResults(), "KSIE_VERIFY_DATA_HASH", "test.txt", "Hash mismatch");
@@ -290,7 +292,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testUsingInternalVerification() throws Exception {
-        Policy signatureVerificationPolicy = new InternalVerificationPolicy();
+        Policy signatureVerificationPolicy = new com.guardtime.ksi.unisignature.verifier.policies.InternalVerificationPolicy();
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_WRONG_SIGNATURE_FILE)) {
             EnvelopeVerifier verifier = getEnvelopeVerifier(signatureVerificationPolicy);
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
@@ -456,7 +458,8 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     private void baseTestCreateEnvelopeUsingEmptyEnvelopeDocumentAndAddDocumentData(VerificationResult verificationResult,
                                                                                     byte[] expectedDocumentContent,
                                                                                     byte[] addedDocumentContent) throws Exception {
-        EnvelopeVerifier envelopeVerifier = getEnvelopeVerifier(new InternalVerificationPolicy());
+        EnvelopeVerifier envelopeVerifier =
+                getEnvelopeVerifier(new com.guardtime.ksi.unisignature.verifier.policies.InternalVerificationPolicy());
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
                 .withVerificationPolicy(new LimitedInternalVerificationPolicy())
