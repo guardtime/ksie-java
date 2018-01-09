@@ -19,39 +19,20 @@
 
 package com.guardtime.envelope.verification.policy;
 
-import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.SignatureContent;
-import com.guardtime.envelope.signature.EnvelopeSignature;
-import com.guardtime.envelope.verification.result.SignatureResult;
-import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.envelope.verification.rule.Rule;
-import com.guardtime.envelope.verification.rule.RuleTerminatingException;
-import com.guardtime.envelope.verification.rule.signature.SignatureVerifier;
-import com.guardtime.envelope.verification.rule.state.RuleState;
-import com.guardtime.envelope.verification.rule.state.RuleStateProvider;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
-import static com.guardtime.envelope.verification.rule.RuleType.KSIE_FORMAT;
-import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION;
-import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_DATA;
-import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_DATA_EXISTS;
-import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_EXISTS;
-import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST;
-import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS;
+import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_DATA_EXISTS;
 import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_DATA_HASH;
-import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_DATA_MANIFEST;
-import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_DATA_MANIFEST_EXISTS;
-import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_MANIFEST_HASH;
-import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_SIGNATURE_EXISTS;
 
-public class InternalVerificationPolicy extends DefaultVerificationPolicy {
+/**
+ * Verification policy that contains all verifications rules necessary for full internal verification of {@link Envelope}.
+ */
+public class InternalVerificationPolicy extends LimitedInternalVerificationPolicy {
 
-    /**
-     */
     public InternalVerificationPolicy() {
         super(
                 new InternalRuleStateProvider(),
@@ -61,55 +42,12 @@ public class InternalVerificationPolicy extends DefaultVerificationPolicy {
         );
     }
 
-    private static class InternalRuleStateProvider implements RuleStateProvider {
-        private final List<String> allowedRules = Arrays.asList(
-                KSIE_FORMAT.getName(),
-                KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName(),
-                KSIE_VERIFY_DATA_MANIFEST.getName(),
-                KSIE_VERIFY_DATA_HASH.getName(),
-                KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName(),
-                KSIE_VERIFY_ANNOTATION_MANIFEST.getName(),
-                KSIE_VERIFY_ANNOTATION_EXISTS.getName(),
-                KSIE_VERIFY_ANNOTATION.getName(),
-                KSIE_VERIFY_ANNOTATION_DATA_EXISTS.getName(),
-                KSIE_VERIFY_ANNOTATION_DATA.getName(),
-                KSIE_VERIFY_SIGNATURE_EXISTS.getName(),
-                KSIE_VERIFY_MANIFEST_HASH.getName()
-        );
+    private static class InternalRuleStateProvider extends LimitedInternalRuleStateProvider {
 
-        @Override
-        public RuleState getStateForRule(String name) {
-            return allowedRules.contains(name) ? RuleState.FAIL : RuleState.IGNORE;
+        public InternalRuleStateProvider() {
+            allowedRules.add(KSIE_VERIFY_DATA_EXISTS.getName());
+            allowedRules.add(KSIE_VERIFY_DATA_HASH.getName());
         }
     }
 
-    /**
-     * Ignores signature verification
-     */
-    private static class InternalSignatureVerifier implements SignatureVerifier {
-        @Override
-        public Boolean isSupported(EnvelopeSignature envelopeSignature) {
-            return true;
-        }
-
-        @Override
-        public SignatureResult getSignatureVerificationResult(final Object signature, Manifest manifest) throws RuleTerminatingException {
-            return new SignatureResult() {
-                @Override
-                public VerificationResult getSimplifiedResult() {
-                    return VerificationResult.OK;
-                }
-
-                @Override
-                public Object getSignature() {
-                    return signature;
-                }
-
-                @Override
-                public Object getFullResult() {
-                    return null;
-                }
-            };
-        }
-    }
 }

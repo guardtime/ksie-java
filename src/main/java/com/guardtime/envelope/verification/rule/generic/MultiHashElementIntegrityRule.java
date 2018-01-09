@@ -27,6 +27,9 @@ import com.guardtime.envelope.verification.rule.AbstractRule;
 import com.guardtime.envelope.verification.rule.RuleTerminatingException;
 import com.guardtime.envelope.verification.rule.state.RuleState;
 
+/**
+ * Sub rule that provides {@link com.guardtime.ksi.hashing.DataHash} validation for other rules which may need it.
+ */
 public class MultiHashElementIntegrityRule extends AbstractRule<Pair<EnvelopeElement, FileReference>> {
 
     private final UnimplementedHashAlgorithmExistenceRule unimplementedHashAlgorithmExistenceRule;

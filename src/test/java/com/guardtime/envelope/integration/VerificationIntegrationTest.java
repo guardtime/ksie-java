@@ -26,11 +26,15 @@ import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.document.EmptyDocument;
 import com.guardtime.envelope.extending.ExtendedEnvelope;
 import com.guardtime.envelope.packaging.Envelope;
+import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.SignatureContent;
+import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.verification.EnvelopeVerifier;
 import com.guardtime.envelope.verification.VerifiedEnvelope;
 import com.guardtime.envelope.verification.VerifiedSignatureContent;
 import com.guardtime.envelope.verification.policy.DefaultVerificationPolicy;
+import com.guardtime.envelope.verification.policy.InternalVerificationPolicy;
+import com.guardtime.envelope.verification.policy.LimitedInternalVerificationPolicy;
 import com.guardtime.envelope.verification.policy.VerificationPolicy;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import com.guardtime.envelope.verification.result.RuleVerificationResult;
@@ -44,7 +48,6 @@ import com.guardtime.ksi.unisignature.verifier.PolicyVerificationResult;
 import com.guardtime.ksi.unisignature.verifier.VerificationErrorCode;
 import com.guardtime.ksi.unisignature.verifier.VerificationResultCode;
 import com.guardtime.ksi.unisignature.verifier.policies.CalendarBasedVerificationPolicy;
-import com.guardtime.ksi.unisignature.verifier.policies.InternalVerificationPolicy;
 import com.guardtime.ksi.unisignature.verifier.policies.KeyBasedVerificationPolicy;
 import com.guardtime.ksi.unisignature.verifier.policies.Policy;
 import com.guardtime.ksi.unisignature.verifier.policies.PublicationsFileBasedVerificationPolicy;
@@ -58,9 +61,9 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
-import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -89,7 +92,9 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testEveryEnvelopeTypeVerifiesOk() throws Exception {
-        EnvelopeVerifier verifier = new EnvelopeVerifier(new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy())));
+        EnvelopeVerifier verifier = new EnvelopeVerifier(
+                new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy()))
+        );
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTIPLE_SIGNATURES)){
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             assertEquals(VerificationResult.OK, verifiedEnvelope.getVerificationResult());
@@ -108,13 +113,21 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testVerifyingEnvelopeWithValidAndInvalidSignatures() throws Exception {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTI_CONTENT_ONE_SIGNATURE_IS_INVALID)) {
-            EnvelopeVerifier verifier = new EnvelopeVerifier(new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy())));
+            EnvelopeVerifier verifier = new EnvelopeVerifier(
+                    new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy()))
+            );
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             for (VerifiedSignatureContent content : verifiedEnvelope.getVerifiedSignatureContents()) {
-                if (content.getManifest().getSignatureReference().getUri().equals("META-INF/signature-1.ksi")) {
+                String uri = content.getManifest().getSignatureReference().getUri();
+                if (uri.equals("META-INF/signature-1.ksi")) {
                     Assert.assertEquals(VerificationResult.OK, content.getVerificationResult());
-                } else if (content.getManifest().getSignatureReference().getUri().equals("META-INF/signature-01-02-03-04-05.ksi")) {
-                    verifyFailingRule(content.getResults(), "KSIE_VERIFY_MANIFEST", "META-INF/signature-01-02-03-04-05.ksi", "Signature mismatch.");
+                } else if (uri.equals("META-INF/signature-01-02-03-04-05.ksi")) {
+                    verifyFailingRule(
+                            content.getResults(),
+                            "KSIE_VERIFY_MANIFEST",
+                            "META-INF/signature-01-02-03-04-05.ksi",
+                            "Signature mismatch."
+                    );
                     Assert.assertEquals(VerificationResult.NOK, content.getVerificationResult());
                 } else {
                     throw new InvalidParameterException("Invalid envelope is provided for test.");
@@ -126,6 +139,8 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testVerifyEnvelopeWithChangedDocument() throws Exception {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_DOCUMENT)) {
+            EnvelopeVerifier verifier = new EnvelopeVerifier(
+                    new InternalVerificationPolicy());
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             Assert.assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
             verifyFailingRule(verifiedEnvelope.getResults(), "KSIE_VERIFY_DATA_HASH", "test.txt", "Hash mismatch");
@@ -137,7 +152,12 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MISSING_SIGNATURE)) {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             Assert.assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
-            verifyFailingRule(verifiedEnvelope.getResults(), "KSIE_VERIFY_SIGNATURE_EXISTS", "META-INF/signature-1.ksi", "No signature in envelope for manifest!");
+            verifyFailingRule(
+                    verifiedEnvelope.getResults(),
+                    "KSIE_VERIFY_SIGNATURE_EXISTS",
+                    "META-INF/signature-1.ksi",
+                    "No signature in envelope for manifest!"
+            );
         }
     }
 
@@ -146,7 +166,12 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CONTAINS_ONLY_MANIFEST)) {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             Assert.assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
-            verifyFailingRule(verifiedEnvelope.getResults(), "KSIE_VERIFY_SIGNATURE_EXISTS", "META-INF/signature-1.ksi", "No signature in envelope for manifest!");
+            verifyFailingRule(
+                    verifiedEnvelope.getResults(),
+                    "KSIE_VERIFY_SIGNATURE_EXISTS",
+                    "META-INF/signature-1.ksi",
+                    "No signature in envelope for manifest!"
+            );
         }
     }
 
@@ -155,7 +180,12 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_ANNOTATION_DATA)) {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             Assert.assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
-            verifyFailingRule(verifiedEnvelope.getResults(), "KSIE_VERIFY_ANNOTATION_DATA", "META-INF/annotation-1.dat", "Annotation data hash mismatch.");
+            verifyFailingRule(
+                    verifiedEnvelope.getResults(),
+                    "KSIE_VERIFY_ANNOTATION_DATA",
+                    "META-INF/annotation-1.dat",
+                    "Annotation data hash mismatch."
+            );
         }
     }
 
@@ -164,7 +194,12 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_DATAMANIFEST_HASH_IN_MANIFEST)) {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             Assert.assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
-            verifyFailingRule(verifiedEnvelope.getResults(), "KSIE_VERIFY_DATA_MANIFEST", "META-INF/datamanifest-1.tlv", "Hash mismatch");
+            verifyFailingRule(
+                    verifiedEnvelope.getResults(),
+                    "KSIE_VERIFY_DATA_MANIFEST",
+                    "META-INF/datamanifest-1.tlv",
+                    "Hash mismatch"
+            );
         }
     }
 
@@ -173,7 +208,12 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_ANNOTATIONS_MANIFEST_HASH_IN_MANIFEST)) {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             Assert.assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
-            verifyFailingRule(verifiedEnvelope.getResults(), "KSIE_VERIFY_ANNOTATION_MANIFEST", "META-INF/annotmanifest-1.tlv", "Hash mismatch");
+            verifyFailingRule(
+                    verifiedEnvelope.getResults(),
+                    "KSIE_VERIFY_ANNOTATION_MANIFEST",
+                    "META-INF/annotmanifest-1.tlv",
+                    "Hash mismatch"
+            );
         }
     }
 
@@ -182,7 +222,12 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_DATAMANIFEST_HASH_IN_ANNOTATION_MANIFEST)) {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             Assert.assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
-            verifyFailingRule(verifiedEnvelope.getResults(), "KSIE_VERIFY_ANNOTATION", "META-INF/datamanifest-1.tlv", "Hash mismatch");
+            verifyFailingRule(
+                    verifiedEnvelope.getResults(),
+                    "KSIE_VERIFY_ANNOTATION",
+                    "META-INF/datamanifest-1.tlv",
+                    "Hash mismatch"
+            );
         }
     }
 
@@ -191,16 +236,27 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_INVALID_DATAMANIFEST_HASH_IN_ANNOTATION_MANIFEST)) {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             Assert.assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
-            verifyFailingRule(verifiedEnvelope.getResults(), "KSIE_VERIFY_ANNOTATION", "META-INF/annotation-1.tlv", "Annotation meta-data mismatch.");
+            verifyFailingRule(
+                    verifiedEnvelope.getResults(),
+                    "KSIE_VERIFY_ANNOTATION",
+                    "META-INF/annotation-1.tlv",
+                    "Annotation meta-data mismatch."
+            );
         }
     }
 
     @Test
     public void testVerifyEnvelopeWithChangedAnnotationManifestHashInAnnotationsManifest() throws Exception {
-        try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_ANNOTATION_MANIFEST_HASH_IN_ANNOTATIONS_MANIFEST)) {
+        try (Envelope envelope =
+                     getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_ANNOTATION_MANIFEST_HASH_IN_ANNOTATIONS_MANIFEST)) {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             Assert.assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
-            verifyFailingRule(verifiedEnvelope.getResults(), "KSIE_VERIFY_ANNOTATION", "META-INF/annotation-1.tlv", "Hash mismatch");
+            verifyFailingRule(
+                    verifiedEnvelope.getResults(),
+                    "KSIE_VERIFY_ANNOTATION",
+                    "META-INF/annotation-1.tlv",
+                    "Hash mismatch"
+            );
         }
     }
 
@@ -209,7 +265,12 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTI_CONTENT_ONE_IS_MISSING_DATAMANIFEST)) {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             Assert.assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
-            verifyFailingRule(verifiedEnvelope.getResults(), "KSIE_VERIFY_DATA_MANIFEST_EXISTS", "META-INF/datamanifest-654984984.tlv", "Datamanifest is not present in the envelope.");
+            verifyFailingRule(
+                    verifiedEnvelope.getResults(),
+                    "KSIE_VERIFY_DATA_MANIFEST_EXISTS",
+                    "META-INF/datamanifest-654984984.tlv",
+                    "Datamanifest is not present in the envelope."
+            );
         }
     }
 
@@ -222,7 +283,8 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             assertNotNull(signatureResult);
             assertEquals(VerificationResult.NOK, signatureResult.getSimplifiedResult());
 
-            com.guardtime.ksi.unisignature.verifier.VerificationResult signatureVerificationFullResults = (com.guardtime.ksi.unisignature.verifier.VerificationResult) signatureResult.getFullResult();
+            com.guardtime.ksi.unisignature.verifier.VerificationResult signatureVerificationFullResults =
+                    (com.guardtime.ksi.unisignature.verifier.VerificationResult) signatureResult.getFullResult();
             assertNotNull(signatureVerificationFullResults);
             assertEquals(VerificationErrorCode.GEN_1, signatureVerificationFullResults.getErrorCode());
         }
@@ -230,13 +292,18 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testUsingInternalVerification() throws Exception {
-        Policy signatureVerificationPolicy = new InternalVerificationPolicy();
+        Policy signatureVerificationPolicy = new com.guardtime.ksi.unisignature.verifier.policies.InternalVerificationPolicy();
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_WRONG_SIGNATURE_FILE)) {
             EnvelopeVerifier verifier = getEnvelopeVerifier(signatureVerificationPolicy);
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             assertTrue(verifiedEnvelope.getVerificationResult().equals(VerificationResult.NOK));
             SignatureResult signatureResult = verifiedEnvelope.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
-            checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.GEN_1, signatureResult);
+            checkExecutedSignatureVerificationPolicy(
+                    signatureVerificationPolicy,
+                    VerificationResultCode.FAIL,
+                    VerificationErrorCode.GEN_1,
+                    signatureResult
+            );
         }
     }
 
@@ -248,7 +315,12 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             assertTrue(verifiedEnvelope.getVerificationResult().equals(VerificationResult.NOK));
             SignatureResult signatureResult = verifiedEnvelope.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
-            checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.CAL_02, signatureResult);
+            checkExecutedSignatureVerificationPolicy(
+                    signatureVerificationPolicy,
+                    VerificationResultCode.FAIL,
+                    VerificationErrorCode.CAL_02,
+                    signatureResult
+            );
         }
     }
 
@@ -260,7 +332,12 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             assertTrue(verifiedEnvelope.getVerificationResult().equals(VerificationResult.NOK));
             SignatureResult signatureResult = verifiedEnvelope.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
-            checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.KEY_02, signatureResult);
+            checkExecutedSignatureVerificationPolicy(
+                    signatureVerificationPolicy,
+                    VerificationResultCode.FAIL,
+                    VerificationErrorCode.KEY_02,
+                    signatureResult
+            );
         }
     }
 
@@ -269,13 +346,24 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         Policy signatureVerificationPolicy = new UserProvidedPublicationBasedVerificationPolicy();
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_AND_EXTENDED_SIGNATURE_FILE)) {
             VerificationPolicy policy = new DefaultVerificationPolicy(
-                    new KsiSignatureVerifier(ksi, signatureVerificationPolicy, new PublicationData("AAAAAA-CX4K4D-6AMFWE-EMMHOH-WZT2ZR-Q5MUMQ-DGYCW5-LV5IID-GA672M-LHP5GW-GUGHQN-DA7CGV"))
+                    new KsiSignatureVerifier(
+                            ksi,
+                            signatureVerificationPolicy,
+                            new PublicationData(
+                                    "AAAAAA-CX4K4D-6AMFWE-EMMHOH-WZT2ZR-Q5MUMQ-DGYCW5-LV5IID-GA672M-LHP5GW-GUGHQN-DA7CGV"
+                            )
+                    )
             );
             EnvelopeVerifier verifier = new EnvelopeVerifier(policy);
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             assertTrue(verifiedEnvelope.getVerificationResult().equals(VerificationResult.NOK));
             SignatureResult signatureResult = verifiedEnvelope.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
-            checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.INT_09, signatureResult);
+            checkExecutedSignatureVerificationPolicy(
+                    signatureVerificationPolicy,
+                    VerificationResultCode.FAIL,
+                    VerificationErrorCode.INT_09,
+                    signatureResult
+            );
         }
     }
 
@@ -287,7 +375,12 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             assertTrue(verifiedEnvelope.getVerificationResult().equals(VerificationResult.NOK));
             SignatureResult signatureResult = verifiedEnvelope.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
-            checkExecutedSignatureVerificationPolicy(signatureVerificationPolicy, VerificationResultCode.FAIL, VerificationErrorCode.PUB_03, signatureResult);
+            checkExecutedSignatureVerificationPolicy(
+                    signatureVerificationPolicy,
+                    VerificationResultCode.FAIL,
+                    VerificationErrorCode.PUB_03,
+                    signatureResult
+            );
         }
     }
 
@@ -307,13 +400,21 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testCreateEnvelopeUsingEmptyEnvelopeDocumentAndAddDocumentLater() throws Exception {
         byte[] documentContent = "This is document's content.".getBytes(StandardCharsets.UTF_8);
-        baseTestCreateEnvelopeUsingEmptyEnvelopeDocumentAndAddDocumentData(VerificationResult.OK, documentContent, documentContent);
+        baseTestCreateEnvelopeUsingEmptyEnvelopeDocumentAndAddDocumentData(
+                VerificationResult.OK,
+                documentContent,
+                documentContent
+        );
     }
 
     @Test
     public void testCreateEnvelopeUsingEmptyEnvelopeDocumentAndAddWrongDocumentLater() throws Exception {
         byte[] documentContent = "This is document's content.".getBytes(StandardCharsets.UTF_8);
-        baseTestCreateEnvelopeUsingEmptyEnvelopeDocumentAndAddDocumentData(VerificationResult.NOK, documentContent, "IncorrectContent".getBytes());
+        baseTestCreateEnvelopeUsingEmptyEnvelopeDocumentAndAddDocumentData(
+                VerificationResult.NOK,
+                documentContent,
+                "IncorrectContent".getBytes()
+        );
     }
 
     @Test
@@ -354,20 +455,27 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         }
     }
 
-    private void baseTestCreateEnvelopeUsingEmptyEnvelopeDocumentAndAddDocumentData(VerificationResult verificationResult, byte[] expectedDocumentContent, byte[] addedDocumentContent) throws Exception {
-        EnvelopeVerifier envelopeVerifier = getEnvelopeVerifier(new InternalVerificationPolicy());
-
+    private void baseTestCreateEnvelopeUsingEmptyEnvelopeDocumentAndAddDocumentData(VerificationResult verificationResult,
+                                                                                    byte[] expectedDocumentContent,
+                                                                                    byte[] addedDocumentContent) throws Exception {
+        EnvelopeVerifier envelopeVerifier =
+                getEnvelopeVerifier(new com.guardtime.ksi.unisignature.verifier.policies.InternalVerificationPolicy());
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withVerificationPolicy(new LimitedInternalVerificationPolicy())
+                .build();
         String documentName = "Document1.txt";
         try (
                 Document document = new EmptyDocument(
                         documentName,
                         "txt",
-                        Collections.singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(expectedDocumentContent).getHash()));
+                        singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(expectedDocumentContent).getHash()));
                 Annotation annotation = new StringAnnotation(
                         EnvelopeAnnotationType.NON_REMOVABLE,
-                        "Document is not with envelope. Envelope was created created with empty envelope document. Document itself can be added later on if needed.",
+                        "Document is not with envelope. Envelope was created created with empty envelope document. " +
+                                "Document itself can be added later on if needed.",
                         "com.guardtime.com");
-                Envelope envelope = packagingFactory.create(Collections.singletonList(document), Collections.singletonList(annotation));
+                Envelope envelope = packagingFactory.create(singletonList(document), singletonList(annotation));
                 InputStream stream = new ByteArrayInputStream(addedDocumentContent)
         ) {
             VerifiedEnvelope verifiedEnvelope = envelopeVerifier.verify(envelope);
@@ -398,8 +506,11 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         return new EnvelopeVerifier(envelopePolicy);
     }
 
-    private void checkExecutedSignatureVerificationPolicy(Policy expectedPolicy, VerificationResultCode expectedResultCode, VerificationErrorCode expectedErrorCode, SignatureResult result) throws Exception {
-        com.guardtime.ksi.unisignature.verifier.VerificationResult signatureVerificationResults = (com.guardtime.ksi.unisignature.verifier.VerificationResult) result.getFullResult();
+    private void checkExecutedSignatureVerificationPolicy(Policy expectedPolicy, VerificationResultCode expectedResultCode,
+                                                          VerificationErrorCode expectedErrorCode, SignatureResult result)
+            throws Exception {
+        com.guardtime.ksi.unisignature.verifier.VerificationResult signatureVerificationResults =
+                (com.guardtime.ksi.unisignature.verifier.VerificationResult) result.getFullResult();
         List<PolicyVerificationResult> verificationResults = signatureVerificationResults.getPolicyVerificationResults();
         boolean expectedPolicyOk = false;
         for (PolicyVerificationResult policyVerificationResult : verificationResults) {
