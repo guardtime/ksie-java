@@ -19,24 +19,24 @@
 
 package com.guardtime.envelope.packaging;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.ParsedEnvelopeDocument;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.ParsedDocument;
+import com.guardtime.envelope.document.SignedDocument;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
+import com.guardtime.envelope.util.SortedList;
 import com.guardtime.envelope.util.Util;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifyNewSignatureContentIsAcceptable;
-import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifySameMimeType;
 import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifyUniqueUnknownFiles;
 import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifyUniqueness;
 
@@ -47,39 +47,32 @@ import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifyUni
 public class Envelope implements AutoCloseable {
 
     private ParsingStore parsingStore;
-    private final EnvelopeWriter writer;
-    private List<SignatureContent> signatureContents = new LinkedList<>();
-    private MimeType mimeType;
+    private List<SignatureContent> signatureContents = new SortedList<>();
     private boolean closed = false;
     private List<UnknownDocument> unknownFiles = new LinkedList<>();
 
-    public Envelope(SignatureContent signatureContent, MimeType mimeType, EnvelopeWriter writer) {
-        this(Collections.singletonList(signatureContent), Collections.<UnknownDocument>emptyList(), mimeType, writer, null);
+    public Envelope(SignatureContent signatureContent) {
+        this(Collections.singletonList(signatureContent), Collections.<UnknownDocument>emptyList(), null);
     }
 
-    public Envelope(List<SignatureContent> contents, List<UnknownDocument> unknownFiles, MimeType mimeType,
-                    EnvelopeWriter writer, ParsingStore store) {
+    public Envelope(Collection<SignatureContent> contents, List<UnknownDocument> unknownFiles, ParsingStore store) {
         Util.notNull(contents, "Signature contents");
         Util.notNull(unknownFiles, "Unknown files");
         this.signatureContents.addAll(contents);
         this.unknownFiles.addAll(unknownFiles);
-        this.mimeType = mimeType;
         this.parsingStore = store;
-        this.writer = writer;
     }
 
     protected Envelope(Envelope original) {
         this(
                 original.getSignatureContents(),
                 original.getUnknownFiles(),
-                original.getMimeType(),
-                original.getWriter(),
                 original.getParsingStore()
         );
     }
 
     /**
-     * Returns list of {@link SignatureContent} contained in this envelope.
+     * Returns sorted list of {@link SignatureContent} contained in this envelope.
      */
     public List<SignatureContent> getSignatureContents() {
         return Collections.unmodifiableList(signatureContents);
@@ -88,24 +81,8 @@ public class Envelope implements AutoCloseable {
     /**
      * Returns the {@link SignatureContent} at {@param index} and removes it from this {@link Envelope}.
      */
-    public SignatureContent removeSignatureContent(int index) {
-        return signatureContents.remove(index);
-    }
-
-    /**
-     * Writes data to provided stream.
-     * @param output    OutputStream to write to. This stream will be closed after writing data to it.
-     * @throws IOException When writing to the stream fails for any reason.
-     */
-    public void writeTo(OutputStream output) throws IOException {
-        if (closed) {
-            throw new IOException("Can't write closed object!");
-        }
-        writer.write(this, output);
-    }
-
-    public MimeType getMimeType() {
-        return mimeType;
+    public boolean removeSignatureContent(SignatureContent content) {
+        return signatureContents.remove(content);
     }
 
     /**
@@ -117,10 +94,10 @@ public class Envelope implements AutoCloseable {
     }
 
     /**
-     * Closes the envelope and all {@link EnvelopeDocument}s and
-     * {@link EnvelopeAnnotation}s in the envelope.
-     * NB! This will close {@link EnvelopeDocument}s and
-     * {@link EnvelopeAnnotation}s added during creation as well.
+     * Closes the envelope and all {@link Document}s and
+     * {@link Annotation}s in the envelope.
+     * NB! This will close {@link Document}s and
+     * {@link Annotation}s added during creation as well.
      */
     @Override
     public void close() throws Exception {
@@ -155,17 +132,17 @@ public class Envelope implements AutoCloseable {
      * clashing file paths or any other reason.
      */
     public void add(Envelope envelope) throws EnvelopeMergingException {
-        verifySameMimeType(envelope, this);
         verifyUniqueUnknownFiles(envelope, this);
-        int i = envelope.getSignatureContents().size();
-        while (i > 0) {
-            add(envelope.removeSignatureContent(0));
-            i--;
+        List<SignatureContent> signatureContents = new ArrayList<>(envelope.getSignatureContents());
+        for (SignatureContent content : signatureContents) {
+            if(envelope.removeSignatureContent(content)) {
+                add(content);
+            }
         }
 
         if (parsingStore != null && envelope.getParsingStore() != null) {
             for (UnknownDocument unknownDocument : envelope.getUnknownFiles()) {
-                unknownFiles.add(new ParsedEnvelopeDocument(
+                unknownFiles.add(new ParsedDocument(
                         parsingStore,
                         unknownDocument.getFileName(),
                         unknownDocument.getMimeType(),
@@ -207,11 +184,24 @@ public class Envelope implements AutoCloseable {
         }
     }
 
+    /**
+     * Returns a list of all {@link Document}s that are signed.
+     */
+    public List<SignedDocument> getSignedDocuments() {
+        List<SignedDocument> signedDocuments = new ArrayList<>();
+        for (SignatureContent content : signatureContents) {
+            for (Document doc : content.getDocuments().values()) {
+                signedDocuments.add(new SignedDocument(doc, content));
+            }
+        }
+        return signedDocuments;
+    }
+
     protected ParsingStore getParsingStore() {
         return parsingStore;
     }
 
-    protected EnvelopeWriter getWriter() {
-        return writer;
+    public boolean isClosed() {
+        return closed;
     }
 }

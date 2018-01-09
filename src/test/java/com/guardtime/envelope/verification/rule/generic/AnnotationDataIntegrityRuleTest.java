@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.verification.rule.generic;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
 import com.guardtime.envelope.manifest.AnnotationDataReference;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
@@ -117,7 +117,7 @@ public class AnnotationDataIntegrityRuleTest {
         String annotationManifestPath = "annotation.ext";
         DataHash nullDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
         SignatureContent mockSignatureContent = Mockito.mock(SignatureContent.class);
-        EnvelopeAnnotation mockAnnotation = Mockito.mock(EnvelopeAnnotation.class);
+        Annotation mockAnnotation = Mockito.mock(Annotation.class);
         final FileReference mockAnnotationManifestReference = Mockito.mock(FileReference.class);
         AnnotationDataReference mockAnnotationReference = Mockito.mock(AnnotationDataReference.class);
         SingleAnnotationManifest mockSignaleAnnotationManifest = Mockito.mock(SingleAnnotationManifest.class);
@@ -136,7 +136,7 @@ public class AnnotationDataIntegrityRuleTest {
         when(mockSignatureContent.getAnnotations()).thenReturn(Collections.singletonMap(annotationPath, mockAnnotation));
         when(mockSignatureContent.getSingleAnnotationManifests()).thenReturn(Collections.singletonMap(annotationManifestPath, mockSignaleAnnotationManifest));
         AnnotationsManifest mockAnnotationsManifest = mock(AnnotationsManifest.class);
-        when(mockSignatureContent.getAnnotationsManifest()).thenReturn(Pair.of("", mockAnnotationsManifest));
+        when(mockSignatureContent.getAnnotationsManifest()).thenReturn(mockAnnotationsManifest);
         when(mockAnnotationsManifest.getSingleAnnotationManifestReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {
             @Override
             public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) throws Throwable {

@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.verification.rule.generic;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
 import com.guardtime.envelope.manifest.AnnotationDataReference;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
@@ -64,7 +64,7 @@ public class AnnotationDataIntegrityRule extends AbstractRule<SignatureContent> 
 
     @Override
     protected void verifyRule(ResultHolder holder, SignatureContent signatureContent) {
-        AnnotationsManifest annotationsManifest = signatureContent.getAnnotationsManifest().getRight();
+        AnnotationsManifest annotationsManifest = signatureContent.getAnnotationsManifest();
         for (FileReference reference : annotationsManifest.getSingleAnnotationManifestReferences()) {
             String manifestUri = reference.getUri();
 
@@ -77,7 +77,7 @@ public class AnnotationDataIntegrityRule extends AbstractRule<SignatureContent> 
             if (dataExistenceRuleFailed(holder, annotationDataReference.getUri())) continue;
 
             String annotationDataUri = annotationDataReference.getUri();
-            EnvelopeAnnotation annotation = signatureContent.getAnnotations().get(annotationDataUri);
+            Annotation annotation = signatureContent.getAnnotations().get(annotationDataUri);
 
             try {
                 DataHash expectedHash = annotationDataReference.getHash();

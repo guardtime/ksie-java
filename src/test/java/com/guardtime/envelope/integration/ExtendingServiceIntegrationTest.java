@@ -68,7 +68,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
             assertSignaturesExtendedStatus(envelope, false);
             ExtendedEnvelope extendedEnvelope = extender.extend(envelope);
             for (ExtendedSignatureContent content : extendedEnvelope.getExtendedSignatureContents()) {
-                String uri = content.getManifest().getRight().getSignatureReference().getUri();
+                String uri = content.getManifest().getSignatureReference().getUri();
                 if (uri.equals("META-INF/signature-1.ksi")) {
                     assertEquals(true, content.isExtended());
                 } else if (uri.equals("META-INF/signature-01-02-03-04-05.ksi")) {

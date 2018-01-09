@@ -23,7 +23,6 @@ import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.SignatureReference;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.signature.EnvelopeSignature;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import com.guardtime.envelope.verification.result.RuleVerificationResult;
 import com.guardtime.envelope.verification.result.SignatureResult;
@@ -75,7 +74,7 @@ public class SignatureIntegrityRuleTest {
         EnvelopeSignature mockEnvelopeSignature = Mockito.mock(EnvelopeSignature.class);
 
         when(mockSignatureContent.getEnvelopeSignature()).thenReturn(mockEnvelopeSignature);
-        when(mockSignatureContent.getManifest()).thenReturn(Pair.of("path", mockedManifest));
+        when(mockSignatureContent.getManifest()).thenReturn(mockedManifest);
         when(mockedManifest.getSignatureReference()).thenReturn(mockSignatureReference);
         when(mockSignatureReference.getUri()).thenReturn("signaturePath.ext");
 

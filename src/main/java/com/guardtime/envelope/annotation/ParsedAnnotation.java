@@ -27,15 +27,15 @@ import java.io.InputStream;
 import static com.guardtime.envelope.util.Util.notNull;
 
 /**
- * Represents a {@link EnvelopeAnnotation} that has been parsed in. Uses a {@link ParsingStore} from where to access the data of
- * the {@link EnvelopeAnnotation}
+ * Represents a {@link Annotation} that has been parsed in. Uses a {@link ParsingStore} from where to access the data of
+ * the {@link Annotation}
  */
-public class ParsedEnvelopeAnnotation extends AbstractEnvelopeAnnotation {
+public class ParsedAnnotation extends AbstractAnnotation {
 
     private final ParsingStore parsingStore;
     private final String key;
 
-    public ParsedEnvelopeAnnotation(ParsingStore store, String key, String domain, EnvelopeAnnotationType type) {
+    public ParsedAnnotation(ParsingStore store, String key, String domain, EnvelopeAnnotationType type) {
         super(domain, type);
         notNull(store, "Parsing store");
         notNull(key, "Parsing store key");

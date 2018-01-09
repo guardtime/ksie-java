@@ -19,15 +19,18 @@
 
 package com.guardtime.envelope.verification.rule.generic;
 
+import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.envelope.manifest.FileReference;
-import com.guardtime.envelope.manifest.MultiHashElement;
 import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import com.guardtime.envelope.verification.rule.AbstractRule;
 import com.guardtime.envelope.verification.rule.RuleTerminatingException;
 import com.guardtime.envelope.verification.rule.state.RuleState;
 
-public class MultiHashElementIntegrityRule extends AbstractRule<Pair<MultiHashElement, FileReference>> {
+/**
+ * Sub rule that provides {@link com.guardtime.ksi.hashing.DataHash} validation for other rules which may need it.
+ */
+public class MultiHashElementIntegrityRule extends AbstractRule<Pair<EnvelopeElement, FileReference>> {
 
     private final UnimplementedHashAlgorithmExistenceRule unimplementedHashAlgorithmExistenceRule;
     private final TrustedHashAlgorithmExistenceRule trustedHashAlgorithmExistenceRule;
@@ -42,7 +45,7 @@ public class MultiHashElementIntegrityRule extends AbstractRule<Pair<MultiHashEl
     }
 
     @Override
-    protected void verifyRule(ResultHolder holder, Pair<MultiHashElement, FileReference> verifiable) throws RuleTerminatingException {
+    protected void verifyRule(ResultHolder holder, Pair<EnvelopeElement, FileReference> verifiable) throws RuleTerminatingException {
         unimplementedHashAlgorithmExistenceRule.verify(holder, verifiable.getRight());
         trustedHashAlgorithmExistenceRule.verify(holder, verifiable.getRight());
         trustedHashesIntegrityRule.verify(holder, verifiable);

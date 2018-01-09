@@ -32,7 +32,7 @@ public class DefaultRuleStateProviderTest {
 
     @Test
     public void testGetStateForRuleReturnFailForValidRuleName() throws Exception {
-        assertEquals(RuleState.FAIL, provider.getStateForRule(RuleType.KSIE_FORMAT.getName()));
+        assertEquals(RuleState.FAIL, provider.getStateForRule(RuleType.KSIE_VERIFY_ANNOTATION.getName()));
     }
 
     @Test

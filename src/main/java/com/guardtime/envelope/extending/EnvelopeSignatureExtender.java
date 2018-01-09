@@ -52,7 +52,7 @@ public class EnvelopeSignatureExtender {
      */
     public ExtendedEnvelope extend(Envelope envelope) {
         for (SignatureContent content : envelope.getSignatureContents()) {
-            Manifest manifest = content.getManifest().getRight();
+            Manifest manifest = content.getManifest();
             String signatureUri = manifest.getSignatureReference().getUri();
             try {
                 EnvelopeSignature envelopeSignature = content.getEnvelopeSignature();

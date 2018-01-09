@@ -31,8 +31,8 @@ public class TlvDocumentsManifestReferenceTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateDocumentsManifestReference() throws Exception {
-        TlvDocumentsManifest documentsManifest = new TlvDocumentsManifest(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), DEFAULT_HASH_ALGORITHM_PROVIDER);
-        TlvDocumentsManifestReference reference = new TlvDocumentsManifestReference(documentsManifest, TEST_FILE_NAME_TEST_TXT, DEFAULT_HASH_ALGORITHM_PROVIDER);
+        TlvDocumentsManifest documentsManifest = new TlvDocumentsManifest(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), DEFAULT_HASH_ALGORITHM_PROVIDER, TEST_FILE_NAME_TEST_TXT);
+        TlvDocumentsManifestReference reference = new TlvDocumentsManifestReference(documentsManifest, DEFAULT_HASH_ALGORITHM_PROVIDER);
         assertEquals(DOCUMENTS_MANIFEST_REFERENCE_TYPE, reference.getElementType());
         assertEquals(DOCUMENTS_MANIFEST_TYPE, getMimeType(reference));
         assertEquals(TEST_FILE_NAME_TEST_TXT, getUri(reference));

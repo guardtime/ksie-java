@@ -80,7 +80,7 @@ class KsiEnvelopeSignature implements EnvelopeSignature<KSISignature> {
         Identity[] newIdentity = newSignature.getAggregationHashChainIdentity();
         Identity[] identity = signature.getAggregationHashChainIdentity();
         for (int i = 0; i < newIdentity.length; i++) {
-            // TODO: Review if decoded client ID is enough for comparisson. And investigate why equals() for Identity is not usable!
+            // TODO: Review if decoded client ID is enough for comparison. And investigate why equals() for Identity is not usable!
             if(!identity[i].getDecodedClientId().equals(newIdentity[i].getDecodedClientId())) {
                  return false;
              }
@@ -89,4 +89,8 @@ class KsiEnvelopeSignature implements EnvelopeSignature<KSISignature> {
         return true;
     }
 
+    @Override
+    public int compareTo(EnvelopeSignature<KSISignature> ksiSignatureEnvelopeSignature) {
+        return this.signature.getAggregationTime().compareTo(ksiSignatureEnvelopeSignature.getSignature().getAggregationTime());
+    }
 }

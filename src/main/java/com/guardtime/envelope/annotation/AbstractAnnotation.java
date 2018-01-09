@@ -33,14 +33,15 @@ import java.io.InputStream;
 import static com.guardtime.envelope.util.Util.notNull;
 import static com.guardtime.ksi.util.Util.toByteArray;
 
-public abstract class AbstractEnvelopeAnnotation implements EnvelopeAnnotation {
-    protected static final Logger logger = LoggerFactory.getLogger(EnvelopeAnnotation.class);
+public abstract class AbstractAnnotation implements Annotation {
+    protected static final Logger logger = LoggerFactory.getLogger(Annotation.class);
 
     protected final String domain;
     protected final EnvelopeAnnotationType type;
     private DataHash dataHash;
+    private String path;
 
-    public AbstractEnvelopeAnnotation(String domain, EnvelopeAnnotationType type) {
+    public AbstractAnnotation(String domain, EnvelopeAnnotationType type) {
         notNull(domain, "Domain");
         notNull(type, "Annotation type");
         this.type = type;
@@ -91,5 +92,15 @@ public abstract class AbstractEnvelopeAnnotation implements EnvelopeAnnotation {
             logger.warn("Failed to get content of annotation.", e);
             return "";
         }
+    }
+
+    @Override
+    public String getPath() {
+        return path;
+    }
+
+    @Override
+    public void setPath(String path) {
+        this.path = path;
     }
 }

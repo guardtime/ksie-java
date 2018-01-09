@@ -27,7 +27,6 @@ import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.envelope.signature.SignatureFactory;
-import com.guardtime.envelope.util.Pair;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +59,7 @@ public class EnvelopeSignatureExtenderTest extends AbstractEnvelopeTest {
         doReturn(mockSignature).when(mockSignatureContent).getEnvelopeSignature();
         doReturn(Collections.singletonList(mockSignatureContent)).when(mockEnvelope).getSignatureContents();
         doReturn(mock(SignatureReference.class)).when(mockManifest).getSignatureReference();
-        doReturn(Pair.of("str", mockManifest)).when(mockSignatureContent).getManifest();
+        doReturn(mockManifest).when(mockSignatureContent).getManifest();
         return mockEnvelope;
     }
 

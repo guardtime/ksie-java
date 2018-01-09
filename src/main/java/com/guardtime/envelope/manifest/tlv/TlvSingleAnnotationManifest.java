@@ -19,14 +19,14 @@
 
 package com.guardtime.envelope.manifest.tlv;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.manifest.AnnotationDataReference;
+import com.guardtime.envelope.manifest.DocumentsManifest;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.InvalidManifestException;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.util.DataHashException;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVInputStream;
 import com.guardtime.ksi.tlv.TLVParserException;
@@ -45,19 +45,23 @@ class TlvSingleAnnotationManifest extends AbstractTlvManifestStructure implement
 
     private TlvAnnotationDataReference annotationReference;
     private TlvDocumentsManifestReference documentsManifestReference;
+    private String path;
 
-    public TlvSingleAnnotationManifest(Pair<String, EnvelopeAnnotation> annotation, Pair<String, TlvDocumentsManifest> documentsManifest, HashAlgorithmProvider algorithmProvider) throws InvalidManifestException {
+    public TlvSingleAnnotationManifest(Annotation annotation, DocumentsManifest documentsManifest,
+                                       HashAlgorithmProvider algorithmProvider, String path) throws InvalidManifestException {
         super(MAGIC);
+        this.path = path;
         try {
             this.annotationReference = new TlvAnnotationDataReference(annotation, algorithmProvider);
-            this.documentsManifestReference = new TlvDocumentsManifestReference(documentsManifest.getRight(), documentsManifest.getLeft(), algorithmProvider);
+            this.documentsManifestReference = new TlvDocumentsManifestReference(documentsManifest, algorithmProvider);
         } catch (TLVParserException | DataHashException e) {
             throw new InvalidManifestException("Failed to generate file reference TLVElement", e);
         }
     }
 
-    public TlvSingleAnnotationManifest(InputStream stream) throws InvalidManifestException {
+    public TlvSingleAnnotationManifest(InputStream stream, String path) throws InvalidManifestException {
         super(MAGIC, stream);
+        this.path = path;
         try {
             read(stream);
         } catch (TLVParserException e) {
@@ -101,4 +105,8 @@ class TlvSingleAnnotationManifest extends AbstractTlvManifestStructure implement
         return documentsManifestReference;
     }
 
+    @Override
+    public String getPath() {
+        return path;
+    }
 }

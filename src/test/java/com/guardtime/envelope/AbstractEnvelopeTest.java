@@ -19,24 +19,26 @@
 
 package com.guardtime.envelope;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
-import com.guardtime.envelope.annotation.StringEnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.StreamEnvelopeDocument;
+import com.guardtime.envelope.annotation.StringAnnotation;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.indexing.IndexProviderFactory;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
-import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.DocumentsManifest;
+import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.ManifestFactoryType;
+import com.guardtime.envelope.manifest.SignatureReference;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.signature.SignatureFactory;
 import com.guardtime.envelope.signature.SignatureFactoryType;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.rule.state.DefaultRuleStateProvider;
 
+import org.hamcrest.CustomTypeSafeMatcher;
+import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,6 +46,8 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -55,6 +59,8 @@ import java.util.List;
 
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class AbstractEnvelopeTest {
@@ -91,6 +97,7 @@ public class AbstractEnvelopeTest {
     protected static final String ENVELOPE_WITH_INVALID_ANNOTATION_TYPE = "envelopes/invalid/invalid-annotation-type.ksie";
     protected static final String ENVELOPE_WITH_BROKEN_SIGNATURE_CONTENT = "envelopes/invalid/broken-signature-content.ksie";
     protected static final String ENVELOPE_WITH_DOCUMENT_MISSING_MIMETYPE = "envelopes/invalid/document-missing-mimetype.ksie";
+    protected static final String ENVELOPE_WITH_DIFFERENT_SIGNATURE_EXTENSION = "envelopes/different-signature-extension.ksie";
     protected static final String ENVELOPE_WITH_NO_DOCUMENT_URI_IN_MANIFEST = "envelopes/invalid/no-document-uri-in-manifest.ksie";
     protected static final String ENVELOPE_WITH_MIMETYPE_CONTAINS_INVALID_VALUE = "envelopes/invalid/mimetype-contains-invalid-value.ksie";
     protected static final String ENVELOPE_WITH_MULTIPLE_EXTENDABLE_SIGNATURES = "envelopes/invalid/multiple-signatures-non-verifying.ksie";
@@ -125,16 +132,16 @@ public class AbstractEnvelopeTest {
 
     protected final DefaultRuleStateProvider defaultRuleStateProvider = new DefaultRuleStateProvider();
 
-    protected EnvelopeAnnotation STRING_ENVELOPE_ANNOTATION;
-    protected EnvelopeDocument TEST_DOCUMENT_HELLO_TEXT;
-    protected EnvelopeDocument TEST_DOCUMENT_HELLO_PDF;
+    protected Annotation STRING_ENVELOPE_ANNOTATION;
+    protected Document TEST_DOCUMENT_HELLO_TEXT;
+    protected Document TEST_DOCUMENT_HELLO_PDF;
     protected final List<AutoCloseable> envelopeElements = new LinkedList<>();
 
     @Before
     public void setUpDocumentsAndAnnotations() {
-        STRING_ENVELOPE_ANNOTATION = new StringEnvelopeAnnotation(EnvelopeAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME);
-        TEST_DOCUMENT_HELLO_TEXT = new StreamEnvelopeDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
-        TEST_DOCUMENT_HELLO_PDF = new StreamEnvelopeDocument(new ByteArrayInputStream(TEST_DATA_PDF_CONTENT), MIME_TYPE_APPLICATION_PDF, TEST_FILE_NAME_TEST_PDF);
+        STRING_ENVELOPE_ANNOTATION = new StringAnnotation(EnvelopeAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME);
+        TEST_DOCUMENT_HELLO_TEXT = new StreamDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
+        TEST_DOCUMENT_HELLO_PDF = new StreamDocument(new ByteArrayInputStream(TEST_DATA_PDF_CONTENT), MIME_TYPE_APPLICATION_PDF, TEST_FILE_NAME_TEST_PDF);
         envelopeElements.addAll(Arrays.asList(
                 TEST_DOCUMENT_HELLO_PDF,
                 TEST_DOCUMENT_HELLO_TEXT,
@@ -179,10 +186,10 @@ public class AbstractEnvelopeTest {
         MockitoAnnotations.initMocks(this);
         when(mockedManifestFactory.getManifestFactoryType()).thenReturn(mockedManifestFactoryType);
         when(mockedManifestFactory.getHashAlgorithmProvider()).thenReturn(mockHashAlgorithmProvider);
-        when(mockedManifestFactory.createDocumentsManifest(anyListOf(EnvelopeDocument.class))).thenReturn(mockedDocumentsManifest);
-        when(mockedManifestFactory.createAnnotationsManifest(anyMap())).thenReturn(mockedAnnotationsManifest);
-        when(mockedManifestFactory.createSingleAnnotationManifest(Mockito.any(Pair.class), Mockito.any(Pair.class))).thenReturn(mockedSingleAnnotationManifest);
-        when(mockedManifestFactory.createManifest(Mockito.any(Pair.class), Mockito.any(Pair.class), Mockito.any(Pair.class))).thenReturn(mockedManifest);
+        when(mockedManifestFactory.createDocumentsManifest(anyListOf(Document.class), anyString())).thenReturn(mockedDocumentsManifest);
+        when(mockedManifestFactory.createAnnotationsManifest(anyMap(), anyString())).thenReturn(mockedAnnotationsManifest);
+        when(mockedManifestFactory.createSingleAnnotationManifest(Mockito.any(DocumentsManifest.class), Mockito.any(Annotation.class), anyString())).thenReturn(mockedSingleAnnotationManifest);
+        when(mockedManifestFactory.createManifest(Mockito.any(DocumentsManifest.class), Mockito.any(AnnotationsManifest.class), Mockito.any(SignatureFactoryType.class), anyString(), anyString())).thenReturn(mockedManifest);
         when(mockedSignatureFactory.getSignatureFactoryType()).thenReturn(mockedSignatureFactoryType);
         when(mockedSignatureFactoryType.getSignatureMimeType()).thenReturn(SIGNATURE_MIME_TYPE);
     }
@@ -202,4 +209,14 @@ public class AbstractEnvelopeTest {
         URL url = Thread.currentThread().getContextClassLoader().getResource(filePath);
         return new File(url.toURI());
     }
+
+    protected Matcher<String> matchesRegex(final String regex) {
+        return new CustomTypeSafeMatcher<String>("") {
+            @Override
+            protected boolean matchesSafely(final String item) {
+                return item.matches(regex);
+            }
+        };
+    }
+
 }

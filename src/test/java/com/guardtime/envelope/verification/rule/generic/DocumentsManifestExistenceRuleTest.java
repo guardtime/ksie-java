@@ -22,7 +22,6 @@ package com.guardtime.envelope.verification.rule.generic;
 import com.guardtime.envelope.AbstractEnvelopeTest;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.packaging.SignatureContent;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.envelope.verification.rule.Rule;
@@ -44,8 +43,9 @@ public class DocumentsManifestExistenceRuleTest extends AbstractEnvelopeTest {
         String documentsManifestPath = "datamanifest.ext";
         when(mockFileReference.getUri()).thenReturn(documentsManifestPath);
         when(mockedManifest.getDocumentsManifestReference()).thenReturn(mockFileReference);
-        when(mockSignatureContent.getManifest()).thenReturn(Pair.of("path", mockedManifest));
-        when(mockSignatureContent.getDocumentsManifest()).thenReturn(Pair.of(documentsManifestPath, mockedDocumentsManifest));
+        when(mockSignatureContent.getManifest()).thenReturn(mockedManifest);
+        when(mockedDocumentsManifest.getPath()).thenReturn(documentsManifestPath);
+        when(mockSignatureContent.getDocumentsManifest()).thenReturn(mockedDocumentsManifest);
 
         ResultHolder holder = new ResultHolder();
         rule.verify(holder, mockSignatureContent);
@@ -60,7 +60,7 @@ public class DocumentsManifestExistenceRuleTest extends AbstractEnvelopeTest {
         String documentsManifestPath = "datamanifest.ext";
         when(mockFileReference.getUri()).thenReturn(documentsManifestPath);
         when(mockedManifest.getDocumentsManifestReference()).thenReturn(mockFileReference);
-        when(mockSignatureContent.getManifest()).thenReturn(Pair.of("path", mockedManifest));
+        when(mockSignatureContent.getManifest()).thenReturn(mockedManifest);
         when(mockSignatureContent.getDocumentsManifest()).thenReturn(null);
 
         ResultHolder holder = new ResultHolder();

@@ -19,13 +19,13 @@
 
 package com.guardtime.envelope.manifest.tlv;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.InvalidManifestException;
+import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.util.DataHashException;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVInputStream;
 import com.guardtime.ksi.tlv.TLVParserException;
@@ -36,29 +36,34 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements AnnotationsManifest {
 
     private static final byte[] MAGIC = "KSIEANMF".getBytes(StandardCharsets.UTF_8);
 
     private List<TlvSingleAnnotationManifestReference> singleAnnotationManifestReferences = new LinkedList<>();
+    private String path = null;
 
-    public TlvAnnotationsManifest(Map<String, Pair<EnvelopeAnnotation, TlvSingleAnnotationManifest>> singleAnnotationManifests, HashAlgorithmProvider algorithmProvider) throws InvalidManifestException {
+    public TlvAnnotationsManifest(Map<Annotation, TlvSingleAnnotationManifest> singleAnnotationManifests,
+                                  HashAlgorithmProvider algorithmProvider, String path) throws InvalidManifestException {
         super(MAGIC);
+        this.path = path;
         try {
-            Set<String> uris = singleAnnotationManifests.keySet();
-            for (String uri : uris) {
-                Pair<EnvelopeAnnotation, TlvSingleAnnotationManifest> pair = singleAnnotationManifests.get(uri);
-                this.singleAnnotationManifestReferences.add(new TlvSingleAnnotationManifestReference(uri, pair.getRight(), pair.getLeft().getAnnotationType(), algorithmProvider));
+            for (Map.Entry<Annotation, TlvSingleAnnotationManifest> entry : singleAnnotationManifests.entrySet()) {
+                Annotation annotation = entry.getKey();
+                SingleAnnotationManifest manifest = entry.getValue();
+                this.singleAnnotationManifestReferences.add(
+                        new TlvSingleAnnotationManifestReference(annotation, manifest, algorithmProvider)
+                );
             }
         } catch (TLVParserException | DataHashException e) {
             throw new InvalidManifestException("Failed to generate file reference TLVElement", e);
         }
     }
 
-    public TlvAnnotationsManifest(InputStream stream) throws InvalidManifestException {
+    public TlvAnnotationsManifest(InputStream stream, String path) throws InvalidManifestException {
         super(MAGIC, stream);
+        this.path = path;
         try {
             read(stream);
         } catch (TLVParserException e) {
@@ -93,4 +98,8 @@ class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements Ann
         return singleAnnotationManifestReferences;
     }
 
+    @Override
+    public String getPath() {
+        return path;
+    }
 }

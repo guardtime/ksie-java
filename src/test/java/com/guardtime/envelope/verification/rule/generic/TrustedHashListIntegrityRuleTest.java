@@ -20,8 +20,8 @@
 package com.guardtime.envelope.verification.rule.generic;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
+import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.envelope.manifest.FileReference;
-import com.guardtime.envelope.manifest.MultiHashElement;
 import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import com.guardtime.envelope.verification.result.RuleVerificationResult;
@@ -51,9 +51,9 @@ public class TrustedHashListIntegrityRuleTest extends AbstractEnvelopeTest {
         FileReference mockFileReference = Mockito.mock(FileReference.class);
         DataHash nullDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
         when(mockFileReference.getHashList()).thenReturn(Collections.singletonList(nullDataHash));
-        MultiHashElement mockMultiHashElement = Mockito.mock(MultiHashElement.class);
-        when(mockMultiHashElement.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(Mockito.mock(DataHash.class));
-        rule.verify(new ResultHolder(), Pair.of(mockMultiHashElement, mockFileReference));
+        EnvelopeElement mockEnvelopeElement = Mockito.mock(EnvelopeElement.class);
+        when(mockEnvelopeElement.getDataHash(Mockito.any(HashAlgorithm.class))).thenReturn(Mockito.mock(DataHash.class));
+        rule.verify(new ResultHolder(), Pair.of(mockEnvelopeElement, mockFileReference));
     }
 
     @Test
@@ -62,10 +62,10 @@ public class TrustedHashListIntegrityRuleTest extends AbstractEnvelopeTest {
         HashAlgorithm hashAlgorithm = HashAlgorithm.SHA2_256;
         DataHash nullDataHash = new DataHash(hashAlgorithm, new byte[32]);
         when(mockFileReference.getHashList()).thenReturn(Collections.singletonList(nullDataHash));
-        MultiHashElement mockMultiHashElement = Mockito.mock(MultiHashElement.class);
-        when(mockMultiHashElement.getDataHash(hashAlgorithm)).thenReturn(nullDataHash);
+        EnvelopeElement mockEnvelopeElement = Mockito.mock(EnvelopeElement.class);
+        when(mockEnvelopeElement.getDataHash(hashAlgorithm)).thenReturn(nullDataHash);
         ResultHolder holder = new ResultHolder();
-        rule.verify(holder, Pair.of(mockMultiHashElement, mockFileReference));
+        rule.verify(holder, Pair.of(mockEnvelopeElement, mockFileReference));
         RuleVerificationResult result = holder.getResults().get(0);
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }

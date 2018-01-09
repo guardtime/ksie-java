@@ -20,14 +20,15 @@
 package com.guardtime.envelope.packaging.zip;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.EmptyEnvelopeDocument;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.EmptyDocument;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.tlv.TlvEnvelopeManifestFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
+import com.guardtime.envelope.packaging.exception.InvalidPackageException;
 import com.guardtime.envelope.packaging.parsing.store.TemporaryFileBasedParsingStoreFactory;
 import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.envelope.signature.SignatureFactory;
@@ -40,10 +41,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -51,6 +52,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
@@ -67,8 +69,11 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
     public void setUpReader() throws Exception {
         EnvelopeManifestFactory manifestFactory = new TlvEnvelopeManifestFactory();
 
-        when(mockKsi.sign(Mockito.any(DataHash.class))).thenReturn(Mockito.mock(KSISignature.class));
-        when(mockKsi.extend(Mockito.any(KSISignature.class))).thenReturn(Mockito.mock(KSISignature.class));
+        when(mockKsi.sign(any(DataHash.class))).thenReturn(mock(KSISignature.class));
+        when(mockKsi.extend(any(KSISignature.class))).thenReturn(mock(KSISignature.class));
+        KSISignature mockKsiSignature = mock(KSISignature.class);
+        when(mockKsiSignature.getAggregationTime()).thenReturn(mock(Date.class));
+        when(mockKsi.read(any(InputStream.class))).thenReturn(mockKsiSignature);
         SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
         this.reader = new ZipEnvelopeReader(manifestFactory, signatureFactory, new TemporaryFileBasedParsingStoreFactory());
     }
@@ -112,9 +117,23 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
 
     @Test
     public void testReadEmptyEnvelopeFile_ThrowsInvalidPackageException() throws Exception {
+        expectedException.expect(InvalidPackageException.class);
+        expectedException.expectMessage("No parsable MIME type");
         setUpEnvelope(EMPTY_ENVELOPE);
-        assertExceptionsContainMessage("Parsed envelope was not valid");
-        assertTrue(envelope.getSignatureContents().isEmpty());
+    }
+
+    @Test
+    public void testReadEnvelopeWithMimetypeContainingInvalidValue_ThrowsInvalidPackageException() throws Exception {
+        expectedException.expect(InvalidPackageException.class);
+        expectedException.expectMessage("Parsed Envelope has invalid MIME type. Can't process it!");
+        setUpEnvelope(ENVELOPE_WITH_MIMETYPE_CONTAINS_INVALID_VALUE);
+    }
+
+    @Test
+    public void testReadEnvelopeWithMimetypeContainingMoreThanNeeded_ThrowsInvalidPackageException() throws Exception {
+        expectedException.expect(InvalidPackageException.class);
+        expectedException.expectMessage("Parsed Envelope has invalid MIME type. Can't process it!");
+        setUpEnvelope(ENVELOPE_WITH_MIMETYPE_CONTAINS_ADDITIONAL_VALUE);
     }
 
     @Test
@@ -131,8 +150,8 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
         assertNotNull(envelope);
         assertFalse(envelope.getSignatureContents().isEmpty());
         for (SignatureContent content : envelope.getSignatureContents()) {
-            for (EnvelopeDocument document : content.getDocuments().values()) {
-                assertTrue(document instanceof EmptyEnvelopeDocument);
+            for (Document document : content.getDocuments().values()) {
+                assertTrue(document instanceof EmptyDocument);
             }
         }
     }
@@ -144,7 +163,7 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
         assertFalse(envelope.getSignatureContents().isEmpty());
         for (SignatureContent content : envelope.getSignatureContents()) {
             assertTrue(content.getDocuments().isEmpty());
-            assertFalse(content.getDocumentsManifest().getRight().getDocumentReferences().isEmpty());
+            assertFalse(content.getDocumentsManifest().getDocumentReferences().isEmpty());
         }
     }
 
@@ -174,7 +193,7 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
         assertNotNull(envelope);
         assertFalse(envelope.getSignatureContents().isEmpty());
         for (SignatureContent content : envelope.getSignatureContents()) {
-            AnnotationsManifest annotationsManifest = content.getAnnotationsManifest().getRight();
+            AnnotationsManifest annotationsManifest = content.getAnnotationsManifest();
             int insertedAnnotationsCount = annotationsManifest.getSingleAnnotationManifestReferences().size();
             int parsableAnnotationsCount = content.getAnnotations().size();
             assertTrue(parsableAnnotationsCount < insertedAnnotationsCount);
@@ -197,11 +216,19 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
     }
 
     @Test
+    public void testReadEnvelopeFileWithDifferentSignatureExtension() throws Exception {
+        setUpEnvelope(ENVELOPE_WITH_DIFFERENT_SIGNATURE_EXTENSION);
+        assertNotNull(envelope);
+        assertFalse(envelope.getSignatureContents().isEmpty());
+        assertTrue(envelope.getUnknownFiles().isEmpty());
+    }
+
+    @Test
     public void testReadEnvelopeFileWithMissingAnnotationData() throws Exception {
         setUpEnvelope(ENVELOPE_WITH_MISSING_ANNOTATION_DATA);
         assertNotNull(envelope);
         SignatureContent signatureContent = envelope.getSignatureContents().get(0);
-        AnnotationsManifest annotationsManifest = signatureContent.getAnnotationsManifest().getRight();
+        AnnotationsManifest annotationsManifest = signatureContent.getAnnotationsManifest();
         assertFalse(envelope.getSignatureContents().isEmpty());
         assertTrue(signatureContent.getAnnotations().isEmpty());
         assertFalse(signatureContent.getSingleAnnotationManifests().isEmpty());
@@ -209,11 +236,11 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testReadCEnvelopeFileWithMissingAnnotation() throws Exception {
+    public void testReadEnvelopeFileWithMissingAnnotation() throws Exception {
         setUpEnvelope(ENVELOPE_WITH_MISSING_ANNOTATION);
         assertNotNull(envelope);
         SignatureContent signatureContent = envelope.getSignatureContents().get(0);
-        AnnotationsManifest annotationsManifest = signatureContent.getAnnotationsManifest().getRight();
+        AnnotationsManifest annotationsManifest = signatureContent.getAnnotationsManifest();
         assertFalse(envelope.getSignatureContents().isEmpty());
         assertTrue(signatureContent.getAnnotations().isEmpty());
         assertTrue(signatureContent.getSingleAnnotationManifests().isEmpty());
@@ -224,27 +251,27 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
     public void testReadInvalidDocumentsManifest() throws Exception {
         setUpEnvelope(ENVELOPE_WITH_MISSING_DOCUMENTS_MANIFEST);
         assertFalse(exceptions.isEmpty());
-        assertExceptionsContainMessage("Failed to fetch file 'META-INF/datamanifest-4.tlv' from parsingStore.");
+        assertExceptionsContainMessage("No content stored for entry 'META-INF/datamanifest-4.tlv'!");
     }
 
     @Test
     public void testReadInvalidAnnotationsManifest() throws Exception {
         setUpEnvelope(ENVELOPE_WITH_BROKEN_SIGNATURE_CONTENT);
-        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotmanifest-2.tlv' from parsingStore.");
+        assertExceptionsContainMessage("No content stored for entry 'META-INF/annotmanifest-2.tlv'!");
     }
 
 
     @Test
     public void testReadInvalidSingleAnnotationManifest() throws Exception {
         setUpEnvelope(ENVELOPE_WITH_MISSING_ANNOTATION);
-        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotation-1.tlv' from parsingStore.");
+        assertExceptionsContainMessage("No content stored for entry 'META-INF/annotation-1.tlv'!");
     }
 
     @Test
     public void testReadInvalidSignature() throws Exception {
         when(mockKsi.read(any(InputStream.class))).thenThrow(SignatureException.class);
         setUpEnvelope(ENVELOPE_WITH_BROKEN_SIGNATURE_CONTENT);
-        assertExceptionsContainMessage("Failed to parse content of 'META-INF/signature-1.ksi'");
+        assertExceptionsContainMessage("Failed to parse content of stream as EnvelopeSignature.");
     }
 
 
@@ -252,11 +279,11 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
     public void testReadInvalidEnvelopeProducesMultipleExceptions() throws Exception {
         when(mockKsi.read(any(InputStream.class))).thenThrow(SignatureException.class);
         setUpEnvelope(ENVELOPE_WITH_BROKEN_SIGNATURE_CONTENT);
-        assertExceptionsContainMessage("Failed to parse content of 'META-INF/signature-1.ksi'");
-        assertExceptionsContainMessage("Failed to parse content of 'META-INF/signature-2.ksi'");
-        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotation-1.tlv' from parsingStore.");
-        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotation-2.tlv' from parsingStore.");
-        assertExceptionsContainMessage("Failed to fetch file 'META-INF/annotmanifest-2.tlv' from parsingStore.");
+        assertExceptionsContainMessage("Failed to parse content of stream as EnvelopeSignature.");
+        assertExceptionsContainMessage("Failed to parse content of stream as EnvelopeSignature.");
+        assertExceptionsContainMessage("No content stored for entry 'META-INF/annotation-1.tlv'!");
+        assertExceptionsContainMessage("No content stored for entry 'META-INF/annotation-2.tlv'!");
+        assertExceptionsContainMessage("No content stored for entry 'META-INF/annotmanifest-2.tlv'!");
     }
 
 }

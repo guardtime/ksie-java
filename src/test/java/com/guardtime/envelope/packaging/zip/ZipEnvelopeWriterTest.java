@@ -1,8 +1,8 @@
 package com.guardtime.envelope.packaging.zip;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.StreamEnvelopeDocument;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.indexing.UuidIndexProviderFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
@@ -14,10 +14,6 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Arrays;
 
 import static java.util.Collections.singletonList;
 import static org.mockito.Matchers.any;
@@ -30,13 +26,13 @@ public class ZipEnvelopeWriterTest extends AbstractEnvelopeTest {
     public void testAddDocumentWithDirectoryName_ThrowsIOException() throws Exception {
         expectedException.expect(IOException.class);
         expectedException.expectMessage(" is an invalid document file name!");
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                disableInternalVerification().
-                withIndexProviderFactory(new UuidIndexProviderFactory()).
-                build();
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .withIndexProviderFactory(new UuidIndexProviderFactory())
+                .build();
         when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mock(EnvelopeSignature.class));
-        EnvelopeDocument testDocument = new StreamEnvelopeDocument(new ByteArrayInputStream(new byte[0]), "some type", "folder/");
+        Document testDocument = new StreamDocument(new ByteArrayInputStream(new byte[0]), "some type", "folder/");
         try (Envelope envelope = packagingFactory.create(singletonList(testDocument), singletonList(STRING_ENVELOPE_ANNOTATION))) {
             ZipEnvelopeWriter writer = new ZipEnvelopeWriter();
             ByteArrayOutputStream bos = new ByteArrayOutputStream();

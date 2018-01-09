@@ -21,7 +21,6 @@ package com.guardtime.envelope.verification;
 
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.Envelope;
-import com.guardtime.envelope.packaging.MimeType;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.verification.result.ResultHolder;
 
@@ -43,7 +42,6 @@ public class VerifiedEnvelopeTest {
     public void testWrappedMethodsProvideAccessToOriginals() {
         Envelope originalEnvelope = setUpMockedEnvelope();
         VerifiedEnvelope verifiedEnvelope = new VerifiedEnvelope(originalEnvelope, new ResultHolder());
-        assertEquals(originalEnvelope.getMimeType(), verifiedEnvelope.getMimeType());
         assertEquals(originalEnvelope.getUnknownFiles(), verifiedEnvelope.getUnknownFiles());
     }
 
@@ -57,7 +55,6 @@ public class VerifiedEnvelopeTest {
 
     private Envelope setUpMockedEnvelope() {
         Envelope mockedEnvelope = mock(Envelope.class);
-        when(mockedEnvelope.getMimeType()).thenReturn(mock(MimeType.class));
         when(mockedEnvelope.getUnknownFiles()).thenReturn(Collections.singletonList(mock(UnknownDocument.class)));
         when(mockedEnvelope.getSignatureContents()).thenAnswer(new Answer<List<? extends SignatureContent>>() {
             @Override

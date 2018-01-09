@@ -17,22 +17,38 @@
  * reserves and retains all trademark rights.
  */
 
-package com.guardtime.envelope.packaging;
+package com.guardtime.envelope.document;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static com.guardtime.envelope.util.Util.notNull;
+
 /**
- * MIME type in envelope.
+ * Document that is based on a {@link File}.
  */
-public interface MimeType {
-    String MIME_TYPE_ENTRY_NAME = "mimetype";
+public class FileDocument extends AbstractDocument {
 
-    String getUri();
+    private final File file;
 
-    /**
-     * Returns InputStream containing the MIME type data.
-     * @throws IOException when the stream can't be created or accessed.
-     */
-    InputStream getInputStream() throws IOException;
+    public FileDocument(File file, String mimeType) {
+        this(file, mimeType, null);
+    }
+
+    public FileDocument(File file, String mimeType, String fileName) {
+        super(mimeType, getFileName(file, fileName));
+        this.file = file;
+    }
+
+    private static String getFileName(File file, String fileName) {
+        notNull(file, "File");
+        return fileName == null ? file.getName() : fileName;
+    }
+
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return new FileInputStream(file);
+    }
 }

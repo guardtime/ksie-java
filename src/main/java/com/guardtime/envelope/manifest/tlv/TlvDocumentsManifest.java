@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.manifest.tlv;
 
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.manifest.DocumentsManifest;
 import com.guardtime.envelope.manifest.InvalidManifestException;
@@ -39,11 +39,14 @@ class TlvDocumentsManifest extends AbstractTlvManifestStructure implements Docum
     private static final byte[] MAGIC = "KSIEDAMF".getBytes(StandardCharsets.UTF_8);
 
     private List<TlvDocumentReference> documents = new LinkedList<>();
+    private String path;
 
-    public TlvDocumentsManifest(List<EnvelopeDocument> documents, HashAlgorithmProvider algorithmProvider) throws InvalidManifestException {
+    public TlvDocumentsManifest(List<Document> documents, HashAlgorithmProvider algorithmProvider, String path)
+            throws InvalidManifestException {
         super(MAGIC);
+        this.path = path;
         try {
-            for (EnvelopeDocument doc : documents) {
+            for (Document doc : documents) {
                 this.documents.add(new TlvDocumentReference(doc, algorithmProvider));
             }
         } catch (DataHashException | TLVParserException | IOException e) {
@@ -51,8 +54,9 @@ class TlvDocumentsManifest extends AbstractTlvManifestStructure implements Docum
         }
     }
 
-    public TlvDocumentsManifest(InputStream stream) throws InvalidManifestException {
+    public TlvDocumentsManifest(InputStream stream, String path) throws InvalidManifestException {
         super(MAGIC, stream);
+        this.path = path;
         try {
             read(stream);
         } catch (TLVParserException e) {
@@ -87,4 +91,8 @@ class TlvDocumentsManifest extends AbstractTlvManifestStructure implements Docum
         }
     }
 
+    @Override
+    public String getPath() {
+        return path;
+    }
 }

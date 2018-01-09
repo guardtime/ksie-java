@@ -17,10 +17,30 @@
  * reserves and retains all trademark rights.
  */
 
-package com.guardtime.envelope.packaging.exception;
+package com.guardtime.envelope.annotation;
 
-public class EnvelopeAnnotationMergingException extends EnvelopeMergingException {
-    public EnvelopeAnnotationMergingException(String path) {
-        super("New SignatureContent has clashing Annotation data! Path: " + path);
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
+import static com.guardtime.envelope.util.Util.notNull;
+
+/**
+ * Annotation that is based on a String as the data source.
+ */
+public class StringAnnotation extends AbstractAnnotation {
+
+    private final String content;
+
+    public StringAnnotation(EnvelopeAnnotationType type, String content, String domain) {
+        super(domain, type);
+        notNull(content, "Content");
+        this.content = content;
+    }
+
+    @Override
+    public InputStream getInputStream() {
+        return new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
     }
 }

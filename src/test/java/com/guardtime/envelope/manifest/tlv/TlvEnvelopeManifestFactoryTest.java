@@ -19,33 +19,36 @@
 
 package com.guardtime.envelope.manifest.tlv;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.util.Pair;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.guardtime.envelope.util.Util.hash;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 public class TlvEnvelopeManifestFactoryTest extends AbstractTlvManifestTest {
 
     private TlvEnvelopeManifestFactory factory = new TlvEnvelopeManifestFactory();
-    private Pair<String, EnvelopeAnnotation> mockedAnnotationPair;
-    private Pair<String, TlvDocumentsManifest> mockedDocumentsManifestPair;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        mockedAnnotationPair = Pair.of(MOCK_URI, mockAnnotation);
-        mockedDocumentsManifestPair = Pair.of(TEST_FILE_NAME_TEST_TXT, mockDocumentsManifest);
+        when(mockedDocumentsManifest.getPath()).thenReturn(TEST_FILE_NAME_TEST_TXT);
     }
 
     @Test
@@ -59,19 +62,22 @@ public class TlvEnvelopeManifestFactoryTest extends AbstractTlvManifestTest {
     public void testCreateSingleAnnotationManifestWithoutDocumentsManifest_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Documents manifest");
-        factory.createSingleAnnotationManifest(null, mockedAnnotationPair);
+        factory.createSingleAnnotationManifest(null, mockAnnotation, "singleAnnotationManifestName");
     }
 
     @Test
     public void testCreateSingleAnnotationManifestWithoutAnnotation_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Annotation");
-        factory.createSingleAnnotationManifest(mockedDocumentsManifestPair, null);
+        factory.createSingleAnnotationManifest(mockedDocumentsManifest, null, "singleAnnotationManifestName");
     }
 
     @Test
     public void testCreateSingleAnnotationManifest() throws Exception {
-        TlvSingleAnnotationManifest singleAnnotationManifest = factory.createSingleAnnotationManifest(mockedDocumentsManifestPair, mockedAnnotationPair);
+        DataHash dataHashForEmptyData = hash(EMPTY_INPUT_STREAM, HashAlgorithm.SHA2_256);
+        doReturn(dataHashForEmptyData).when(mockedDocumentsManifest).getDataHash(any(HashAlgorithm.class));
+        TlvSingleAnnotationManifest singleAnnotationManifest =
+                factory.createSingleAnnotationManifest(mockedDocumentsManifest, mockAnnotation, "singleAnnotationManifestName");
         assertNotNull(singleAnnotationManifest);
         assertNotNull(singleAnnotationManifest.getAnnotationReference());
         assertNotNull(singleAnnotationManifest.getDocumentsManifestReference());
@@ -79,15 +85,18 @@ public class TlvEnvelopeManifestFactoryTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateAnnotationsManifestWithoutSingleAnnotationManifestsOK() throws Exception {
-        TlvAnnotationsManifest manifest = factory.createAnnotationsManifest(new HashMap<String, Pair<EnvelopeAnnotation, TlvSingleAnnotationManifest>>());
+        TlvAnnotationsManifest manifest = factory.createAnnotationsManifest(
+                new HashMap<Annotation, TlvSingleAnnotationManifest>(),
+                "annotationsManifestName"
+        );
         assertNotNull(manifest);
     }
 
     @Test
     public void testCreateAnnotationsManifestOK() throws Exception {
-        Map<String, Pair<EnvelopeAnnotation, TlvSingleAnnotationManifest>> annotationManifests = new HashMap();
-        annotationManifests.put("Non-important-for-test", Pair.of(mockAnnotation, mockSingleAnnotationManifest));
-        TlvAnnotationsManifest manifest = factory.createAnnotationsManifest(annotationManifests);
+        Map<Annotation, TlvSingleAnnotationManifest> annotationManifests = new HashMap();
+        annotationManifests.put(mockAnnotation, mockSingleAnnotationManifest);
+        TlvAnnotationsManifest manifest = factory.createAnnotationsManifest(annotationManifests, "annotationsManifestName");
 
         assertNotNull("Manifest was not created", manifest);
     }
@@ -96,19 +105,19 @@ public class TlvEnvelopeManifestFactoryTest extends AbstractTlvManifestTest {
     public void testCreateDocumentsManifestWithEmptyDocumentsList_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Document files list must not be empty");
-        factory.createDocumentsManifest(new ArrayList<EnvelopeDocument>());
+        factory.createDocumentsManifest(new ArrayList<Document>(), "documentsManifestName");
     }
 
     @Test
     public void testCreateDocumentsManifestWithoutDocumentsList_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Document files list must be present");
-        factory.createDocumentsManifest(null);
+        factory.createDocumentsManifest(null, "documentsManifestName");
     }
 
     @Test
     public void testCreateDocumentsManifestOK() throws Exception {
-        TlvDocumentsManifest documentsManifest = factory.createDocumentsManifest(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT));
+        TlvDocumentsManifest documentsManifest = factory.createDocumentsManifest(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), "documentsManifestName");
         assertNotNull("Manifest was not created", documentsManifest);
         assertEquals(1, documentsManifest.getDocumentReferences().size());
     }
@@ -117,23 +126,24 @@ public class TlvEnvelopeManifestFactoryTest extends AbstractTlvManifestTest {
     public void testCreateManifestWithoutDocumentsManifest_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Documents manifest must be present");
-        factory.createManifest(null, Pair.of("Non-important-for-test", mockAnnotationsManifest), Pair.of("Non-important-for-test", "signature.ksig"));
+        factory.createManifest(null, mockAnnotationsManifest, mockedSignatureFactoryType, "signatureName", "manifestName");
     }
 
     @Test
     public void testCreateManifestWithoutAnnotationsManifest_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Annotations manifest must be present");
-        factory.createManifest(Pair.of("Non-important-for-test", mockDocumentsManifest), null, Pair.of("Non-important-for-test", "signature.ksig"));
+        factory.createManifest(mockDocumentsManifest, null, mockedSignatureFactoryType, "signatureName", "manifestName");
     }
 
     @Test
     public void testCreateManifestOK() throws Exception {
         TlvManifest manifest = factory.createManifest(
-                Pair.of("Non-important-for-test", mockDocumentsManifest),
-                Pair.of("Non-important-for-test", mockAnnotationsManifest),
-                Pair.of("Non-important-for-test", "signature.ksig")
-        );
+                mockDocumentsManifest,
+                mockAnnotationsManifest,
+                mockedSignatureFactoryType,
+                "signatureName",
+                "manifestName");
 
         assertNotNull("Manifest was not created", manifest);
     }

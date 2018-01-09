@@ -19,11 +19,11 @@
 
 package com.guardtime.envelope.packaging;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.EmptyEnvelopeDocument;
-import com.guardtime.envelope.document.ParsedEnvelopeDocument;
-import com.guardtime.envelope.document.StreamEnvelopeDocument;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.EmptyDocument;
+import com.guardtime.envelope.document.ParsedDocument;
+import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.DocumentsManifest;
 import com.guardtime.envelope.manifest.FileReference;
@@ -32,7 +32,6 @@ import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.signature.EnvelopeSignature;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.InputStream;
@@ -47,14 +46,14 @@ import java.util.Map;
  * Structure that groups together all envelope internal structure elements(manifests), documents, annotations and
  * signature that are directly connected to the signature.
  */
-public class SignatureContent implements AutoCloseable {
+public class SignatureContent implements AutoCloseable, Comparable<SignatureContent> {
 
-    private final Map<String, EnvelopeDocument> documents;
-    private final Pair<String, DocumentsManifest> documentsManifest;
-    private final Pair<String, Manifest> manifest;
-    private final Pair<String, AnnotationsManifest> annotationsManifest;
+    private final Map<String, Document> documents;
+    private final DocumentsManifest documentsManifest;
+    private final Manifest manifest;
+    private final AnnotationsManifest annotationsManifest;
     private final Map<String, SingleAnnotationManifest> singleAnnotationManifestMap;
-    private final Map<String, EnvelopeAnnotation> annotations;
+    private final Map<String, Annotation> annotations;
     private EnvelopeSignature signature;
     private final ParsingStore store;
 
@@ -70,20 +69,20 @@ public class SignatureContent implements AutoCloseable {
     }
 
     /**
-     * Provides access to all {@link EnvelopeDocument} contained by the structure.
+     * Provides access to all {@link Document} contained by the structure.
      *
      * @return Map containing the name and the document.
      */
-    public Map<String, EnvelopeDocument> getDocuments() {
+    public Map<String, Document> getDocuments() {
         return Collections.unmodifiableMap(documents);
     }
 
     /**
-     * Provides access to all {@link EnvelopeAnnotation} contained by the structure.
+     * Provides access to all {@link Annotation} contained by the structure.
      *
      * @return Map containing path and annotation where path is used for envelope management.
      */
-    public Map<String, EnvelopeAnnotation> getAnnotations() {
+    public Map<String, Annotation> getAnnotations() {
         return Collections.unmodifiableMap(annotations);
     }
 
@@ -95,15 +94,15 @@ public class SignatureContent implements AutoCloseable {
     }
 
 
-    public Pair<String, DocumentsManifest> getDocumentsManifest() {
+    public DocumentsManifest getDocumentsManifest() {
         return documentsManifest;
     }
 
-    public Pair<String, AnnotationsManifest> getAnnotationsManifest() {
+    public AnnotationsManifest getAnnotationsManifest() {
         return annotationsManifest;
     }
 
-    public Pair<String, Manifest> getManifest() {
+    public Manifest getManifest() {
         return manifest;
     }
 
@@ -112,40 +111,40 @@ public class SignatureContent implements AutoCloseable {
     }
 
     /**
-     * Attached data to a detached {@link EnvelopeDocument}. Returns true after successful attachment.
-     * @param path Path of the {@link EnvelopeDocument} to attach the data to.
-     * @param data Data stream to be attached to the {@link EnvelopeDocument}. NB! Does NOT close the stream!
+     * Attached data to a detached {@link Document}. Returns true after successful attachment.
+     * @param path Path of the {@link Document} to attach the data to.
+     * @param data Data stream to be attached to the {@link Document}. NB! Does NOT close the stream!
      */
     public boolean attachDetachedDocument(String path, InputStream data) {
-        EnvelopeDocument document = documents.get(path);
-        if (document instanceof EmptyEnvelopeDocument) {
-            documents.put(path, new StreamEnvelopeDocument(data, document.getMimeType(), document.getFileName()));
+        Document document = documents.get(path);
+        if (document instanceof EmptyDocument) {
+            documents.put(path, new StreamDocument(data, document.getMimeType(), document.getFileName()));
             return true;
         }
         return false;
     }
 
     /**
-     * Returns existing {@link EnvelopeDocument} if present and replaces it with an {@link EmptyEnvelopeDocument} in the
+     * Returns existing {@link Document} if present and replaces it with an {@link EmptyDocument} in the
      * {@link SignatureContent}. If no document found or if the document is already detached null will be returned.
-     * @throws ParsingStoreException When detaching an instance of {@link ParsedEnvelopeDocument} fails.
+     * @throws ParsingStoreException When detaching an instance of {@link ParsedDocument} fails.
      */
-    public EnvelopeDocument detachDocument(String path) throws ParsingStoreException {
-        if (!documents.containsKey(path) || documents.get(path) instanceof EmptyEnvelopeDocument) {
+    public Document detachDocument(String path) throws ParsingStoreException {
+        if (!documents.containsKey(path) || documents.get(path) instanceof EmptyDocument) {
             return null;
         }
-        EnvelopeDocument removed = documents.remove(path);
+        Document removed = documents.remove(path);
         List<DataHash> removedDocumentHashes = null;
-        for (FileReference ref : documentsManifest.getRight().getDocumentReferences()) {
+        for (FileReference ref : documentsManifest.getDocumentReferences()) {
             if (ref.getUri().equals(path)) {
                 removedDocumentHashes = ref.getHashList();
                 break;
             }
         }
-        documents.put(path, new EmptyEnvelopeDocument(removed.getFileName(), removed.getMimeType(), removedDocumentHashes));
-        if (removed instanceof ParsedEnvelopeDocument) {
+        documents.put(path, new EmptyDocument(removed.getFileName(), removed.getMimeType(), removedDocumentHashes));
+        if (removed instanceof ParsedDocument) {
             try (InputStream inputStream = removed.getInputStream()) {
-                EnvelopeDocument detached = new StreamEnvelopeDocument(inputStream, removed.getMimeType(), removed.getFileName());
+                Document detached = new StreamDocument(inputStream, removed.getMimeType(), removed.getFileName());
                 removed.close();
                 return detached;
             } catch (Exception e) {
@@ -157,11 +156,11 @@ public class SignatureContent implements AutoCloseable {
 
     @Override
     public void close() throws Exception {
-        for (EnvelopeAnnotation annotation : annotations.values()) {
+        for (Annotation annotation : annotations.values()) {
             annotation.close();
         }
 
-        for (EnvelopeDocument document : documents.values()) {
+        for (Document document : documents.values()) {
             document.close();
         }
 
@@ -170,67 +169,88 @@ public class SignatureContent implements AutoCloseable {
         }
     }
 
-    private Map<String, SingleAnnotationManifest> formatSingleAnnotationManifestsListToMap(List<Pair<String, SingleAnnotationManifest>> annotationManifests) {
+    private Map<String, SingleAnnotationManifest> formatSingleAnnotationManifestsListToMap(List<SingleAnnotationManifest> annotationManifests) {
         Map<String, SingleAnnotationManifest> returnable = new HashMap<>();
-        for (Pair<String, SingleAnnotationManifest> manifestPair : annotationManifests) {
-            returnable.put(manifestPair.getLeft(), manifestPair.getRight());
+        for (SingleAnnotationManifest manifest : annotationManifests) {
+            returnable.put(manifest.getPath(), manifest);
         }
         return returnable;
     }
 
-    private Map<String, EnvelopeAnnotation> formatAnnotationsListToMap(List<Pair<String, EnvelopeAnnotation>> annotations) {
-        Map<String, EnvelopeAnnotation> returnable = new HashMap<>();
-        for (Pair<String, EnvelopeAnnotation> annotation : annotations) {
-            returnable.put(annotation.getLeft(), annotation.getRight());
+    private Map<String, Annotation> formatAnnotationsListToMap(List<Annotation> annotations) {
+        Map<String, Annotation> returnable = new HashMap<>();
+        for (Annotation annotation : annotations) {
+            returnable.put(annotation.getPath(), annotation);
         }
         return returnable;
     }
 
-    private Map<String, EnvelopeDocument> formatDocumentsListToMap(List<EnvelopeDocument> documents) {
-        Map<String, EnvelopeDocument> returnable = new HashMap<>();
-        for (EnvelopeDocument document : documents) {
-            returnable.put(document.getFileName(), document);
+    private Map<String, Document> formatDocumentsListToMap(List<Document> documents) {
+        Map<String, Document> returnable = new HashMap<>();
+        for (Document document : documents) {
+            returnable.put(document.getPath(), document);
         }
         return returnable;
+    }
+
+    @Override
+    public int compareTo(SignatureContent other) {
+        if (other == null || other.getEnvelopeSignature() == null) {
+            if (this.signature == null) {
+                return 0;
+            }
+            // The other content is unsigned, moves to the back of any sorting.
+            return -1;
+        }
+        if (this.signature == null) {
+            return 1;
+        }
+        int compared = this.signature.compareTo(other.getEnvelopeSignature());
+        if (compared == 0) {
+            String signatureUri = this.getManifest().getSignatureReference().getUri();
+            String otherSignatureUri = other.getManifest().getSignatureReference().getUri();
+            return signatureUri.compareTo(otherSignatureUri);
+        }
+        return compared;
     }
 
     public static class Builder {
 
-        private List<EnvelopeDocument> documents;
-        private List<Pair<String, EnvelopeAnnotation>> annotations;
-        private Pair<String, DocumentsManifest> documentsManifest;
-        private Pair<String, AnnotationsManifest> annotationsManifest;
-        private Pair<String, Manifest> manifest;
-        private List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifests;
+        private List<Document> documents;
+        private List<Annotation> annotations;
+        private DocumentsManifest documentsManifest;
+        private AnnotationsManifest annotationsManifest;
+        private Manifest manifest;
+        private List<SingleAnnotationManifest> singleAnnotationManifests;
         private EnvelopeSignature signature;
         private ParsingStore store;
 
-        public Builder withDocuments(Collection<EnvelopeDocument> documents) {
+        public Builder withDocuments(Collection<Document> documents) {
             this.documents = new ArrayList<>(documents);
             return this;
         }
 
-        public Builder withAnnotations(List<Pair<String, EnvelopeAnnotation>> annotations) {
+        public Builder withAnnotations(List<Annotation> annotations) {
             this.annotations = annotations;
             return this;
         }
 
-        public Builder withDocumentsManifest(Pair<String, DocumentsManifest> documentsManifest) {
+        public Builder withDocumentsManifest(DocumentsManifest documentsManifest) {
             this.documentsManifest = documentsManifest;
             return this;
         }
 
-        public Builder withAnnotationsManifest(Pair<String, AnnotationsManifest> annotationsManifest) {
+        public Builder withAnnotationsManifest(AnnotationsManifest annotationsManifest) {
             this.annotationsManifest = annotationsManifest;
             return this;
         }
 
-        public Builder withManifest(Pair<String, Manifest> manifest) {
+        public Builder withManifest(Manifest manifest) {
             this.manifest = manifest;
             return this;
         }
 
-        public Builder withSingleAnnotationManifests(List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifests) {
+        public Builder withSingleAnnotationManifests(List<SingleAnnotationManifest> singleAnnotationManifests) {
             this.singleAnnotationManifests = singleAnnotationManifests;
             return this;
         }

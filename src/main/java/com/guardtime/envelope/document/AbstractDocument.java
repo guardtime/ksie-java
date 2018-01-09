@@ -31,14 +31,14 @@ import java.util.List;
 
 import static com.guardtime.envelope.util.Util.notNull;
 
-public abstract class AbstractEnvelopeDocument implements EnvelopeDocument {
+public abstract class AbstractDocument implements Document {
 
     public static final HashAlgorithm HASH_ALGORITHM = HashAlgorithm.SHA2_256;
 
     protected final String mimeType;
     protected final String fileName;
 
-    protected AbstractEnvelopeDocument(String mimeType, String fileName) {
+    protected AbstractDocument(String mimeType, String fileName) {
         notNull(mimeType, "MIME type");
         notNull(fileName, "File name");
         this.mimeType = mimeType;
@@ -100,7 +100,7 @@ public abstract class AbstractEnvelopeDocument implements EnvelopeDocument {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
-            EnvelopeDocument that = (EnvelopeDocument) o;
+            Document that = (Document) o;
 
             if (getFileName() != null ? !getFileName().equals(that.getFileName()) : that.getFileName()!= null) return false;
             if (getMimeType() != null ? !getMimeType().equals(that.getMimeType()) : that.getMimeType() != null) return false;
@@ -128,4 +128,8 @@ public abstract class AbstractEnvelopeDocument implements EnvelopeDocument {
         //Nothing to do here
     }
 
+    @Override
+    public String getPath() {
+        return fileName;
+    }
 }

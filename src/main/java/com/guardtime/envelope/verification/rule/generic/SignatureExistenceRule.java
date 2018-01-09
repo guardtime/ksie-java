@@ -43,7 +43,7 @@ public class SignatureExistenceRule extends AbstractRule<SignatureContent> {
 
     @Override
     protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
-        String uri = verifiable.getManifest().getRight().getSignatureReference().getUri();
+        String uri = verifiable.getManifest().getSignatureReference().getUri();
         EnvelopeSignature signature = verifiable.getEnvelopeSignature();
         if (signature == null || signature.getSignature() == null) {
             holder.addResult(

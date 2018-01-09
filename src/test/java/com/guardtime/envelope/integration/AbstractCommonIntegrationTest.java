@@ -22,12 +22,15 @@ package com.guardtime.envelope.integration;
 import com.guardtime.envelope.AbstractEnvelopeTest;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
+import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
+import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
 import com.guardtime.envelope.signature.SignatureFactory;
 import com.guardtime.envelope.signature.ksi.KsiSignatureFactory;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.KSIBuilder;
+import com.guardtime.ksi.pdu.PduVersion;
 import com.guardtime.ksi.service.client.KSIServiceCredentials;
 import com.guardtime.ksi.service.client.http.HttpClientSettings;
 import com.guardtime.ksi.service.http.simple.SimpleHttpClient;
@@ -48,6 +51,7 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
     private static final String TRUST_STORE_PASSWORD;
     protected EnvelopePackagingFactory packagingFactory;
     protected SignatureFactory signatureFactory;
+    protected EnvelopeWriter envelopeWriter;
     protected KSI ksi;
 
     private static final KSIServiceCredentials KSI_SERVICE_CREDENTIALS;
@@ -64,7 +68,10 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
             TEST_SIGNING_SERVICE = properties.getProperty("service.signing");
             TEST_EXTENDING_SERVICE = properties.getProperty("service.extending");
             GUARDTIME_PUBLICATIONS_FILE = properties.getProperty("publications.file.url");
-            KSI_SERVICE_CREDENTIALS = new KSIServiceCredentials(properties.getProperty("credentials.id"), properties.getProperty("credentials.key"));
+            KSI_SERVICE_CREDENTIALS = new KSIServiceCredentials(
+                    properties.getProperty("credentials.id"),
+                    properties.getProperty("credentials.key")
+            );
             TRUST_STORE_FILE = new File(
                     Thread.currentThread().
                             getContextClassLoader().
@@ -83,7 +90,8 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
                 TEST_SIGNING_SERVICE,
                 TEST_EXTENDING_SERVICE,
                 GUARDTIME_PUBLICATIONS_FILE,
-                KSI_SERVICE_CREDENTIALS
+                KSI_SERVICE_CREDENTIALS,
+                PduVersion.V2
         );
         SimpleHttpClient httpClient = new SimpleHttpClient(settings);
         ksi = new KSIBuilder()
@@ -96,9 +104,8 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
         signatureFactory = new KsiSignatureFactory(ksi);
         packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
-                .enableInternalVerification()
                 .build();
-
+        envelopeWriter = new ZipEnvelopeWriter();
     }
 
     Envelope getEnvelope() throws Exception {

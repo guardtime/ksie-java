@@ -19,6 +19,7 @@
 
 package com.guardtime.envelope.signature;
 
+import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.IOException;
@@ -27,8 +28,10 @@ import java.io.OutputStream;
 /**
  * General interface for all possible signature implementations.
  * @param <O>   Class of the underlying signature.
+ *
+ * NB! compareTo should indicate which EnvelopeSignature was created first.
  */
-public interface EnvelopeSignature<O> {
+public interface EnvelopeSignature<O> extends Comparable<EnvelopeSignature<O>> {
 
     /**
      * Write content of signature to output.

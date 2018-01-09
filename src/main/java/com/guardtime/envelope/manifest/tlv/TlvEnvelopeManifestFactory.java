@@ -19,13 +19,15 @@
 
 package com.guardtime.envelope.manifest.tlv;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.hash.SingleHashAlgorithmProvider;
+import com.guardtime.envelope.manifest.AnnotationsManifest;
+import com.guardtime.envelope.manifest.DocumentsManifest;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.InvalidManifestException;
-import com.guardtime.envelope.util.Pair;
+import com.guardtime.envelope.signature.SignatureFactoryType;
 import com.guardtime.envelope.util.Util;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
@@ -36,9 +38,14 @@ import java.util.Map;
 /**
  * Creates and parses manifests with TLV (Type Length Value) structure.
  */
-public class TlvEnvelopeManifestFactory implements EnvelopeManifestFactory<TlvManifest, TlvDocumentsManifest, TlvAnnotationsManifest, TlvSingleAnnotationManifest> {
+public class TlvEnvelopeManifestFactory implements
+        EnvelopeManifestFactory<TlvManifest, TlvDocumentsManifest, TlvAnnotationsManifest, TlvSingleAnnotationManifest> {
+
     private static final HashAlgorithm DEFAULT_HASH_ALGORITHM = HashAlgorithm.SHA2_256;
-    protected static final TlvManifestFactoryType TLV_MANIFEST_FACTORY_TYPE = new TlvManifestFactoryType("TLV manifest factory", "tlv");
+    protected static final TlvManifestFactoryType TLV_MANIFEST_FACTORY_TYPE = new TlvManifestFactoryType(
+            "TLV manifest factory",
+            "tlv"
+    );
 
     private final HashAlgorithmProvider algorithmProvider;
 
@@ -62,53 +69,72 @@ public class TlvEnvelopeManifestFactory implements EnvelopeManifestFactory<TlvMa
     }
 
     @Override
-    public TlvManifest createManifest(Pair<String, TlvDocumentsManifest> documentsManifest, Pair<String, TlvAnnotationsManifest> annotationManifest, Pair<String, String> signatureReference) throws InvalidManifestException {
+    public TlvManifest createManifest(DocumentsManifest documentsManifest, AnnotationsManifest annotationManifest,
+                                      SignatureFactoryType factoryType, String signatureName, String manifestName) throws InvalidManifestException {
         Util.notNull(documentsManifest, "Documents manifest");
         Util.notNull(annotationManifest, "Annotations manifest");
-        return new TlvManifest(documentsManifest, annotationManifest, signatureReference, algorithmProvider);
+        return new TlvManifest(
+                documentsManifest,
+                annotationManifest,
+                signatureName,
+                factoryType,
+                algorithmProvider,
+                manifestName
+        );
     }
 
     @Override
-    public TlvDocumentsManifest createDocumentsManifest(List<EnvelopeDocument> files) throws InvalidManifestException {
+    public TlvDocumentsManifest createDocumentsManifest(List<Document> files, String documentsManifestName)
+            throws InvalidManifestException {
         Util.notNull(files, "Document files list");
         Util.notEmpty(files, "Document files list");
-        return new TlvDocumentsManifest(files, algorithmProvider);
+        return new TlvDocumentsManifest(files, algorithmProvider, documentsManifestName);
     }
 
     @Override
-    public TlvAnnotationsManifest createAnnotationsManifest(Map<String, Pair<EnvelopeAnnotation, TlvSingleAnnotationManifest>> annotationManifest) throws InvalidManifestException {
-        return new TlvAnnotationsManifest(annotationManifest, algorithmProvider);
+    public TlvAnnotationsManifest createAnnotationsManifest(Map<Annotation, TlvSingleAnnotationManifest> annotationManifests,
+                                                            String annotationsManifestName)
+            throws InvalidManifestException {
+        return new TlvAnnotationsManifest(annotationManifests, algorithmProvider, annotationsManifestName);
     }
 
     @Override
-    public TlvSingleAnnotationManifest createSingleAnnotationManifest(Pair<String, TlvDocumentsManifest> documentsManifest, Pair<String, EnvelopeAnnotation> annotation) throws InvalidManifestException {
+    public TlvSingleAnnotationManifest createSingleAnnotationManifest(DocumentsManifest documentsManifest,
+                                                                      Annotation annotation, String singleAnnotationManifestName)
+            throws InvalidManifestException {
         Util.notNull(documentsManifest, "Documents manifest");
         Util.notNull(annotation, "Annotation");
-        return new TlvSingleAnnotationManifest(annotation, documentsManifest, algorithmProvider);
+        return new TlvSingleAnnotationManifest(
+                annotation,
+                documentsManifest,
+                algorithmProvider,
+                singleAnnotationManifestName
+        );
     }
 
     @Override
-    public TlvManifest readManifest(InputStream input) throws InvalidManifestException {
+    public TlvManifest readManifest(InputStream input, String path) throws InvalidManifestException {
         Util.notNull(input, "Input stream");
-        return new TlvManifest(input);
+        return new TlvManifest(input, path);
     }
 
     @Override
-    public TlvDocumentsManifest readDocumentsManifest(InputStream input) throws InvalidManifestException {
+    public TlvDocumentsManifest readDocumentsManifest(InputStream input, String path) throws InvalidManifestException {
         Util.notNull(input, "Input stream");
-        return new TlvDocumentsManifest(input);
+        return new TlvDocumentsManifest(input, path);
     }
 
     @Override
-    public TlvAnnotationsManifest readAnnotationsManifest(InputStream input) throws InvalidManifestException {
+    public TlvAnnotationsManifest readAnnotationsManifest(InputStream input, String path) throws InvalidManifestException {
         Util.notNull(input, "Input stream");
-        return new TlvAnnotationsManifest(input);
+        return new TlvAnnotationsManifest(input, path);
     }
 
     @Override
-    public TlvSingleAnnotationManifest readSingleAnnotationManifest(InputStream input) throws InvalidManifestException {
+    public TlvSingleAnnotationManifest readSingleAnnotationManifest(InputStream input, String path)
+            throws InvalidManifestException {
         Util.notNull(input, "Input stream");
-        return new TlvSingleAnnotationManifest(input);
+        return new TlvSingleAnnotationManifest(input, path);
     }
 
     @Override

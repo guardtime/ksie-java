@@ -46,7 +46,7 @@ public class SignatureSignsManifestRule extends AbstractRule<SignatureContent> {
     @Override
     protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
         VerificationResult result = getFailureVerificationResult();
-        Manifest manifest = verifiable.getManifest().getRight();
+        Manifest manifest = verifiable.getManifest();
         try {
             DataHash signedHash = verifiable.getEnvelopeSignature().getSignedDataHash();
             DataHash realHash = manifest.getDataHash(signedHash.getAlgorithm());
@@ -56,7 +56,7 @@ public class SignatureSignsManifestRule extends AbstractRule<SignatureContent> {
         } catch (DataHashException e) {
             throw new RuleTerminatingException("Failed to verify hash of manifest!", e);
         } finally {
-            String manifestUri = verifiable.getManifest().getLeft();
+            String manifestUri = verifiable.getManifest().getPath();
             holder.addResult(verifiable, new GenericVerificationResult(result, getName(), getErrorMessage(), manifestUri));
         }
     }

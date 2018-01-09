@@ -19,12 +19,12 @@
 
 package com.guardtime.envelope.packaging.parsing;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
-import com.guardtime.envelope.annotation.ParsedEnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.EmptyEnvelopeDocument;
-import com.guardtime.envelope.document.ParsedEnvelopeDocument;
+import com.guardtime.envelope.annotation.ParsedAnnotation;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.EmptyDocument;
+import com.guardtime.envelope.document.ParsedDocument;
 import com.guardtime.envelope.manifest.AnnotationDataReference;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.DocumentsManifest;
@@ -32,14 +32,7 @@ import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.SignatureContent;
-import com.guardtime.envelope.packaging.parsing.handler.AnnotationContentHandler;
-import com.guardtime.envelope.packaging.parsing.handler.AnnotationsManifestHandler;
 import com.guardtime.envelope.packaging.parsing.handler.ContentParsingException;
-import com.guardtime.envelope.packaging.parsing.handler.DocumentContentHandler;
-import com.guardtime.envelope.packaging.parsing.handler.DocumentsManifestHandler;
-import com.guardtime.envelope.packaging.parsing.handler.ManifestHandler;
-import com.guardtime.envelope.packaging.parsing.handler.SignatureHandler;
-import com.guardtime.envelope.packaging.parsing.handler.SingleAnnotationManifestHandler;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
@@ -54,25 +47,11 @@ import java.util.List;
 
 public class SignatureContentHandler {
 
-    private final DocumentContentHandler documentHandler;
-    private final AnnotationContentHandler annotationContentHandler;
-    private final ManifestHandler manifestHandler;
-    private final DocumentsManifestHandler documentsManifestHandler;
-    private final AnnotationsManifestHandler annotationsManifestHandler;
-    private final SingleAnnotationManifestHandler singleAnnotationManifestHandler;
-    private final SignatureHandler signatureHandler;
 
-    public SignatureContentHandler(DocumentContentHandler documentHandler, AnnotationContentHandler annotationContentHandler,
-                                   ManifestHandler manifestHandler, DocumentsManifestHandler documentsManifestHandler,
-                                   AnnotationsManifestHandler annotationsManifestHandler, SingleAnnotationManifestHandler singleAnnotationManifestHandler,
-                                   SignatureHandler signatureHandler) {
-        this.documentHandler = documentHandler;
-        this.annotationContentHandler = annotationContentHandler;
-        this.manifestHandler = manifestHandler;
-        this.documentsManifestHandler = documentsManifestHandler;
-        this.annotationsManifestHandler = annotationsManifestHandler;
-        this.singleAnnotationManifestHandler = singleAnnotationManifestHandler;
-        this.signatureHandler = signatureHandler;
+    private final HandlerSet handler;
+
+    public SignatureContentHandler(HandlerSet handlerSet) {
+        this.handler = handlerSet;
     }
 
     public Pair<SignatureContent, List<Throwable>> get(String manifestPath, ParsingStoreFactory parsingStoreFactory)
@@ -95,12 +74,12 @@ public class SignatureContentHandler {
     private class SignatureContentGroup {
 
         List<Throwable> exceptions = new ArrayList<>();
-        Pair<String, Manifest> manifest;
-        Pair<String, DocumentsManifest> documentsManifest;
-        Pair<String, AnnotationsManifest> annotationsManifest;
-        List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifests = new LinkedList<>();
-        List<Pair<String, EnvelopeAnnotation>> annotations = new LinkedList<>();
-        List<EnvelopeDocument> documents = new LinkedList<>();
+        Manifest manifest;
+        DocumentsManifest documentsManifest;
+        AnnotationsManifest annotationsManifest;
+        List<SingleAnnotationManifest> singleAnnotationManifests = new LinkedList<>();
+        List<Annotation> annotations = new LinkedList<>();
+        List<Document> documents = new LinkedList<>();
         EnvelopeSignature signature;
         ParsingStore parsingStore;
 
@@ -116,27 +95,24 @@ public class SignatureContentHandler {
             fetchSignature();
         }
 
-        private Pair<String, Manifest> getManifest(String manifestPath) throws ContentParsingException {
-            return Pair.of(manifestPath, manifestHandler.get(manifestPath));
+        private Manifest getManifest(String manifestPath) throws ContentParsingException {
+            return handler.getManifest(manifestPath);
         }
 
-        private Pair<String, AnnotationsManifest> getAnnotationsManifest() {
-            FileReference annotationsManifestReference = manifest.getRight().getAnnotationsManifestReference();
+        private AnnotationsManifest getAnnotationsManifest() {
+            FileReference annotationsManifestReference = manifest.getAnnotationsManifestReference();
             try {
-                return Pair.of(
-                        annotationsManifestReference.getUri(),
-                        annotationsManifestHandler.get(annotationsManifestReference.getUri())
-                );
+                return handler.getAnnotationsManifest(annotationsManifestReference.getUri());
             } catch (ContentParsingException e) {
                 exceptions.add(e);
                 return null;
             }
         }
 
-        private Pair<String, DocumentsManifest> getDocumentsManifest() {
-            FileReference documentsManifestReference = manifest.getRight().getDocumentsManifestReference();
+        private DocumentsManifest getDocumentsManifest() {
+            FileReference documentsManifestReference = manifest.getDocumentsManifestReference();
             try {
-                return Pair.of(documentsManifestReference.getUri(), documentsManifestHandler.get(documentsManifestReference.getUri()));
+                return handler.getDocumentsManifest(documentsManifestReference.getUri());
             } catch (ContentParsingException e) {
                 exceptions.add(e);
                 return null;
@@ -145,21 +121,21 @@ public class SignatureContentHandler {
 
         private void populateDocuments() {
             if (documentsManifest == null) return;
-            for (FileReference reference : documentsManifest.getRight().getDocumentReferences()) {
-                EnvelopeDocument envelopeDocument = fetchDocumentFromHandler(reference);
-                if (envelopeDocument != null) documents.add(envelopeDocument);
+            for (FileReference reference : documentsManifest.getDocumentReferences()) {
+                Document document = fetchDocumentFromHandler(reference);
+                if (document != null) documents.add(document);
             }
         }
 
-        private EnvelopeDocument fetchDocumentFromHandler(FileReference reference) {
+        private Document fetchDocumentFromHandler(FileReference reference) {
             if (invalidReference(reference)) return null;
             String documentUri = reference.getUri();
-            try (InputStream stream = documentHandler.get(documentUri)) {
+            try (InputStream stream = handler.getInputStream(documentUri)) {
                 parsingStore.store(documentUri, stream);
-                return new ParsedEnvelopeDocument(parsingStore, documentUri, reference.getMimeType(), documentUri);
+                return new ParsedDocument(parsingStore, documentUri, reference.getMimeType(), documentUri);
             } catch (ContentParsingException | ParsingStoreException | IOException e) {
                 // either removed or was never present in the first place, verifier will decide
-                return new EmptyEnvelopeDocument(documentUri, reference.getMimeType(), reference.getHashList());
+                return new EmptyDocument(documentUri, reference.getMimeType(), reference.getHashList());
             }
         }
 
@@ -172,28 +148,27 @@ public class SignatureContentHandler {
 
         private void populateAnnotationsWithManifests() {
             if (annotationsManifest == null) return;
-            for (FileReference manifestReference : annotationsManifest.getRight().getSingleAnnotationManifestReferences()) {
-                Pair<String, SingleAnnotationManifest> singleAnnotationManifest = getSingleAnnotationManifest(manifestReference);
+            for (FileReference manifestReference : annotationsManifest.getSingleAnnotationManifestReferences()) {
+                SingleAnnotationManifest singleAnnotationManifest = getSingleAnnotationManifest(manifestReference);
                 if (singleAnnotationManifest != null) {
                     singleAnnotationManifests.add(singleAnnotationManifest);
-                    Pair<String, EnvelopeAnnotation> annotation = getEnvelopeAnnotation(manifestReference, singleAnnotationManifest.getRight());
+                    Annotation annotation = getEnvelopeAnnotation(manifestReference, singleAnnotationManifest);
                     if (annotation != null) annotations.add(annotation);
                 }
             }
         }
 
-        private Pair<String, SingleAnnotationManifest> getSingleAnnotationManifest(FileReference manifestReference) {
+        private SingleAnnotationManifest getSingleAnnotationManifest(FileReference manifestReference) {
             try {
-                String manifestReferenceUri = manifestReference.getUri();
-                SingleAnnotationManifest singleAnnotationManifest = singleAnnotationManifestHandler.get(manifestReferenceUri);
-                return Pair.of(manifestReferenceUri, singleAnnotationManifest);
+                String manifestUri = manifestReference.getUri();
+                return handler.getSingleAnnotationManifest(manifestUri);
             } catch (ContentParsingException e) {
                 exceptions.add(e);
                 return null;
             }
         }
 
-        private Pair<String, EnvelopeAnnotation> getEnvelopeAnnotation(FileReference manifestReference, SingleAnnotationManifest singleAnnotationManifest) {
+        private Annotation getEnvelopeAnnotation(FileReference manifestReference, SingleAnnotationManifest singleAnnotationManifest) {
             EnvelopeAnnotationType type = EnvelopeAnnotationType.fromContent(manifestReference.getMimeType());
             if (type == null) {
                 String message = String.format(
@@ -206,10 +181,11 @@ public class SignatureContentHandler {
             }
             AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
             String uri = annotationDataReference.getUri();
-            try (InputStream stream = annotationContentHandler.get(uri)) {
+            try (InputStream stream = handler.getInputStream(uri)) {
                 parsingStore.store(uri, stream);
-                EnvelopeAnnotation annotation = new ParsedEnvelopeAnnotation(parsingStore, uri, annotationDataReference.getDomain(), type);
-                return Pair.of(uri, annotation);
+                Annotation annotation = new ParsedAnnotation(parsingStore, uri, annotationDataReference.getDomain(), type);
+                annotation.setPath(uri);
+                return annotation;
             } catch (ContentParsingException | ParsingStoreException | IOException e) {
                 exceptions.add(e);
                 return null;
@@ -217,9 +193,9 @@ public class SignatureContentHandler {
         }
 
         private void fetchSignature() {
-            String signatureUri = manifest.getRight().getSignatureReference().getUri();
+            String signatureUri = manifest.getSignatureReference().getUri();
             try {
-                signature = signatureHandler.get(signatureUri);
+                signature = handler.getEnvelopeSignature(signatureUri);
             } catch (ContentParsingException e) {
                 exceptions.add(e);
                 signature = null;

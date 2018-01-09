@@ -19,11 +19,11 @@
 
 package com.guardtime.envelope.integration;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
-import com.guardtime.envelope.annotation.StringEnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
-import com.guardtime.envelope.document.StreamEnvelopeDocument;
+import com.guardtime.envelope.annotation.StringAnnotation;
+import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.extending.ExtendedEnvelope;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.exception.InvalidPackageException;
@@ -47,6 +47,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -105,10 +106,14 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         Envelope existingEnvelope = getEnvelope(ENVELOPE_WITH_MULTIPLE_SIGNATURES);
         List<File> ksieTempFiles = getKsieTempFiles();
         try (
-                EnvelopeDocument document = new StreamEnvelopeDocument(new ByteArrayInputStream(new byte[313]), "byte inputstream", "byte-input-stream.bis");
-                EnvelopeAnnotation annotation = new StringEnvelopeAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "content", "domain.com")
+                Document document = new StreamDocument(
+                        new ByteArrayInputStream(new byte[313]),
+                        "byte inputstream",
+                        "byte-input-stream.bis"
+                );
+                Annotation annotation = new StringAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "content", "domain.com")
         ) {
-            packagingFactory.addSignature(existingEnvelope, Collections.singletonList(document), Collections.singletonList(annotation));
+            packagingFactory.addSignature(existingEnvelope, singletonList(document), singletonList(annotation));
             for (File doc : ksieTempFiles) {
                 if (isTempFile(doc)) {
                     Util.deleteFileOrDirectory(doc.toPath());
@@ -126,10 +131,14 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         Envelope existingEnvelope = getEnvelope(ENVELOPE_WITH_MULTIPLE_SIGNATURES);
         List<File> ksieTempFiles = getKsieTempFiles();
         try (
-                EnvelopeDocument document = new StreamEnvelopeDocument(new ByteArrayInputStream(new byte[313]), "byte inputstream", "byte-input-stream.bis");
-                EnvelopeAnnotation annotation = new StringEnvelopeAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "content", "domain.com")
+                Document document = new StreamDocument(
+                        new ByteArrayInputStream(new byte[313]),
+                        "byte inputstream",
+                        "byte-input-stream.bis"
+                );
+                Annotation annotation = new StringAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "content", "domain.com")
         ) {
-            packagingFactory.addSignature(existingEnvelope, Collections.singletonList(document), Collections.singletonList(annotation));
+            packagingFactory.addSignature(existingEnvelope, singletonList(document), singletonList(annotation));
             for (File doc : getKsieTempFiles()) {
                 if (isTempFile(doc) && !ksieTempFiles.contains(doc)) {
                     Util.deleteFileOrDirectory(doc.toPath());
@@ -149,7 +158,7 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         Envelope envelope = getEnvelope(ENVELOPE_WITH_MULTIPLE_SIGNATURES);
         envelope.close();
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-            envelope.writeTo(bos);
+            envelopeWriter.write(envelope, bos);
         }
         assertFalse(anyKsieTempFiles());
     }
@@ -165,7 +174,7 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
             List<File> tempFiles = getKsieTempFiles();
             assertTrue(tempFiles.size() == envelope.getSignatureContents().size() + 1);
             Util.deleteFileOrDirectory(tempFiles.get(0).toPath());
-            envelope.writeTo(bos);
+            envelopeWriter.write(envelope, bos);
         }
     }
 
@@ -174,13 +183,20 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         expectedException.expect(InvalidPackageException.class);
         expectedException.expectMessage("Created envelope did not pass internal verification");
         try (
-                EnvelopeDocument document = new StreamEnvelopeDocument(new ByteArrayInputStream(new byte[3]), "qwerty", "qwert.file");
-                EnvelopeAnnotation annotation = new StringEnvelopeAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "qwerty file", "qwerty.domain.com");
+                Document document = new StreamDocument(new ByteArrayInputStream(new byte[3]), "qwerty", "qwert.file");
+                Annotation annotation = new StringAnnotation(
+                        EnvelopeAnnotationType.FULLY_REMOVABLE,
+                        "qwerty file",
+                        "qwerty.domain.com"
+                );
                 Envelope envelope = getEnvelope(ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION)
         ) {
             List<File> tempFiles = getKsieTempFiles();
             //One KSIE directory for envelope, one per signatureContent and one KSIE...tmp file for annotation.
-            assertTrue("Temp dir contains more than necessary KSIE temporary files, test system is not clean.",tempFiles.size() == envelope.getSignatureContents().size() + 2);
+            assertTrue(
+                    "Temp dir contains more than necessary KSIE temporary files, test system is not clean.",
+                    tempFiles.size() == envelope.getSignatureContents().size() + 2
+            );
             for (File tmp : tempFiles) {
                 if (tmp.isDirectory()){
                     File[] files = tmp.listFiles();
@@ -191,7 +207,7 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
                     }
                 }
             }
-            packagingFactory.addSignature(envelope, Collections.singletonList(document), Collections.singletonList(annotation));
+            packagingFactory.addSignature(envelope, singletonList(document), singletonList(annotation));
         }
     }
 

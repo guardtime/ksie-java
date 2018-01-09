@@ -20,17 +20,15 @@
 package com.guardtime.envelope.verification.rule.generic;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.packaging.SignatureContent;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.result.GenericVerificationResult;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.envelope.verification.rule.Rule;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -40,6 +38,7 @@ import java.util.List;
 import static com.guardtime.envelope.verification.result.VerificationResult.OK;
 import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_DATA_MANIFEST_EXISTS;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class DocumentExistenceRuleTest extends AbstractEnvelopeTest {
@@ -48,12 +47,12 @@ public class DocumentExistenceRuleTest extends AbstractEnvelopeTest {
 
     @Test
     public void testDocumentExistsResultsInOK() throws Exception {
-        final FileReference mockFileReference = Mockito.mock(FileReference.class);
-        SignatureContent mockSignatureContent = Mockito.mock(SignatureContent.class);
+        final FileReference mockFileReference = mock(FileReference.class);
+        SignatureContent mockSignatureContent = mock(SignatureContent.class);
         String documentPath = "somePath";
         when(mockFileReference.getUri()).thenReturn(documentPath);
-        when(mockSignatureContent.getDocuments()).thenReturn(Collections.singletonMap(documentPath, Mockito.mock(EnvelopeDocument.class)));
-        when(mockSignatureContent.getDocumentsManifest()).thenReturn(Pair.of("", mockedDocumentsManifest));
+        when(mockSignatureContent.getDocuments()).thenReturn(Collections.singletonMap(documentPath, mock(Document.class)));
+        when(mockSignatureContent.getDocumentsManifest()).thenReturn(mockedDocumentsManifest);
         when(mockedDocumentsManifest.getDocumentReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {
             @Override
             public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) throws Throwable {
@@ -62,7 +61,10 @@ public class DocumentExistenceRuleTest extends AbstractEnvelopeTest {
         });
 
         ResultHolder holder = new ResultHolder();
-        holder.addResult(mockSignatureContent, new GenericVerificationResult(OK, KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName(), "", documentPath));
+        holder.addResult(
+                mockSignatureContent,
+                new GenericVerificationResult(OK, KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName(), "", documentPath)
+        );
         rule.verify(holder, mockSignatureContent);
 
         assertEquals(VerificationResult.OK, holder.getAggregatedResult());
@@ -70,12 +72,12 @@ public class DocumentExistenceRuleTest extends AbstractEnvelopeTest {
 
     @Test
     public void testDocumentDoesNotExistsResultsInNOK() throws Exception {
-        final FileReference mockFileReference = Mockito.mock(FileReference.class);
-        SignatureContent mockSignatureContent = Mockito.mock(SignatureContent.class);
+        final FileReference mockFileReference = mock(FileReference.class);
+        SignatureContent mockSignatureContent = mock(SignatureContent.class);
         String documentPath = "somePath";
         when(mockFileReference.getUri()).thenReturn(documentPath);
-        when(mockSignatureContent.getDocuments()).thenReturn(Collections.<String, EnvelopeDocument>emptyMap());
-        when(mockSignatureContent.getDocumentsManifest()).thenReturn(Pair.of("", mockedDocumentsManifest));
+        when(mockSignatureContent.getDocuments()).thenReturn(Collections.<String, Document>emptyMap());
+        when(mockSignatureContent.getDocumentsManifest()).thenReturn(mockedDocumentsManifest);
         when(mockedDocumentsManifest.getDocumentReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {
             @Override
             public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) throws Throwable {
@@ -84,7 +86,10 @@ public class DocumentExistenceRuleTest extends AbstractEnvelopeTest {
         });
 
         ResultHolder holder = new ResultHolder();
-        holder.addResult(mockSignatureContent, new GenericVerificationResult(OK, KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName(), "", documentPath));
+        holder.addResult(
+                mockSignatureContent,
+                new GenericVerificationResult(OK, KSIE_VERIFY_DATA_MANIFEST_EXISTS.getName(), "", documentPath)
+        );
         rule.verify(holder, mockSignatureContent);
 
         assertEquals(VerificationResult.NOK, holder.getAggregatedResult());

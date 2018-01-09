@@ -19,10 +19,9 @@
 
 package com.guardtime.envelope.verification;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.SignatureContent;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import com.guardtime.envelope.verification.result.RuleVerificationResult;
 import com.guardtime.envelope.verification.result.SignatureResult;
@@ -31,7 +30,6 @@ import com.guardtime.envelope.verification.result.VerificationResultFilter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class VerifiedSignatureContent extends SignatureContent {
     private final List<RuleVerificationResult> results;
@@ -60,20 +58,13 @@ public class VerifiedSignatureContent extends SignatureContent {
         });
     }
 
-    private static List<Pair<String, EnvelopeAnnotation>> getAnnotations(SignatureContent original) {
-        List<Pair<String, EnvelopeAnnotation>> annotationPairs = new ArrayList<>(original.getAnnotations().size());
-        for (Map.Entry<String, EnvelopeAnnotation> entry : original.getAnnotations().entrySet()) {
-            annotationPairs.add(Pair.of(entry.getKey(), entry.getValue()));
-        }
-        return annotationPairs;
+
+    private static List<Annotation> getAnnotations(SignatureContent original) {
+        return new ArrayList<>(original.getAnnotations().values());
     }
 
-    private static List<Pair<String, SingleAnnotationManifest>> getSingleAnnotationManifests(SignatureContent original) {
-        List<Pair<String, SingleAnnotationManifest>> singleAnnotationManifestPairs = new ArrayList<>(original.getSingleAnnotationManifests().size());
-        for (Map.Entry<String, SingleAnnotationManifest> entry : original.getSingleAnnotationManifests().entrySet()) {
-            singleAnnotationManifestPairs.add(Pair.of(entry.getKey(), entry.getValue()));
-        }
-        return singleAnnotationManifestPairs;
+    private static List<SingleAnnotationManifest> getSingleAnnotationManifests(SignatureContent original) {
+        return new ArrayList<>(original.getSingleAnnotationManifests().values());
     }
 
     /**

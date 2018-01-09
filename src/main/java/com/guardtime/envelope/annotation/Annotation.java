@@ -17,27 +17,32 @@
  * reserves and retains all trademark rights.
  */
 
-package com.guardtime.envelope.packaging;
+package com.guardtime.envelope.annotation;
 
-import java.io.ByteArrayInputStream;
+import com.guardtime.envelope.EnvelopeElement;
+
+import java.io.IOException;
 import java.io.InputStream;
 
-public class MimeTypeEntry implements MimeType {
+/**
+ * Represents annotations that can be used in envelope. Combines annotation data and annotation
+ * meta-data into one object.
+ */
+public interface Annotation extends AutoCloseable, EnvelopeElement {
 
-    private final String uri;
-    private final byte[] content;
+    EnvelopeAnnotationType getAnnotationType();
 
-    public MimeTypeEntry(String uri, byte[] content) {
-        this.uri = uri;
-        this.content = content;
-    }
+    String getDomain();
 
-    public String getUri() {
-        return uri;
-    }
+    /**
+     * Returns {@link InputStream} containing the annotation data.
+     * @throws IOException when there is a problem creating or accessing the InputStream.
+     */
+    InputStream getInputStream() throws IOException;
 
-    public InputStream getInputStream() {
-        return new ByteArrayInputStream(content);
-    }
+    /**
+     * Sets the path value used by {@link EnvelopeElement#getPath()}.
+     */
+    void setPath(String path);
 
 }

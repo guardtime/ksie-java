@@ -19,10 +19,10 @@
 
 package com.guardtime.envelope.manifest;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
-import com.guardtime.envelope.util.Pair;
+import com.guardtime.envelope.signature.SignatureFactoryType;
 
 import java.io.InputStream;
 import java.util.List;
@@ -35,25 +35,30 @@ import java.util.Map;
  * @param <A>     Annotations manifest implementation.
  * @param <SA>    Annotation info manifest implementation.
  */
-public interface EnvelopeManifestFactory<M extends Manifest, D extends DocumentsManifest, A extends AnnotationsManifest, SA extends SingleAnnotationManifest> {
+public interface EnvelopeManifestFactory
+        <M extends Manifest, D extends DocumentsManifest, A extends AnnotationsManifest, SA extends SingleAnnotationManifest> {
 
     HashAlgorithmProvider getHashAlgorithmProvider();
 
-    M createManifest(Pair<String, D> documentsManifest, Pair<String, A> annotationManifest, Pair<String, String> signatureReference) throws InvalidManifestException;
+    M createManifest(DocumentsManifest documentsManifest, AnnotationsManifest annotationManifest,
+                     SignatureFactoryType signatureFactoryType, String signatureName, String manifestName)
+            throws InvalidManifestException;
 
-    D createDocumentsManifest(List<EnvelopeDocument> files) throws InvalidManifestException;
+    D createDocumentsManifest(List<Document> files, String documentsManifestName) throws InvalidManifestException;
 
-    A createAnnotationsManifest(Map<String, Pair<EnvelopeAnnotation, SA>> annotationManifests) throws InvalidManifestException;
+    A createAnnotationsManifest(Map<Annotation, SA> annotationManifests, String annotationsManifestName)
+            throws InvalidManifestException;
 
-    SA createSingleAnnotationManifest(Pair<String, D> documentsManifest, Pair<String, EnvelopeAnnotation> annotation) throws InvalidManifestException;
+    SA createSingleAnnotationManifest(DocumentsManifest documentsManifest, Annotation annotation,
+                                      String singleAnnotationManifestName) throws InvalidManifestException;
 
-    M readManifest(InputStream input) throws InvalidManifestException;
+    M readManifest(InputStream input, String path) throws InvalidManifestException;
 
-    D readDocumentsManifest(InputStream input) throws InvalidManifestException;
+    D readDocumentsManifest(InputStream input, String path) throws InvalidManifestException;
 
-    A readAnnotationsManifest(InputStream input) throws InvalidManifestException;
+    A readAnnotationsManifest(InputStream input, String path) throws InvalidManifestException;
 
-    SA readSingleAnnotationManifest(InputStream input) throws InvalidManifestException;
+    SA readSingleAnnotationManifest(InputStream input, String path) throws InvalidManifestException;
 
     ManifestFactoryType getManifestFactoryType();
 

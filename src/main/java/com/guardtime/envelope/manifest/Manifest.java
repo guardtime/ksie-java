@@ -19,10 +19,8 @@
 
 package com.guardtime.envelope.manifest;
 
+import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.envelope.signature.EnvelopeSignature;
-import com.guardtime.envelope.util.DataHashException;
-import com.guardtime.ksi.hashing.DataHash;
-import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,14 +30,7 @@ import java.io.InputStream;
  * {@link EnvelopeSignature} contained in the envelope. This is the root manifest of
  * envelope structure.
  */
-public interface Manifest {
-
-    /**
-     * Returns {@link DataHash} created based on the same data available from {@link #getInputStream()} for given algorithm.
-     * @param algorithm to be used for generating the hash.
-     * @throws DataHashException when the hash input data can't be accessed.
-     */
-    DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException;
+public interface Manifest extends EnvelopeElement {
 
     /**
      * Returns InputStream containing this manifest.

@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.hash;
 
-import com.guardtime.envelope.document.EnvelopeDocument;
+import com.guardtime.envelope.document.Document;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.util.List;
@@ -39,7 +39,7 @@ public interface HashAlgorithmProvider {
     /**
      * Returns a {@link List} of all {@link HashAlgorithm}s to be used for creating {@link
      * com.guardtime.ksi.hashing.DataHash}es for {@link com.guardtime.envelope.manifest.FileReference} used
-     * specifically for {@link EnvelopeDocument}s.
+     * specifically for {@link Document}s.
      */
     List<HashAlgorithm> getDocumentReferenceHashAlgorithms();
 

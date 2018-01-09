@@ -19,10 +19,9 @@
 
 package com.guardtime.envelope.manifest.tlv;
 
-import com.guardtime.envelope.annotation.EnvelopeAnnotation;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.InvalidManifestException;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.ksi.tlv.TLVElement;
 
 import org.junit.Test;
@@ -35,14 +34,16 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateAnnotationsManifest() throws Exception {
-        Map<String, Pair<EnvelopeAnnotation, TlvSingleAnnotationManifest>> singleAnnotationManifests = new HashMap<>();
-        singleAnnotationManifests.put(MOCK_URI, Pair.of(mockAnnotation, mockSingleAnnotationManifest));
-        TlvAnnotationsManifest annotationsManifest = new TlvAnnotationsManifest(singleAnnotationManifests, DEFAULT_HASH_ALGORITHM_PROVIDER);
+        Map<Annotation, TlvSingleAnnotationManifest> singleAnnotationManifests = new HashMap<>();
+        singleAnnotationManifests.put(mockAnnotation, mockSingleAnnotationManifest);
+        TlvAnnotationsManifest annotationsManifest =
+                new TlvAnnotationsManifest(singleAnnotationManifests, DEFAULT_HASH_ALGORITHM_PROVIDER, "Path");
         assertArrayEquals(ANNOTATIONS_MANIFEST_MAGIC, annotationsManifest.getMagic());
         assertNotNull(annotationsManifest.getSingleAnnotationManifestReferences());
         assertNotNull(annotationsManifest.getSingleAnnotationManifestReferences().get(0));
@@ -50,10 +51,11 @@ public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
 
     @Test
     public void testReadAnnotationsManifest() throws Exception {
-        TLVElement annotationsInfoReference = createReference(ANNOTATION_INFO_REFERENCE_TYPE, MOCK_URI, MIME_TYPE_APPLICATION_TXT, dataHash);
+        TLVElement annotationsInfoReference =
+                createReference(ANNOTATION_INFO_REFERENCE_TYPE, MOCK_URI, MIME_TYPE_APPLICATION_TXT, dataHash);
         byte[] bytes = join(ANNOTATIONS_MANIFEST_MAGIC, annotationsInfoReference.getEncoded());
 
-        TlvAnnotationsManifest annotationsManifest = new TlvAnnotationsManifest(new ByteArrayInputStream(bytes));
+        TlvAnnotationsManifest annotationsManifest = new TlvAnnotationsManifest(new ByteArrayInputStream(bytes), "");
         assertArrayEquals(ANNOTATIONS_MANIFEST_MAGIC, annotationsManifest.getMagic());
         assertNotNull(annotationsManifest.getSingleAnnotationManifestReferences());
         assertEquals(1, annotationsManifest.getSingleAnnotationManifestReferences().size());
@@ -67,12 +69,13 @@ public class TlvAnnotationsManifestTest extends AbstractTlvManifestTest {
     public void testReadAnnotationsManifestUsingInvalidMagicBytes_ThrowsInvalidManifestException() throws Exception {
         expectedException.expect(InvalidManifestException.class);
         expectedException.expectMessage("Invalid magic for manifest type");
-        new TlvAnnotationsManifest(new ByteArrayInputStream(DOCUMENTS_MANIFEST_MAGIC));
+        new TlvAnnotationsManifest(new ByteArrayInputStream(DOCUMENTS_MANIFEST_MAGIC), "");
     }
 
     @Test
     public void testReadAnnotationsManifestWithoutAnnotationReferences() throws Exception {
-        TlvAnnotationsManifest annotationsManifest = new TlvAnnotationsManifest(new ByteArrayInputStream(ANNOTATIONS_MANIFEST_MAGIC));
+        TlvAnnotationsManifest annotationsManifest =
+                new TlvAnnotationsManifest(new ByteArrayInputStream(ANNOTATIONS_MANIFEST_MAGIC), "");
         assertArrayEquals(ANNOTATIONS_MANIFEST_MAGIC, annotationsManifest.getMagic());
         assertNotNull(annotationsManifest.getSingleAnnotationManifestReferences());
         assertTrue(annotationsManifest.getSingleAnnotationManifestReferences().isEmpty());

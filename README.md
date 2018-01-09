@@ -72,6 +72,16 @@ Envelope parsedEnvelope = packagingFactory.read(inputStream);
 It is suggested to always verify the parsed envelope before adding new documents or annotations to it.
 
 
+### Writing an Envelope
+
+In order to write an envelope to some storage medium an EnvelopeWriter is needed.
+From existing implementations ZipEnvelopeWriter can be used from com.guardtime.envelope.packaging.zip package.
+
+OutputStream outputStream = new FileOutputStream("path/to/store/envelope.extension");
+EnvelopeWriter writer = new ZipEnvelopeWriter();
+writer.write(envelope, outputStream);
+
+
 ### Adding New Documents or Annotations to the Existing Envelope
 
 Both, the `EnvelopeBuilder` and `EnvelopePackagingFactory` allow for adding new documents and annotations to an existing envelope. The existing envelope's content will be copied to a new envelope and that will be expanded with the new documents/annotation and a signature covering them.

@@ -20,17 +20,25 @@
 package com.guardtime.envelope.indexing;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
+import com.guardtime.envelope.document.ParsedDocument;
+import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
+import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
+import static com.guardtime.envelope.packaging.EntryNameProvider.META_INF;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
 
@@ -38,11 +46,14 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
 
     @Test
     public void testCreateWithValidEnvelope() throws Exception {
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                disableInternalVerification().
-                build();
-        try (Envelope envelope = packagingFactory.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_ENVELOPE_ANNOTATION))) {
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .build();
+        try (Envelope envelope = packagingFactory.create(
+                singletonList(TEST_DOCUMENT_HELLO_TEXT),
+                singletonList(STRING_ENVELOPE_ANNOTATION)
+        )) {
             IndexProvider indexProvider = indexProviderFactory.create(envelope);
             Assert.assertEquals("2", indexProvider.getNextSignatureIndex());
         }
@@ -50,20 +61,22 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
 
     @Test
     public void testCreateWithMixedEnvelope() throws Exception {
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withManifestFactory(mockedManifestFactory).
-                withIndexProviderFactory(new UuidIndexProviderFactory()).
-                disableInternalVerification().
-                build();
-        try (Envelope envelope = packagingFactory.create(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), Collections.singletonList(STRING_ENVELOPE_ANNOTATION))) {
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .withIndexProviderFactory(new UuidIndexProviderFactory())
+                .build();
+        try (Envelope envelope = packagingFactory.create(
+                singletonList(TEST_DOCUMENT_HELLO_TEXT),
+                singletonList(STRING_ENVELOPE_ANNOTATION)
+        )) {
             IndexProvider indexProvider = indexProviderFactory.create(envelope);
             Assert.assertEquals("1", indexProvider.getNextSignatureIndex());
         }
     }
 
     @Test
-    public void testValuesIncrement() throws Exception {
+    public void testValuesIncrement() {
         IndexProvider indexProvider = indexProviderFactory.create();
         int firstIndex = Integer.parseInt(indexProvider.getNextAnnotationIndex());
         int secondIndex = Integer.parseInt(indexProvider.getNextAnnotationIndex());
@@ -76,6 +89,16 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
         int manifestIndex = Integer.parseInt(indexProvider.getNextManifestIndex());
         int documentManifestIndex = Integer.parseInt(indexProvider.getNextDocumentsManifestIndex());
         assertEquals(manifestIndex, documentManifestIndex);
+    }
+
+    @Test
+    public void testWithClashingUnkownFiles() {
+        Envelope mockEnvelope = mock(Envelope.class);
+        List<UnknownDocument> unknownFileList = new ArrayList<>();
+        unknownFileList.add(new ParsedDocument(mock(ParsingStore.class), "k", "m", META_INF + "/manifest-8.tlv"));
+        when(mockEnvelope.getUnknownFiles()).thenReturn(unknownFileList);
+        IndexProvider indexProvider = indexProviderFactory.create(mockEnvelope);
+        Assert.assertEquals("9", indexProvider.getNextSignatureIndex());
     }
 
 }
