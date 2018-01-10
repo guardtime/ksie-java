@@ -55,6 +55,7 @@ import com.guardtime.ksi.unisignature.verifier.policies.UserProvidedPublicationB
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -286,7 +287,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             com.guardtime.ksi.unisignature.verifier.VerificationResult signatureVerificationFullResults =
                     (com.guardtime.ksi.unisignature.verifier.VerificationResult) signatureResult.getFullResult();
             assertNotNull(signatureVerificationFullResults);
-            assertEquals(VerificationErrorCode.GEN_1, signatureVerificationFullResults.getErrorCode());
+            assertEquals(VerificationErrorCode.GEN_01, signatureVerificationFullResults.getErrorCode());
         }
     }
 
@@ -301,7 +302,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             checkExecutedSignatureVerificationPolicy(
                     signatureVerificationPolicy,
                     VerificationResultCode.FAIL,
-                    VerificationErrorCode.GEN_1,
+                    VerificationErrorCode.GEN_01,
                     signatureResult
             );
         }
@@ -325,7 +326,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
-    public void testUsingKeyBasedVerification() throws Exception {
+    public void testUsingKeyBasedVerification_NOK() throws Exception {
         Policy signatureVerificationPolicy = new KeyBasedVerificationPolicy();
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_SIGNATURE_FILE)) {
             EnvelopeVerifier verifier = getEnvelopeVerifier(signatureVerificationPolicy);
@@ -342,7 +343,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
-    public void testUsingUserPublicationBasedVerification() throws Exception {
+    public void testUsingUserPublicationBasedVerification_NOK() throws Exception {
         Policy signatureVerificationPolicy = new UserProvidedPublicationBasedVerificationPolicy();
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_AND_EXTENDED_SIGNATURE_FILE)) {
             VerificationPolicy policy = new DefaultVerificationPolicy(
@@ -361,7 +362,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             checkExecutedSignatureVerificationPolicy(
                     signatureVerificationPolicy,
                     VerificationResultCode.FAIL,
-                    VerificationErrorCode.INT_09,
+                    VerificationErrorCode.PUB_04,
                     signatureResult
             );
         }

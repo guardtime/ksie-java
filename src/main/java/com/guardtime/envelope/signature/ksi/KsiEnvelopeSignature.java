@@ -23,10 +23,12 @@ import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.unisignature.Identity;
 import com.guardtime.ksi.unisignature.KSISignature;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 /**
  * {@link EnvelopeSignature} implementation with {@link KSISignature} as the underlying signature.
@@ -67,11 +69,23 @@ class KsiEnvelopeSignature implements EnvelopeSignature<KSISignature> {
         if (!newSignature.isExtended() ||
                 !newSignature.getInputHash().equals(this.signature.getInputHash()) ||
                 !newSignature.getAggregationTime().equals(this.signature.getAggregationTime()) ||
-                !newSignature.getIdentity().equals(this.signature.getIdentity())
+                !areIdentitiesEqual(newSignature, this.signature)
                 ) {
             throw new SignatureException("Provided signature is not an extended variant of the existing signature!");
         }
         this.signature = newSignature;
+    }
+
+    private boolean areIdentitiesEqual(KSISignature newSignature, KSISignature signature) {
+        Identity[] newIdentity = newSignature.getAggregationHashChainIdentity();
+        Identity[] identity = signature.getAggregationHashChainIdentity();
+        for (int i = 0; i < newIdentity.length; i++) {
+            if(!identity[i].getDecodedClientId().equals(newIdentity[i].getDecodedClientId())) {
+                 return false;
+             }
+
+        }
+        return true;
     }
 
     @Override
