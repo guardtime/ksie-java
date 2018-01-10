@@ -35,7 +35,7 @@ import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.InvalidPackageException;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.signature.SignatureFactoryType;
-import com.guardtime.envelope.util.Pair;
+import com.guardtime.envelope.verification.policy.LimitedInternalVerificationPolicy;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.KSISignature;
@@ -53,7 +53,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -64,7 +63,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -131,25 +129,14 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     }
 
     @Test
-    public void testCreatePackagingFactoryWithoutSignatureFactory_ThrowsNullPointerException() throws Exception {
+    public void testCreateZipPackagingFactoryWithoutSignatureFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Signature factory must be present");
         new ZipEnvelopePackagingFactoryBuilder().withSignatureFactory(null).build();
     }
 
     @Test
-    public void testCreatePackagingFactoryWithoutParsingStoreFactory_ThrowsNullPointerException() throws Exception {
-        expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("Parsing store factory must be present");
-        new ZipEnvelopePackagingFactoryBuilder()
-                .withSignatureFactory(mockedSignatureFactory)
-                .withManifestFactory(mockedManifestFactory)
-                .withParsingStoreFactory(null)
-                .build();
-    }
-
-    @Test
-    public void testCreatePackagingFactoryWithoutManifestFactory_ThrowsNullPointerException() throws Exception {
+    public void testCreateZipPackagingFactoryWithoutManifestFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Manifest factory must be present");
         new ZipEnvelopePackagingFactoryBuilder().
@@ -159,12 +146,85 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     }
 
     @Test
-    public void testCreatePackagingFactoryWithoutIndexProviderFactory_ThrowsNullPointerException() throws Exception {
+    public void testCreateZipPackagingFactoryWithoutParsingStoreFactory_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Parsing store factory must be present");
+        new ZipEnvelopePackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                withManifestFactory(mockedManifestFactory).
+                withParsingStoreFactory(null).
+                build();
+    }
+
+    @Test
+    public void testCreateZipPackagingFactoryWithoutIndexProviderFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Index provider factory must be present");
         new ZipEnvelopePackagingFactoryBuilder().
                 withSignatureFactory(mockedSignatureFactory).
                 withIndexProviderFactory(null).
+                build();
+    }
+
+    @Test
+    public void testCreateZipPackagingFactoryWithoutEnvelopeReader_Ok() throws Exception {
+        new ZipEnvelopePackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                withEnvelopeReader(null).
+                build();
+    }
+
+    @Test
+    public void testCreatePackagingFactoryWithoutSignatureFactory_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Signature factory must be present");
+        new EnvelopePackagingFactory.Builder().withSignatureFactory(null).build();
+    }
+
+    @Test
+    public void testCreatePackagingFactoryWithoutManifestFactory_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Manifest factory must be present");
+        new EnvelopePackagingFactory.Builder().
+                withSignatureFactory(mockedSignatureFactory).
+                withManifestFactory(null).
+                build();
+    }
+
+    @Test
+    public void testCreatePackagingFactoryWithoutParsingStoreFactory_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Parsing store factory must be present");
+        new EnvelopePackagingFactory.Builder().
+                withSignatureFactory(mockedSignatureFactory).
+                withManifestFactory(mockedManifestFactory).
+                withParsingStoreFactory(null).
+                build();
+    }
+
+    @Test
+    public void testCreatePackagingFactoryWithoutEnvelopeReader_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Envelope reader must be present");
+        new EnvelopePackagingFactory.Builder().
+                withSignatureFactory(mockedSignatureFactory).
+                withEnvelopeReader(null).
+                build();
+    }
+
+    @Test
+    public void testCreatePackagingFactoryWithNoVerificationPolicy_Ok() throws Exception {
+        new ZipEnvelopePackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                withVerificationPolicy(null).
+                build();
+    }
+
+    @Test
+    public void testCreatePackagingFactoryWithNotDefaultVerificationPolicy_Ok() throws Exception {
+        new ZipEnvelopePackagingFactoryBuilder().
+                withSignatureFactory(mockedSignatureFactory).
+                withVerificationPolicy(new LimitedInternalVerificationPolicy()).
                 build();
     }
 

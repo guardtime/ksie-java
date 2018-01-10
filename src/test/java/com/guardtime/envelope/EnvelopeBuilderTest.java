@@ -22,17 +22,12 @@ package com.guardtime.envelope;
 import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
-import com.guardtime.envelope.manifest.AnnotationsManifest;
-import com.guardtime.envelope.manifest.DocumentsManifest;
-import com.guardtime.envelope.manifest.InvalidManifestException;
-import com.guardtime.envelope.manifest.SignatureReference;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.signature.SignatureException;
-import com.guardtime.envelope.signature.SignatureFactoryType;
 import com.guardtime.ksi.hashing.DataHash;
 
 import org.junit.Before;
@@ -53,8 +48,6 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -72,13 +65,13 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testCreateBuilder() throws Exception {
+    public void testCreateBuilder() {
         EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
         assertNotNull(builder);
     }
 
     @Test
-    public void testCreateBuilderWithoutPackagingFactory_ThrowsNullPointerException() throws Exception {
+    public void testCreateBuilderWithoutPackagingFactory_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Packaging factory must be present");
         new EnvelopeBuilder(null);
@@ -112,7 +105,7 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testAddAnnotationToEnvelope() throws Exception {
+    public void testAddAnnotationToEnvelope() {
         EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
         builder.withAnnotation(STRING_ENVELOPE_ANNOTATION);
         assertEquals(1, builder.getAnnotations().size());
@@ -148,25 +141,6 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
                 assertEquals(2, newEnvelope.getSignatureContents().size());
             }
         }
-    }
-
-    private EnvelopePackagingFactory getEnvelopePackagingFactory() throws IOException, SignatureException {
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
-                .withSignatureFactory(mockedSignatureFactory)
-                .withVerificationPolicy(null)
-                .withIndexProviderFactory(new IncrementingIndexProviderFactory())
-                .build();
-
-        EnvelopeSignature mockedSignature = mock(EnvelopeSignature.class);
-        when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mockedSignature);
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-                invocationOnMock.getArgumentAt(0, OutputStream.class).write("someData".getBytes());
-                return null;
-            }
-        }) .when(mockedSignature).writeTo(any(OutputStream.class));
-        return packagingFactory;
     }
 
     @Test
@@ -247,4 +221,22 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
         }
     }
 
+    private EnvelopePackagingFactory getEnvelopePackagingFactory() throws IOException, SignatureException {
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .withIndexProviderFactory(new IncrementingIndexProviderFactory())
+                .build();
+
+        EnvelopeSignature mockedSignature = mock(EnvelopeSignature.class);
+        when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mockedSignature);
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                invocationOnMock.getArgumentAt(0, OutputStream.class).write("someData".getBytes());
+                return null;
+            }
+        }) .when(mockedSignature).writeTo(any(OutputStream.class));
+        return packagingFactory;
+    }
 }
