@@ -72,11 +72,12 @@ import static org.junit.Assert.assertTrue;
 public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     private EnvelopeVerifier verifier;
+    private VerificationPolicy defaultPolicy;
 
     @Before
     public void setUpVerifier() {
-        VerificationPolicy defaultPolicy = new DefaultVerificationPolicy(
-                new KsiSignatureVerifier(ksi, new CalendarBasedVerificationPolicy())
+        this.defaultPolicy = new DefaultVerificationPolicy(
+                new KsiSignatureVerifier(ksi, new com.guardtime.ksi.unisignature.verifier.policies.InternalVerificationPolicy())
         );
         this.verifier = new EnvelopeVerifier(defaultPolicy);
     }
@@ -91,10 +92,37 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
+    public void testVerifyEnvelopeWithNoDocumentUsingLimitedPolicy_OK() throws Exception {
+        checkPolicyResult(new LimitedInternalVerificationPolicy(), ENVELOPE_WITH_NO_DOCUMENTS, VerificationResult.OK);
+    }
+
+    @Test
+    public void testVerifyEnvelopeWithNoDocumentUsingInternalPolicy_NOK() throws Exception {
+        checkPolicyResult(new InternalVerificationPolicy(), ENVELOPE_WITH_NO_DOCUMENTS, VerificationResult.NOK);
+    }
+
+    @Test
+    public void testVerifyEnvelopeWithNoDocumentUsingDefaultPolicy_NOK() throws Exception {
+        checkPolicyResult(defaultPolicy, ENVELOPE_WITH_NO_DOCUMENTS, VerificationResult.NOK);
+    }
+
+    @Test
+    public void testVerifyEnvelopeWithDocumentUsingLimitedPolicy_OK() throws Exception {
+        checkPolicyResult(new LimitedInternalVerificationPolicy(), ENVELOPE_WITH_ONE_DOCUMENT, VerificationResult.OK);
+    }
+
+    @Test
+    public void testVerifyEnvelopeWithDocumentUsingInternalPolicy_OK() throws Exception {
+        checkPolicyResult(new InternalVerificationPolicy(), ENVELOPE_WITH_ONE_DOCUMENT, VerificationResult.OK);
+    }
+
+    @Test
+    public void testVerifyEnvelopeWithDocumentUsingDefaultPolicy_OK() throws Exception {
+        checkPolicyResult(defaultPolicy, ENVELOPE_WITH_ONE_DOCUMENT, VerificationResult.OK);
+    }
+
+    @Test
     public void testEveryEnvelopeTypeVerifiesOk() throws Exception {
-        EnvelopeVerifier verifier = new EnvelopeVerifier(
-                new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy()))
-        );
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTIPLE_SIGNATURES)){
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             assertEquals(VerificationResult.OK, verifiedEnvelope.getVerificationResult());
@@ -139,8 +167,6 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testVerifyEnvelopeWithChangedDocument() throws Exception {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_DOCUMENT)) {
-            EnvelopeVerifier verifier = new EnvelopeVerifier(
-                    new InternalVerificationPolicy());
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             Assert.assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
             verifyFailingRule(verifiedEnvelope.getResults(), "KSIE_VERIFY_DATA_HASH", "test.txt", "Hash mismatch");
@@ -386,8 +412,12 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testEnvelopeWithValidSignature_VerificationSucceeds() throws Exception {
+        VerificationPolicy policy = new DefaultVerificationPolicy(
+                new KsiSignatureVerifier(ksi, new CalendarBasedVerificationPolicy())
+        );
+        EnvelopeVerifier envelopeVerifier = new EnvelopeVerifier(policy);
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_ONE_DOCUMENT)) {
-            VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
+            VerifiedEnvelope verifiedEnvelope = envelopeVerifier.verify(envelope);
 
             SignatureResult signatureResult = verifiedEnvelope.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
             assertEquals(VerificationResult.OK, verifiedEnvelope.getVerificationResult());
@@ -455,35 +485,11 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         }
     }
 
-    private void baseTestCreateEnvelopeUsingEmptyEnvelopeDocumentAndAddDocumentData(VerificationResult verificationResult,
-                                                                                    byte[] expectedDocumentContent,
-                                                                                    byte[] addedDocumentContent) throws Exception {
-        EnvelopeVerifier envelopeVerifier =
-                getEnvelopeVerifier(new com.guardtime.ksi.unisignature.verifier.policies.InternalVerificationPolicy());
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
-                .withSignatureFactory(signatureFactory)
-                .withVerificationPolicy(new LimitedInternalVerificationPolicy())
-                .build();
-        String documentName = "Document1.txt";
-        try (
-                Document document = new EmptyDocument(
-                        documentName,
-                        "txt",
-                        singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(expectedDocumentContent).getHash()));
-                Annotation annotation = new StringAnnotation(
-                        EnvelopeAnnotationType.NON_REMOVABLE,
-                        "Document is not with envelope. Envelope was created created with empty envelope document. " +
-                                "Document itself can be added later on if needed.",
-                        "com.guardtime.com");
-                Envelope envelope = packagingFactory.create(singletonList(document), singletonList(annotation));
-                InputStream stream = new ByteArrayInputStream(addedDocumentContent)
-        ) {
-            VerifiedEnvelope verifiedEnvelope = envelopeVerifier.verify(envelope);
-            assertTrue(verifiedEnvelope.getVerificationResult().equals(VerificationResult.NOK));
-
-            envelope.getSignatureContents().get(0).attachDetachedDocument(documentName, stream);
-            verifiedEnvelope = envelopeVerifier.verify(envelope);
-            assertTrue(verifiedEnvelope.getVerificationResult().equals(verificationResult));
+    private void checkPolicyResult(VerificationPolicy policy, String envelopeName, VerificationResult result) throws Exception {
+        EnvelopeVerifier verifier = new EnvelopeVerifier(policy);
+        try(Envelope envelope = getEnvelope(envelopeName)){
+            VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
+            assertEquals(result, verifiedEnvelope.getVerificationResult());
         }
     }
 
@@ -523,6 +529,38 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         }
         if (!expectedPolicyOk) {
             throw new Exception("Policy '" + expectedPolicy.getName() + "' not executed.");
+        }
+    }
+
+    private void baseTestCreateEnvelopeUsingEmptyEnvelopeDocumentAndAddDocumentData(VerificationResult verificationResult,
+                                                                                    byte[] expectedDocumentContent,
+                                                                                    byte[] addedDocumentContent) throws Exception {
+        EnvelopeVerifier envelopeVerifier =
+                getEnvelopeVerifier(new com.guardtime.ksi.unisignature.verifier.policies.InternalVerificationPolicy());
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withVerificationPolicy(new LimitedInternalVerificationPolicy())
+                .build();
+        String documentName = "Document1.txt";
+        try (
+                Document document = new EmptyDocument(
+                        documentName,
+                        "txt",
+                        singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(expectedDocumentContent).getHash()));
+                Annotation annotation = new StringAnnotation(
+                        EnvelopeAnnotationType.NON_REMOVABLE,
+                        "Document is not with envelope. Envelope was created with empty envelope document. " +
+                                "Document itself can be added later on if needed.",
+                        "com.guardtime.com");
+                Envelope envelope = packagingFactory.create(singletonList(document), singletonList(annotation));
+                InputStream stream = new ByteArrayInputStream(addedDocumentContent)
+        ) {
+            VerifiedEnvelope verifiedEnvelope = envelopeVerifier.verify(envelope);
+            assertTrue(verifiedEnvelope.getVerificationResult().equals(VerificationResult.NOK));
+
+            envelope.getSignatureContents().get(0).attachDetachedDocument(documentName, stream);
+            verifiedEnvelope = envelopeVerifier.verify(envelope);
+            assertTrue(verifiedEnvelope.getVerificationResult().equals(verificationResult));
         }
     }
 }
