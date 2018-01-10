@@ -6,14 +6,20 @@ import com.guardtime.ksi.hashing.DataHash;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class PostponedSignature implements EnvelopeSignature {
+// TODO: Javadoc
+class PostponedSignature implements EnvelopeSignature {
 
+    private final DataHash dataHash;
     private EnvelopeSignature internalSignature = null;
+
+    public PostponedSignature(DataHash hash) {
+        this.dataHash = hash;
+    }
 
     @Override
     public void writeTo(OutputStream output) throws IOException {
         if(internalSignature == null) {
-            output.write("DummyData".getBytes());
+            output.write(dataHash.getImprint());
         } else {
             internalSignature.writeTo(output);
         }
@@ -30,7 +36,7 @@ public class PostponedSignature implements EnvelopeSignature {
     @Override
     public DataHash getSignedDataHash() {
         if(internalSignature == null) {
-            throw new UnsupportedOperationException();
+            return dataHash;
         }
         return internalSignature.getSignedDataHash();
     }
