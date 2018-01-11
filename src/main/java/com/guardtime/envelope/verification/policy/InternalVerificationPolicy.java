@@ -20,34 +20,14 @@
 package com.guardtime.envelope.verification.policy;
 
 import com.guardtime.envelope.packaging.Envelope;
-import com.guardtime.envelope.packaging.SignatureContent;
-import com.guardtime.envelope.verification.rule.Rule;
-
-import java.util.Collections;
-
-import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_DATA_EXISTS;
-import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_DATA_HASH;
+import com.guardtime.envelope.verification.rule.state.DefaultRuleStateProvider;
 
 /**
  * Verification policy that contains all verifications rules necessary for full internal verification of {@link Envelope}.
  */
-public class InternalVerificationPolicy extends LimitedInternalVerificationPolicy {
+public class InternalVerificationPolicy extends AbstractVerificationPolicy {
 
     public InternalVerificationPolicy() {
-        super(
-                new InternalRuleStateProvider(),
-                new InternalSignatureVerifier(),
-                Collections.<Rule<Envelope>>emptyList(),
-                Collections.<Rule<SignatureContent>>emptyList()
-        );
+        signatureContentRules.addAll(CommonPolicyRuleSets.getIntegrityRules(new DefaultRuleStateProvider()));
     }
-
-    private static class InternalRuleStateProvider extends LimitedInternalRuleStateProvider {
-
-        public InternalRuleStateProvider() {
-            allowedRules.add(KSIE_VERIFY_DATA_EXISTS.getName());
-            allowedRules.add(KSIE_VERIFY_DATA_HASH.getName());
-        }
-    }
-
 }
