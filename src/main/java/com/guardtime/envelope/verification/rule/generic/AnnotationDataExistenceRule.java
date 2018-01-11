@@ -59,7 +59,7 @@ public class AnnotationDataExistenceRule extends AbstractRule<SignatureContent> 
     }
 
     @Override
-    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) {
         for (FileReference reference : verifiable.getAnnotationsManifest().getSingleAnnotationManifestReferences()) {
             String manifestUri = reference.getUri();
             if (anyRuleFailed(holder, manifestUri)) continue;

@@ -38,7 +38,7 @@ import java.util.zip.ZipInputStream;
 class ZipEnvelopeReader extends EnvelopeReader {
 
     ZipEnvelopeReader(EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory,
-                      ParsingStoreFactory storeFactory) throws IOException {
+                      ParsingStoreFactory storeFactory) {
         super(manifestFactory, signatureFactory, storeFactory);
     }
 

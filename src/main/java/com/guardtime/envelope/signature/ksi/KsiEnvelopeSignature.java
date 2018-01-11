@@ -28,7 +28,6 @@ import com.guardtime.ksi.unisignature.KSISignature;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 /**
  * {@link EnvelopeSignature} implementation with {@link KSISignature} as the underlying signature.

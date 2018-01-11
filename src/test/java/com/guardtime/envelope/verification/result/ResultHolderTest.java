@@ -33,14 +33,14 @@ public class ResultHolderTest {
     private ResultHolder holder = new ResultHolder();
 
     @Test
-    public void addResult() throws Exception {
+    public void addResult() {
         RuleVerificationResult mockResult = Mockito.mock(RuleVerificationResult.class);
         holder.addResult(mockResult);
         assertEquals(mockResult, holder.getResults().get(0));
     }
 
     @Test
-    public void addResults() throws Exception {
+    public void addResults() {
         List<RuleVerificationResult> mockResults = Arrays.asList(Mockito.mock(RuleVerificationResult.class), Mockito.mock(RuleVerificationResult.class), Mockito.mock(RuleVerificationResult.class));
         holder.addResults(mockResults);
         assertTrue(mockResults.containsAll(holder.getResults()));

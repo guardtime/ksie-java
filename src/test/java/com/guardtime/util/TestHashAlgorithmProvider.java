@@ -31,14 +31,14 @@ public class TestHashAlgorithmProvider implements HashAlgorithmProvider {
     private HashAlgorithm annotationDataReferenceHashAlgorithm;
     private HashAlgorithm signingHashAlgorithm;
 
-    public TestHashAlgorithmProvider() throws Exception {
+    public TestHashAlgorithmProvider() {
         this.fileReferenceHashAlgorithms = Collections.singletonList(HashAlgorithm.SHA2_256);
         this.documentReferenceHashAlgorithms = Collections.singletonList(HashAlgorithm.SHA2_256);
         this.annotationDataReferenceHashAlgorithm = HashAlgorithm.SHA2_256;
         this.signingHashAlgorithm = HashAlgorithm.SHA2_256;
     }
 
-    public TestHashAlgorithmProvider(HashAlgorithm algorithm) throws Exception {
+    public TestHashAlgorithmProvider(HashAlgorithm algorithm) {
         this.fileReferenceHashAlgorithms = Collections.singletonList(algorithm);
         this.documentReferenceHashAlgorithms = Collections.singletonList(algorithm);
         this.annotationDataReferenceHashAlgorithm = algorithm;
@@ -48,7 +48,7 @@ public class TestHashAlgorithmProvider implements HashAlgorithmProvider {
     public TestHashAlgorithmProvider(List<HashAlgorithm> fileReferenceHashAlgorithms,
                                      List<HashAlgorithm> documentReferenceHashAlgorithms,
                                      HashAlgorithm annotationDataReferenceHashAlgorithm,
-                                     HashAlgorithm signingHashAlgorithm) throws Exception {
+                                     HashAlgorithm signingHashAlgorithm) {
         this.fileReferenceHashAlgorithms = fileReferenceHashAlgorithms;
         this.documentReferenceHashAlgorithms = documentReferenceHashAlgorithms;
         this.annotationDataReferenceHashAlgorithm = annotationDataReferenceHashAlgorithm;

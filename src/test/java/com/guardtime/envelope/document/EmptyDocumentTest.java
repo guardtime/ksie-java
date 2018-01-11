@@ -52,12 +52,12 @@ public class EmptyDocumentTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testGetFileName() throws Exception {
+    public void testGetFileName() {
         assertNotNull(document.getFileName());
     }
 
     @Test
-    public void testGetMimeType() throws Exception {
+    public void testGetMimeType() {
         assertEquals(MIME_TYPE_APPLICATION_TXT, document.getMimeType());
     }
 
@@ -74,20 +74,20 @@ public class EmptyDocumentTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testIsWritable() throws Exception {
+    public void testIsWritable() {
         assertFalse(document.isWritable());
     }
 
 
     @Test
-    public void testCreateEmptyDocumentWithoutFileName_ThrowsNullPointerException() throws Exception {
+    public void testCreateEmptyDocumentWithoutFileName_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("File name must be present");
         new EmptyDocument(null, MIME_TYPE_APPLICATION_TXT, Collections.singletonList(hash));
     }
 
     @Test
-    public void testCreateEmptyDocumentWithoutMimeType_ThrowsNullPointerException() throws Exception {
+    public void testCreateEmptyDocumentWithoutMimeType_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("MIME type must be present");
         new EmptyDocument(DOCUMENT_NAME, null, Collections.singletonList(hash));
@@ -95,7 +95,7 @@ public class EmptyDocumentTest extends AbstractEnvelopeTest {
 
 
     @Test
-    public void testCreateEmptyDocumentWithoutDataHash_ThrowsNullPointerException() throws Exception {
+    public void testCreateEmptyDocumentWithoutDataHash_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Data hash list must be present");
         new EmptyDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, null);

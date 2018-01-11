@@ -72,13 +72,13 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testCreateBuilder() throws Exception {
+    public void testCreateBuilder() {
         EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
         assertNotNull(builder);
     }
 
     @Test
-    public void testCreateBuilderWithoutPackagingFactory_ThrowsNullPointerException() throws Exception {
+    public void testCreateBuilderWithoutPackagingFactory_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Packaging factory must be present");
         new EnvelopeBuilder(null);
@@ -112,7 +112,7 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testAddAnnotationToEnvelope() throws Exception {
+    public void testAddAnnotationToEnvelope() {
         EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
         builder.withAnnotation(STRING_ENVELOPE_ANNOTATION);
         assertEquals(1, builder.getAnnotations().size());

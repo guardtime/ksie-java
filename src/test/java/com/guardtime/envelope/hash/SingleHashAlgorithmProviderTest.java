@@ -31,22 +31,22 @@ public class SingleHashAlgorithmProviderTest {
     private SingleHashAlgorithmProvider singleHashAlgorithmProvider = new SingleHashAlgorithmProvider(HASH_ALGORITHM);
 
     @Test
-    public void testGetFileReferenceHashAlgorithms() throws Exception {
+    public void testGetFileReferenceHashAlgorithms() {
         assertEquals(HASH_ALGORITHM, singleHashAlgorithmProvider.getFileReferenceHashAlgorithms().get(0));
     }
 
     @Test
-    public void testGetDocumentReferenceHashAlgorithms() throws Exception {
+    public void testGetDocumentReferenceHashAlgorithms() {
         assertEquals(HASH_ALGORITHM, singleHashAlgorithmProvider.getDocumentReferenceHashAlgorithms().get(0));
     }
 
     @Test
-    public void testGetAnnotationDataReferenceHashAlgorithm() throws Exception {
+    public void testGetAnnotationDataReferenceHashAlgorithm() {
         assertEquals(HASH_ALGORITHM, singleHashAlgorithmProvider.getAnnotationDataReferenceHashAlgorithm());
     }
 
     @Test
-    public void testGetSigningHashAlgorithm() throws Exception {
+    public void testGetSigningHashAlgorithm() {
         assertEquals(HASH_ALGORITHM, singleHashAlgorithmProvider.getSigningHashAlgorithm());
     }
 

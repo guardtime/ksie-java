@@ -31,12 +31,12 @@ public class DefaultRuleStateProviderTest {
     private RuleStateProvider provider = new DefaultRuleStateProvider();
 
     @Test
-    public void testGetStateForRuleReturnFailForValidRuleName() throws Exception {
+    public void testGetStateForRuleReturnFailForValidRuleName() {
         assertEquals(RuleState.FAIL, provider.getStateForRule(RuleType.KSIE_VERIFY_ANNOTATION.getName()));
     }
 
     @Test
-    public void testGetStateForRuleReturnFailForRandomString() throws Exception {
+    public void testGetStateForRuleReturnFailForRandomString() {
         assertEquals(RuleState.FAIL, provider.getStateForRule(UUID.randomUUID().toString()));
     }
 

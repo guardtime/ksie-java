@@ -373,7 +373,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         createEnvelopeWriteItToAndReadFromStream("SubDir/AddedDocument.txt");
     }
 
-    private List<Document> getEnvelopeDocument(String fileName) throws Exception {
+    private List<Document> getEnvelopeDocument(String fileName) {
         return singletonList((Document)new StreamDocument(
                 new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                 MIME_TYPE_APPLICATION_TXT,

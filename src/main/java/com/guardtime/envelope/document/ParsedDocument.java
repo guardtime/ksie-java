@@ -53,7 +53,7 @@ public class ParsedDocument extends AbstractDocument implements UnknownDocument 
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         parsingStore.remove(key);
     }
 }

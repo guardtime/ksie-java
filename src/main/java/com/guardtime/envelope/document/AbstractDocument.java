@@ -65,7 +65,7 @@ public abstract class AbstractDocument implements Document {
     }
 
     @Override
-    public List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws IOException, DataHashException {
+    public List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws DataHashException {
         Util.notNull(algorithmList, "Hash algorithm list");
         List<DataHash> hashList = new ArrayList<>();
         for (HashAlgorithm algorithm : algorithmList) {
