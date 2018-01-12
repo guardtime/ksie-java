@@ -92,13 +92,23 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testWithClashingUnkownFiles() {
+    public void testWithClashingUnknownManifestFile() {
         Envelope mockEnvelope = mock(Envelope.class);
         List<UnknownDocument> unknownFileList = new ArrayList<>();
-        unknownFileList.add(new ParsedDocument(mock(ParsingStore.class), "k", "m", META_INF + "/manifest-8.tlv"));
+        unknownFileList.add(new ParsedDocument(mock(ParsingStore.class), "k", "m", META_INF + "/manifest-384.tlv"));
         when(mockEnvelope.getUnknownFiles()).thenReturn(unknownFileList);
         IndexProvider indexProvider = indexProviderFactory.create(mockEnvelope);
-        Assert.assertEquals("9", indexProvider.getNextSignatureIndex());
+        Assert.assertEquals("385", indexProvider.getNextSignatureIndex());
+    }
+
+    @Test
+    public void testWithClashingUnknownAnnotationFile() {
+        Envelope mockEnvelope = mock(Envelope.class);
+        List<UnknownDocument> unknownFileList = new ArrayList<>();
+        unknownFileList.add(new ParsedDocument(mock(ParsingStore.class), "k", "m", META_INF + "/annotation-854.tlv"));
+        when(mockEnvelope.getUnknownFiles()).thenReturn(unknownFileList);
+        IndexProvider indexProvider = indexProviderFactory.create(mockEnvelope);
+        Assert.assertEquals("855", indexProvider.getNextAnnotationIndex());
     }
 
 }
