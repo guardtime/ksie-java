@@ -25,24 +25,11 @@ import com.guardtime.envelope.manifest.DocumentsManifest;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.verification.rule.Rule;
-import com.guardtime.envelope.verification.rule.generic.AnnotationDataExistenceRule;
-import com.guardtime.envelope.verification.rule.generic.AnnotationDataIntegrityRule;
-import com.guardtime.envelope.verification.rule.generic.AnnotationsManifestExistenceRule;
-import com.guardtime.envelope.verification.rule.generic.AnnotationsManifestIntegrityRule;
-import com.guardtime.envelope.verification.rule.generic.DocumentExistenceRule;
-import com.guardtime.envelope.verification.rule.generic.DocumentIntegrityRule;
-import com.guardtime.envelope.verification.rule.generic.DocumentsManifestExistenceRule;
-import com.guardtime.envelope.verification.rule.generic.DocumentsManifestIntegrityRule;
-import com.guardtime.envelope.verification.rule.generic.SignatureExistenceRule;
 import com.guardtime.envelope.verification.rule.generic.SignatureIntegrityRule;
-import com.guardtime.envelope.verification.rule.generic.SignatureSignsManifestRule;
-import com.guardtime.envelope.verification.rule.generic.SingleAnnotationManifestExistenceRule;
-import com.guardtime.envelope.verification.rule.generic.SingleAnnotationManifestIntegrityRule;
 import com.guardtime.envelope.verification.rule.signature.SignatureVerifier;
 import com.guardtime.envelope.verification.rule.state.DefaultRuleStateProvider;
 import com.guardtime.envelope.verification.rule.state.RuleStateProvider;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -61,9 +48,7 @@ import java.util.List;
  * May contain extra rules to add specialized verification requirements to the policy or to overwrite some of the
  * pre-existing rules.
  */
-public class DefaultVerificationPolicy implements VerificationPolicy {
-    private ArrayList<Rule<SignatureContent>> signatureContentRules = new ArrayList<>();
-    private ArrayList<Rule<Envelope>> envelopeRules = new ArrayList<>();
+public class DefaultVerificationPolicy extends AbstractVerificationPolicy {
 
     /**
      * @param signatureVerifier will be called for verifying each signature.
@@ -82,29 +67,13 @@ public class DefaultVerificationPolicy implements VerificationPolicy {
                                      List<Rule<Envelope>> customEnvelopeRules,
                                      List<Rule<SignatureContent>> customSignatureContentRules) {
         envelopeRules.addAll(customEnvelopeRules);
-        signatureContentRules.add(new SignatureExistenceRule(stateProvider));
-        signatureContentRules.add(new SignatureSignsManifestRule(stateProvider));
-        signatureContentRules.add(new SignatureIntegrityRule(stateProvider, signatureVerifier));
-        signatureContentRules.add(new DocumentsManifestExistenceRule(stateProvider));
-        signatureContentRules.add(new DocumentsManifestIntegrityRule(stateProvider));
-        signatureContentRules.add(new DocumentExistenceRule(stateProvider));
-        signatureContentRules.add(new DocumentIntegrityRule(stateProvider));
-        signatureContentRules.add(new AnnotationsManifestExistenceRule(stateProvider));
-        signatureContentRules.add(new AnnotationsManifestIntegrityRule(stateProvider));
-        signatureContentRules.add(new SingleAnnotationManifestExistenceRule(stateProvider));
-        signatureContentRules.add(new SingleAnnotationManifestIntegrityRule(stateProvider));
-        signatureContentRules.add(new AnnotationDataExistenceRule(stateProvider));
-        signatureContentRules.add(new AnnotationDataIntegrityRule(stateProvider));
+
+        signatureContentRules.addAll(CommonPolicyRuleSets.getSignatureRules(stateProvider, signatureVerifier));
+        signatureContentRules.addAll(CommonPolicyRuleSets.getManifestRules(stateProvider));
+        signatureContentRules.addAll(CommonPolicyRuleSets.getAnnotationRules(stateProvider));
+        signatureContentRules.addAll(CommonPolicyRuleSets.getDocumentRules(stateProvider));
+
         signatureContentRules.addAll(customSignatureContentRules);
-    }
-
-    public List<Rule<SignatureContent>> getSignatureContentRules() {
-        return signatureContentRules;
-    }
-
-    @Override
-    public List<Rule<Envelope>> getEnvelopeRules() {
-        return envelopeRules;
     }
 
 }
