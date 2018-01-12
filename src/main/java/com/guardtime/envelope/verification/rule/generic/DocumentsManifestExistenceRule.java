@@ -44,7 +44,7 @@ public class DocumentsManifestExistenceRule extends AbstractRule<SignatureConten
     }
 
     @Override
-    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) {
 
         VerificationResult verificationResult = getFailureVerificationResult();
         Manifest manifest = verifiable.getManifest();

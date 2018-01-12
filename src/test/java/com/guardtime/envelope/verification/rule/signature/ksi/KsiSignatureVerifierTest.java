@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
 public class KsiSignatureVerifierTest extends AbstractEnvelopeTest {
 
     @Test
-    public void testCreateWithoutKSI_ThrowsNullPointerException() throws Exception {
+    public void testCreateWithoutKSI_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("KSI");
         new KsiSignatureVerifier(null, null);

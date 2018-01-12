@@ -57,7 +57,7 @@ public class SingleAnnotationManifestExistenceRuleTest extends AbstractEnvelopeT
         when(mockSignatureContent.getAnnotationsManifest()).thenReturn(mockedAnnotationsManifest);
         when(mockedAnnotationsManifest.getSingleAnnotationManifestReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {
             @Override
-            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) throws Throwable {
+            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) {
                 return Collections.singletonList(mockFileReference);
             }
         });
@@ -78,7 +78,7 @@ public class SingleAnnotationManifestExistenceRuleTest extends AbstractEnvelopeT
         when(mockSignatureContent.getAnnotationsManifest()).thenReturn(mockedAnnotationsManifest);
         when(mockedAnnotationsManifest.getSingleAnnotationManifestReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {
             @Override
-            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) throws Throwable {
+            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) {
                 return Collections.singletonList(mockFileReference);
             }
         });

@@ -33,14 +33,14 @@ import static org.junit.Assert.assertTrue;
 public class FileDocumentTest extends AbstractEnvelopeTest {
 
     @Test
-    public void testCreateFileDocumentWithoutInputFile_ThrowsNullPointerException() throws Exception {
+    public void testCreateFileDocumentWithoutInputFile_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("File must be present");
         new FileDocument(null, MIME_TYPE_APPLICATION_TXT);
     }
 
     @Test
-    public void testCreateFileDocumentWithoutMimeType_ThrowsNullPointerException() throws Exception {
+    public void testCreateFileDocumentWithoutMimeType_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("MIME type must be present");
         new FileDocument(new File(TEST_FILE_PATH_TEST_TXT), null);

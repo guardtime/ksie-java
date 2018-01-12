@@ -55,7 +55,7 @@ public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureConten
     }
 
     @Override
-    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) {
         EnvelopeElement documentsManifest = verifiable.getDocumentsManifest();
         Manifest manifest = verifiable.getManifest();
         FileReference documentsManifestReference = manifest.getDocumentsManifestReference();

@@ -46,7 +46,7 @@ public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureCont
     }
 
     @Override
-    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) {
         VerificationResult verificationResult = getFailureVerificationResult();
         Manifest manifest = verifiable.getManifest();
         FileReference annotationsManifestReference = manifest.getAnnotationsManifestReference();

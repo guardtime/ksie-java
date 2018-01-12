@@ -56,7 +56,7 @@ public class DocumentIntegrityRule extends AbstractRule<SignatureContent> {
     }
 
     @Override
-    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) {
         for (FileReference documentReference : verifiable.getDocumentsManifest().getDocumentReferences()) {
             String uri = documentReference.getUri();
             if (existenceRuleFailed(holder, verifiable, uri)) continue;

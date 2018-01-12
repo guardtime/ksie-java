@@ -52,7 +52,7 @@ public class TlvEnvelopeManifestFactoryTest extends AbstractTlvManifestTest {
     }
 
     @Test
-    public void testCreateTlvEnvelopeManifestFactoryWithoutHashAlgorithm_ThrowsNullPointerException() throws Exception {
+    public void testCreateTlvEnvelopeManifestFactoryWithoutHashAlgorithm_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Hash algorithm provider");
         new TlvEnvelopeManifestFactory(null);
@@ -149,7 +149,7 @@ public class TlvEnvelopeManifestFactoryTest extends AbstractTlvManifestTest {
     }
 
     @Test
-    public void testGetManifestFactoryType() throws Exception {
+    public void testGetManifestFactoryType() {
         TlvManifestFactoryType type = factory.getManifestFactoryType();
         assertNotNull(type);
         assertNotNull(type.getManifestFileExtension());

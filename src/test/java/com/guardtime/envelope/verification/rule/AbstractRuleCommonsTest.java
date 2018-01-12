@@ -45,7 +45,7 @@ public class AbstractRuleCommonsTest {
         }
 
         @Override
-        public void verifyRule(ResultHolder holder, Object verifiable) throws RuleTerminatingException {
+        public void verifyRule(ResultHolder holder, Object verifiable) {
         }
     }
 
