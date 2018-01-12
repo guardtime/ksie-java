@@ -31,14 +31,14 @@ public class StringAnnotationTest extends AbstractEnvelopeTest {
 
 
     @Test
-    public void testCreateStringAnnotationWithoutInputString_ThrowsNullPointerException() throws Exception {
+    public void testCreateStringAnnotationWithoutInputString_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Content must be present");
         new StringAnnotation(EnvelopeAnnotationType.NON_REMOVABLE, null, ANNOTATION_DOMAIN_COM_GUARDTIME);
     }
 
     @Test
-    public void testCreateStringAnnotationWithoutAnnotationType_ThrowsNullPointerException() throws Exception {
+    public void testCreateStringAnnotationWithoutAnnotationType_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Annotation type must be present");
         new StringAnnotation(null, "Example Content", ANNOTATION_DOMAIN_COM_GUARDTIME);

@@ -33,21 +33,21 @@ import static org.junit.Assert.assertTrue;
 public class FileAnnotationTest extends AbstractEnvelopeTest {
 
     @Test
-    public void testCreateFileAnnotationWithoutInputFile_ThrowsNullPointerException() throws Exception {
+    public void testCreateFileAnnotationWithoutInputFile_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("File must be present");
         new FileAnnotation(null, ANNOTATION_DOMAIN_COM_GUARDTIME, EnvelopeAnnotationType.NON_REMOVABLE);
     }
 
     @Test
-    public void testCreateFileAnnotationWithoutDomain_ThrowsNullPointerException() throws Exception {
+    public void testCreateFileAnnotationWithoutDomain_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Domain must be present");
         new FileAnnotation(new File(TEST_FILE_PATH_TEST_TXT), null, EnvelopeAnnotationType.NON_REMOVABLE);
     }
 
     @Test
-    public void testCreateFileAnnotationWithoutAnnotationType_ThrowsNullPointerException() throws Exception {
+    public void testCreateFileAnnotationWithoutAnnotationType_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Annotation type must be present");
         new FileAnnotation(new File(TEST_FILE_PATH_TEST_TXT), ANNOTATION_DOMAIN_COM_GUARDTIME, null);

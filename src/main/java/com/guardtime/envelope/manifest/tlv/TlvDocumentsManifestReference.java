@@ -30,11 +30,11 @@ class TlvDocumentsManifestReference extends TlvFileReference {
     public static final int DOCUMENTS_MANIFEST_REFERENCE = 0xb01;
     private static final String DATA_FILES_MANIFEST = "ksie10/datamanifest";
 
-    public TlvDocumentsManifestReference(TLVElement rootElement) throws TLVParserException {
+    TlvDocumentsManifestReference(TLVElement rootElement) throws TLVParserException {
         super(rootElement);
     }
 
-    public TlvDocumentsManifestReference(DocumentsManifest documentsManifest, HashAlgorithmProvider algorithmProvider)
+    TlvDocumentsManifestReference(DocumentsManifest documentsManifest, HashAlgorithmProvider algorithmProvider)
             throws TLVParserException, DataHashException {
         super(
                 documentsManifest.getPath(),

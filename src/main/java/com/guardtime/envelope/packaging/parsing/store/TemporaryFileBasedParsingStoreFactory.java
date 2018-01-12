@@ -58,7 +58,7 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
         private final Path tempDir;
         private boolean closed;
 
-        public TemporaryFileBasedParsingStore() throws IOException {
+        TemporaryFileBasedParsingStore() throws IOException {
             this.tempDir = Util.getTempDirectory();
         }
 
@@ -115,7 +115,7 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
 
         @Override
         public void transferFrom(ParsingStore that) throws ParsingStoreException {
-            for(String key : that.getStoredKeys()) {
+            for (String key : that.getStoredKeys()) {
                 try (InputStream stream = that.get(key)) {
                     store(key, stream);
                     that.remove(key);

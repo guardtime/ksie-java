@@ -47,7 +47,7 @@ public class ExtendedEnvelopeTest {
     @Test
     public void testSignatureContentsAreWrapped() {
         ExtendedEnvelope extendedEnvelope = new ExtendedEnvelope(setUpMockedEnvelope());
-        for(SignatureContent content : extendedEnvelope.getExtendedSignatureContents()) {
+        for (SignatureContent content : extendedEnvelope.getExtendedSignatureContents()) {
             assertTrue(content instanceof ExtendedSignatureContent);
         }
     }
@@ -57,7 +57,7 @@ public class ExtendedEnvelopeTest {
         when(mockedEnvelope.getUnknownFiles()).thenReturn(Collections.singletonList(mock(UnknownDocument.class)));
         when(mockedEnvelope.getSignatureContents()).thenAnswer(new Answer<List<? extends SignatureContent>>() {
             @Override
-            public List<? extends SignatureContent> answer(InvocationOnMock invocationOnMock) throws Throwable {
+            public List<? extends SignatureContent> answer(InvocationOnMock invocationOnMock) {
                 return Collections.singletonList(mock(SignatureContent.class));
             }
         });

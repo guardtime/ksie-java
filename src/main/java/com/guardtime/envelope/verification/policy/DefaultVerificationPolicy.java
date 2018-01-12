@@ -25,7 +25,6 @@ import com.guardtime.envelope.manifest.DocumentsManifest;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.verification.rule.Rule;
-import com.guardtime.envelope.verification.rule.generic.SignatureIntegrityRule;
 import com.guardtime.envelope.verification.rule.signature.SignatureVerifier;
 import com.guardtime.envelope.verification.rule.state.DefaultRuleStateProvider;
 import com.guardtime.envelope.verification.rule.state.RuleStateProvider;

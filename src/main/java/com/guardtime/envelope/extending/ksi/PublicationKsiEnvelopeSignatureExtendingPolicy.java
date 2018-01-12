@@ -26,7 +26,6 @@ import com.guardtime.envelope.util.Util;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.publication.PublicationRecord;
-import com.guardtime.ksi.service.KSIExtendingService;
 import com.guardtime.ksi.unisignature.KSISignature;
 
 /**

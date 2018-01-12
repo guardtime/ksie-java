@@ -51,7 +51,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
 
     @Test
     public void testVerifyOriginalEnvelopeIsExtended() throws Exception {
-        try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTIPLE_SIGNATURES)){
+        try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTIPLE_SIGNATURES)) {
             KsiEnvelopeSignatureExtendingPolicy policy = new KsiEnvelopeSignatureExtendingPolicy(ksi);
             EnvelopeSignatureExtender extender = new EnvelopeSignatureExtender(new KsiSignatureFactory(ksi), policy);
             extender.extend(envelope);

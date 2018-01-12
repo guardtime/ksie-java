@@ -55,7 +55,6 @@ import com.guardtime.ksi.unisignature.verifier.policies.UserProvidedPublicationB
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -84,7 +83,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testVerifiedEnvelopeWithEmptyResults() throws Exception {
-        try(Envelope envelope = getEnvelope(ENVELOPE_WITH_NO_DOCUMENTS)){
+        try (Envelope envelope = getEnvelope(ENVELOPE_WITH_NO_DOCUMENTS)) {
             VerifiedEnvelope verifiedEnvelope = new VerifiedEnvelope(envelope, new ResultHolder());
             assertEquals(0, verifiedEnvelope.getResults().size());
             assertEquals(VerificationResult.OK, verifiedEnvelope.getVerificationResult());
@@ -96,7 +95,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         EnvelopeVerifier verifier = new EnvelopeVerifier(
                 new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy()))
         );
-        try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTIPLE_SIGNATURES)){
+        try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTIPLE_SIGNATURES)) {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             assertEquals(VerificationResult.OK, verifiedEnvelope.getVerificationResult());
 
@@ -470,11 +469,11 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             added = content.attachDetachedDocument(detached.getFileName(), inputStream);
             assertFalse(added);
         } finally {
-            if(inputStream != null) {
+            if (inputStream != null) {
                 inputStream.close();
             }
 
-            if(detached != null) {
+            if (detached != null) {
                 detached.close();
             }
 

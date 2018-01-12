@@ -26,7 +26,6 @@ import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.SignatureContent;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.verification.result.GenericVerificationResult;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import com.guardtime.envelope.verification.result.RuleVerificationResult;
@@ -142,9 +141,10 @@ public class AnnotationDataIntegrityRuleTest {
                 .thenReturn(Collections.singletonMap(annotationManifestPath, mockSignaleAnnotationManifest));
         AnnotationsManifest mockAnnotationsManifest = mock(AnnotationsManifest.class);
         when(mockSignatureContent.getAnnotationsManifest()).thenReturn(mockAnnotationsManifest);
-        when(mockAnnotationsManifest.getSingleAnnotationManifestReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {
+        when(mockAnnotationsManifest.getSingleAnnotationManifestReferences())
+                .thenAnswer(new Answer<List<? extends FileReference>>() {
             @Override
-            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) throws Throwable {
+            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) {
                 return Collections.singletonList(mockAnnotationManifestReference);
             }
         });

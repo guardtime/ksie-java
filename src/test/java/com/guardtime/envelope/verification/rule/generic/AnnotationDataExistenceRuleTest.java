@@ -34,7 +34,6 @@ import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.envelope.verification.rule.Rule;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -107,9 +106,10 @@ public class AnnotationDataExistenceRuleTest extends AbstractEnvelopeTest {
                 .thenReturn(Collections.singletonMap(annotationManifestPath, mockSignaleAnnotationManifest));
         AnnotationsManifest mockAnnotationsManifest = mock(AnnotationsManifest.class);
         when(mockSignatureContent.getAnnotationsManifest()).thenReturn(mockAnnotationsManifest);
-        when(mockAnnotationsManifest.getSingleAnnotationManifestReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {
+        when(mockAnnotationsManifest.getSingleAnnotationManifestReferences())
+                .thenAnswer(new Answer<List<? extends FileReference>>() {
             @Override
-            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) throws Throwable {
+            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) {
                 return Collections.singletonList(mockAnnotationManifestReference);
             }
         });

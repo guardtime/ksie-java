@@ -100,7 +100,7 @@ public class AnnotationsIntegrityRuleTest extends AbstractEnvelopeTest {
     }
 
     private RuleVerificationResult selectMostImportantResult(List<RuleVerificationResult> results) {
-        if(results.isEmpty()) {
+        if (results.isEmpty()) {
             return null;
         }
         RuleVerificationResult returnable = results.get(0);

@@ -84,7 +84,7 @@ public class VerifiedEnvelope extends Envelope {
     private void wrapSignatureContents() {
         List<SignatureContent> originalSignatureContents = getSignatureContents();
         List<VerifiedSignatureContent> verifiedContents = new ArrayList<>(originalSignatureContents.size());
-        for(SignatureContent content : originalSignatureContents) {
+        for (SignatureContent content : originalSignatureContents) {
             verifiedContents.add(new VerifiedSignatureContent(content, resultHolder));
         }
         this.verifiedSignatureContents = verifiedContents;

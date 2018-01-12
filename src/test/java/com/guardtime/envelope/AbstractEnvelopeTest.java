@@ -25,7 +25,6 @@ import com.guardtime.envelope.annotation.StringAnnotation;
 import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
-import com.guardtime.envelope.indexing.IndexProviderFactory;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.DocumentsManifest;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
@@ -57,7 +56,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class AbstractEnvelopeTest {
@@ -201,9 +199,6 @@ public class AbstractEnvelopeTest {
 
     @Mock
     protected HashAlgorithmProvider mockHashAlgorithmProvider;
-
-    @Mock
-    protected IndexProviderFactory mockIndexProviderFactory;
 
     @Before
     public void setUp() throws Exception {

@@ -135,7 +135,7 @@ public class Envelope implements AutoCloseable {
         verifyUniqueUnknownFiles(envelope, this);
         List<SignatureContent> signatureContents = new ArrayList<>(envelope.getSignatureContents());
         for (SignatureContent content : signatureContents) {
-            if(envelope.removeSignatureContent(content)) {
+            if (envelope.removeSignatureContent(content)) {
                 add(content);
             }
         }

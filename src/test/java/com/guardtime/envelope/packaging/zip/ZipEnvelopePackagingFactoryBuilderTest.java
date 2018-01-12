@@ -99,10 +99,10 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     private Envelope createInternallyValidEnvelope(List<Document> documents, List<Annotation> annotations,
                                                    Envelope existingEnvelope) throws Exception {
         TlvEnvelopeManifestFactory manifestFactorySpy = spy(new TlvEnvelopeManifestFactory());
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withManifestFactory(manifestFactorySpy).
-                build();
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withManifestFactory(manifestFactorySpy)
+                .build();
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
@@ -153,20 +153,20 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     public void testCreatePackagingFactoryWithoutManifestFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Manifest factory must be present");
-        new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withManifestFactory(null).
-                build();
+        new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withManifestFactory(null)
+                .build();
     }
 
     @Test
     public void testCreatePackagingFactoryWithoutIndexProviderFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Index provider factory must be present");
-        new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withIndexProviderFactory(null).
-                build();
+        new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withIndexProviderFactory(null)
+                .build();
     }
 
     @Test
@@ -354,10 +354,10 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     public void testReadFromBadStream_ThrowsInvalidPackageException() throws Exception {
         expectedException.expect(InvalidPackageException.class);
         expectedException.expectMessage("Failed to parse InputStream");
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withManifestFactory(new TlvEnvelopeManifestFactory()).
-                build();
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withManifestFactory(new TlvEnvelopeManifestFactory())
+                .build();
         InputStream inputStream = spy(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)));
         doThrow(IOException.class).when(inputStream).close();
         packagingFactory.read(inputStream);

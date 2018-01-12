@@ -95,14 +95,14 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withIndexProviderFactory(new UuidIndexProviderFactory()).
-                build();
-        incPackagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withIndexProviderFactory(new IncrementingIndexProviderFactory()).
-                build();
+        packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withIndexProviderFactory(new UuidIndexProviderFactory())
+                .build();
+        incPackagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withIndexProviderFactory(new IncrementingIndexProviderFactory())
+                .build();
     }
 
     @Test

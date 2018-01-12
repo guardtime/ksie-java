@@ -50,7 +50,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-class EnvelopeMergingVerifier {
+final class EnvelopeMergingVerifier {
+
+    private EnvelopeMergingVerifier() {
+    }
 
     public static void verifyNewSignatureContentIsAcceptable(SignatureContent newContent, List<SignatureContent> existingContents)
             throws EnvelopeMergingException {

@@ -28,7 +28,6 @@ import com.guardtime.ksi.unisignature.KSISignature;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 /**
  * {@link EnvelopeSignature} implementation with {@link KSISignature} as the underlying signature.
@@ -80,7 +79,7 @@ class KsiEnvelopeSignature implements EnvelopeSignature<KSISignature> {
         Identity[] newIdentity = newSignature.getAggregationHashChainIdentity();
         Identity[] identity = signature.getAggregationHashChainIdentity();
         for (int i = 0; i < newIdentity.length; i++) {
-            if(!identity[i].getDecodedClientId().equals(newIdentity[i].getDecodedClientId())) {
+            if (!identity[i].getDecodedClientId().equals(newIdentity[i].getDecodedClientId())) {
                  return false;
              }
 

@@ -346,10 +346,10 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
 
     private EnvelopePackagingFactory getEnvelopePackagingFactory(HashAlgorithmProvider provider) throws Exception {
         EnvelopeManifestFactory envelopeManifestFactory = new TlvEnvelopeManifestFactory(provider);
-        return new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withManifestFactory(envelopeManifestFactory).
-                build();
+        return new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withManifestFactory(envelopeManifestFactory)
+                .build();
     }
 
     private void setUpEnvelope(HashAlgorithmProvider provider) throws Exception {

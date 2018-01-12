@@ -69,20 +69,20 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     @Before
     public void setUpPackagingFactories() throws Exception {
         parsingStoreFactory = getParsingStoreFactory();
-        this.packagingFactoryWithIncIndex = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withIndexProviderFactory(new IncrementingIndexProviderFactory()).
-                withParsingStoreFactory(parsingStoreFactory).
-                build();
-        this.packagingFactoryWithUuid = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withIndexProviderFactory(new UuidIndexProviderFactory()).
-                withParsingStoreFactory(parsingStoreFactory).
-                build();
-        this.defaultPackagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withParsingStoreFactory(parsingStoreFactory).
-                build();
+        this.packagingFactoryWithIncIndex = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withIndexProviderFactory(new IncrementingIndexProviderFactory())
+                .withParsingStoreFactory(parsingStoreFactory)
+                .build();
+        this.packagingFactoryWithUuid = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withIndexProviderFactory(new UuidIndexProviderFactory())
+                .withParsingStoreFactory(parsingStoreFactory)
+                .build();
+        this.defaultPackagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withParsingStoreFactory(parsingStoreFactory)
+                .build();
     }
 
     @Test
@@ -185,7 +185,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         try (Envelope existingEnvelope = packagingFactoryWithIncIndex.create(
                 singletonList(testDocumentHelloText),
                 singletonList(stringEnvelopeAnnotation)
-        )){
+        )) {
             packagingFactoryWithUuid.addSignature(
                     existingEnvelope,
                     singletonList(testDocumentHelloPdf),
@@ -200,7 +200,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         try (Envelope existingEnvelope = packagingFactoryWithUuid.create(
                 singletonList(testDocumentHelloText),
                 singletonList(stringEnvelopeAnnotation)
-        )){
+        )) {
                 packagingFactoryWithIncIndex.addSignature(
                         existingEnvelope,
                         singletonList(testDocumentHelloPdf),

@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 public class EnvelopeVerifierTest extends AbstractEnvelopeTest {
 
     @Test
-    public void testCreateWithoutVerificationPolicy_ThrowsNullPointerException() throws Exception {
+    public void testCreateWithoutVerificationPolicy_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Verification policy");
         new EnvelopeVerifier(null);

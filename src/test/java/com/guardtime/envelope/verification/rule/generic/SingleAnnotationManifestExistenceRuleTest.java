@@ -56,9 +56,10 @@ public class SingleAnnotationManifestExistenceRuleTest extends AbstractEnvelopeT
         when(mockSignatureContent.getSingleAnnotationManifests())
                 .thenReturn(Collections.singletonMap(manifesturi, mockedSingleAnnotationManifest));
         when(mockSignatureContent.getAnnotationsManifest()).thenReturn(mockedAnnotationsManifest);
-        when(mockedAnnotationsManifest.getSingleAnnotationManifestReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {
+        when(mockedAnnotationsManifest.getSingleAnnotationManifestReferences())
+                .thenAnswer(new Answer<List<? extends FileReference>>() {
             @Override
-            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) throws Throwable {
+            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) {
                 return Collections.singletonList(mockFileReference);
             }
         });
@@ -78,11 +79,13 @@ public class SingleAnnotationManifestExistenceRuleTest extends AbstractEnvelopeT
         String manifesturi = "uri";
         when(mockFileReference.getUri()).thenReturn(manifesturi);
         when(mockFileReference.getMimeType()).thenReturn(EnvelopeAnnotationType.NON_REMOVABLE.getContent());
-        when(mockSignatureContent.getSingleAnnotationManifests()).thenReturn(Collections.<String, SingleAnnotationManifest>emptyMap());
+        when(mockSignatureContent.getSingleAnnotationManifests())
+                .thenReturn(Collections.<String, SingleAnnotationManifest>emptyMap());
         when(mockSignatureContent.getAnnotationsManifest()).thenReturn(mockedAnnotationsManifest);
-        when(mockedAnnotationsManifest.getSingleAnnotationManifestReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {
+        when(mockedAnnotationsManifest.getSingleAnnotationManifestReferences())
+                .thenAnswer(new Answer<List<? extends FileReference>>() {
             @Override
-            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) throws Throwable {
+            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) {
                 return Collections.singletonList(mockFileReference);
             }
         });
