@@ -26,7 +26,6 @@ import com.guardtime.envelope.document.EmptyDocument;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.util.Util;
@@ -93,9 +92,13 @@ public class SignatureContentTest extends AbstractEnvelopeTest {
 
     private SignatureContent getTestableContent() {
         List<Document> documents = Arrays.asList(
-                TEST_DOCUMENT_HELLO_TEXT,
-                TEST_DOCUMENT_HELLO_PDF,
-                new EmptyDocument(TEST_FILE_NAME_TEST_DOC, "application/doc", singletonList(new DataHash(HashAlgorithm.SHA2_256, new byte[32])))
+                testDocumentHelloText,
+                testDocumentHelloPdf,
+                new EmptyDocument(
+                        TEST_FILE_NAME_TEST_DOC,
+                        "application/doc",
+                        singletonList(new DataHash(HashAlgorithm.SHA2_256, new byte[32]))
+                )
         );
         when(mockedDocumentsManifest.getDocumentReferences()).thenAnswer(makeFileReferenceList(documents));
         when(mockedDocumentsManifest.getPath()).thenReturn("datamanifest.tlv");

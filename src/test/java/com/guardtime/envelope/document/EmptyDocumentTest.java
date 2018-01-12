@@ -34,6 +34,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -48,16 +49,16 @@ public class EmptyDocumentTest extends AbstractEnvelopeTest {
     @Before
     public void setUp() {
         hash = Util.hash(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)), HashAlgorithm.SHA2_256);
-        document = new EmptyDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, Collections.singletonList(hash));
+        document = new EmptyDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, singletonList(hash));
     }
 
     @Test
-    public void testGetFileName() throws Exception {
+    public void testGetFileName() {
         assertNotNull(document.getFileName());
     }
 
     @Test
-    public void testGetMimeType() throws Exception {
+    public void testGetMimeType() {
         assertEquals(MIME_TYPE_APPLICATION_TXT, document.getMimeType());
     }
 
@@ -74,28 +75,28 @@ public class EmptyDocumentTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testIsWritable() throws Exception {
+    public void testIsWritable() {
         assertFalse(document.isWritable());
     }
 
 
     @Test
-    public void testCreateEmptyDocumentWithoutFileName_ThrowsNullPointerException() throws Exception {
+    public void testCreateEmptyDocumentWithoutFileName_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("File name must be present");
-        new EmptyDocument(null, MIME_TYPE_APPLICATION_TXT, Collections.singletonList(hash));
+        new EmptyDocument(null, MIME_TYPE_APPLICATION_TXT, singletonList(hash));
     }
 
     @Test
-    public void testCreateEmptyDocumentWithoutMimeType_ThrowsNullPointerException() throws Exception {
+    public void testCreateEmptyDocumentWithoutMimeType_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("MIME type must be present");
-        new EmptyDocument(DOCUMENT_NAME, null, Collections.singletonList(hash));
+        new EmptyDocument(DOCUMENT_NAME, null, singletonList(hash));
     }
 
 
     @Test
-    public void testCreateEmptyDocumentWithoutDataHash_ThrowsNullPointerException() throws Exception {
+    public void testCreateEmptyDocumentWithoutDataHash_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Data hash list must be present");
         new EmptyDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, null);
@@ -103,17 +104,20 @@ public class EmptyDocumentTest extends AbstractEnvelopeTest {
 
     @Test
     public void testGetDataHashList() throws Exception {
-        List<DataHash> hashes = Collections.singletonList(hash);
+        List<DataHash> hashes = singletonList(hash);
         Document doc = new EmptyDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, hashes);
-        assertEquals(hashes, doc.getDataHashList(Collections.singletonList(hash.getAlgorithm())));
+        assertEquals(hashes, doc.getDataHashList(singletonList(hash.getAlgorithm())));
     }
 
     @Test
     public void testGetDataHashListForNotPresentAlgorithm() throws Exception {
         expectedException.expect(DataHashException.class);
         expectedException.expectMessage("Could not find any pre-generated hashes for requested algorithms!");
-        List<DataHash> hashes = Collections.singletonList(Util.hash(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)), HashAlgorithm.SHA2_256));
+        List<DataHash> hashes = singletonList(Util.hash(
+                new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)),
+                HashAlgorithm.SHA2_256
+        ));
         Document doc = new EmptyDocument(DOCUMENT_NAME, MIME_TYPE_APPLICATION_TXT, hashes);
-        doc.getDataHashList(Collections.singletonList(HashAlgorithm.RIPEMD_160));
+        doc.getDataHashList(singletonList(HashAlgorithm.RIPEMD_160));
     }
 }

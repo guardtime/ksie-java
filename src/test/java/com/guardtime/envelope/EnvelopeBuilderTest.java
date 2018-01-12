@@ -22,17 +22,12 @@ package com.guardtime.envelope;
 import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
-import com.guardtime.envelope.manifest.AnnotationsManifest;
-import com.guardtime.envelope.manifest.DocumentsManifest;
-import com.guardtime.envelope.manifest.InvalidManifestException;
-import com.guardtime.envelope.manifest.SignatureReference;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.signature.SignatureException;
-import com.guardtime.envelope.signature.SignatureFactoryType;
 import com.guardtime.ksi.hashing.DataHash;
 
 import org.junit.Before;
@@ -53,8 +48,6 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -114,17 +107,17 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
     @Test
     public void testAddAnnotationToEnvelope() throws Exception {
         EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
-        builder.withAnnotation(STRING_ENVELOPE_ANNOTATION);
+        builder.withAnnotation(stringEnvelopeAnnotation);
         assertEquals(1, builder.getAnnotations().size());
     }
 
     @Test
     public void testCreateSignature() throws Exception {
         EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
-        builder.withDocument(TEST_DOCUMENT_HELLO_TEXT);
-        builder.withDocument(TEST_DOCUMENT_HELLO_PDF);
+        builder.withDocument(testDocumentHelloText);
+        builder.withDocument(testDocumentHelloPdf);
 
-        builder.withAnnotation(STRING_ENVELOPE_ANNOTATION);
+        builder.withAnnotation(stringEnvelopeAnnotation);
         try (Envelope envelope = builder.build()) {
             assertNotNull(envelope);
         }
@@ -136,11 +129,11 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
 
         // build initial envelope
         EnvelopeBuilder builder = new EnvelopeBuilder(packagingFactory);
-        builder.withDocument(TEST_DOCUMENT_HELLO_PDF);
+        builder.withDocument(testDocumentHelloPdf);
         try (Envelope envelope = builder.build()) {
 
             // add new documents to existing envelope
-            builder.withDocument(TEST_DOCUMENT_HELLO_TEXT);
+            builder.withDocument(testDocumentHelloText);
             builder.withExistingEnvelope(envelope);
             try (Envelope newEnvelope = builder.build()) {
 
@@ -228,12 +221,12 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
         EnvelopePackagingFactory packagingFactory = getEnvelopePackagingFactory();
         // build initial envelope
         EnvelopeBuilder builder = new EnvelopeBuilder(packagingFactory);
-        builder.withDocument(TEST_DOCUMENT_HELLO_PDF);
+        builder.withDocument(testDocumentHelloPdf);
 
         try (Envelope envelope = builder.build()) {
             // add new documents to existing envelope
             builder.withExistingEnvelope(envelope);
-            builder.withDocument(TEST_DOCUMENT_HELLO_PDF);
+            builder.withDocument(testDocumentHelloPdf);
 
             try (Envelope newEnvelope = builder.build()) {
                 assertNotNull(newEnvelope);

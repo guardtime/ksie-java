@@ -35,7 +35,6 @@ import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.InvalidPackageException;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.signature.SignatureFactoryType;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.KSISignature;
@@ -53,7 +52,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -64,7 +62,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -74,15 +71,19 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest {
-    private static final DataHash nullDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
+    private static final DataHash NULL_DATA_HASH = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
     private List<Annotation> annotationList = new ArrayList<>();
     private List<Document> documentList = new ArrayList<>();
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        annotationList.add(new StringAnnotation(EnvelopeAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME));
-        documentList.add(TEST_DOCUMENT_HELLO_TEXT);
+        annotationList.add(new StringAnnotation(
+                EnvelopeAnnotationType.NON_REMOVABLE,
+                ANNOTATION_CONTENT,
+                ANNOTATION_DOMAIN_COM_GUARDTIME
+        ));
+        documentList.add(testDocumentHelloText);
     }
 
     @After
@@ -106,7 +107,7 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
                 Manifest spyManifest = spy((Manifest) invocationOnMock.callRealMethod());
-                doReturn(nullDataHash).when(spyManifest).getDataHash(any(HashAlgorithm.class));
+                doReturn(NULL_DATA_HASH).when(spyManifest).getDataHash(any(HashAlgorithm.class));
                 return spyManifest;
             }
         }).when(manifestFactorySpy).createManifest(
@@ -121,7 +122,7 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
         KSISignature mockKSISignature = mock(KSISignature.class);
         when(mockKSISignature.getAggregationTime()).thenReturn(new Date());
         when(mockSignature.getSignature()).thenReturn(mockKSISignature);
-        when(mockSignature.getSignedDataHash()).thenReturn(nullDataHash);
+        when(mockSignature.getSignedDataHash()).thenReturn(NULL_DATA_HASH);
         when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mockSignature);
         if (existingEnvelope != null) {
             packagingFactory.addSignature(existingEnvelope, documents, annotations);
@@ -192,7 +193,7 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     @Test
     public void testCreateEnvelopeWithMultipleDocuments() throws Exception {
         List<Document> documentsList = new ArrayList<>(documentList);
-        documentsList.add(TEST_DOCUMENT_HELLO_PDF);
+        documentsList.add(testDocumentHelloPdf);
 
         try (Envelope envelope = createInternallyValidEnvelope(documentsList, null)) {
             assertNotNull(envelope);
@@ -205,7 +206,7 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     @Test
     public void testCreateEnvelopeWithMultipleDocumentsAndAnnotations() throws Exception {
         List<Document> documentsList = new ArrayList<>(documentList);
-        documentsList.add(TEST_DOCUMENT_HELLO_PDF);
+        documentsList.add(testDocumentHelloPdf);
         List<Annotation> annotationsList = new ArrayList<>(annotationList);
         annotationsList.add(new StringAnnotation(
                 EnvelopeAnnotationType.VALUE_REMOVABLE,
@@ -232,7 +233,7 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
                 )
         ) {
             List<Document> documentsList = new ArrayList<>();
-            documentsList.add(TEST_DOCUMENT_HELLO_PDF);
+            documentsList.add(testDocumentHelloPdf);
             documentsList.add(streamDocument);
             List<Annotation> annotationsList = new ArrayList<>(annotationList);
             annotationsList.add(new StringAnnotation(
@@ -246,7 +247,8 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
                 Collection<Document> containedDocuments = newEnvelope.getSignatureContents().get(1).getDocuments().values();
                 assertNotNull(containedDocuments);
                 assertTrue(containedDocuments.containsAll(documentsList));
-                Collection<Annotation> containedAnnotations = newEnvelope.getSignatureContents().get(1).getAnnotations().values();
+                Collection<Annotation> containedAnnotations =
+                        newEnvelope.getSignatureContents().get(1).getAnnotations().values();
                 assertNotNull(containedAnnotations);
                 assertTrue(containedAnnotations.containsAll(annotationsList));
             }
@@ -305,7 +307,8 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     }
 
     @Test
-    public void testCreateEnvelopeWithExistingEnvelopeWithDocumentsWithSameName_ThrowsIllegalArgumentException() throws Exception {
+    public void testCreateEnvelopeWithExistingEnvelopeWithDocumentsWithSameName_ThrowsIllegalArgumentException()
+            throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Found multiple documents with same name!");
         try (

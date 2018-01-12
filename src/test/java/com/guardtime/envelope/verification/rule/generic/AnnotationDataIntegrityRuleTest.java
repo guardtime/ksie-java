@@ -112,7 +112,8 @@ public class AnnotationDataIntegrityRuleTest {
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
 
-    private SignatureContent setUpVerifiable(boolean validAnnotation, EnvelopeAnnotationType annotationType, ResultHolder holder) throws Exception {
+    private SignatureContent setUpVerifiable(boolean validAnnotation, EnvelopeAnnotationType annotationType,
+                                             ResultHolder holder) throws Exception {
         String annotationPath = "annotation.dat";
         String annotationManifestPath = "annotation.ext";
         DataHash nullDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
@@ -131,10 +132,14 @@ public class AnnotationDataIntegrityRuleTest {
             result = VerificationResult.OK;
             when(mockAnnotation.getDataHash(HashAlgorithm.SHA2_256)).thenReturn(nullDataHash);
         }
-        holder.addResult(mockSignatureContent, new GenericVerificationResult(result, KSIE_VERIFY_ANNOTATION_EXISTS.getName(), "", annotationManifestPath));
+        holder.addResult(
+                mockSignatureContent,
+                new GenericVerificationResult(result, KSIE_VERIFY_ANNOTATION_EXISTS.getName(), "", annotationManifestPath)
+        );
         when(mockSignaleAnnotationManifest.getAnnotationReference()).thenReturn(mockAnnotationReference);
         when(mockSignatureContent.getAnnotations()).thenReturn(Collections.singletonMap(annotationPath, mockAnnotation));
-        when(mockSignatureContent.getSingleAnnotationManifests()).thenReturn(Collections.singletonMap(annotationManifestPath, mockSignaleAnnotationManifest));
+        when(mockSignatureContent.getSingleAnnotationManifests())
+                .thenReturn(Collections.singletonMap(annotationManifestPath, mockSignaleAnnotationManifest));
         AnnotationsManifest mockAnnotationsManifest = mock(AnnotationsManifest.class);
         when(mockSignatureContent.getAnnotationsManifest()).thenReturn(mockAnnotationsManifest);
         when(mockAnnotationsManifest.getSingleAnnotationManifestReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {

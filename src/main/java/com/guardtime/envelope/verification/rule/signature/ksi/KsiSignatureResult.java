@@ -28,7 +28,9 @@ public class KsiSignatureResult implements SignatureResult<KSISignature, Verific
     private final com.guardtime.envelope.verification.result.VerificationResult simpleResult;
     private final KSISignature signature;
 
-    public KsiSignatureResult(VerificationResult result, com.guardtime.envelope.verification.result.VerificationResult simpleResult, KSISignature signature) {
+    public KsiSignatureResult(VerificationResult result,
+                              com.guardtime.envelope.verification.result.VerificationResult simpleResult,
+                              KSISignature signature) {
         this.result = result;
         this.simpleResult = simpleResult;
         this.signature = signature;

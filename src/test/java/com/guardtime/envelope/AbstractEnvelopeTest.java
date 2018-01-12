@@ -31,7 +31,6 @@ import com.guardtime.envelope.manifest.DocumentsManifest;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.ManifestFactoryType;
-import com.guardtime.envelope.manifest.SignatureReference;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.signature.SignatureFactory;
 import com.guardtime.envelope.signature.SignatureFactoryType;
@@ -44,10 +43,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -57,6 +53,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
@@ -76,8 +73,10 @@ public class AbstractEnvelopeTest {
     protected static final String ENVELOPE_WITH_MULTIPLE_ANNOTATIONS = "envelopes/multiple-annotations.ksie";
     protected static final String ENVELOPE_WITH_MIXED_INDEX_TYPES = "envelopes/with-mixed-index-types.ksie";
     protected static final String ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION = "envelopes/non-removable-annotation.ksie";
-    protected static final String ENVELOPE_WITH_RANDOM_INCREMENTING_INDEXES = "envelopes/multi-content-random-incrementing-indexes.ksie";
-    protected static final String ENVELOPE_WITH_MIXED_INDEX_TYPES_IN_CONTENTS = "envelopes/contents-with-different-index-types.ksie";
+    protected static final String ENVELOPE_WITH_RANDOM_INCREMENTING_INDEXES =
+            "envelopes/multi-content-random-incrementing-indexes.ksie";
+    protected static final String ENVELOPE_WITH_MIXED_INDEX_TYPES_IN_CONTENTS =
+            "envelopes/contents-with-different-index-types.ksie";
 
     /**
      * Envelopes - Internally invalid or does not verify against anchors.
@@ -98,20 +97,34 @@ public class AbstractEnvelopeTest {
     protected static final String ENVELOPE_WITH_BROKEN_SIGNATURE_CONTENT = "envelopes/invalid/broken-signature-content.ksie";
     protected static final String ENVELOPE_WITH_DOCUMENT_MISSING_MIMETYPE = "envelopes/invalid/document-missing-mimetype.ksie";
     protected static final String ENVELOPE_WITH_DIFFERENT_SIGNATURE_EXTENSION = "envelopes/different-signature-extension.ksie";
-    protected static final String ENVELOPE_WITH_NO_DOCUMENT_URI_IN_MANIFEST = "envelopes/invalid/no-document-uri-in-manifest.ksie";
-    protected static final String ENVELOPE_WITH_MIMETYPE_CONTAINS_INVALID_VALUE = "envelopes/invalid/mimetype-contains-invalid-value.ksie";
-    protected static final String ENVELOPE_WITH_MULTIPLE_EXTENDABLE_SIGNATURES = "envelopes/invalid/multiple-signatures-non-verifying.ksie";
-    protected static final String ENVELOPE_WITH_MIMETYPE_CONTAINS_ADDITIONAL_VALUE = "envelopes/invalid/mimetype-contains-additional-value.ksie";
-    protected static final String ENVELOPE_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED = "envelopes/invalid/two-contents-one-manifest-removed.ksie";
-    protected static final String ENVELOPE_WITH_CHANGED_SIGNATURE_FILE = "envelopes/invalid/invalid-signature-from-last-aggregation-hash-chain.ksie";
-    protected static final String ENVELOPE_WITH_CHANGED_DATAMANIFEST_HASH_IN_MANIFEST = "envelopes/invalid/changed-datamanifest-hash-in-manifest.ksie";
-    protected static final String ENVELOPE_WITH_MULTI_CONTENT_ONE_SIGNATURE_IS_INVALID = "envelopes/invalid/multi-content-one-signature-is-invalid.ksie";
-    protected static final String ENVELOPE_WITH_MULTI_CONTENT_ONE_IS_MISSING_DATAMANIFEST = "envelopes/invalid/multi-content-one-content-is-missing-datamanifest.ksie";
-    protected static final String ENVELOPE_WITH_CHANGED_ANNOTATIONS_MANIFEST_HASH_IN_MANIFEST = "envelopes/invalid/changed-annotations-manifest-hash-in-manifest.ksie";
-    protected static final String ENVELOPE_WITH_CHANGED_AND_EXTENDED_SIGNATURE_FILE = "envelopes/invalid/invalid-signature-from-last-aggregation-hash-chain-extended.ksie";
-    protected static final String ENVELOPE_WITH_CHANGED_DATAMANIFEST_HASH_IN_ANNOTATION_MANIFEST = "envelopes/invalid/changed-datamanifest-hash-in-annotation-manifest.ksie";
-    protected static final String ENVELOPE_WITH_INVALID_DATAMANIFEST_HASH_IN_ANNOTATION_MANIFEST = "envelopes/invalid/invalid-datamanifest-in-single-annotation-manifest.ksie";
-    protected static final String ENVELOPE_WITH_CHANGED_ANNOTATION_MANIFEST_HASH_IN_ANNOTATIONS_MANIFEST = "envelopes/invalid/changed-annotation-manifest-hash-in-annotations-manifest.ksie";
+    protected static final String ENVELOPE_WITH_NO_DOCUMENT_URI_IN_MANIFEST =
+            "envelopes/invalid/no-document-uri-in-manifest.ksie";
+    protected static final String ENVELOPE_WITH_MIMETYPE_CONTAINS_INVALID_VALUE =
+            "envelopes/invalid/mimetype-contains-invalid-value.ksie";
+    protected static final String ENVELOPE_WITH_MULTIPLE_EXTENDABLE_SIGNATURES =
+            "envelopes/invalid/multiple-signatures-non-verifying.ksie";
+    protected static final String ENVELOPE_WITH_MIMETYPE_CONTAINS_ADDITIONAL_VALUE =
+            "envelopes/invalid/mimetype-contains-additional-value.ksie";
+    protected static final String ENVELOPE_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED =
+            "envelopes/invalid/two-contents-one-manifest-removed.ksie";
+    protected static final String ENVELOPE_WITH_CHANGED_SIGNATURE_FILE =
+            "envelopes/invalid/invalid-signature-from-last-aggregation-hash-chain.ksie";
+    protected static final String ENVELOPE_WITH_CHANGED_DATAMANIFEST_HASH_IN_MANIFEST =
+            "envelopes/invalid/changed-datamanifest-hash-in-manifest.ksie";
+    protected static final String ENVELOPE_WITH_MULTI_CONTENT_ONE_SIGNATURE_IS_INVALID =
+            "envelopes/invalid/multi-content-one-signature-is-invalid.ksie";
+    protected static final String ENVELOPE_WITH_MULTI_CONTENT_ONE_IS_MISSING_DATAMANIFEST =
+            "envelopes/invalid/multi-content-one-content-is-missing-datamanifest.ksie";
+    protected static final String ENVELOPE_WITH_CHANGED_ANNOTATIONS_MANIFEST_HASH_IN_MANIFEST =
+            "envelopes/invalid/changed-annotations-manifest-hash-in-manifest.ksie";
+    protected static final String ENVELOPE_WITH_CHANGED_AND_EXTENDED_SIGNATURE_FILE =
+            "envelopes/invalid/invalid-signature-from-last-aggregation-hash-chain-extended.ksie";
+    protected static final String ENVELOPE_WITH_CHANGED_DATAMANIFEST_HASH_IN_ANNOTATION_MANIFEST =
+            "envelopes/invalid/changed-datamanifest-hash-in-annotation-manifest.ksie";
+    protected static final String ENVELOPE_WITH_INVALID_DATAMANIFEST_HASH_IN_ANNOTATION_MANIFEST =
+            "envelopes/invalid/invalid-datamanifest-in-single-annotation-manifest.ksie";
+    protected static final String ENVELOPE_WITH_CHANGED_ANNOTATION_MANIFEST_HASH_IN_ANNOTATIONS_MANIFEST =
+            "envelopes/invalid/changed-annotation-manifest-hash-in-annotations-manifest.ksie";
 
     protected static final String MIME_TYPE_APPLICATION_TXT = "application/txt";
     protected static final String MIME_TYPE_APPLICATION_PDF = "application/pdf";
@@ -132,20 +145,31 @@ public class AbstractEnvelopeTest {
 
     protected final DefaultRuleStateProvider defaultRuleStateProvider = new DefaultRuleStateProvider();
 
-    protected Annotation STRING_ENVELOPE_ANNOTATION;
-    protected Document TEST_DOCUMENT_HELLO_TEXT;
-    protected Document TEST_DOCUMENT_HELLO_PDF;
+    protected Annotation stringEnvelopeAnnotation;
+    protected Document testDocumentHelloText;
+    protected Document testDocumentHelloPdf;
     protected final List<AutoCloseable> envelopeElements = new LinkedList<>();
 
     @Before
     public void setUpDocumentsAndAnnotations() {
-        STRING_ENVELOPE_ANNOTATION = new StringAnnotation(EnvelopeAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME);
-        TEST_DOCUMENT_HELLO_TEXT = new StreamDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
-        TEST_DOCUMENT_HELLO_PDF = new StreamDocument(new ByteArrayInputStream(TEST_DATA_PDF_CONTENT), MIME_TYPE_APPLICATION_PDF, TEST_FILE_NAME_TEST_PDF);
+        stringEnvelopeAnnotation = new StringAnnotation(EnvelopeAnnotationType.NON_REMOVABLE,
+                ANNOTATION_CONTENT,
+                ANNOTATION_DOMAIN_COM_GUARDTIME
+        );
+        testDocumentHelloText = new StreamDocument(
+                new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
+                MIME_TYPE_APPLICATION_TXT,
+                TEST_FILE_NAME_TEST_TXT
+        );
+        testDocumentHelloPdf = new StreamDocument(
+                new ByteArrayInputStream(TEST_DATA_PDF_CONTENT),
+                MIME_TYPE_APPLICATION_PDF,
+                TEST_FILE_NAME_TEST_PDF
+        );
         envelopeElements.addAll(Arrays.asList(
-                TEST_DOCUMENT_HELLO_PDF,
-                TEST_DOCUMENT_HELLO_TEXT,
-                STRING_ENVELOPE_ANNOTATION));
+                testDocumentHelloPdf,
+                testDocumentHelloText,
+                stringEnvelopeAnnotation));
     }
 
     @Rule
@@ -186,10 +210,21 @@ public class AbstractEnvelopeTest {
         MockitoAnnotations.initMocks(this);
         when(mockedManifestFactory.getManifestFactoryType()).thenReturn(mockedManifestFactoryType);
         when(mockedManifestFactory.getHashAlgorithmProvider()).thenReturn(mockHashAlgorithmProvider);
-        when(mockedManifestFactory.createDocumentsManifest(anyListOf(Document.class), anyString())).thenReturn(mockedDocumentsManifest);
+        when(mockedManifestFactory.createDocumentsManifest(anyListOf(Document.class), anyString()))
+                .thenReturn(mockedDocumentsManifest);
         when(mockedManifestFactory.createAnnotationsManifest(anyMap(), anyString())).thenReturn(mockedAnnotationsManifest);
-        when(mockedManifestFactory.createSingleAnnotationManifest(Mockito.any(DocumentsManifest.class), Mockito.any(Annotation.class), anyString())).thenReturn(mockedSingleAnnotationManifest);
-        when(mockedManifestFactory.createManifest(Mockito.any(DocumentsManifest.class), Mockito.any(AnnotationsManifest.class), Mockito.any(SignatureFactoryType.class), anyString(), anyString())).thenReturn(mockedManifest);
+        when(mockedManifestFactory.createSingleAnnotationManifest(
+                        any(DocumentsManifest.class),
+                        any(Annotation.class),
+                        anyString()
+        )).thenReturn(mockedSingleAnnotationManifest);
+        when(mockedManifestFactory.createManifest(
+                any(DocumentsManifest.class),
+                any(AnnotationsManifest.class),
+                any(SignatureFactoryType.class),
+                anyString(),
+                anyString()
+        )).thenReturn(mockedManifest);
         when(mockedSignatureFactory.getSignatureFactoryType()).thenReturn(mockedSignatureFactoryType);
         when(mockedSignatureFactoryType.getSignatureMimeType()).thenReturn(SIGNATURE_MIME_TYPE);
     }

@@ -19,7 +19,6 @@
 
 package com.guardtime.envelope.manifest;
 
-
 import com.guardtime.envelope.EnvelopeElement;
 
 import java.io.IOException;

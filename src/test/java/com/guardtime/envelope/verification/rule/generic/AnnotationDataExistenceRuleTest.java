@@ -83,18 +83,28 @@ public class AnnotationDataExistenceRuleTest extends AbstractEnvelopeTest {
     private SignatureContent setUpVerifiable(EnvelopeAnnotationType annotationType, ResultHolder holder) {
         String annotationPath = "annotation.dat";
         String annotationManifestPath = "annotation.ext";
-        SignatureContent mockSignatureContent = Mockito.mock(SignatureContent.class);
-        final FileReference mockAnnotationManifestReference = Mockito.mock(FileReference.class);
-        AnnotationDataReference mockAnnotationReference = Mockito.mock(AnnotationDataReference.class);
-        SingleAnnotationManifest mockSignaleAnnotationManifest = Mockito.mock(SingleAnnotationManifest.class);
+        SignatureContent mockSignatureContent = mock(SignatureContent.class);
+        final FileReference mockAnnotationManifestReference = mock(FileReference.class);
+        AnnotationDataReference mockAnnotationReference = mock(AnnotationDataReference.class);
+        SingleAnnotationManifest mockSignaleAnnotationManifest = mock(SingleAnnotationManifest.class);
 
         when(mockAnnotationManifestReference.getUri()).thenReturn(annotationManifestPath);
         when(mockAnnotationManifestReference.getMimeType()).thenReturn(annotationType.getContent());
         when(mockAnnotationReference.getUri()).thenReturn(annotationPath);
         when(mockSignaleAnnotationManifest.getAnnotationReference()).thenReturn(mockAnnotationReference);
-        when(mockSignatureContent.getAnnotations()).thenReturn(Collections.singletonMap(annotationPath, Mockito.mock(Annotation.class)));
-        holder.addResult(mockSignatureContent, new GenericVerificationResult(VerificationResult.OK, KSIE_VERIFY_ANNOTATION_EXISTS.getName(), "", annotationManifestPath));
-        when(mockSignatureContent.getSingleAnnotationManifests()).thenReturn(Collections.singletonMap(annotationManifestPath, mockSignaleAnnotationManifest));
+        when(mockSignatureContent.getAnnotations())
+                .thenReturn(Collections.singletonMap(annotationPath, mock(Annotation.class)));
+        holder.addResult(
+                mockSignatureContent,
+                new GenericVerificationResult(
+                        VerificationResult.OK,
+                        KSIE_VERIFY_ANNOTATION_EXISTS.getName(),
+                        "",
+                        annotationManifestPath
+                )
+        );
+        when(mockSignatureContent.getSingleAnnotationManifests())
+                .thenReturn(Collections.singletonMap(annotationManifestPath, mockSignaleAnnotationManifest));
         AnnotationsManifest mockAnnotationsManifest = mock(AnnotationsManifest.class);
         when(mockSignatureContent.getAnnotationsManifest()).thenReturn(mockAnnotationsManifest);
         when(mockAnnotationsManifest.getSingleAnnotationManifestReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {

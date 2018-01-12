@@ -33,7 +33,10 @@ public class ZipEnvelopeWriterTest extends AbstractEnvelopeTest {
                 .build();
         when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mock(EnvelopeSignature.class));
         Document testDocument = new StreamDocument(new ByteArrayInputStream(new byte[0]), "some type", "folder/");
-        try (Envelope envelope = packagingFactory.create(singletonList(testDocument), singletonList(STRING_ENVELOPE_ANNOTATION))) {
+        try (Envelope envelope = packagingFactory.create(
+                singletonList(testDocument),
+                singletonList(stringEnvelopeAnnotation)
+        )) {
             ZipEnvelopeWriter writer = new ZipEnvelopeWriter();
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             writer.write(envelope, bos);

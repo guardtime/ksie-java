@@ -79,7 +79,8 @@ public class SignatureIntegrityRuleTest {
         when(mockSignatureReference.getUri()).thenReturn("signaturePath.ext");
 
         when(mockSignatureVerifier.isSupported(mockEnvelopeSignature)).thenReturn(true);
-        when(mockSignatureVerifier.getSignatureVerificationResult(Mockito.any(), eq(mockedManifest))).thenReturn(mockSignatureResult);
+        when(mockSignatureVerifier.getSignatureVerificationResult(Mockito.any(), eq(mockedManifest)))
+                .thenReturn(mockSignatureResult);
         return mockSignatureContent;
     }
 }

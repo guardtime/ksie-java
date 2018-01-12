@@ -69,7 +69,10 @@ public class KsiSignatureFactoryTest extends AbstractEnvelopeTest {
     @Test
     public void testCreate() throws Exception {
         SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
-        DataHash testHash = new DataHash(HashAlgorithm.SHA2_256, "TestStringTestingStuffLongString".getBytes(StandardCharsets.UTF_8));
+        DataHash testHash = new DataHash(
+                HashAlgorithm.SHA2_256,
+                "TestStringTestingStuffLongString".getBytes(StandardCharsets.UTF_8)
+        );
         EnvelopeSignature signature = signatureFactory.create(testHash);
         assertNotNull(signature);
     }

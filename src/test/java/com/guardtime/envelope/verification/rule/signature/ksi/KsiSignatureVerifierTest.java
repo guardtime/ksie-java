@@ -39,6 +39,7 @@ import org.mockito.Mockito;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -73,7 +74,8 @@ public class KsiSignatureVerifierTest extends AbstractEnvelopeTest {
 
         when(mockSignature.getInputHash()).thenReturn(nullDataHash);
         when(mockManifest.getDataHash(HashAlgorithm.SHA2_256)).thenReturn(nullDataHash);
-        when(mockKsi.verify(Mockito.any(KSISignature.class), Mockito.any(Policy.class), Mockito.any(DataHash.class), Mockito.any(PublicationData.class))).thenReturn(Mockito.mock(VerificationResult.class));
+        when(mockKsi.verify(any(KSISignature.class), any(Policy.class), any(DataHash.class), any(PublicationData.class)))
+                .thenReturn(Mockito.mock(VerificationResult.class));
 
 
         SignatureVerifier<KSISignature> verifier = new KsiSignatureVerifier(mockKsi, policy, publicationData);
@@ -94,7 +96,8 @@ public class KsiSignatureVerifierTest extends AbstractEnvelopeTest {
 
         when(mockSignature.getInputHash()).thenReturn(nullDataHash);
         when(mockManifest.getDataHash(HashAlgorithm.SHA2_256)).thenReturn(nullDataHash);
-        when(mockKsi.verify(Mockito.any(KSISignature.class), Mockito.any(Policy.class), Mockito.any(DataHash.class), Mockito.any(PublicationData.class))).thenThrow(KSIException.class);
+        when(mockKsi.verify(any(KSISignature.class), any(Policy.class), any(DataHash.class), any(PublicationData.class)))
+                .thenThrow(KSIException.class);
 
         SignatureVerifier<KSISignature> verifier = new KsiSignatureVerifier(mockKsi, Mockito.mock(Policy.class));
         verifier.getSignatureVerificationResult(mockSignature, mockManifest);
@@ -114,7 +117,8 @@ public class KsiSignatureVerifierTest extends AbstractEnvelopeTest {
         when(mockSignature.getInputHash()).thenReturn(nullDataHash);
         when(mockManifest.getDataHash(HashAlgorithm.SHA2_256)).thenReturn(nullDataHash);
         when(mockKsiVerificationResult.isOk()).thenReturn(true);
-        when(mockKsi.verify(Mockito.any(KSISignature.class), Mockito.any(Policy.class), Mockito.any(DataHash.class), Mockito.any(PublicationData.class))).thenReturn(mockKsiVerificationResult);
+        when(mockKsi.verify(any(KSISignature.class), any(Policy.class), any(DataHash.class), any(PublicationData.class)))
+                .thenReturn(mockKsiVerificationResult);
 
 
         SignatureVerifier<KSISignature> verifier = new KsiSignatureVerifier(mockKsi, policy, publicationData);

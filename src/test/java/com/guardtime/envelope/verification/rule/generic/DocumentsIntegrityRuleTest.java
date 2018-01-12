@@ -44,7 +44,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 public class DocumentsIntegrityRuleTest extends AbstractEnvelopeTest {
-    private static final String ENVELOPE_WITH_MISSING_DOCUMENTS_MANIFEST_ = "verification/documents/envelope-with-missing-documents-manifest.ksie";
+    private static final String ENVELOPE_WITH_MISSING_DOCUMENTS_MANIFEST_VER = "verification/documents/envelope-with-missing-documents-manifest.ksie";
     private static final String ENVELOPE_WITH_CORRUPT_DOCUMENTS_MANIFEST = "verification/documents/envelope-with-corrupt-documents-manifest.ksie";
     private static final String ENVELOPE_WITH_DOCUMENT = "verification/documents/envelope-with-document.ksie";
     private static final String ENVELOPE_WITH_MISSING_DOCUMENT = "verification/documents/envelope-with-missing-document.ksie";
@@ -99,7 +99,7 @@ public class DocumentsIntegrityRuleTest extends AbstractEnvelopeTest {
 
     @Test
     public void testDocumentsManifestMissing_NOK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResult(ENVELOPE_WITH_MISSING_DOCUMENTS_MANIFEST_);
+        RuleVerificationResult result = getRuleVerificationResult(ENVELOPE_WITH_MISSING_DOCUMENTS_MANIFEST_VER);
 
         assertEquals(VerificationResult.NOK, result.getVerificationResult());
     }

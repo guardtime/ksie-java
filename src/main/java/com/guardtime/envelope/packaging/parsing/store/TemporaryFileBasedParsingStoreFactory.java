@@ -89,7 +89,10 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
                 File file = store.get(name);
                 return Files.newInputStream(file.toPath());
             } catch (IOException e) {
-                throw new IllegalStateException("Store has been corrupted! Expected to find file at '" + store.get(name).toPath() + "' for key '" + name + "'", e);
+                throw new IllegalStateException(
+                        "Store has been corrupted! Expected to find file at '" + store.get(name).toPath() +
+                                "' for key '" + name + "'", e
+                );
             }
         }
 
