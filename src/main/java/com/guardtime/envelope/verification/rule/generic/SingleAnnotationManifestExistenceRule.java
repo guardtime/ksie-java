@@ -29,11 +29,11 @@ import com.guardtime.envelope.verification.result.RuleVerificationResult;
 import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.envelope.verification.result.VerificationResultFilter;
 import com.guardtime.envelope.verification.rule.AbstractRule;
-import com.guardtime.envelope.verification.rule.RuleTerminatingException;
 import com.guardtime.envelope.verification.rule.state.RuleState;
 import com.guardtime.envelope.verification.rule.state.RuleStateProvider;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_EXISTS;
@@ -55,7 +55,10 @@ public class SingleAnnotationManifestExistenceRule extends AbstractRule<Signatur
 
     @Override
     protected void verifyRule(ResultHolder holder, SignatureContent verifiable) {
-        for (FileReference annotationManifestReference : verifiable.getAnnotationsManifest().getSingleAnnotationManifestReferences()) {
+        List<? extends FileReference> singleAnnotationManifestReferences = verifiable
+                .getAnnotationsManifest()
+                .getSingleAnnotationManifestReferences();
+        for (FileReference annotationManifestReference : singleAnnotationManifestReferences) {
             EnvelopeAnnotationType type = EnvelopeAnnotationType.fromContent(annotationManifestReference.getMimeType());
             RuleState ruleState = type.equals(EnvelopeAnnotationType.FULLY_REMOVABLE) ? RuleState.IGNORE : state;
 
@@ -89,7 +92,8 @@ public class SingleAnnotationManifestExistenceRule extends AbstractRule<Signatur
         return new VerificationResultFilter() {
             @Override
             public boolean apply(RuleVerificationResult result) {
-                return results.contains(result) && (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName()) ||
+                return results.contains(result) &&
+                        (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName()) ||
                         result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST.getName()));
             }
         };

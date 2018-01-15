@@ -45,7 +45,8 @@ public class MultiHashElementIntegrityRule extends AbstractRule<Pair<EnvelopeEle
     }
 
     @Override
-    protected void verifyRule(ResultHolder holder, Pair<EnvelopeElement, FileReference> verifiable) throws RuleTerminatingException {
+    protected void verifyRule(ResultHolder holder, Pair<EnvelopeElement, FileReference> verifiable)
+            throws RuleTerminatingException {
         unimplementedHashAlgorithmExistenceRule.verify(holder, verifiable.getRight());
         trustedHashAlgorithmExistenceRule.verify(holder, verifiable.getRight());
         trustedHashesIntegrityRule.verify(holder, verifiable);

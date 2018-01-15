@@ -28,7 +28,7 @@ class TlvManifestFactoryType implements ManifestFactoryType {
     private final String name;
     private final String manifestFileExtension;
 
-    public TlvManifestFactoryType(String name, String manifestFileExtension) {
+    TlvManifestFactoryType(String name, String manifestFileExtension) {
         this.name = name;
         this.manifestFileExtension = manifestFileExtension;
     }

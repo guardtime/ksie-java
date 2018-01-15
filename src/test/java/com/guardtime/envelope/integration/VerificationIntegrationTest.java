@@ -55,7 +55,6 @@ import com.guardtime.ksi.unisignature.verifier.policies.UserProvidedPublicationB
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -84,7 +83,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testVerifiedEnvelopeWithEmptyResults() throws Exception {
-        try(Envelope envelope = getEnvelope(ENVELOPE_WITH_NO_DOCUMENTS)){
+        try (Envelope envelope = getEnvelope(ENVELOPE_WITH_NO_DOCUMENTS)) {
             VerifiedEnvelope verifiedEnvelope = new VerifiedEnvelope(envelope, new ResultHolder());
             assertEquals(0, verifiedEnvelope.getResults().size());
             assertEquals(VerificationResult.OK, verifiedEnvelope.getVerificationResult());
@@ -96,7 +95,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         EnvelopeVerifier verifier = new EnvelopeVerifier(
                 new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy()))
         );
-        try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTIPLE_SIGNATURES)){
+        try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTIPLE_SIGNATURES)) {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             assertEquals(VerificationResult.OK, verifiedEnvelope.getVerificationResult());
 
@@ -279,7 +278,11 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     public void testEnvelopeWithInvalidSignature_VerificationFails() throws Exception {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_WRONG_SIGNATURE_FILE)) {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
-            SignatureResult signatureResult = verifiedEnvelope.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
+            SignatureResult signatureResult = verifiedEnvelope
+                    .getVerifiedSignatureContents()
+                    .get(0)
+                    .getSignatureResults()
+                    .get(0);
             assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
             assertNotNull(signatureResult);
             assertEquals(VerificationResult.NOK, signatureResult.getSimplifiedResult());
@@ -298,7 +301,11 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             EnvelopeVerifier verifier = getEnvelopeVerifier(signatureVerificationPolicy);
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             assertTrue(verifiedEnvelope.getVerificationResult().equals(VerificationResult.NOK));
-            SignatureResult signatureResult = verifiedEnvelope.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
+            SignatureResult signatureResult = verifiedEnvelope
+                    .getVerifiedSignatureContents()
+                    .get(0)
+                    .getSignatureResults()
+                    .get(0);
             checkExecutedSignatureVerificationPolicy(
                     signatureVerificationPolicy,
                     VerificationResultCode.FAIL,
@@ -315,7 +322,11 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             EnvelopeVerifier verifier = getEnvelopeVerifier(signatureVerificationPolicy);
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             assertTrue(verifiedEnvelope.getVerificationResult().equals(VerificationResult.NOK));
-            SignatureResult signatureResult = verifiedEnvelope.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
+            SignatureResult signatureResult = verifiedEnvelope
+                    .getVerifiedSignatureContents()
+                    .get(0)
+                    .getSignatureResults()
+                    .get(0);
             checkExecutedSignatureVerificationPolicy(
                     signatureVerificationPolicy,
                     VerificationResultCode.FAIL,
@@ -332,7 +343,11 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             EnvelopeVerifier verifier = getEnvelopeVerifier(signatureVerificationPolicy);
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             assertTrue(verifiedEnvelope.getVerificationResult().equals(VerificationResult.NOK));
-            SignatureResult signatureResult = verifiedEnvelope.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
+            SignatureResult signatureResult = verifiedEnvelope
+                    .getVerifiedSignatureContents()
+                    .get(0)
+                    .getSignatureResults()
+                    .get(0);
             checkExecutedSignatureVerificationPolicy(
                     signatureVerificationPolicy,
                     VerificationResultCode.FAIL,
@@ -358,7 +373,11 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             EnvelopeVerifier verifier = new EnvelopeVerifier(policy);
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             assertTrue(verifiedEnvelope.getVerificationResult().equals(VerificationResult.NOK));
-            SignatureResult signatureResult = verifiedEnvelope.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
+            SignatureResult signatureResult = verifiedEnvelope
+                    .getVerifiedSignatureContents()
+                    .get(0)
+                    .getSignatureResults()
+                    .get(0);
             checkExecutedSignatureVerificationPolicy(
                     signatureVerificationPolicy,
                     VerificationResultCode.FAIL,
@@ -375,7 +394,11 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             EnvelopeVerifier verifier = getEnvelopeVerifier(signatureVerificationPolicy);
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             assertTrue(verifiedEnvelope.getVerificationResult().equals(VerificationResult.NOK));
-            SignatureResult signatureResult = verifiedEnvelope.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
+            SignatureResult signatureResult = verifiedEnvelope
+                    .getVerifiedSignatureContents()
+                    .get(0)
+                    .getSignatureResults()
+                    .get(0);
             checkExecutedSignatureVerificationPolicy(
                     signatureVerificationPolicy,
                     VerificationResultCode.FAIL,
@@ -390,7 +413,11 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_ONE_DOCUMENT)) {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
 
-            SignatureResult signatureResult = verifiedEnvelope.getVerifiedSignatureContents().get(0).getSignatureResults().get(0);
+            SignatureResult signatureResult = verifiedEnvelope
+                    .getVerifiedSignatureContents()
+                    .get(0)
+                    .getSignatureResults()
+                    .get(0);
             assertEquals(VerificationResult.OK, verifiedEnvelope.getVerificationResult());
             assertNotNull(signatureResult);
             assertEquals(VerificationResult.OK, signatureResult.getSimplifiedResult());
@@ -442,11 +469,11 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             added = content.attachDetachedDocument(detached.getFileName(), inputStream);
             assertFalse(added);
         } finally {
-            if(inputStream != null) {
+            if (inputStream != null) {
                 inputStream.close();
             }
 
-            if(detached != null) {
+            if (detached != null) {
                 detached.close();
             }
 
@@ -458,7 +485,8 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     private void baseTestCreateEnvelopeUsingEmptyEnvelopeDocumentAndAddDocumentData(VerificationResult verificationResult,
                                                                                     byte[] expectedDocumentContent,
-                                                                                    byte[] addedDocumentContent) throws Exception {
+                                                                                    byte[] addedDocumentContent)
+            throws Exception {
         EnvelopeVerifier envelopeVerifier =
                 getEnvelopeVerifier(new com.guardtime.ksi.unisignature.verifier.policies.InternalVerificationPolicy());
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()

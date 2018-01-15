@@ -31,7 +31,6 @@ import com.guardtime.envelope.verification.result.RuleVerificationResult;
 import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.envelope.verification.result.VerificationResultFilter;
 import com.guardtime.envelope.verification.rule.AbstractRule;
-import com.guardtime.envelope.verification.rule.RuleTerminatingException;
 import com.guardtime.envelope.verification.rule.RuleType;
 import com.guardtime.envelope.verification.rule.state.RuleState;
 import com.guardtime.envelope.verification.rule.state.RuleStateProvider;

@@ -78,7 +78,7 @@ public class EnvelopeSignatureExtenderTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testExtendingSuccess() throws Exception {
+    public void testExtendingSuccess() {
         doReturn(true).when(mockSignature).isExtended();
         assertTrue(extender.extend(makeMockEnvelope()).getExtendedSignatureContents().get(0).isExtended());
     }
@@ -92,7 +92,7 @@ public class EnvelopeSignatureExtenderTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testExtendingIsNotDone() throws Exception {
+    public void testExtendingIsNotDone() {
         doReturn(false).when(mockSignature).isExtended();
         assertFalse(extender.extend(makeMockEnvelope()).getExtendedSignatureContents().get(0).isExtended());
     }

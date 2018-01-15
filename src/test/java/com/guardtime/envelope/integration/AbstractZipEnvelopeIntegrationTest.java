@@ -69,27 +69,29 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     @Before
     public void setUpPackagingFactories() throws Exception {
         parsingStoreFactory = getParsingStoreFactory();
-        this.packagingFactoryWithIncIndex = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withIndexProviderFactory(new IncrementingIndexProviderFactory()).
-                withParsingStoreFactory(parsingStoreFactory).
-                build();
-        this.packagingFactoryWithUuid = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withIndexProviderFactory(new UuidIndexProviderFactory()).
-                withParsingStoreFactory(parsingStoreFactory).
-                build();
-        this.defaultPackagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withParsingStoreFactory(parsingStoreFactory).
-                build();
+        this.packagingFactoryWithIncIndex = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withIndexProviderFactory(new IncrementingIndexProviderFactory())
+                .withParsingStoreFactory(parsingStoreFactory)
+                .build();
+        this.packagingFactoryWithUuid = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withIndexProviderFactory(new UuidIndexProviderFactory())
+                .withParsingStoreFactory(parsingStoreFactory)
+                .build();
+        this.defaultPackagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withParsingStoreFactory(parsingStoreFactory)
+                .build();
     }
 
     @Test
     public void testReadEnvelopeWithMissingManifest() throws Exception {
         expectedException.expect(InvalidPackageException.class);
         expectedException.expectMessage("Reading envelope encountered errors!");
-        try (Envelope ignored = getEnvelope(ENVELOPE_WITH_MISSING_MANIFEST)) {}
+        try (Envelope ignored = getEnvelope(ENVELOPE_WITH_MISSING_MANIFEST)) {
+            //empty
+        }
     }
 
     @Test
@@ -97,6 +99,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         expectedException.expect(InvalidPackageException.class);
         expectedException.expectMessage("No parsable MIME type.");
         try (Envelope ignored = getEnvelope(ENVELOPE_WITH_MISSING_MIMETYPE)) {
+            //empty
         }
     }
 
@@ -104,7 +107,9 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     public void testVerifyEnvelopeWithEmptyMimetype() throws Exception {
         expectedException.expect(InvalidPackageException.class);
         expectedException.expectMessage("Parsed Envelope has invalid MIME type. Can't process it!");
-        try (Envelope ignored = getEnvelope(ENVELOPE_WITH_MIMETYPE_IS_EMPTY)) {}
+        try (Envelope ignored = getEnvelope(ENVELOPE_WITH_MIMETYPE_IS_EMPTY)) {
+            //empty
+        }
     }
 
     @Test
@@ -158,8 +163,8 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     @Test
     public void testReadEnvelopeWithDifferentIndexProviderCombination1_OK() throws Exception {
         try (Envelope envelope = packagingFactoryWithUuid.create(
-                singletonList(TEST_DOCUMENT_HELLO_TEXT),
-                singletonList(STRING_ENVELOPE_ANNOTATION)
+                singletonList(testDocumentHelloText),
+                singletonList(stringEnvelopeAnnotation)
         )) {
             writeEnvelopeToAndReadFromStream(envelope, packagingFactoryWithIncIndex);
         }
@@ -168,8 +173,8 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     @Test
     public void testReadEnvelopeWithDifferentIndexProviderCombination2_OK() throws Exception {
         try (Envelope envelope = packagingFactoryWithIncIndex.create(
-                singletonList(TEST_DOCUMENT_HELLO_TEXT),
-                singletonList(STRING_ENVELOPE_ANNOTATION)
+                singletonList(testDocumentHelloText),
+                singletonList(stringEnvelopeAnnotation)
         )) {
             writeEnvelopeToAndReadFromStream(envelope, packagingFactoryWithUuid);
         }
@@ -178,13 +183,13 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     @Test
     public void testCreateEnvelopeFromExistingWithDifferentIndexProviderCombination_OK() throws Exception {
         try (Envelope existingEnvelope = packagingFactoryWithIncIndex.create(
-                singletonList(TEST_DOCUMENT_HELLO_TEXT),
-                singletonList(STRING_ENVELOPE_ANNOTATION)
-        )){
+                singletonList(testDocumentHelloText),
+                singletonList(stringEnvelopeAnnotation)
+        )) {
             packagingFactoryWithUuid.addSignature(
                     existingEnvelope,
-                    singletonList(TEST_DOCUMENT_HELLO_PDF),
-                    singletonList(STRING_ENVELOPE_ANNOTATION)
+                    singletonList(testDocumentHelloPdf),
+                    singletonList(stringEnvelopeAnnotation)
             );
             writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithUuid);
         }
@@ -193,13 +198,13 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     @Test
     public void testCreateEnvelopeFromExistingWithDifferentIndexProviderCombination2_OK() throws Exception {
         try (Envelope existingEnvelope = packagingFactoryWithUuid.create(
-                singletonList(TEST_DOCUMENT_HELLO_TEXT),
-                singletonList(STRING_ENVELOPE_ANNOTATION)
-        )){
+                singletonList(testDocumentHelloText),
+                singletonList(stringEnvelopeAnnotation)
+        )) {
                 packagingFactoryWithIncIndex.addSignature(
                         existingEnvelope,
-                        singletonList(TEST_DOCUMENT_HELLO_PDF),
-                        singletonList(STRING_ENVELOPE_ANNOTATION)
+                        singletonList(testDocumentHelloPdf),
+                        singletonList(stringEnvelopeAnnotation)
                 );
                 writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithIncIndex);
         }
@@ -215,7 +220,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         ) {
             defaultPackagingFactory.addSignature(existingEnvelope,
                     singletonList(document),
-                    singletonList(STRING_ENVELOPE_ANNOTATION));
+                    singletonList(stringEnvelopeAnnotation));
             writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithIncIndex);
         }
     }
@@ -230,7 +235,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         ) {
             packagingFactoryWithUuid.addSignature(existingEnvelope,
                     singletonList(document),
-                    singletonList(STRING_ENVELOPE_ANNOTATION));
+                    singletonList(stringEnvelopeAnnotation));
             writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithUuid);
         }
     }
@@ -245,7 +250,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         ) {
             packagingFactoryWithUuid.addSignature(existingEnvelope,
                     singletonList(document),
-                    singletonList(STRING_ENVELOPE_ANNOTATION));
+                    singletonList(stringEnvelopeAnnotation));
             writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithUuid);
         }
     }
@@ -254,7 +259,9 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     public void testCreateEnvelopeFromExistingWithDifferentIndexesInContents_OK() throws Exception {
         try (
                 Envelope existingEnvelope =
-                        packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(ENVELOPE_WITH_MIXED_INDEX_TYPES_IN_CONTENTS)));
+                        packagingFactoryWithIncIndex.read(
+                                new FileInputStream(loadFile(ENVELOPE_WITH_MIXED_INDEX_TYPES_IN_CONTENTS))
+                        );
                 Document document = new StreamDocument(
                         new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                         MIME_TYPE_APPLICATION_TXT,
@@ -262,7 +269,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         )) {
             packagingFactoryWithUuid.addSignature(existingEnvelope,
                     singletonList(document),
-                    singletonList(STRING_ENVELOPE_ANNOTATION));
+                    singletonList(stringEnvelopeAnnotation));
             writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithIncIndex);
         }
     }
@@ -374,7 +381,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     }
 
     private List<Document> getEnvelopeDocument(String fileName) {
-        return singletonList((Document)new StreamDocument(
+        return singletonList((Document) new StreamDocument(
                 new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                 MIME_TYPE_APPLICATION_TXT,
                 fileName
@@ -411,7 +418,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     private void createEnvelopeWriteItToAndReadFromStream(String documentFileName) throws Exception {
         try (Envelope envelope = defaultPackagingFactory.create(
                 getEnvelopeDocument(documentFileName),
-                singletonList(STRING_ENVELOPE_ANNOTATION)
+                singletonList(stringEnvelopeAnnotation)
         )) {
             writeEnvelopeToAndReadFromStream(envelope, packagingFactoryWithIncIndex);
         }
@@ -420,7 +427,8 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     /*
     Created envelope will be closed.
      */
-    private void writeEnvelopeToAndReadFromStream(Envelope envelope, EnvelopePackagingFactory packagingFactory) throws Exception {
+    private void writeEnvelopeToAndReadFromStream(Envelope envelope, EnvelopePackagingFactory packagingFactory)
+            throws Exception {
         assertNotNull(envelope);
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             envelopeWriter.write(envelope, bos);

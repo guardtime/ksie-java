@@ -63,12 +63,12 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                 .build();
         try (
                 Envelope envelope =
-                     packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_ENVELOPE_ANNOTATION))
+                     packagingFactory.create(singletonList(testDocumentHelloPdf), singletonList(stringEnvelopeAnnotation))
         ) {
             assertEquals(1, envelope.getSignatureContents().size());
             try (
                     Envelope newEnvelope =
-                            packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<Annotation>())
+                            packagingFactory.create(singletonList(testDocumentHelloText), new ArrayList<Annotation>())
             ) {
                 envelope.add(newEnvelope.getSignatureContents().get(0));
                 assertEquals(2, envelope.getSignatureContents().size());
@@ -85,12 +85,12 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                 .build();
         try (
                 Envelope envelope =
-                        packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_ENVELOPE_ANNOTATION))
+                        packagingFactory.create(singletonList(testDocumentHelloPdf), singletonList(stringEnvelopeAnnotation))
         ) {
             assertEquals(1, envelope.getSignatureContents().size());
             try (
                     Envelope newEnvelope =
-                            packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<Annotation>())
+                            packagingFactory.create(singletonList(testDocumentHelloText), new ArrayList<Annotation>())
             ) {
                 envelope.add(newEnvelope);
                 assertEquals(2, envelope.getSignatureContents().size());
@@ -107,14 +107,14 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                 .build();
         try (
                 Envelope envelope =
-                        packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_ENVELOPE_ANNOTATION))
+                        packagingFactory.create(singletonList(testDocumentHelloPdf), singletonList(stringEnvelopeAnnotation))
         ) {
             assertEquals(1, envelope.getSignatureContents().size());
             try (
                     Envelope newEnvelope =
-                            packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<Annotation>());
-                 ByteArrayInputStream input = new ByteArrayInputStream("auh".getBytes(StandardCharsets.UTF_8));
-                 Document document = new StreamDocument(input, "text/plain", "someTestFile.txt")
+                            packagingFactory.create(singletonList(testDocumentHelloText), new ArrayList<Annotation>());
+                    ByteArrayInputStream input = new ByteArrayInputStream("auh".getBytes(StandardCharsets.UTF_8));
+                    Document document = new StreamDocument(input, "text/plain", "someTestFile.txt")
             ) {
                 packagingFactory.addSignature(newEnvelope, singletonList(document), new ArrayList<Annotation>());
                 int expected = newEnvelope.getSignatureContents().size() + 1;
@@ -135,12 +135,12 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                 .build();
         try (
                 Envelope envelope =
-                        packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_PDF), singletonList(STRING_ENVELOPE_ANNOTATION))
+                        packagingFactory.create(singletonList(testDocumentHelloPdf), singletonList(stringEnvelopeAnnotation))
         ) {
             assertEquals(1, envelope.getSignatureContents().size());
             try (
                     Envelope newEnvelope =
-                            packagingFactory.create(singletonList(TEST_DOCUMENT_HELLO_TEXT), new ArrayList<Annotation>())
+                            packagingFactory.create(singletonList(testDocumentHelloText), new ArrayList<Annotation>())
             ) {
                 envelope.add(newEnvelope.getSignatureContents().get(0));
             }
@@ -157,14 +157,14 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                 .withIndexProviderFactory(new UuidIndexProviderFactory())
                 .build();
         try (Envelope envelope = packagingFactory.create(
-                singletonList(TEST_DOCUMENT_HELLO_PDF),
-                singletonList(STRING_ENVELOPE_ANNOTATION)
+                singletonList(testDocumentHelloPdf),
+                singletonList(stringEnvelopeAnnotation)
         )) {
             assertEquals(1, envelope.getSignatureContents().size());
             try (Document clashingDocument = new StreamDocument(
                     new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
-                    TEST_DOCUMENT_HELLO_PDF.getMimeType(),
-                    TEST_DOCUMENT_HELLO_PDF.getFileName()
+                    testDocumentHelloPdf.getMimeType(),
+                    testDocumentHelloPdf.getFileName()
             );
                  Envelope newEnvelope = packagingFactory.create(singletonList(clashingDocument), new ArrayList<Annotation>())
             ) {
@@ -201,7 +201,8 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                 "some type",
                 filename
         );
-        try (Envelope ignored = packagingFactory.create(singletonList(testDocument), singletonList(STRING_ENVELOPE_ANNOTATION))) {
+        try (Envelope ignored = packagingFactory.create(singletonList(testDocument), singletonList(stringEnvelopeAnnotation))) {
+            //empty
         }
     }
 

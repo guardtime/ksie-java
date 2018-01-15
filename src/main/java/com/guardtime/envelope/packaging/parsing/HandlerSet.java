@@ -90,7 +90,7 @@ public class HandlerSet {
     public Set<String> getManifestUris() {
         Set<String> returnable = new HashSet<>();
         for (String key : parsingStore.getStoredKeys()) {
-            if(manifestHandler.isSupported(key)) {
+            if (manifestHandler.isSupported(key)) {
                 returnable.add(key);
             }
         }
@@ -122,7 +122,7 @@ public class HandlerSet {
     }
 
     private  <T> T parse(ContentHandler<T> handler, String path) throws ContentParsingException {
-        try(InputStream stream = getInputStream(path)) {
+        try (InputStream stream = getInputStream(path)) {
             return handler.parse(stream, path);
         } catch (IOException e) {
             throw new ContentParsingException("Failed to access data for '" + path + "'!");

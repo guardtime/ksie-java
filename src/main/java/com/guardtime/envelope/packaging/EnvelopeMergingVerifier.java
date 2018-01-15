@@ -50,7 +50,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class EnvelopeMergingVerifier {
+final class EnvelopeMergingVerifier {
+
+    private EnvelopeMergingVerifier() {
+    }
 
     public static void verifyNewSignatureContentIsAcceptable(SignatureContent newContent, List<SignatureContent> existingContents)
             throws EnvelopeMergingException {
@@ -165,7 +168,7 @@ public class EnvelopeMergingVerifier {
         for (Document doc : documents) {
             if (doc.getPath().equals(path)) {
                 for (HashAlgorithm algorithm : HashAlgorithm.getImplementedHashAlgorithms()) {
-                    if(algorithm.isDeprecated(new Date())) {
+                    if (algorithm.isDeprecated(new Date())) {
                         continue;
                     }
                     try {

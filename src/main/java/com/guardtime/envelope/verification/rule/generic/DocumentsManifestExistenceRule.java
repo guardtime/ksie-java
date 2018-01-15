@@ -21,19 +21,17 @@ package com.guardtime.envelope.verification.rule.generic;
 
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.Manifest;
-import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.verification.result.GenericVerificationResult;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.envelope.verification.rule.AbstractRule;
-import com.guardtime.envelope.verification.rule.RuleTerminatingException;
 import com.guardtime.envelope.verification.rule.RuleType;
 import com.guardtime.envelope.verification.rule.state.RuleStateProvider;
 
 /**
  * This rule verifies that the documents manifest is actually present in the {@link
- * Envelope}
+ * com.guardtime.envelope.packaging.Envelope}
  */
 public class DocumentsManifestExistenceRule extends AbstractRule<SignatureContent> {
 

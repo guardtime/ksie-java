@@ -30,6 +30,9 @@ import org.mockito.Mockito;
 
 import java.util.Date;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 public class PublicationKsiEnvelopeSignatureExtendingPolicyTest extends AbstractEnvelopeTest {
@@ -38,26 +41,27 @@ public class PublicationKsiEnvelopeSignatureExtendingPolicyTest extends Abstract
     public void testPublicationKsiEnvelopeSignatureExtenderWithoutKsi_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("KSI");
-        new PublicationKsiEnvelopeSignatureExtendingPolicy(null, Mockito.mock(PublicationRecord.class));
+        new PublicationKsiEnvelopeSignatureExtendingPolicy(null, mock(PublicationRecord.class));
     }
 
     @Test
     public void testPublicationKsiEnvelopeSignatureExtenderWithoutPublicationRecord_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Publication record");
-        new PublicationKsiEnvelopeSignatureExtendingPolicy(Mockito.mock(KSI.class), null);
+        new PublicationKsiEnvelopeSignatureExtendingPolicy(mock(KSI.class), null);
     }
 
     @Test
     public void testExtendingDelegatesToKsi() throws Exception {
-        KSI mockKsi = Mockito.mock(KSI.class);
-        PublicationRecord mockPublicationRecord = Mockito.mock(PublicationRecord.class);
+        KSI mockKsi = mock(KSI.class);
+        PublicationRecord mockPublicationRecord = mock(PublicationRecord.class);
         when(mockPublicationRecord.getPublicationTime()).thenReturn(new Date(5000));
-        ExtendingPolicy<KSISignature> extendingPolicy = new PublicationKsiEnvelopeSignatureExtendingPolicy(mockKsi, mockPublicationRecord);
-        KSISignature mockSignature = Mockito.mock(KSISignature.class);
+        ExtendingPolicy<KSISignature> extendingPolicy =
+                new PublicationKsiEnvelopeSignatureExtendingPolicy(mockKsi, mockPublicationRecord);
+        KSISignature mockSignature = mock(KSISignature.class);
         when(mockSignature.getAggregationTime()).thenReturn(new Date(1000));
         extendingPolicy.getExtendedSignature(mockSignature);
-        Mockito.verify(mockKsi, Mockito.times(1)).extend(Mockito.any(KSISignature.class), Mockito.any(PublicationRecord.class));
+        Mockito.verify(mockKsi, times(1)).extend(any(KSISignature.class), any(PublicationRecord.class));
     }
 
 }

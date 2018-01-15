@@ -44,26 +44,49 @@ public class EntryNameProvider {
     }
 
     public String nextDocumentsManifestName() {
-        return String.format(DOCUMENTS_MANIFEST_FORMAT, indexProvider.getNextDocumentsManifestIndex(), manifestSuffix);
+        return String.format(
+                DOCUMENTS_MANIFEST_FORMAT,
+                indexProvider.getNextDocumentsManifestIndex(),
+                manifestSuffix
+        );
     }
 
     public String nextManifestName() {
-        return String.format(MANIFEST_FORMAT, indexProvider.getNextManifestIndex(), manifestSuffix);
+        return String.format(
+                MANIFEST_FORMAT,
+                indexProvider.getNextManifestIndex(),
+                manifestSuffix
+        );
     }
 
     public String nextAnnotationsManifestName() {
-        return String.format(ANNOTATIONS_MANIFEST_FORMAT, indexProvider.getNextAnnotationsManifestIndex(), manifestSuffix);
+        return String.format(
+                ANNOTATIONS_MANIFEST_FORMAT,
+                indexProvider.getNextAnnotationsManifestIndex(),
+                manifestSuffix
+        );
     }
 
     public String nextSignatureName() {
-        return String.format(SIGNATURE_FORMAT, indexProvider.getNextSignatureIndex(), signatureSuffix);
+        return String.format(
+                SIGNATURE_FORMAT,
+                indexProvider.getNextSignatureIndex(),
+                signatureSuffix
+        );
     }
 
     public String nextSingleAnnotationManifestName() {
-        return String.format(SINGLE_ANNOTATION_MANIFEST_FORMAT, indexProvider.getNextSingleAnnotationManifestIndex(), manifestSuffix);
+        return String.format(
+                SINGLE_ANNOTATION_MANIFEST_FORMAT,
+                indexProvider.getNextSingleAnnotationManifestIndex(),
+                manifestSuffix
+        );
     }
 
     public String nextAnnotationDataFileName() {
-        return String.format(ANNOTATION_DATA_FORMAT, indexProvider.getNextAnnotationIndex());
+        return String.format(
+                ANNOTATION_DATA_FORMAT,
+                indexProvider.getNextAnnotationIndex()
+        );
     }
 }

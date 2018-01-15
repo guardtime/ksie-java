@@ -71,7 +71,7 @@ public class ResultHolder {
      */
     public List<RuleVerificationResult> getResults(SignatureContent content) {
         List<RuleVerificationResult> contentVerificationResults = signatureContentResultsMap.get(content);
-        if(contentVerificationResults == null) {
+        if (contentVerificationResults == null) {
             return null;
         }
         List<RuleVerificationResult> ruleVerificationResults = new ArrayList<>(contentVerificationResults);
