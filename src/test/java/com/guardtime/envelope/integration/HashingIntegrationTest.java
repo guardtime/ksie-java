@@ -359,7 +359,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
         this.envelope = builder.build();
     }
 
-    private void checkDataHashList(List<HashAlgorithm> expectedHashAlgorithms, List<DataHash> dataHashes) throws Exception {
+    private void checkDataHashList(List<HashAlgorithm> expectedHashAlgorithms, List<DataHash> dataHashes) {
         Assert.assertEquals(expectedHashAlgorithms.size(), dataHashes.size());
         List<HashAlgorithm> foundAlgorithms = new LinkedList<>();
         for (DataHash dataHash : dataHashes) {

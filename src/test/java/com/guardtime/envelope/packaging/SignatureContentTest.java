@@ -133,7 +133,7 @@ public class SignatureContentTest extends AbstractEnvelopeTest {
         }
         return new Answer<List<? extends FileReference>>() {
             @Override
-            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) throws Throwable {
+            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) {
                 return fileReferenceList;
             }
         };
