@@ -45,8 +45,6 @@ import java.util.List;
 
 import static com.guardtime.envelope.util.Util.hash;
 import static org.junit.Assert.assertArrayEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 public class AbstractTlvManifestTest extends AbstractEnvelopeTest {
@@ -74,7 +72,8 @@ public class AbstractTlvManifestTest extends AbstractEnvelopeTest {
     protected static final String MOCK_URI = "/mock/mock";
     protected static final String SIGNATURE_URI = "/META-INF/signature4.ksig";
     protected static final String SINGLE_ANNOTATION_MANIFEST_URI = "/META-INF/annotation1.tlv";
-    protected static final HashAlgorithmProvider DEFAULT_HASH_ALGORITHM_PROVIDER = new SingleHashAlgorithmProvider(HashAlgorithm.SHA2_256);
+    protected static final HashAlgorithmProvider DEFAULT_HASH_ALGORITHM_PROVIDER =
+            new SingleHashAlgorithmProvider(HashAlgorithm.SHA2_256);
 
     @Mock
     protected TlvDocumentsManifest mockDocumentsManifest;
@@ -130,11 +129,13 @@ public class AbstractTlvManifestTest extends AbstractEnvelopeTest {
         assertArrayEquals("Magic doesn't match", magic, data);
     }
 
-    protected TLVElement createReference(int referenceType, String referenceUri, String referenceMime, DataHash dataHash) throws Exception {
+    protected TLVElement createReference(int referenceType, String referenceUri, String referenceMime, DataHash dataHash)
+            throws Exception {
         return createReference(referenceType, referenceUri, referenceMime, Collections.singletonList(dataHash));
     }
 
-    protected TLVElement createReference(int referenceType, String referenceUri, String referenceMime, List<DataHash> dataHashList) throws Exception {
+    protected TLVElement createReference(int referenceType, String referenceUri, String referenceMime,
+                                         List<DataHash> dataHashList) throws Exception {
         TLVElement reference = new TLVElement(false, false, referenceType);
         if (referenceUri != null) {
             TLVElement uri = new TLVElement(false, false, TLV_ELEMENT_URI_TYPE);

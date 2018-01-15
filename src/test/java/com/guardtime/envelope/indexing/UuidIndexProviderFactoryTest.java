@@ -27,8 +27,6 @@ import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Collections;
-
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertNotEquals;
 
@@ -43,8 +41,8 @@ public class UuidIndexProviderFactoryTest extends AbstractEnvelopeTest {
                 .withVerificationPolicy(null)
                 .build();
         try (Envelope envelope = packagingFactory.create(
-                singletonList(TEST_DOCUMENT_HELLO_TEXT),
-                singletonList(STRING_ENVELOPE_ANNOTATION)
+                singletonList(testDocumentHelloText),
+                singletonList(stringEnvelopeAnnotation)
         )) {
             IndexProvider indexProvider = indexProviderFactory.create(envelope);
             Assert.assertNotNull(indexProvider);

@@ -46,13 +46,13 @@ public class EnvelopeSignatureExtenderTest extends AbstractEnvelopeTest {
     private EnvelopeSignature mockSignature;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         mockSignatureFactory = mock(SignatureFactory.class);
         mockSignature = mock(EnvelopeSignature.class);
         extender = new EnvelopeSignatureExtender(mockSignatureFactory, mock(ExtendingPolicy.class));
     }
 
-    private Envelope makeMockEnvelope() throws Exception {
+    private Envelope makeMockEnvelope() {
         Envelope mockEnvelope = mock(Envelope.class);
         SignatureContent mockSignatureContent = mock(SignatureContent.class);
         Manifest mockManifest = mock(Manifest.class);
@@ -64,21 +64,21 @@ public class EnvelopeSignatureExtenderTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testCreateWithoutSignatureFactory_ThrowsNullPointerException() throws Exception {
+    public void testCreateWithoutSignatureFactory_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Signature factory");
         new EnvelopeSignatureExtender(null, mock(ExtendingPolicy.class));
     }
 
     @Test
-    public void testCreateWithoutExtendingPolicy_ThrowsNullPointerException() throws Exception {
+    public void testCreateWithoutExtendingPolicy_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Extending policy");
         new EnvelopeSignatureExtender(mock(SignatureFactory.class), null);
     }
 
     @Test
-    public void testExtendingSuccess() throws Exception {
+    public void testExtendingSuccess() {
         doReturn(true).when(mockSignature).isExtended();
         assertTrue(extender.extend(makeMockEnvelope()).getExtendedSignatureContents().get(0).isExtended());
     }
@@ -92,7 +92,7 @@ public class EnvelopeSignatureExtenderTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testExtendingIsNotDone() throws Exception {
+    public void testExtendingIsNotDone() {
         doReturn(false).when(mockSignature).isExtended();
         assertFalse(extender.extend(makeMockEnvelope()).getExtendedSignatureContents().get(0).isExtended());
     }

@@ -31,12 +31,17 @@ class TlvDocumentReference extends TlvFileReference {
 
     public static final int DATA_FILE_REFERENCE = 0xb03;
 
-    public TlvDocumentReference(TLVElement root) throws TLVParserException {
+    TlvDocumentReference(TLVElement root) throws TLVParserException {
         super(root);
     }
 
-    public TlvDocumentReference(Document document, HashAlgorithmProvider algorithmProvider) throws TLVParserException, IOException, DataHashException {
-        super(document.getFileName(), document.getDataHashList(algorithmProvider.getDocumentReferenceHashAlgorithms()), document.getMimeType());
+    TlvDocumentReference(Document document, HashAlgorithmProvider algorithmProvider)
+            throws TLVParserException, IOException, DataHashException {
+        super(
+                document.getFileName(),
+                document.getDataHashList(algorithmProvider.getDocumentReferenceHashAlgorithms()),
+                document.getMimeType()
+        );
     }
 
     @Override

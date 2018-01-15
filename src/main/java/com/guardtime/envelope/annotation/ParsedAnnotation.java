@@ -53,7 +53,7 @@ public class ParsedAnnotation extends AbstractAnnotation {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         parsingStore.remove(key);
     }
 }

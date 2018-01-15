@@ -36,7 +36,7 @@ public class TlvDocumentsManifestTest extends AbstractTlvManifestTest {
     @Test
     public void testCreateDocumentsManifest() throws Exception {
         TlvDocumentsManifest documentsManifest = new TlvDocumentsManifest(
-                Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT),
+                Collections.singletonList(testDocumentHelloText),
                 DEFAULT_HASH_ALGORITHM_PROVIDER,
                 "path"
         );

@@ -40,42 +40,53 @@ public class GenericVerificationResultTest {
     private Rule mockRule;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
         when(mockRule.getName()).thenReturn(RULE_NAME);
         when(mockRule.getErrorMessage()).thenReturn(RULE_ERROR_MESSAGE);
-        result = new GenericVerificationResult(VERIFICATION_RESULT, mockRule.getName(), mockRule.getErrorMessage(), TESTED_ELEMENT);
+        result = new GenericVerificationResult(
+                VERIFICATION_RESULT,
+                mockRule.getName(),
+                mockRule.getErrorMessage(),
+                TESTED_ELEMENT
+        );
     }
 
     @Test
-    public void getVerificationResult() throws Exception {
+    public void getVerificationResult() {
         assertNotNull(result.getVerificationResult());
         assertEquals(VERIFICATION_RESULT, result.getVerificationResult());
     }
 
     @Test
-    public void getRuleName() throws Exception {
+    public void getRuleName() {
         assertNotNull(result.getRuleName());
         assertEquals(RULE_NAME, result.getRuleName());
     }
 
     @Test
-    public void getRuleErrorMessage() throws Exception {
+    public void getRuleErrorMessage() {
         assertNotNull(result.getRuleErrorMessage());
         assertEquals(RULE_ERROR_MESSAGE, result.getRuleErrorMessage());
     }
 
     @Test
-    public void getTestedElementPath() throws Exception {
+    public void getTestedElementPath() {
         assertNotNull(result.getTestedElementPath());
         assertEquals(TESTED_ELEMENT, result.getTestedElementPath());
     }
 
     @Test
-    public void getRuleErrorMessageWithExceptionInConstructor() throws Exception {
+    public void getRuleErrorMessageWithExceptionInConstructor() {
         String exceptionMessage = "The exception occurred!";
         Exception exception = new Exception(exceptionMessage);
-        RuleVerificationResult genericResult = new GenericVerificationResult(VERIFICATION_RESULT, mockRule.getName(), mockRule.getErrorMessage(), TESTED_ELEMENT, exception);
+        RuleVerificationResult genericResult = new GenericVerificationResult(
+                VERIFICATION_RESULT,
+                mockRule.getName(),
+                mockRule.getErrorMessage(),
+                TESTED_ELEMENT,
+                exception
+        );
         assertNotNull(genericResult.getRuleErrorMessage());
         assertEquals(exceptionMessage, genericResult.getRuleErrorMessage());
     }

@@ -26,7 +26,6 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,7 +51,7 @@ public class TlvEnvelopeManifestFactoryTest extends AbstractTlvManifestTest {
     }
 
     @Test
-    public void testCreateTlvEnvelopeManifestFactoryWithoutHashAlgorithm_ThrowsNullPointerException() throws Exception {
+    public void testCreateTlvEnvelopeManifestFactoryWithoutHashAlgorithm_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Hash algorithm provider");
         new TlvEnvelopeManifestFactory(null);
@@ -117,7 +116,10 @@ public class TlvEnvelopeManifestFactoryTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateDocumentsManifestOK() throws Exception {
-        TlvDocumentsManifest documentsManifest = factory.createDocumentsManifest(Collections.singletonList(TEST_DOCUMENT_HELLO_TEXT), "documentsManifestName");
+        TlvDocumentsManifest documentsManifest = factory.createDocumentsManifest(
+                Collections.singletonList(testDocumentHelloText),
+                "documentsManifestName"
+        );
         assertNotNull("Manifest was not created", documentsManifest);
         assertEquals(1, documentsManifest.getDocumentReferences().size());
     }
@@ -149,7 +151,7 @@ public class TlvEnvelopeManifestFactoryTest extends AbstractTlvManifestTest {
     }
 
     @Test
-    public void testGetManifestFactoryType() throws Exception {
+    public void testGetManifestFactoryType() {
         TlvManifestFactoryType type = factory.getManifestFactoryType();
         assertNotNull(type);
         assertNotNull(type.getManifestFileExtension());

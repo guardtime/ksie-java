@@ -20,28 +20,32 @@
 package com.guardtime.envelope.verification.result;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class ResultHolderTest {
 
     private ResultHolder holder = new ResultHolder();
 
     @Test
-    public void addResult() throws Exception {
-        RuleVerificationResult mockResult = Mockito.mock(RuleVerificationResult.class);
+    public void addResult() {
+        RuleVerificationResult mockResult = mock(RuleVerificationResult.class);
         holder.addResult(mockResult);
         assertEquals(mockResult, holder.getResults().get(0));
     }
 
     @Test
-    public void addResults() throws Exception {
-        List<RuleVerificationResult> mockResults = Arrays.asList(Mockito.mock(RuleVerificationResult.class), Mockito.mock(RuleVerificationResult.class), Mockito.mock(RuleVerificationResult.class));
+    public void addResults() {
+        List<RuleVerificationResult> mockResults = Arrays.asList(
+                mock(RuleVerificationResult.class),
+                mock(RuleVerificationResult.class),
+                mock(RuleVerificationResult.class)
+        );
         holder.addResults(mockResults);
         assertTrue(mockResults.containsAll(holder.getResults()));
         assertTrue(holder.getResults().containsAll(mockResults));

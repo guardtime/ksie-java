@@ -58,14 +58,14 @@ public class SignatureExistenceRuleTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testVerifyWithoutSignature() throws Exception {
+    public void testVerifyWithoutSignature() {
         when(mockSignatureContent.getEnvelopeSignature()).thenReturn(null);
 
         assertRuleResult(VerificationResult.NOK);
     }
 
     @Test
-    public void testVerifyWithSignature() throws Exception {
+    public void testVerifyWithSignature() {
         EnvelopeSignature mockSignature = Mockito.mock(EnvelopeSignature.class);
         when(mockSignatureContent.getEnvelopeSignature()).thenReturn(mockSignature);
         when(mockSignature.getSignature()).thenReturn(Mockito.mock(KSISignature.class));

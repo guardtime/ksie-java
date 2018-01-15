@@ -6,7 +6,7 @@
 
     <groupId>com.guardtime.envelope</groupId>
     <artifactId>ksie-java</artifactId>
-    <version>0.2.140-SNAPSHOT</version>
+    <version>0.2.145-SNAPSHOT</version>
 
     <name>KSIE Java SDK</name>
 
@@ -14,7 +14,7 @@
         <junit.version>4.12</junit.version>
         <mockito.version>1.10.19</mockito.version>
         <slf4j.version>1.7.12</slf4j.version>
-        <ksi.sdk.version>4.5.71</ksi.sdk.version>
+        <ksi.sdk.version>4.11.153</ksi.sdk.version>
     </properties>
 
     <dependencies>
@@ -59,6 +59,12 @@
         <dependency>
             <groupId>com.guardtime</groupId>
             <artifactId>ksi-service-client-simple-http</artifactId>
+            <version>${ksi.sdk.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.guardtime</groupId>
+            <artifactId>ksi-service-client-common-http</artifactId>
             <version>${ksi.sdk.version}</version>
             <scope>test</scope>
         </dependency>
@@ -108,6 +114,35 @@
                         <goals>
                             <goal>integration-test</goal>
                             <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.0.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>6.18</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>compile</phase>
+                        <configuration>
+                            <configLocation>checkstyle/envelope_checks.xml</configLocation>
+                            <encoding>UTF-8</encoding>
+                            <consoleOutput>true</consoleOutput>
+                            <failsOnError>true</failsOnError>
+                            <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        </configuration>
+                        <goals>
+                            <goal>check</goal>
                         </goals>
                     </execution>
                 </executions>

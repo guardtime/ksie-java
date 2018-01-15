@@ -55,7 +55,7 @@ public class DocumentExistenceRuleTest extends AbstractEnvelopeTest {
         when(mockSignatureContent.getDocumentsManifest()).thenReturn(mockedDocumentsManifest);
         when(mockedDocumentsManifest.getDocumentReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {
             @Override
-            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) throws Throwable {
+            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) {
                 return Collections.singletonList(mockFileReference);
             }
         });
@@ -80,7 +80,7 @@ public class DocumentExistenceRuleTest extends AbstractEnvelopeTest {
         when(mockSignatureContent.getDocumentsManifest()).thenReturn(mockedDocumentsManifest);
         when(mockedDocumentsManifest.getDocumentReferences()).thenAnswer(new Answer<List<? extends FileReference>>() {
             @Override
-            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) throws Throwable {
+            public List<? extends FileReference> answer(InvocationOnMock invocationOnMock) {
                 return Collections.singletonList(mockFileReference);
             }
         });

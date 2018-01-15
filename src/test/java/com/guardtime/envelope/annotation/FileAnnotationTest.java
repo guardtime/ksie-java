@@ -33,21 +33,21 @@ import static org.junit.Assert.assertTrue;
 public class FileAnnotationTest extends AbstractEnvelopeTest {
 
     @Test
-    public void testCreateFileAnnotationWithoutInputFile_ThrowsNullPointerException() throws Exception {
+    public void testCreateFileAnnotationWithoutInputFile_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("File must be present");
         new FileAnnotation(null, ANNOTATION_DOMAIN_COM_GUARDTIME, EnvelopeAnnotationType.NON_REMOVABLE);
     }
 
     @Test
-    public void testCreateFileAnnotationWithoutDomain_ThrowsNullPointerException() throws Exception {
+    public void testCreateFileAnnotationWithoutDomain_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Domain must be present");
         new FileAnnotation(new File(TEST_FILE_PATH_TEST_TXT), null, EnvelopeAnnotationType.NON_REMOVABLE);
     }
 
     @Test
-    public void testCreateFileAnnotationWithoutAnnotationType_ThrowsNullPointerException() throws Exception {
+    public void testCreateFileAnnotationWithoutAnnotationType_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Annotation type must be present");
         new FileAnnotation(new File(TEST_FILE_PATH_TEST_TXT), ANNOTATION_DOMAIN_COM_GUARDTIME, null);
@@ -55,7 +55,11 @@ public class FileAnnotationTest extends AbstractEnvelopeTest {
 
     @Test
     public void testCreateNewFileAnnotation() throws Exception {
-        FileAnnotation annotation = new FileAnnotation(loadFile(TEST_FILE_PATH_TEST_TXT), ANNOTATION_DOMAIN_COM_GUARDTIME, EnvelopeAnnotationType.NON_REMOVABLE);
+        FileAnnotation annotation = new FileAnnotation(
+                loadFile(TEST_FILE_PATH_TEST_TXT),
+                ANNOTATION_DOMAIN_COM_GUARDTIME,
+                EnvelopeAnnotationType.NON_REMOVABLE
+        );
         assertEquals(ANNOTATION_DOMAIN_COM_GUARDTIME, annotation.getDomain());
         assertEquals(EnvelopeAnnotationType.NON_REMOVABLE, annotation.getAnnotationType());
         assertNotNull(annotation.getDataHash(HashAlgorithm.SHA2_256));
@@ -65,7 +69,11 @@ public class FileAnnotationTest extends AbstractEnvelopeTest {
     @Test
     public void testCloseDoesNotDeleteFile() throws Exception {
         File file = loadFile(TEST_FILE_PATH_TEST_TXT);
-        FileAnnotation annotation = new FileAnnotation(file, ANNOTATION_DOMAIN_COM_GUARDTIME, EnvelopeAnnotationType.NON_REMOVABLE);
+        FileAnnotation annotation = new FileAnnotation(
+                file,
+                ANNOTATION_DOMAIN_COM_GUARDTIME,
+                EnvelopeAnnotationType.NON_REMOVABLE
+        );
         annotation.close();
         assertTrue(file.exists());
     }

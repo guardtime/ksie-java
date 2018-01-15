@@ -23,7 +23,6 @@ import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.manifest.AnnotationDataReference;
 import com.guardtime.envelope.util.DataHashException;
-import com.guardtime.envelope.util.Pair;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
@@ -37,7 +36,7 @@ class TlvAnnotationDataReference extends TLVStructure implements AnnotationDataR
     private DataHash hash;
     private String domain;
 
-    public TlvAnnotationDataReference(TLVElement rootElement) throws TLVParserException {
+    TlvAnnotationDataReference(TLVElement rootElement) throws TLVParserException {
         super(rootElement);
         for (TLVElement element : rootElement.getChildElements()) {
             switch (element.getType()) {
@@ -56,17 +55,17 @@ class TlvAnnotationDataReference extends TLVStructure implements AnnotationDataR
         }
     }
 
-    public TlvAnnotationDataReference(Annotation annotation, HashAlgorithmProvider algorithmProvider)
+    TlvAnnotationDataReference(Annotation annotation, HashAlgorithmProvider algorithmProvider)
             throws TLVParserException, DataHashException {
         this.uri = annotation.getPath();
         this.hash = annotation.getDataHash(algorithmProvider.getAnnotationDataReferenceHashAlgorithm());
         this.domain = annotation.getDomain();
-        this.rootElement = new TlvReferenceBuilder().
-                withType(ANNOTATION_REFERENCE).
-                withUriElement(uri).
-                withHashElement(hash).
-                withDomainElement(domain).
-                build();
+        this.rootElement = new TlvReferenceBuilder()
+                .withType(ANNOTATION_REFERENCE)
+                .withUriElement(uri)
+                .withHashElement(hash)
+                .withDomainElement(domain)
+                .build();
     }
 
     @Override

@@ -32,21 +32,21 @@ import static org.junit.Assert.assertEquals;
 public class StreamDocumentTest extends AbstractEnvelopeTest {
 
     @Test
-    public void testCreateStreamBasedEnvelopeDocumentWithoutInputStream_ThrowsNullPointerException() throws Exception {
+    public void testCreateStreamBasedEnvelopeDocumentWithoutInputStream_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Input stream must be present");
         new StreamDocument(null, MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
     }
 
     @Test
-    public void testCreateStreamBasedEnvelopeDocumentWithoutMimeType_ThrowsNullPointerException() throws Exception {
+    public void testCreateStreamBasedEnvelopeDocumentWithoutMimeType_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("MIME type must be present");
         new StreamDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), null, TEST_FILE_NAME_TEST_TXT);
     }
 
     @Test
-    public void testCreateStreamBasedEnvelopeDocumentWithoutFileName_ThrowsNullPointerException() throws Exception {
+    public void testCreateStreamBasedEnvelopeDocumentWithoutFileName_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("File name must be present");
         new StreamDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, null);
@@ -54,10 +54,17 @@ public class StreamDocumentTest extends AbstractEnvelopeTest {
 
     @Test
     public void testCreateStreamBasedEnvelopeDocument() throws Exception {
-        try (StreamDocument document = new StreamDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT)) {
+        try (StreamDocument document = new StreamDocument(
+                new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
+                MIME_TYPE_APPLICATION_TXT,
+                TEST_FILE_NAME_TEST_TXT)
+        ) {
             assertEquals(TEST_FILE_NAME_TEST_TXT, document.getFileName());
             assertEquals(MIME_TYPE_APPLICATION_TXT, document.getMimeType());
-            assertEquals(Util.hash(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), HashAlgorithm.SHA2_256), document.getDataHash(HashAlgorithm.SHA2_256));
+            assertEquals(
+                    Util.hash(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), HashAlgorithm.SHA2_256),
+                    document.getDataHash(HashAlgorithm.SHA2_256)
+            );
         }
     }
 

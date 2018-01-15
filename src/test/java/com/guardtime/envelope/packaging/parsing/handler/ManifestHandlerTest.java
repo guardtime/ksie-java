@@ -43,7 +43,7 @@ public class ManifestHandlerTest {
     private ManifestFactoryType mockManifestFactoryType;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
         when(mockManifestFactoryType.getManifestFileExtension()).thenReturn("tlv");
         when(mockManifestFactory.getManifestFactoryType()).thenReturn(mockManifestFactoryType);
@@ -51,12 +51,12 @@ public class ManifestHandlerTest {
     }
 
     @Test
-    public void testIsSupported() throws Exception {
+    public void testIsSupported() {
         assertTrue("Failed to identify supported filename string.", handler.isSupported(VALID_MANIFEST_PATH));
     }
 
     @Test
-    public void testIsSupportedDoesntValidateInvalidFile() throws Exception {
+    public void testIsSupportedDoesntValidateInvalidFile() {
         assertFalse("Identified unsupported filename string.", handler.isSupported(INVALID_MANIFEST_PATH));
     }
 }

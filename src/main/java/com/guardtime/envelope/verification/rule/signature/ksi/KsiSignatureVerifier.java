@@ -58,12 +58,14 @@ public class KsiSignatureVerifier implements SignatureVerifier<KSISignature> {
     }
 
     @Override
-    public SignatureResult getSignatureVerificationResult(KSISignature signature, Manifest manifest) throws RuleTerminatingException {
+    public SignatureResult getSignatureVerificationResult(KSISignature signature, Manifest manifest)
+            throws RuleTerminatingException {
         VerificationResult ruleResult = null;
         try {
             HashAlgorithm hashAlgorithm = signature.getInputHash().getAlgorithm();
             DataHash realHash = manifest.getDataHash(hashAlgorithm);
-            com.guardtime.ksi.unisignature.verifier.VerificationResult ksiVerificationResult = ksi.verify(signature, policy, realHash, publication);
+            com.guardtime.ksi.unisignature.verifier.VerificationResult ksiVerificationResult =
+                    ksi.verify(signature, policy, realHash, publication);
             if (ksiVerificationResult.isOk()) {
                 ruleResult = VerificationResult.OK;
             }
