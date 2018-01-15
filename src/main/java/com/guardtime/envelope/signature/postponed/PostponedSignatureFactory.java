@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.envelope.signature.postponed;
 
 import com.guardtime.envelope.extending.ExtendingPolicy;
@@ -12,7 +31,12 @@ import com.guardtime.ksi.util.Util;
 import java.io.IOException;
 import java.io.InputStream;
 
-// TODO: Javadoc
+/**
+ * Implementation for a {@link SignatureFactory} that allows for postponing real signing.
+ * Requires actual {@link SignatureFactory} for providing proper signatures once they are available.
+ * For creating placeholder {@link EnvelopeSignature}s a {@link SignatureFactoryType} or {@link SignatureFactory} must be
+ * provided to indicate what type of signatures will eventually be used.
+ */
 public class PostponedSignatureFactory implements SignatureFactory {
 
     private final SignatureFactoryType realType;
@@ -29,7 +53,7 @@ public class PostponedSignatureFactory implements SignatureFactory {
     }
 
     @Override
-    public EnvelopeSignature create(DataHash hash) throws SignatureException {
+    public EnvelopeSignature create(DataHash hash) {
         return new PostponedSignature(hash);
     }
 
@@ -44,7 +68,7 @@ public class PostponedSignatureFactory implements SignatureFactory {
 
     @Override
     public void extend(EnvelopeSignature envelopeSignature, ExtendingPolicy extender) throws SignatureException {
-        if(realFactory == null) {
+        if (realFactory == null) {
             throw new UnsupportedOperationException("Not supported if SignatureFactory is not provided to constructor!");
         }
         realFactory.extend(envelopeSignature, extender);
@@ -55,11 +79,15 @@ public class PostponedSignatureFactory implements SignatureFactory {
         return realType;
     }
 
-    public void sign(SignatureContent content) throws SignatureException {
-        if(realFactory == null) {
+    /**
+     * Replaces placeholder underlying signature in {@link EnvelopeSignature} for provided {@param signatureContent}.
+     * Requires that a real {@link SignatureFactory} is provided during object construction.
+     */
+    public void sign(SignatureContent signatureContent) throws SignatureException {
+        if (realFactory == null) {
             throw new UnsupportedOperationException("Not supported if SignatureFactory is not provided to constructor!");
         }
-        PostponedSignature postponedSignature = (PostponedSignature) content.getEnvelopeSignature();
+        PostponedSignature postponedSignature = (PostponedSignature) signatureContent.getEnvelopeSignature();
         EnvelopeSignature signature = realFactory.create(postponedSignature.getSignedDataHash());
         postponedSignature.sign(signature);
     }

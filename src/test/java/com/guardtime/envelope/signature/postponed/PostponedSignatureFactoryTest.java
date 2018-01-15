@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013-2017 Guardtime, Inc.
+ *
+ * This file is part of the Guardtime client SDK.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES, CONDITIONS, OR OTHER LICENSES OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * "Guardtime" and "KSI" are trademarks or registered trademarks of
+ * Guardtime, Inc., and no license to trademarks is granted; Guardtime
+ * reserves and retains all trademark rights.
+ */
+
 package com.guardtime.envelope.signature.postponed;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
@@ -73,7 +92,7 @@ public class PostponedSignatureFactoryTest extends AbstractEnvelopeTest {
     @Test
     public void testParsing_OK() throws Exception {
         DataHash hash = new DataHash(HashAlgorithm.SHA2_256, "32323232323232323232323232323232".getBytes());
-        try(ByteArrayInputStream input = new ByteArrayInputStream(hash.getImprint())) {
+        try (ByteArrayInputStream input = new ByteArrayInputStream(hash.getImprint())) {
             EnvelopeSignature signature = limitedFactory.read(input);
             assertEquals(hash, signature.getSignedDataHash());
         }
