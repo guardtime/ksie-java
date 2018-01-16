@@ -226,5 +226,4 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
             }
         }
     }
-
 }
