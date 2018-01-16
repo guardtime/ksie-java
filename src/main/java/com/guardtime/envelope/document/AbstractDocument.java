@@ -65,7 +65,7 @@ public abstract class AbstractDocument implements Document {
     }
 
     @Override
-    public List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws IOException, DataHashException {
+    public List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws DataHashException {
         Util.notNull(algorithmList, "Hash algorithm list");
         List<DataHash> hashList = new ArrayList<>();
         for (HashAlgorithm algorithm : algorithmList) {
@@ -77,7 +77,9 @@ public abstract class AbstractDocument implements Document {
         }
 
         if (!algorithmList.isEmpty() && hashList.isEmpty()) {
-            throw new DataHashException("Could not find any pre-generated hashes for requested algorithms! Algorithms requested: " + algorithmList);
+            throw new DataHashException(
+                    "Could not find any pre-generated hashes for requested algorithms! Algorithms requested: " + algorithmList
+            );
         }
         return hashList;
     }
@@ -102,7 +104,7 @@ public abstract class AbstractDocument implements Document {
 
             Document that = (Document) o;
 
-            if (getFileName() != null ? !getFileName().equals(that.getFileName()) : that.getFileName()!= null) return false;
+            if (getFileName() != null ? !getFileName().equals(that.getFileName()) : that.getFileName() != null) return false;
             if (getMimeType() != null ? !getMimeType().equals(that.getMimeType()) : that.getMimeType() != null) return false;
             return this.getDataHash(HASH_ALGORITHM).equals(that.getDataHash(HASH_ALGORITHM));
         } catch (DataHashException e) {

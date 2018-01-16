@@ -46,7 +46,7 @@ public class EntryNameProviderTest {
     }
 
     @Test
-    public void testNextSignatureName() throws Exception {
+    public void testNextSignatureName() {
         when(indexProvider.getNextSignatureIndex()).thenReturn(INDEX_STRING);
         String name = nameProvider.nextSignatureName();
         assertEquals(format(EntryNameProvider.SIGNATURE_FORMAT, INDEX_STRING, SIGNATURE_SUFFIX), name);
@@ -54,7 +54,7 @@ public class EntryNameProviderTest {
     }
 
     @Test
-    public void testNextManifestName() throws Exception {
+    public void testNextManifestName() {
         when(indexProvider.getNextManifestIndex()).thenReturn(INDEX_STRING);
         String manifestName = nameProvider.nextManifestName();
         assertEquals(format(EntryNameProvider.MANIFEST_FORMAT, INDEX_STRING, MANIFEST_SUFFIX), manifestName);
@@ -62,7 +62,7 @@ public class EntryNameProviderTest {
     }
 
     @Test
-    public void testNextDocumentsManifestName() throws Exception {
+    public void testNextDocumentsManifestName() {
         when(indexProvider.getNextDocumentsManifestIndex()).thenReturn(INDEX_STRING);
         String documentsManifestName = nameProvider.nextDocumentsManifestName();
         assertEquals(format(EntryNameProvider.DOCUMENTS_MANIFEST_FORMAT, INDEX_STRING, MANIFEST_SUFFIX), documentsManifestName);
@@ -70,7 +70,7 @@ public class EntryNameProviderTest {
     }
 
     @Test
-    public void testNextAnnotationsManifestName() throws Exception {
+    public void testNextAnnotationsManifestName() {
         when(indexProvider.getNextAnnotationsManifestIndex()).thenReturn(INDEX_STRING);
         String manifestName = nameProvider.nextAnnotationsManifestName();
         assertEquals(format(EntryNameProvider.ANNOTATIONS_MANIFEST_FORMAT, INDEX_STRING, MANIFEST_SUFFIX), manifestName);
@@ -78,7 +78,7 @@ public class EntryNameProviderTest {
     }
 
     @Test
-    public void testNextSingleAnnotationManifestName() throws Exception {
+    public void testNextSingleAnnotationManifestName() {
         when(indexProvider.getNextSingleAnnotationManifestIndex()).thenReturn(INDEX_STRING);
         String manifestName = nameProvider.nextSingleAnnotationManifestName();
         assertEquals(format(EntryNameProvider.SINGLE_ANNOTATION_MANIFEST_FORMAT, INDEX_STRING, MANIFEST_SUFFIX), manifestName);
@@ -86,7 +86,7 @@ public class EntryNameProviderTest {
     }
 
     @Test
-    public void testNextAnnotationDataFileName() throws Exception {
+    public void testNextAnnotationDataFileName() {
         when(indexProvider.getNextAnnotationIndex()).thenReturn(INDEX_STRING);
         String name = nameProvider.nextAnnotationDataFileName();
         assertEquals(format(EntryNameProvider.ANNOTATION_DATA_FORMAT, INDEX_STRING, MANIFEST_SUFFIX), name);

@@ -22,20 +22,18 @@ package com.guardtime.envelope.verification.rule.generic;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.Manifest;
-import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.verification.result.GenericVerificationResult;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.envelope.verification.rule.AbstractRule;
-import com.guardtime.envelope.verification.rule.RuleTerminatingException;
 import com.guardtime.envelope.verification.rule.state.RuleStateProvider;
 
 import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS;
 
 /**
  * This rule verifies that the annotations manifest is actually present in the {@link
- * Envelope}
+ * com.guardtime.envelope.packaging.Envelope}
  */
 public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureContent> {
 
@@ -46,7 +44,7 @@ public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureCont
     }
 
     @Override
-    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) {
         VerificationResult verificationResult = getFailureVerificationResult();
         Manifest manifest = verifiable.getManifest();
         FileReference annotationsManifestReference = manifest.getAnnotationsManifestReference();

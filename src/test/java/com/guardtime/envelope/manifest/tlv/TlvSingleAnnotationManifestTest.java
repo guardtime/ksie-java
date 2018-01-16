@@ -42,7 +42,12 @@ public class TlvSingleAnnotationManifestTest extends AbstractTlvManifestTest {
     public void setUp() throws Exception {
         super.setUp();
         this.annotationReference = createAnnotationReferenceElement();
-        this.documentsManifestReference = createReference(DOCUMENTS_MANIFEST_REFERENCE_TYPE, TEST_FILE_NAME_TEST_TXT, MIME_TYPE_APPLICATION_TXT, dataHash);
+        this.documentsManifestReference = createReference(
+                DOCUMENTS_MANIFEST_REFERENCE_TYPE,
+                TEST_FILE_NAME_TEST_TXT,
+                MIME_TYPE_APPLICATION_TXT,
+                dataHash
+        );
     }
 
     @Test
@@ -50,7 +55,12 @@ public class TlvSingleAnnotationManifestTest extends AbstractTlvManifestTest {
         String annotationPath = "annotation1.dat";
         when(mockAnnotation.getPath()).thenReturn(annotationPath);
         when(mockDocumentsManifest.getPath()).thenReturn(MOCK_URI);
-        TlvSingleAnnotationManifest annotationManifest = new TlvSingleAnnotationManifest(mockAnnotation, mockDocumentsManifest, DEFAULT_HASH_ALGORITHM_PROVIDER, SINGLE_ANNOTATION_MANIFEST_URI);
+        TlvSingleAnnotationManifest annotationManifest = new TlvSingleAnnotationManifest(
+                mockAnnotation,
+                mockDocumentsManifest,
+                DEFAULT_HASH_ALGORITHM_PROVIDER,
+                SINGLE_ANNOTATION_MANIFEST_URI
+        );
 
         assertNotNull(annotationManifest.getAnnotationReference());
         assertNotNull(annotationManifest.getDocumentsManifestReference());
@@ -65,8 +75,13 @@ public class TlvSingleAnnotationManifestTest extends AbstractTlvManifestTest {
 
     @Test
     public void testReadSingleAnnotationManifest() throws Exception {
-        byte[] bytes = join(SINGLE_ANNOTATION_MANIFEST_MAGIC, annotationReference.getEncoded(), documentsManifestReference.getEncoded());
-        TlvSingleAnnotationManifest annotationInfoManifest = new TlvSingleAnnotationManifest(new ByteArrayInputStream(bytes), "");
+        byte[] bytes = join(
+                SINGLE_ANNOTATION_MANIFEST_MAGIC,
+                annotationReference.getEncoded(),
+                documentsManifestReference.getEncoded()
+        );
+        TlvSingleAnnotationManifest annotationInfoManifest =
+                new TlvSingleAnnotationManifest(new ByteArrayInputStream(bytes), "");
 
         assertArrayEquals(SINGLE_ANNOTATION_MANIFEST_MAGIC, annotationInfoManifest.getMagic());
         assertNotNull(annotationInfoManifest.getDocumentsManifestReference());

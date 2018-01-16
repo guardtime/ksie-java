@@ -22,7 +22,6 @@ package com.guardtime.envelope.verification.rule.generic;
 import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.document.EmptyDocument;
 import com.guardtime.envelope.manifest.FileReference;
-import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.verification.result.GenericVerificationResult;
 import com.guardtime.envelope.verification.result.ResultHolder;
@@ -30,7 +29,6 @@ import com.guardtime.envelope.verification.result.RuleVerificationResult;
 import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.envelope.verification.result.VerificationResultFilter;
 import com.guardtime.envelope.verification.rule.AbstractRule;
-import com.guardtime.envelope.verification.rule.RuleTerminatingException;
 import com.guardtime.envelope.verification.rule.RuleType;
 import com.guardtime.envelope.verification.rule.state.RuleStateProvider;
 
@@ -42,7 +40,7 @@ import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_DATA
 
 /**
  * This rule verifies that the tested {@link Document} is indeed present in the {@link
- * Envelope}
+ * com.guardtime.envelope.packaging.Envelope}
  * It expects to find successful results for rules verifying existence and integrity of
  * {@link com.guardtime.envelope.manifest.DocumentsManifest}.
  */
@@ -55,7 +53,7 @@ public class DocumentExistenceRule extends AbstractRule<SignatureContent> {
     }
 
     @Override
-    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) {
         for (FileReference documentReference : verifiable.getDocumentsManifest().getDocumentReferences()) {
             VerificationResult result = getFailureVerificationResult();
             String documentUri = documentReference.getUri();

@@ -61,7 +61,7 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Signatur
     }
 
     @Override
-    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) {
         for (FileReference reference : verifiable.getAnnotationsManifest().getSingleAnnotationManifestReferences()) {
             String singleAnnotationManifestUri = reference.getUri();
             if (existenceRuleFailed(holder, singleAnnotationManifestUri)) continue;
@@ -121,7 +121,8 @@ public class SingleAnnotationManifestIntegrityRule extends AbstractRule<Signatur
         return new VerificationResultFilter() {
             @Override
             public boolean apply(RuleVerificationResult result) {
-                return results.contains(result) && (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName()) ||
+                return results.contains(result) &&
+                        (result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS.getName()) ||
                         result.getRuleName().equals(KSIE_VERIFY_ANNOTATION_MANIFEST.getName()));
             }
         };

@@ -72,15 +72,19 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest {
-    private static final DataHash nullDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
+    private static final DataHash NULL_DATA_HASH = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
     private List<Annotation> annotationList = new ArrayList<>();
     private List<Document> documentList = new ArrayList<>();
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        annotationList.add(new StringAnnotation(EnvelopeAnnotationType.NON_REMOVABLE, ANNOTATION_CONTENT, ANNOTATION_DOMAIN_COM_GUARDTIME));
-        documentList.add(TEST_DOCUMENT_HELLO_TEXT);
+        annotationList.add(new StringAnnotation(
+                EnvelopeAnnotationType.NON_REMOVABLE,
+                ANNOTATION_CONTENT,
+                ANNOTATION_DOMAIN_COM_GUARDTIME
+        ));
+        documentList.add(testDocumentHelloText);
     }
 
     @After
@@ -96,15 +100,15 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     private Envelope createInternallyValidEnvelope(List<Document> documents, List<Annotation> annotations,
                                                    Envelope existingEnvelope) throws Exception {
         TlvEnvelopeManifestFactory manifestFactorySpy = spy(new TlvEnvelopeManifestFactory());
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withManifestFactory(manifestFactorySpy).
-                build();
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withManifestFactory(manifestFactorySpy)
+                .build();
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
                 Manifest spyManifest = spy((Manifest) invocationOnMock.callRealMethod());
-                doReturn(nullDataHash).when(spyManifest).getDataHash(any(HashAlgorithm.class));
+                doReturn(NULL_DATA_HASH).when(spyManifest).getDataHash(any(HashAlgorithm.class));
                 return spyManifest;
             }
         }).when(manifestFactorySpy).createManifest(
@@ -119,7 +123,7 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
         KSISignature mockKSISignature = mock(KSISignature.class);
         when(mockKSISignature.getAggregationTime()).thenReturn(new Date());
         when(mockSignature.getSignature()).thenReturn(mockKSISignature);
-        when(mockSignature.getSignedDataHash()).thenReturn(nullDataHash);
+        when(mockSignature.getSignedDataHash()).thenReturn(NULL_DATA_HASH);
         when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mockSignature);
         if (existingEnvelope != null) {
             packagingFactory.addSignature(existingEnvelope, documents, annotations);
@@ -175,44 +179,6 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     }
 
     @Test
-    public void testCreatePackagingFactoryWithoutSignatureFactory_ThrowsNullPointerException() throws Exception {
-        expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("Signature factory must be present");
-        new EnvelopePackagingFactory.Builder().withSignatureFactory(null).build();
-    }
-
-    @Test
-    public void testCreatePackagingFactoryWithoutManifestFactory_ThrowsNullPointerException() throws Exception {
-        expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("Manifest factory must be present");
-        new EnvelopePackagingFactory.Builder().
-                withSignatureFactory(mockedSignatureFactory).
-                withManifestFactory(null).
-                build();
-    }
-
-    @Test
-    public void testCreatePackagingFactoryWithoutParsingStoreFactory_ThrowsNullPointerException() throws Exception {
-        expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("Parsing store factory must be present");
-        new EnvelopePackagingFactory.Builder().
-                withSignatureFactory(mockedSignatureFactory).
-                withManifestFactory(mockedManifestFactory).
-                withParsingStoreFactory(null).
-                build();
-    }
-
-    @Test
-    public void testCreatePackagingFactoryWithoutEnvelopeReader_ThrowsNullPointerException() throws Exception {
-        expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("Envelope reader must be present");
-        new EnvelopePackagingFactory.Builder().
-                withSignatureFactory(mockedSignatureFactory).
-                withEnvelopeReader(null).
-                build();
-    }
-
-    @Test
     public void testCreatePackagingFactoryWithNoVerificationPolicy_Ok() throws Exception {
         new ZipEnvelopePackagingFactoryBuilder().
                 withSignatureFactory(mockedSignatureFactory).
@@ -252,7 +218,7 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     @Test
     public void testCreateEnvelopeWithMultipleDocuments() throws Exception {
         List<Document> documentsList = new ArrayList<>(documentList);
-        documentsList.add(TEST_DOCUMENT_HELLO_PDF);
+        documentsList.add(testDocumentHelloPdf);
 
         try (Envelope envelope = createInternallyValidEnvelope(documentsList, null)) {
             assertNotNull(envelope);
@@ -265,7 +231,7 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     @Test
     public void testCreateEnvelopeWithMultipleDocumentsAndAnnotations() throws Exception {
         List<Document> documentsList = new ArrayList<>(documentList);
-        documentsList.add(TEST_DOCUMENT_HELLO_PDF);
+        documentsList.add(testDocumentHelloPdf);
         List<Annotation> annotationsList = new ArrayList<>(annotationList);
         annotationsList.add(new StringAnnotation(
                 EnvelopeAnnotationType.VALUE_REMOVABLE,
@@ -292,7 +258,7 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
                 )
         ) {
             List<Document> documentsList = new ArrayList<>();
-            documentsList.add(TEST_DOCUMENT_HELLO_PDF);
+            documentsList.add(testDocumentHelloPdf);
             documentsList.add(streamDocument);
             List<Annotation> annotationsList = new ArrayList<>(annotationList);
             annotationsList.add(new StringAnnotation(
@@ -306,7 +272,8 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
                 Collection<Document> containedDocuments = newEnvelope.getSignatureContents().get(1).getDocuments().values();
                 assertNotNull(containedDocuments);
                 assertTrue(containedDocuments.containsAll(documentsList));
-                Collection<Annotation> containedAnnotations = newEnvelope.getSignatureContents().get(1).getAnnotations().values();
+                Collection<Annotation> containedAnnotations =
+                        newEnvelope.getSignatureContents().get(1).getAnnotations().values();
                 assertNotNull(containedAnnotations);
                 assertTrue(containedAnnotations.containsAll(annotationsList));
             }
@@ -365,7 +332,8 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     }
 
     @Test
-    public void testCreateEnvelopeWithExistingEnvelopeWithDocumentsWithSameName_ThrowsIllegalArgumentException() throws Exception {
+    public void testCreateEnvelopeWithExistingEnvelopeWithDocumentsWithSameName_ThrowsIllegalArgumentException()
+            throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Found multiple documents with same name!");
         try (
@@ -411,10 +379,10 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     public void testReadFromBadStream_ThrowsInvalidPackageException() throws Exception {
         expectedException.expect(InvalidPackageException.class);
         expectedException.expectMessage("Failed to parse InputStream");
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withManifestFactory(new TlvEnvelopeManifestFactory()).
-                build();
+        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withManifestFactory(new TlvEnvelopeManifestFactory())
+                .build();
         InputStream inputStream = spy(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)));
         doThrow(IOException.class).when(inputStream).close();
         packagingFactory.read(inputStream);

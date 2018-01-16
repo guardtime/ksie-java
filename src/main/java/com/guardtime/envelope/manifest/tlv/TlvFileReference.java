@@ -30,7 +30,6 @@ import com.guardtime.ksi.tlv.TLVParserException;
 import com.guardtime.ksi.tlv.TLVStructure;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 abstract class TlvFileReference extends TLVStructure implements FileReference {
@@ -39,7 +38,7 @@ abstract class TlvFileReference extends TLVStructure implements FileReference {
     private List<DataHash> hashList = new ArrayList<>();
     private String mimeType;
 
-    public TlvFileReference(TLVElement rootElement) throws TLVParserException {
+    TlvFileReference(TLVElement rootElement) throws TLVParserException {
         super(rootElement);
         for (TLVElement element : rootElement.getChildElements()) {
             switch (element.getType()) {
@@ -58,11 +57,7 @@ abstract class TlvFileReference extends TLVStructure implements FileReference {
         }
     }
 
-    public TlvFileReference(String uri, DataHash dataHash, String mimeType) throws TLVParserException {
-        this(uri, Collections.singletonList(dataHash), mimeType);
-    }
-
-    public TlvFileReference(String uri, List<DataHash> dataHashList, String mimeType) throws TLVParserException {
+    TlvFileReference(String uri, List<DataHash> dataHashList, String mimeType) throws TLVParserException {
         Util.notEmpty(dataHashList, "Data hashes");
         this.uri = uri;
         this.hashList.addAll(dataHashList);

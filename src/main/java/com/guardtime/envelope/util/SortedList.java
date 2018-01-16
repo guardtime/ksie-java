@@ -19,8 +19,6 @@
 
 package com.guardtime.envelope.util;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -84,7 +82,7 @@ public class SortedList<E extends Comparable<? super E>> implements List<E> {
 
     @Override
     public boolean add(E e) {
-        if(contains(e)) {
+        if (contains(e)) {
             return false;
         }
         int index = Collections.binarySearch(delegate, e);

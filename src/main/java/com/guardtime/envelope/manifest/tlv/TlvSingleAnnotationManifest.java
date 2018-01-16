@@ -47,7 +47,7 @@ class TlvSingleAnnotationManifest extends AbstractTlvManifestStructure implement
     private TlvDocumentsManifestReference documentsManifestReference;
     private String path;
 
-    public TlvSingleAnnotationManifest(Annotation annotation, DocumentsManifest documentsManifest,
+    TlvSingleAnnotationManifest(Annotation annotation, DocumentsManifest documentsManifest,
                                        HashAlgorithmProvider algorithmProvider, String path) throws InvalidManifestException {
         super(MAGIC);
         this.path = path;
@@ -59,7 +59,7 @@ class TlvSingleAnnotationManifest extends AbstractTlvManifestStructure implement
         }
     }
 
-    public TlvSingleAnnotationManifest(InputStream stream, String path) throws InvalidManifestException {
+    TlvSingleAnnotationManifest(InputStream stream, String path) throws InvalidManifestException {
         super(MAGIC, stream);
         this.path = path;
         try {

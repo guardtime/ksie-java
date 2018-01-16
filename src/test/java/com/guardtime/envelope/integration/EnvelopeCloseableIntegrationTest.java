@@ -43,7 +43,6 @@ import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -198,7 +197,7 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
                     tempFiles.size() == envelope.getSignatureContents().size() + 2
             );
             for (File tmp : tempFiles) {
-                if (tmp.isDirectory()){
+                if (tmp.isDirectory()) {
                     File[] files = tmp.listFiles();
                     for (File file : files) {
                         try (PrintWriter out = new PrintWriter(file)) {

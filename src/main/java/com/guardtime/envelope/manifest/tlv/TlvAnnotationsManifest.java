@@ -44,7 +44,7 @@ class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements Ann
     private List<TlvSingleAnnotationManifestReference> singleAnnotationManifestReferences = new LinkedList<>();
     private String path = null;
 
-    public TlvAnnotationsManifest(Map<Annotation, TlvSingleAnnotationManifest> singleAnnotationManifests,
+    TlvAnnotationsManifest(Map<Annotation, TlvSingleAnnotationManifest> singleAnnotationManifests,
                                   HashAlgorithmProvider algorithmProvider, String path) throws InvalidManifestException {
         super(MAGIC);
         this.path = path;
@@ -61,7 +61,7 @@ class TlvAnnotationsManifest extends AbstractTlvManifestStructure implements Ann
         }
     }
 
-    public TlvAnnotationsManifest(InputStream stream, String path) throws InvalidManifestException {
+    TlvAnnotationsManifest(InputStream stream, String path) throws InvalidManifestException {
         super(MAGIC, stream);
         this.path = path;
         try {

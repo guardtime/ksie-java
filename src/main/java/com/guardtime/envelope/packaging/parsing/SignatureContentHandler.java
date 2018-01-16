@@ -73,18 +73,18 @@ public class SignatureContentHandler {
 
     private class SignatureContentGroup {
 
-        List<Throwable> exceptions = new ArrayList<>();
-        Manifest manifest;
-        DocumentsManifest documentsManifest;
-        AnnotationsManifest annotationsManifest;
-        List<SingleAnnotationManifest> singleAnnotationManifests = new LinkedList<>();
-        List<Annotation> annotations = new LinkedList<>();
-        List<Document> documents = new LinkedList<>();
-        EnvelopeSignature signature;
-        ParsingStore parsingStore;
+        private List<Throwable> exceptions = new ArrayList<>();
+        private Manifest manifest;
+        private DocumentsManifest documentsManifest;
+        private AnnotationsManifest annotationsManifest;
+        private List<SingleAnnotationManifest> singleAnnotationManifests = new LinkedList<>();
+        private List<Annotation> annotations = new LinkedList<>();
+        private List<Document> documents = new LinkedList<>();
+        private EnvelopeSignature signature;
+        private ParsingStore parsingStore;
 
 
-        public SignatureContentGroup(String manifestPath, ParsingStore parsingStore) throws ContentParsingException {
+        SignatureContentGroup(String manifestPath, ParsingStore parsingStore) throws ContentParsingException {
             this.parsingStore = parsingStore;
             this.manifest = getManifest(manifestPath);
             this.documentsManifest = getDocumentsManifest();
@@ -168,7 +168,8 @@ public class SignatureContentHandler {
             }
         }
 
-        private Annotation getEnvelopeAnnotation(FileReference manifestReference, SingleAnnotationManifest singleAnnotationManifest) {
+        private Annotation getEnvelopeAnnotation(FileReference manifestReference,
+                                                 SingleAnnotationManifest singleAnnotationManifest) {
             EnvelopeAnnotationType type = EnvelopeAnnotationType.fromContent(manifestReference.getMimeType());
             if (type == null) {
                 String message = String.format(

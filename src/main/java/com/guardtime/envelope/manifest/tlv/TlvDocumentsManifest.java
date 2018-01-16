@@ -41,7 +41,7 @@ class TlvDocumentsManifest extends AbstractTlvManifestStructure implements Docum
     private List<TlvDocumentReference> documents = new LinkedList<>();
     private String path;
 
-    public TlvDocumentsManifest(List<Document> documents, HashAlgorithmProvider algorithmProvider, String path)
+    TlvDocumentsManifest(List<Document> documents, HashAlgorithmProvider algorithmProvider, String path)
             throws InvalidManifestException {
         super(MAGIC);
         this.path = path;
@@ -54,7 +54,7 @@ class TlvDocumentsManifest extends AbstractTlvManifestStructure implements Docum
         }
     }
 
-    public TlvDocumentsManifest(InputStream stream, String path) throws InvalidManifestException {
+    TlvDocumentsManifest(InputStream stream, String path) throws InvalidManifestException {
         super(MAGIC, stream);
         this.path = path;
         try {

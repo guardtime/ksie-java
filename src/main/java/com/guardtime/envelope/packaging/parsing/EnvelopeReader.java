@@ -121,7 +121,7 @@ public abstract class EnvelopeReader {
         try {
             byte[] content = handlerSet.getMimeTypeContent();
             String parsedMimeType = new String(content);
-            if(!parsedMimeType.equals(getMimeType())) {
+            if (!parsedMimeType.equals(getMimeType())) {
                 // TODO: Maybe use a better exception class?
                 throw new InvalidPackageException("Parsed Envelope has invalid MIME type. Can't process it!");
             }

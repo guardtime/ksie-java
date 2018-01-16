@@ -39,7 +39,7 @@ public class TlvDocumentReferenceTest extends AbstractTlvManifestTest {
 
     @Test
     public void testCreateDocumentReference() throws Exception {
-        TlvDocumentReference reference = new TlvDocumentReference(TEST_DOCUMENT_HELLO_TEXT, DEFAULT_HASH_ALGORITHM_PROVIDER);
+        TlvDocumentReference reference = new TlvDocumentReference(testDocumentHelloText, DEFAULT_HASH_ALGORITHM_PROVIDER);
         assertEquals(DOCUMENT_REFERENCE_TYPE, reference.getElementType());
         assertEquals(MIME_TYPE_APPLICATION_TXT, getMimeType(reference));
         assertEquals(TEST_FILE_NAME_TEST_TXT, getUri(reference));
@@ -48,7 +48,12 @@ public class TlvDocumentReferenceTest extends AbstractTlvManifestTest {
 
     @Test
     public void testReadDocumentReference() throws Exception {
-        TLVElement element = createReference(DOCUMENT_REFERENCE_TYPE, TEST_FILE_NAME_TEST_TXT, MIME_TYPE_APPLICATION_TXT, dataHash);
+        TLVElement element = createReference(
+                DOCUMENT_REFERENCE_TYPE,
+                TEST_FILE_NAME_TEST_TXT,
+                MIME_TYPE_APPLICATION_TXT,
+                dataHash
+        );
         TlvDocumentReference reference = new TlvDocumentReference(element);
         assertEquals(TEST_FILE_NAME_TEST_TXT, reference.getUri());
         assertEquals(MIME_TYPE_APPLICATION_TXT, reference.getMimeType());
@@ -59,9 +64,20 @@ public class TlvDocumentReferenceTest extends AbstractTlvManifestTest {
     public void testReadDocumentReferenceWithMultipleHashes() throws Exception {
         List<DataHash> dataHashList = new LinkedList<>();
         dataHashList.add(dataHash);
-        dataHashList.add(new DataHash(HashAlgorithm.SHA2_384, "123456789012345678901234567890123456789012345678".getBytes(StandardCharsets.UTF_8)));
-        dataHashList.add(new DataHash(HashAlgorithm.SHA2_512, "1234567890123456789012345678909812345678901234567890123456789098".getBytes(StandardCharsets.UTF_8)));
-        TLVElement element = createReference(DOCUMENT_REFERENCE_TYPE, TEST_FILE_NAME_TEST_TXT, MIME_TYPE_APPLICATION_TXT, dataHashList);
+        dataHashList.add(new DataHash(
+                HashAlgorithm.SHA2_384,
+                "123456789012345678901234567890123456789012345678".getBytes(StandardCharsets.UTF_8)
+        ));
+        dataHashList.add(new DataHash(
+                HashAlgorithm.SHA2_512,
+                "1234567890123456789012345678909812345678901234567890123456789098".getBytes(StandardCharsets.UTF_8)
+        ));
+        TLVElement element = createReference(
+                DOCUMENT_REFERENCE_TYPE,
+                TEST_FILE_NAME_TEST_TXT,
+                MIME_TYPE_APPLICATION_TXT,
+                dataHashList
+        );
         TlvDocumentReference reference = new TlvDocumentReference(element);
         assertEquals(TEST_FILE_NAME_TEST_TXT, reference.getUri());
         assertEquals(MIME_TYPE_APPLICATION_TXT, reference.getMimeType());
@@ -71,8 +87,14 @@ public class TlvDocumentReferenceTest extends AbstractTlvManifestTest {
     @Test
     public void testCreateDocumentReferenceWithMultipleHashes() throws Exception {
         HashAlgorithmProvider mockHashAlgorithmProvider = Mockito.mock(HashAlgorithmProvider.class);
-        when(mockHashAlgorithmProvider.getDocumentReferenceHashAlgorithms()).thenReturn(Arrays.asList(HashAlgorithm.SHA2_384, HashAlgorithm.SHA2_512, HashAlgorithm.SHA2_512, HashAlgorithm.SHA2_256));
-        TlvDocumentReference reference = new TlvDocumentReference(TEST_DOCUMENT_HELLO_TEXT, mockHashAlgorithmProvider);
+        when(mockHashAlgorithmProvider.getDocumentReferenceHashAlgorithms())
+                .thenReturn(Arrays.asList(
+                        HashAlgorithm.SHA2_384,
+                        HashAlgorithm.SHA2_512,
+                        HashAlgorithm.SHA2_512,
+                        HashAlgorithm.SHA2_256
+                ));
+        TlvDocumentReference reference = new TlvDocumentReference(testDocumentHelloText, mockHashAlgorithmProvider);
         assertEquals(DOCUMENT_REFERENCE_TYPE, reference.getElementType());
         assertEquals(MIME_TYPE_APPLICATION_TXT, getMimeType(reference));
         assertEquals(TEST_FILE_NAME_TEST_TXT, getUri(reference));

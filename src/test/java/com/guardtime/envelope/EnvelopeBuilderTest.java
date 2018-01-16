@@ -32,7 +32,6 @@ import com.guardtime.ksi.hashing.DataHash;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -55,13 +54,26 @@ import static org.mockito.Mockito.when;
 
 public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
 
-    @Mock
     private EnvelopePackagingFactory mockedPackagingFactory;
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        when(mockedPackagingFactory.create(Mockito.anyList(), Mockito.anyList())).thenReturn(Mockito.mock(Envelope.class));
+        mockedPackagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .withIndexProviderFactory(new IncrementingIndexProviderFactory())
+                .build();
+
+        EnvelopeSignature mockedSignature = mock(EnvelopeSignature.class);
+        when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mockedSignature);
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                invocationOnMock.getArgumentAt(0, OutputStream.class).write("someData".getBytes());
+                return null;
+            }
+        }) .when(mockedSignature).writeTo(any(OutputStream.class));
     }
 
     @Test
@@ -107,17 +119,17 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
     @Test
     public void testAddAnnotationToEnvelope() {
         EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
-        builder.withAnnotation(STRING_ENVELOPE_ANNOTATION);
+        builder.withAnnotation(stringEnvelopeAnnotation);
         assertEquals(1, builder.getAnnotations().size());
     }
 
     @Test
     public void testCreateSignature() throws Exception {
         EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
-        builder.withDocument(TEST_DOCUMENT_HELLO_TEXT);
-        builder.withDocument(TEST_DOCUMENT_HELLO_PDF);
+        builder.withDocument(testDocumentHelloText);
+        builder.withDocument(testDocumentHelloPdf);
 
-        builder.withAnnotation(STRING_ENVELOPE_ANNOTATION);
+        builder.withAnnotation(stringEnvelopeAnnotation);
         try (Envelope envelope = builder.build()) {
             assertNotNull(envelope);
         }
@@ -125,15 +137,13 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
 
     @Test
     public void testCreateWithExistingEnvelope() throws Exception {
-        EnvelopePackagingFactory packagingFactory = getEnvelopePackagingFactory();
-
         // build initial envelope
-        EnvelopeBuilder builder = new EnvelopeBuilder(packagingFactory);
-        builder.withDocument(TEST_DOCUMENT_HELLO_PDF);
+        EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
+        builder.withDocument(testDocumentHelloPdf);
         try (Envelope envelope = builder.build()) {
 
             // add new documents to existing envelope
-            builder.withDocument(TEST_DOCUMENT_HELLO_TEXT);
+            builder.withDocument(testDocumentHelloText);
             builder.withExistingEnvelope(envelope);
             try (Envelope newEnvelope = builder.build()) {
 
@@ -183,9 +193,8 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
                         TEST_FILE_NAME_TEST_TXT
                 )
         ) {
-            EnvelopePackagingFactory packagingFactory = getEnvelopePackagingFactory();
             // build initial envelope
-            EnvelopeBuilder builder = new EnvelopeBuilder(packagingFactory);
+            EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
             builder.withDocument(document);
             try (Envelope envelope = builder.build()) {
 
@@ -199,15 +208,14 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
 
     @Test
     public void testCreateNewEnvelopeUsingExistingEnvelopeAndExistingDocument() throws Exception {
-        EnvelopePackagingFactory packagingFactory = getEnvelopePackagingFactory();
         // build initial envelope
-        EnvelopeBuilder builder = new EnvelopeBuilder(packagingFactory);
-        builder.withDocument(TEST_DOCUMENT_HELLO_PDF);
+        EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
+        builder.withDocument(testDocumentHelloPdf);
 
         try (Envelope envelope = builder.build()) {
             // add new documents to existing envelope
             builder.withExistingEnvelope(envelope);
-            builder.withDocument(TEST_DOCUMENT_HELLO_PDF);
+            builder.withDocument(testDocumentHelloPdf);
 
             try (Envelope newEnvelope = builder.build()) {
                 assertNotNull(newEnvelope);

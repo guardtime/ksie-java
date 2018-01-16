@@ -30,11 +30,11 @@ class TlvAnnotationsManifestReference extends TlvFileReference {
     public static final int ANNOTATIONS_MANIFEST_REFERENCE = 0xb02;
     private static final String ANNOTATIONS_MANIFEST_TYPE = "ksie10/annotmanifest";
 
-    public TlvAnnotationsManifestReference(TLVElement rootElement) throws TLVParserException {
+    TlvAnnotationsManifestReference(TLVElement rootElement) throws TLVParserException {
         super(rootElement);
     }
 
-    public TlvAnnotationsManifestReference(AnnotationsManifest annotationsManifest, HashAlgorithmProvider algorithmProvider)
+    TlvAnnotationsManifestReference(AnnotationsManifest annotationsManifest, HashAlgorithmProvider algorithmProvider)
             throws TLVParserException, DataHashException {
         super(
                 annotationsManifest.getPath(),
