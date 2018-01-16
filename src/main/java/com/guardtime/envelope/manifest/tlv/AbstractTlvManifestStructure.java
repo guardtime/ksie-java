@@ -45,12 +45,12 @@ abstract class AbstractTlvManifestStructure {
     private Set<Integer> processedElements = new HashSet<>();
     private byte[] magic;
 
-    public AbstractTlvManifestStructure(byte[] magic) {
+    AbstractTlvManifestStructure(byte[] magic) {
         Util.notNull(magic, "Magic bytes");
         this.magic = magic;
     }
 
-    public AbstractTlvManifestStructure(byte[] magic, InputStream stream) throws InvalidManifestException {
+    AbstractTlvManifestStructure(byte[] magic, InputStream stream) throws InvalidManifestException {
         this(magic);
         try {
             Util.notNull(stream, "InputStream");
@@ -81,7 +81,9 @@ abstract class AbstractTlvManifestStructure {
      */
     protected void verifyCriticalFlag(TLVElement element) throws TLVParserException {
         if (!element.isNonCritical()) {
-            throw new TLVParserException("Unknown critical TLV element with tag=0x" + Integer.toHexString(element.getType()) + " encountered");
+            throw new TLVParserException(
+                    "Unknown critical TLV element with tag=0x" + Integer.toHexString(element.getType()) + " encountered"
+            );
         }
     }
 
@@ -96,7 +98,9 @@ abstract class AbstractTlvManifestStructure {
             processedElements.add(tlvElementType);
             return element;
         }
-        throw new TLVParserException("Multiple TLV 0x" + Integer.toHexString(tlvElementType) + " elements. Only one is allowed.");
+        throw new TLVParserException(
+                "Multiple TLV 0x" + Integer.toHexString(tlvElementType) + " elements. Only one is allowed."
+        );
     }
 
     protected void checkMandatoryElement(TLVStructure structure, String name) throws InvalidManifestException {
@@ -124,7 +128,7 @@ abstract class AbstractTlvManifestStructure {
     }
 
     public InputStream getInputStream() throws IOException {
-        try(ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             writeTo(bos);
             return new ByteArrayInputStream(bos.toByteArray());
         }
@@ -154,7 +158,7 @@ abstract class AbstractTlvManifestStructure {
     }
 
     public DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException {
-        try(InputStream inputStream = getInputStream()) {
+        try (InputStream inputStream = getInputStream()) {
             return Util.hash(inputStream, algorithm);
         } catch (IOException e) {
             throw new DataHashException("Failed to access data to generate hash", e);

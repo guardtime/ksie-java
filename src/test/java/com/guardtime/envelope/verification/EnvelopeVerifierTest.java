@@ -51,7 +51,8 @@ public class EnvelopeVerifierTest extends AbstractEnvelopeTest {
         Rule mockEnvelopeRuleSecond = Mockito.mock(Rule.class);
         Rule mockEnvelopeRuleThird = Mockito.mock(Rule.class);
         VerificationPolicy mockPolicy = Mockito.mock(VerificationPolicy.class);
-        when(mockEnvelopeRuleSecond.verify(Mockito.any(ResultHolder.class), Mockito.any(Envelope.class))).thenThrow(RuleTerminatingException.class);
+        when(mockEnvelopeRuleSecond.verify(Mockito.any(ResultHolder.class), Mockito.any(Envelope.class)))
+                .thenThrow(RuleTerminatingException.class);
         when(mockPolicy.getSignatureContentRules()).thenReturn(Arrays.<Rule<SignatureContent>>asList(
                 mockEnvelopeRuleFirst,
                 mockEnvelopeRuleSecond,

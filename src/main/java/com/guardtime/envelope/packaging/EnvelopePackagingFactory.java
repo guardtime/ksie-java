@@ -73,7 +73,7 @@ import static com.guardtime.envelope.packaging.EnvelopeWriter.MIME_TYPE_ENTRY_NA
 /**
  * Creates or parses {@link Envelope} instances.
  */
-public class EnvelopePackagingFactory {
+public final class EnvelopePackagingFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(EnvelopePackagingFactory.class);
 
@@ -208,11 +208,11 @@ public class EnvelopePackagingFactory {
             } catch (Exception e) {
                 logger.warn("Failed to clean up after created envelope that did not pass internal verification.", e);
             }
-            for(RuleVerificationResult res : result.getResults()) {
-                if(res.getVerificationResult().equals(VerificationResult.NOK)) {
+            for (RuleVerificationResult res : result.getResults()) {
+                if (res.getVerificationResult().equals(VerificationResult.NOK)) {
                     logger.error("Failed rule '{}' for '{}' ", res.getRuleName(), res.getTestedElementPath());
                 }
-                if(res.getVerificationResult().equals(VerificationResult.WARN)) {
+                if (res.getVerificationResult().equals(VerificationResult.WARN)) {
                     logger.warn("Failed rule '{}' for '{}' ", res.getRuleName(), res.getTestedElementPath());
                 }
             }
@@ -242,7 +242,7 @@ public class EnvelopePackagingFactory {
         private Map<Annotation, SingleAnnotationManifest> annotationsManifestContent = new HashMap<>();
         private List<SingleAnnotationManifest> singleAnnotationManifests = new ArrayList<>();
 
-        public ContentSigner(List<Document> documents, List<Annotation> annotations, IndexProvider indexProvider,
+        ContentSigner(List<Document> documents, List<Annotation> annotations, IndexProvider indexProvider,
                              EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory) {
             this.documents = documents;
             this.annotations = annotations;

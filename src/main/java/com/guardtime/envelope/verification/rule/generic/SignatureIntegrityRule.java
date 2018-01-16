@@ -56,12 +56,18 @@ public class SignatureIntegrityRule extends AbstractRule<SignatureContent> {
             if (!verifier.isSupported(envelopeSignature)) {
                 throw new RuleTerminatingException("Unsupported signature type!");
             }
-            SignatureResult signatureResult = verifier.getSignatureVerificationResult(envelopeSignature.getSignature(), manifest);
+            SignatureResult signatureResult =
+                    verifier.getSignatureVerificationResult(envelopeSignature.getSignature(), manifest);
             signatureResult = new WrappedSignatureResult(signatureResult, result);
             holder.addSignatureResult(verifiable, signatureResult);
             holder.addResult(
                     verifiable,
-                    new GenericVerificationResult(signatureResult.getSimplifiedResult(), getName(), getErrorMessage(), signatureUri)
+                    new GenericVerificationResult(
+                            signatureResult.getSimplifiedResult(),
+                            getName(),
+                            getErrorMessage(),
+                            signatureUri
+                    )
             );
         } catch (RuleTerminatingException e) {
             LOGGER.info("Verifying signature failed!", e);
@@ -82,7 +88,7 @@ public class SignatureIntegrityRule extends AbstractRule<SignatureContent> {
         private final SignatureResult original;
         private final VerificationResult simpleResult;
 
-        public WrappedSignatureResult(SignatureResult result, VerificationResult verificationResult) {
+        WrappedSignatureResult(SignatureResult result, VerificationResult verificationResult) {
             this.original = result;
             this.simpleResult = original.getSimplifiedResult() == null ? verificationResult : original.getSimplifiedResult();
         }

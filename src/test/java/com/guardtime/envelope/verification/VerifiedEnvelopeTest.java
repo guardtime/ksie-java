@@ -48,7 +48,7 @@ public class VerifiedEnvelopeTest {
     @Test
     public void testSignatureContentsAreWrapped() {
         VerifiedEnvelope verifiedEnvelope = new VerifiedEnvelope(setUpMockedEnvelope(), new ResultHolder());
-        for(SignatureContent content : verifiedEnvelope.getVerifiedSignatureContents()) {
+        for (SignatureContent content : verifiedEnvelope.getVerifiedSignatureContents()) {
             assertTrue(content instanceof VerifiedSignatureContent);
         }
     }

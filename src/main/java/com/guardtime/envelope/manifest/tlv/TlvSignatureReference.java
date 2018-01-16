@@ -31,7 +31,7 @@ class TlvSignatureReference extends TLVStructure implements SignatureReference {
     private String uri;
     private String type;
 
-    public TlvSignatureReference(TLVElement rootElement) throws TLVParserException {
+    TlvSignatureReference(TLVElement rootElement) throws TLVParserException {
         super(rootElement);
         for (TLVElement element : rootElement.getChildElements()) {
             switch (element.getType()) {
@@ -47,14 +47,14 @@ class TlvSignatureReference extends TLVStructure implements SignatureReference {
         }
     }
 
-    public TlvSignatureReference(String uri, String type) throws TLVParserException {
+    TlvSignatureReference(String uri, String type) throws TLVParserException {
         this.uri = uri;
         this.type = type;
-        this.rootElement = new TlvReferenceBuilder().
-                withType(SIGNATURE_REFERENCE).
-                withUriElement(uri).
-                withMimeTypeElement(type).
-                build();
+        this.rootElement = new TlvReferenceBuilder()
+                .withType(SIGNATURE_REFERENCE)
+                .withUriElement(uri)
+                .withMimeTypeElement(type)
+                .build();
     }
 
     public String getUri() {

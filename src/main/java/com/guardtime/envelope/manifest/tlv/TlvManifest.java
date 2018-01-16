@@ -49,7 +49,7 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
     private TlvAnnotationsManifestReference annotationsManifestReference;
     private String path;
 
-    public TlvManifest(DocumentsManifest documentsManifest, AnnotationsManifest annotationsManifest,
+    TlvManifest(DocumentsManifest documentsManifest, AnnotationsManifest annotationsManifest,
                        String signatureReferenceUri, SignatureFactoryType factoryType, HashAlgorithmProvider algorithmProvider,
                        String path) throws InvalidManifestException {
         super(MAGIC);
@@ -63,7 +63,7 @@ class TlvManifest extends AbstractTlvManifestStructure implements Manifest {
         }
     }
 
-    public TlvManifest(InputStream stream, String path) throws InvalidManifestException {
+    TlvManifest(InputStream stream, String path) throws InvalidManifestException {
         super(MAGIC, stream);
         this.path = path;
         try {

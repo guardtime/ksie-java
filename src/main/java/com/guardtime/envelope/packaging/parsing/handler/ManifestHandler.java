@@ -39,7 +39,7 @@ public class ManifestHandler implements ContentHandler<Manifest> {
     public ManifestHandler(EnvelopeManifestFactory manifestFactory) {
         this.manifestFactory = manifestFactory;
         this.pattern = Pattern.compile(String.format(
-                "/?" + MANIFEST_FORMAT.replaceAll("([\\.])","\\\\$1"),
+                "/?" + MANIFEST_FORMAT.replaceAll("([\\.])", "\\\\$1"),
                 ".+",
                 manifestFactory.getManifestFactoryType().getManifestFileExtension()
         ));

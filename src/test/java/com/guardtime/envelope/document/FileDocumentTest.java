@@ -48,7 +48,10 @@ public class FileDocumentTest extends AbstractEnvelopeTest {
 
     @Test
     public void testCreateNewFileBasedDocument() throws Exception {
-        FileDocument fileDocument = new FileDocument(loadFile(TEST_FILE_PATH_TEST_TXT), MIME_TYPE_APPLICATION_TXT);
+        FileDocument fileDocument = new FileDocument(
+                loadFile(TEST_FILE_PATH_TEST_TXT),
+                MIME_TYPE_APPLICATION_TXT
+        );
         assertEquals(TEST_FILE_NAME_TEST_TXT, fileDocument.getFileName());
         assertEquals(MIME_TYPE_APPLICATION_TXT, fileDocument.getMimeType());
         assertNotNull(fileDocument.getDataHash(HashAlgorithm.SHA2_256));
@@ -56,14 +59,22 @@ public class FileDocumentTest extends AbstractEnvelopeTest {
 
     @Test
     public void testOverrideDocumentName() throws Exception {
-        FileDocument fileDocument = new FileDocument(loadFile(TEST_FILE_PATH_TEST_TXT), MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_DOC);
+        FileDocument fileDocument = new FileDocument(
+                loadFile(TEST_FILE_PATH_TEST_TXT),
+                MIME_TYPE_APPLICATION_TXT,
+                TEST_FILE_NAME_TEST_DOC
+        );
         assertEquals(TEST_FILE_NAME_TEST_DOC, fileDocument.getFileName());
     }
 
     @Test
     public void testCloseDoesNotDeleteFile() throws Exception {
         File file = loadFile(TEST_FILE_PATH_TEST_TXT);
-        FileDocument fileDocument = new FileDocument(file, MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_DOC);
+        FileDocument fileDocument = new FileDocument(
+                file,
+                MIME_TYPE_APPLICATION_TXT,
+                TEST_FILE_NAME_TEST_DOC
+        );
         fileDocument.close();
         assertTrue(file.exists());
     }

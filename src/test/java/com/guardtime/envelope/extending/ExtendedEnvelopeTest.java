@@ -47,7 +47,7 @@ public class ExtendedEnvelopeTest {
     @Test
     public void testSignatureContentsAreWrapped() {
         ExtendedEnvelope extendedEnvelope = new ExtendedEnvelope(setUpMockedEnvelope());
-        for(SignatureContent content : extendedEnvelope.getExtendedSignatureContents()) {
+        for (SignatureContent content : extendedEnvelope.getExtendedSignatureContents()) {
             assertTrue(content instanceof ExtendedSignatureContent);
         }
     }

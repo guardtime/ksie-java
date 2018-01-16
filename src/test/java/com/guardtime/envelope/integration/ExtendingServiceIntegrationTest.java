@@ -51,7 +51,7 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
 
     @Test
     public void testVerifyOriginalEnvelopeIsExtended() throws Exception {
-        try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTIPLE_SIGNATURES)){
+        try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTIPLE_SIGNATURES)) {
             KsiEnvelopeSignatureExtendingPolicy policy = new KsiEnvelopeSignatureExtendingPolicy(ksi);
             EnvelopeSignatureExtender extender = new EnvelopeSignatureExtender(new KsiSignatureFactory(ksi), policy);
             extender.extend(envelope);
@@ -87,7 +87,8 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
     @Test
     public void testExtendingWithPublicationKsiEnvelopeSignatureExtender() throws Exception {
         PublicationData publicationData = new PublicationData(
-                "AAAAAA-CXMCNI-AAJIV3-RB5OEJ-JBK57H-SJ42PI-IB2RE7-2CA2TM-H5W3EF-TF2BX7-HRNRP5-Q2E754"//June 2016 publication string
+                //June 2016 publication string
+                "AAAAAA-CXMCNI-AAJIV3-RB5OEJ-JBK57H-SJ42PI-IB2RE7-2CA2TM-H5W3EF-TF2BX7-HRNRP5-Q2E754"
         );
         PublicationsFilePublicationRecord publicationRecord = new PublicationsFilePublicationRecord(publicationData);
         ExtendingPolicy policy = new PublicationKsiEnvelopeSignatureExtendingPolicy(ksi, publicationRecord);
@@ -97,7 +98,8 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
     @Test
     public void testExtendingWithPublicationKsiEnvelopeSignatureExtender_WithOlderPublicationString() throws Exception {
         PublicationData publicationData = new PublicationData(
-                "AAAAAA-CVFWVA-AAPV2S-SN3JLW-YEKPW3-AUSQP6-PF65K5-KVGZZA-7UYTOV-27VX54-VVJQFG-VCK6GR"//Apr 2015 publication string
+                //April 2015 publication string
+                "AAAAAA-CVFWVA-AAPV2S-SN3JLW-YEKPW3-AUSQP6-PF65K5-KVGZZA-7UYTOV-27VX54-VVJQFG-VCK6GR"
         );
         PublicationsFilePublicationRecord publicationRecord = new PublicationsFilePublicationRecord(publicationData);
         ExtendingPolicy policy = new PublicationKsiEnvelopeSignatureExtendingPolicy(ksi, publicationRecord);

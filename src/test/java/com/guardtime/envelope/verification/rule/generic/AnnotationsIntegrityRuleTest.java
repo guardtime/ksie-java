@@ -54,7 +54,7 @@ public class AnnotationsIntegrityRuleTest extends AbstractEnvelopeTest {
     private static final String ENVELOPE_WITH_VALUE_REMOVABLE_MISSING_ANNOTATION = "verification/annotations/envelope-with-value-removable-missing-annotation.ksie";
     private static final String ENVELOPE_WITH_VALUE_REMOVABLE_MISSING_ANNOTATION_DATA = "verification/annotations/envelope-with-value-removable-missing-annotation-data.ksie";
     private static final String ENVELOPE_WITH_VALUE_REMOVABLE_CORRUPT_ANNOTATION_DATA = "verification/annotations/envelope-with-value-removable-corrupt-annotation-data.ksie";
-    private static final String ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION_ = "verification/annotations/envelope-with-non-removable-annotation.ksie";
+    private static final String ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION_VER = "verification/annotations/envelope-with-non-removable-annotation.ksie";
     private static final String ENVELOPE_WITH_NON_REMOVABLE_MISSING_ANNOTATION_DATA = "verification/annotations/envelope-with-non-removable-missing-annotation-data.ksie";
     private static final String ENVELOPE_WITH_NON_REMOVABLE_CORRUPT_ANNOTATION_DATA = "verification/annotations/envelope-with-non-removable-corrupt-annotation-data.ksie";
     private static final String ENVELOPE_WITH_NON_REMOVABLE_MISSING_ANNOTATION = "verification/annotations/envelope-with-non-removable-missing-annotation.ksie";
@@ -100,7 +100,7 @@ public class AnnotationsIntegrityRuleTest extends AbstractEnvelopeTest {
     }
 
     private RuleVerificationResult selectMostImportantResult(List<RuleVerificationResult> results) {
-        if(results.isEmpty()) {
+        if (results.isEmpty()) {
             return null;
         }
         RuleVerificationResult returnable = results.get(0);
@@ -184,7 +184,7 @@ public class AnnotationsIntegrityRuleTest extends AbstractEnvelopeTest {
 
     @Test
     public void testNonRemovableAnnotationDataPresent_OK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION_);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION_VER);
 
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }
@@ -219,7 +219,7 @@ public class AnnotationsIntegrityRuleTest extends AbstractEnvelopeTest {
 
     @Test
     public void testAnnotationsManifestPresent_OK() throws Exception {
-        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION_);
+        RuleVerificationResult result = getRuleVerificationResults(ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION_VER);
 
         assertEquals(VerificationResult.OK, result.getVerificationResult());
     }

@@ -63,11 +63,10 @@ public class IncrementingIndexProviderFactory implements IndexProviderFactory {
         Set<String> manifestUriSet = new HashSet<>();
         Set<String> annotationUriSet = new HashSet<>();
         for (SignatureContent content : envelope.getSignatureContents()) {
-            {
-                manifestUriSet.add(content.getManifest().getPath());
-                manifestUriSet.add(content.getDocumentsManifest().getPath());
-                manifestUriSet.add(content.getAnnotationsManifest().getPath());
-            }
+            manifestUriSet.add(content.getManifest().getPath());
+            manifestUriSet.add(content.getDocumentsManifest().getPath());
+            manifestUriSet.add(content.getAnnotationsManifest().getPath());
+
             Manifest manifest = content.getManifest();
             if (manifest != null && manifest.getSignatureReference() != null) {
                 manifestUriSet.add(manifest.getSignatureReference().getUri());
@@ -77,11 +76,11 @@ public class IncrementingIndexProviderFactory implements IndexProviderFactory {
         }
         for (UnknownDocument doc : envelope.getUnknownFiles()) {
             String fileName = doc.getFileName();
-            if(manifestMatcher.matcher(fileName).matches() || documentsManifestMatcher.matcher(fileName).matches() ||
+            if (manifestMatcher.matcher(fileName).matches() || documentsManifestMatcher.matcher(fileName).matches() ||
                     annotationsManifestMatcher.matcher(fileName).matches() || signatureMatcher.matcher(fileName).matches()) {
                 manifestUriSet.add(fileName);
             }
-            if(annotationMatcher.matcher(fileName).matches() || singleAnnotationManifestMatcher.matcher(fileName).matches()) {
+            if (annotationMatcher.matcher(fileName).matches() || singleAnnotationManifestMatcher.matcher(fileName).matches()) {
                 annotationUriSet.add(fileName);
             }
         }
@@ -106,7 +105,7 @@ public class IncrementingIndexProviderFactory implements IndexProviderFactory {
             logger.warn("Not an integer based index");
             return Integer.MIN_VALUE;
         }
-        return new Integer(index);
+        return Integer.parseInt(index);
     }
 
     private class IncrementingIndexProvider implements IndexProvider {

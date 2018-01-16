@@ -46,7 +46,11 @@ public class StringAnnotationTest extends AbstractEnvelopeTest {
 
     @Test
     public void testCreateNewFileAnnotation() throws Exception {
-        StringAnnotation annotation = new StringAnnotation(EnvelopeAnnotationType.NON_REMOVABLE, "Example Content", ANNOTATION_DOMAIN_COM_GUARDTIME);
+        StringAnnotation annotation = new StringAnnotation(
+                EnvelopeAnnotationType.NON_REMOVABLE,
+                "Example Content",
+                ANNOTATION_DOMAIN_COM_GUARDTIME
+        );
         assertEquals(ANNOTATION_DOMAIN_COM_GUARDTIME, annotation.getDomain());
         assertEquals(EnvelopeAnnotationType.NON_REMOVABLE, annotation.getAnnotationType());
         assertNotNull(annotation.getDataHash(HashAlgorithm.SHA2_256));

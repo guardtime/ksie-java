@@ -51,8 +51,8 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
                 .withVerificationPolicy(null)
                 .build();
         try (Envelope envelope = packagingFactory.create(
-                singletonList(TEST_DOCUMENT_HELLO_TEXT),
-                singletonList(STRING_ENVELOPE_ANNOTATION)
+                singletonList(testDocumentHelloText),
+                singletonList(stringEnvelopeAnnotation)
         )) {
             IndexProvider indexProvider = indexProviderFactory.create(envelope);
             Assert.assertEquals("2", indexProvider.getNextSignatureIndex());
@@ -67,8 +67,8 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
                 .withIndexProviderFactory(new UuidIndexProviderFactory())
                 .build();
         try (Envelope envelope = packagingFactory.create(
-                singletonList(TEST_DOCUMENT_HELLO_TEXT),
-                singletonList(STRING_ENVELOPE_ANNOTATION)
+                singletonList(testDocumentHelloText),
+                singletonList(stringEnvelopeAnnotation)
         )) {
             IndexProvider indexProvider = indexProviderFactory.create(envelope);
             Assert.assertEquals("1", indexProvider.getNextSignatureIndex());

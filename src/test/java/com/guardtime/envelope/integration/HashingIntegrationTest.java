@@ -60,12 +60,12 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     private static final String ENVELOPE_DOCUMENT_FILE_NAME = "StreamFile.txt";
     private static final String ENVELOPE_DOCUMENT_MIME_TYPE = "Stream";
     private static final String INPUT_STREAM_STRING = "Input from stream.";
-    private final Annotation ENVELOPE_ANNOTATION = new StringAnnotation(
+    private final Annotation envelopeAnnotation = new StringAnnotation(
             EnvelopeAnnotationType.FULLY_REMOVABLE,
             ENVELOPE_ANNOTATION_CONTENT,
             ENVELOPE_ANNOTATION_TYPE_DOMAIN
     );
-    private final Document ENVELOPE_DOCUMENT = new StreamDocument(
+    private final Document envelopeDocument = new StreamDocument(
             new ByteArrayInputStream(INPUT_STREAM_STRING.getBytes(StandardCharsets.UTF_8)),
             ENVELOPE_DOCUMENT_MIME_TYPE,
             ENVELOPE_DOCUMENT_FILE_NAME
@@ -74,8 +74,8 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
 
     @After
     public void cleanUp() throws Exception {
-        ENVELOPE_ANNOTATION.close();
-        ENVELOPE_DOCUMENT.close();
+        envelopeAnnotation.close();
+        envelopeDocument.close();
         if (envelope != null) {
             envelope.close();
         }
@@ -321,8 +321,8 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
         HashAlgorithm hashAlgorithm = HashAlgorithm.SHA3_512;
         HashAlgorithmProvider hashAlgorithmProvider = new TestHashAlgorithmProvider(hashAlgorithm);
         EnvelopeBuilder builder = new EnvelopeBuilder(getEnvelopePackagingFactory(hashAlgorithmProvider));
-        builder.withAnnotation(ENVELOPE_ANNOTATION);
-        builder.withDocument(ENVELOPE_DOCUMENT);
+        builder.withAnnotation(envelopeAnnotation);
+        builder.withDocument(envelopeDocument);
         builder.build();
     }
 
@@ -339,23 +339,23 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
                 hashAlgorithm
         );
         EnvelopeBuilder builder = new EnvelopeBuilder(getEnvelopePackagingFactory(hashAlgorithmProvider));
-        builder.withAnnotation(ENVELOPE_ANNOTATION);
-        builder.withDocument(ENVELOPE_DOCUMENT);
+        builder.withAnnotation(envelopeAnnotation);
+        builder.withDocument(envelopeDocument);
         builder.build();
     }
 
     private EnvelopePackagingFactory getEnvelopePackagingFactory(HashAlgorithmProvider provider) throws Exception {
         EnvelopeManifestFactory envelopeManifestFactory = new TlvEnvelopeManifestFactory(provider);
-        return new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withManifestFactory(envelopeManifestFactory).
-                build();
+        return new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withManifestFactory(envelopeManifestFactory)
+                .build();
     }
 
     private void setUpEnvelope(HashAlgorithmProvider provider) throws Exception {
         EnvelopeBuilder builder = new EnvelopeBuilder(getEnvelopePackagingFactory(provider));
-        builder.withAnnotation(ENVELOPE_ANNOTATION);
-        builder.withDocument(ENVELOPE_DOCUMENT);
+        builder.withAnnotation(envelopeAnnotation);
+        builder.withDocument(envelopeDocument);
         this.envelope = builder.build();
     }
 

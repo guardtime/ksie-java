@@ -73,10 +73,10 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
                     properties.getProperty("credentials.key")
             );
             TRUST_STORE_FILE = new File(
-                    Thread.currentThread().
-                            getContextClassLoader().
-                            getResource("ksi-truststore.jks").
-                            toURI()
+                    Thread.currentThread()
+                            .getContextClassLoader()
+                            .getResource("ksi-truststore.jks")
+                            .toURI()
             );
             TRUST_STORE_PASSWORD = "changeit";
         } catch (URISyntaxException | IOException e) {

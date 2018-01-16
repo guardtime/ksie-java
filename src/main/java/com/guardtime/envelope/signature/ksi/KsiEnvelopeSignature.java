@@ -79,7 +79,7 @@ class KsiEnvelopeSignature implements EnvelopeSignature<KSISignature> {
         Identity[] newIdentity = newSignature.getAggregationHashChainIdentity();
         Identity[] identity = signature.getAggregationHashChainIdentity();
         for (int i = 0; i < newIdentity.length; i++) {
-            if(!identity[i].getDecodedClientId().equals(newIdentity[i].getDecodedClientId())) {
+            if (!identity[i].getDecodedClientId().equals(newIdentity[i].getDecodedClientId())) {
                  return false;
              }
 

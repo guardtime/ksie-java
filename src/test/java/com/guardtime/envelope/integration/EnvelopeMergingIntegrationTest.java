@@ -28,10 +28,10 @@ import com.guardtime.envelope.indexing.UuidIndexProviderFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.SignatureContent;
+import com.guardtime.envelope.packaging.exception.AnnotationMergingException;
 import com.guardtime.envelope.packaging.exception.AnnotationsManifestMergingException;
 import com.guardtime.envelope.packaging.exception.DocumentMergingException;
 import com.guardtime.envelope.packaging.exception.DocumentsManifestMergingException;
-import com.guardtime.envelope.packaging.exception.AnnotationMergingException;
 import com.guardtime.envelope.packaging.exception.ManifestMergingException;
 import com.guardtime.envelope.packaging.exception.SignatureMergingException;
 import com.guardtime.envelope.packaging.exception.SingleAnnotationManifestMergingException;
@@ -95,21 +95,21 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        packagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withIndexProviderFactory(new UuidIndexProviderFactory()).
-                build();
-        incPackagingFactory = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withIndexProviderFactory(new IncrementingIndexProviderFactory()).
-                build();
+        packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withIndexProviderFactory(new UuidIndexProviderFactory())
+                .build();
+        incPackagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withIndexProviderFactory(new IncrementingIndexProviderFactory())
+                .build();
     }
 
     @Test
     public void testMergeParsedEnvelopeWithCreatedEnvelope() throws Exception {
         try (Envelope parsedEnvelope = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES);
              Envelope newEnvelope = packagingFactory.create(
-                     singletonList(TEST_DOCUMENT_HELLO_TEXT),
+                     singletonList(testDocumentHelloText),
                      new LinkedList<Annotation>()
              )) {
             int expectedSignatureContentsSize =
@@ -168,7 +168,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
                 "textDoc",
                 "1-" + Long.toString(new Date().getTime())
         );
-             Envelope uuidEnvelope = packagingFactory.create(singletonList(document), singletonList(STRING_ENVELOPE_ANNOTATION));
+             Envelope uuidEnvelope = packagingFactory.create(singletonList(document), singletonList(stringEnvelopeAnnotation));
              Envelope incEnvelope = getEnvelope(ENVELOPE_WITH_RANDOM_INCREMENTING_INDEXES);
              Document document2 = new StreamDocument(
                      new ByteArrayInputStream("".getBytes()),
@@ -176,7 +176,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
                      "2-" + Long.toString(new Date().getTime())
              )) {
             uuidEnvelope.add(incEnvelope);
-            packagingFactory.addSignature(uuidEnvelope, singletonList(document2), singletonList(STRING_ENVELOPE_ANNOTATION));
+            packagingFactory.addSignature(uuidEnvelope, singletonList(document2), singletonList(stringEnvelopeAnnotation));
             assertEquals(uuidEnvelope.getSignatureContents().size(), 4);
         }
     }
@@ -203,8 +203,8 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     public void testAddNewContentToMergedEnvelope2() throws Exception {
         try (Envelope uuidEnvelope = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES);
              Envelope incEnvelope = incPackagingFactory.create(
-                     singletonList(TEST_DOCUMENT_HELLO_TEXT),
-                     singletonList(STRING_ENVELOPE_ANNOTATION)
+                     singletonList(testDocumentHelloText),
+                     singletonList(stringEnvelopeAnnotation)
              );
              Document document = new StreamDocument(
                      new ByteArrayInputStream("".getBytes()),
@@ -212,7 +212,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
                      Long.toString(new Date().getTime())
              )) {
             incEnvelope.add(uuidEnvelope);
-            incPackagingFactory.addSignature(incEnvelope, singletonList(document), singletonList(STRING_ENVELOPE_ANNOTATION));
+            incPackagingFactory.addSignature(incEnvelope, singletonList(document), singletonList(stringEnvelopeAnnotation));
             assertEquals(incEnvelope.getSignatureContents().size(), 3);
         }
     }

@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Helper that provides pre-compiled lists of commonly used rules.
  */
-public class CommonPolicyRuleSets {
+public abstract class CommonPolicyRuleSets {
 
     /**
      * Returns a list of all rules related to underlying signature verification.
