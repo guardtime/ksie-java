@@ -247,9 +247,6 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         try (FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_UNUSED_INTERNAL_FILE_AS_DOC_REFERENCE));
              Envelope envelope = packagingFactoryWithIncIndex.read(stream)
         ) {
-            SignatureContent content = envelope.getSignatureContents().get(1);
-            content.detachDocument(content.getDocuments().values().iterator().next().getFileName());
-
             writeEnvelopeToAndReadFromStream(envelope, packagingFactoryWithIncIndex);
         }
     }
@@ -271,7 +268,8 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         ) {
             factory.addSignature(envelope,
                     singletonList(document),
-                    singletonList(stringEnvelopeAnnotation));
+                    singletonList(stringEnvelopeAnnotation)
+            );
 
             assertNotNull(envelope);
             int contentCount = envelope.getSignatureContents().size();
