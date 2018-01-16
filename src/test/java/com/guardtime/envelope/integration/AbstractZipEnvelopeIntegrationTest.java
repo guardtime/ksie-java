@@ -175,7 +175,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
 
             packagingFactoryWithUuid.addSignature(existingEnvelope,
                     singletonList(document),
-                    singletonList(stringEnvelopeAnnotation ));
+                    singletonList(stringEnvelopeAnnotation));
 
             Assert.assertTrue(compareSignatureContentListOrder(existingEnvelope));
         }
@@ -193,7 +193,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
 
             packagingFactoryWithUuid.addSignature(existingEnvelope,
                     singletonList(document),
-                    singletonList(stringEnvelopeAnnotation ));
+                    singletonList(stringEnvelopeAnnotation));
 
             Assert.assertTrue(compareSignatureContentListOrder(existingEnvelope));
         }
@@ -201,14 +201,14 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
 
     @Test
     public void testDocumentOrderWithSameSigningTimes() throws Exception {
-        try ( FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_MULTIPLE_SIGNATURES_WITH_SAME_SIGNING_TIME));
+        try (FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_MULTIPLE_SIGNATURES_WITH_SAME_SIGNING_TIME));
               Envelope envelope = packagingFactoryWithIncIndex.read(stream);
               ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
               Document document = new StreamDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
-        ){
+        ) {
             packagingFactoryWithIncIndex.addSignature(envelope,
                     singletonList(document),
-                    singletonList(stringEnvelopeAnnotation ));
+                    singletonList(stringEnvelopeAnnotation));
             KSISignature signature0 = (KSISignature) envelope.getSignatureContents().get(0).getEnvelopeSignature().getSignature();
             KSISignature signature1 = (KSISignature) envelope.getSignatureContents().get(1).getEnvelopeSignature().getSignature();
             KSISignature signature2 = (KSISignature) envelope.getSignatureContents().get(2).getEnvelopeSignature().getSignature();
@@ -219,17 +219,20 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
             Assert.assertTrue(signature2.getAggregationTime().after(signature0.getAggregationTime()));
             Assert.assertTrue(signature2.getAggregationTime().after(signature1.getAggregationTime()));
 
-            Assert.assertTrue(envelope.getSignatureContents().get(0).getManifest().getSignatureReference().getUri().startsWith("META-INF/signature-1.ksi"));
-            Assert.assertTrue(envelope.getSignatureContents().get(1).getManifest().getSignatureReference().getUri().startsWith("META-INF/signature-2.ksi"));
-            Assert.assertTrue(envelope.getSignatureContents().get(2).getManifest().getSignatureReference().getUri().startsWith("META-INF/signature-3.ksi"));
+            Assert.assertTrue(envelope.getSignatureContents().get(0).getManifest().getSignatureReference().getUri()
+                    .startsWith("META-INF/signature-1.ksi"));
+            Assert.assertTrue(envelope.getSignatureContents().get(1).getManifest().getSignatureReference().getUri()
+                    .startsWith("META-INF/signature-2.ksi"));
+            Assert.assertTrue(envelope.getSignatureContents().get(2).getManifest().getSignatureReference().getUri()
+                    .startsWith("META-INF/signature-3.ksi"));
         }
     }
 
     @Test
-    public void testInternalFileReferencedAsDocument() throws  Exception{
+    public void testInternalFileReferencedAsDocument() throws  Exception {
         try (FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_INTERNAL_FILE_AS_DOC_REFERENCE));
              Envelope envelope = packagingFactoryWithIncIndex.read(stream)
-        ){
+        ) {
             SignatureContent content = envelope.getSignatureContents().get(1);
             content.detachDocument(content.getDocuments().values().iterator().next().getFileName());
 
@@ -239,10 +242,10 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
 
     //TODO KSIE-98: Should fail in the future - this should not be allowed.
     @Test
-    public void testNotUsedInternalFileReferencedAsDocument() throws  Exception{
+    public void testNotUsedInternalFileReferencedAsDocument() throws  Exception {
         try (FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_UNUSED_INTERNAL_FILE_AS_DOC_REFERENCE));
              Envelope envelope = packagingFactoryWithIncIndex.read(stream)
-        ){
+        ) {
             SignatureContent content = envelope.getSignatureContents().get(1);
             content.detachDocument(content.getDocuments().values().iterator().next().getFileName());
 
@@ -253,21 +256,21 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     //TODO: KSIE-98:Should fail in the future - this should not be allowed
     //TODO      and thus becomes obsolete as previous test would cover this.
     @Test
-    public void testNotUsedInternalFileReferencedAsDocumentAndAdd() throws  Exception{
-        EnvelopePackagingFactory packagingFactory_ = new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withIndexProviderFactory(new IncrementingIndexProviderFactory()).
-                withParsingStoreFactory(parsingStoreFactory).
-                withVerificationPolicy(new LimitedInternalVerificationPolicy()).
-                build();
+    public void testNotUsedInternalFileReferencedAsDocumentAndAdd() throws  Exception {
+        EnvelopePackagingFactory factory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withIndexProviderFactory(new IncrementingIndexProviderFactory())
+                .withParsingStoreFactory(parsingStoreFactory)
+                .withVerificationPolicy(new LimitedInternalVerificationPolicy())
+                .build();
         try (FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_UNUSED_INTERNAL_FILE_AS_DOC_REFERENCE));
-             Envelope envelope = packagingFactory_.read(stream);
+             Envelope envelope = factory.read(stream);
              ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
              Document document = new StreamDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
-        ){
-            packagingFactory_.addSignature(envelope,
+        ) {
+            factory.addSignature(envelope,
                     singletonList(document),
-                    singletonList(stringEnvelopeAnnotation ));
+                    singletonList(stringEnvelopeAnnotation));
 
             assertNotNull(envelope);
             int contentCount = envelope.getSignatureContents().size();
@@ -275,18 +278,21 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
                 envelopeWriter.write(envelope, bos);
                 try (
                         ByteArrayInputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
-                        Envelope inputEnvelope = packagingFactory_.read(inputStream)) {
+                        Envelope inputEnvelope = factory.read(inputStream)) {
                     assertNotNull(inputEnvelope);
                     Assert.assertEquals(contentCount, inputEnvelope.getSignatureContents().size());
                     //Detach doc
                     inputEnvelope.getSignatureContents().get(1).detachDocument(
-                            inputEnvelope.getSignatureContents().get(1).getDocumentsManifest().getDocumentReferences().get(0).getUri());
+                            inputEnvelope.getSignatureContents().get(1)
+                                    .getDocumentsManifest().getDocumentReferences().get(0).getUri());
                     //Attach doc
                     inputEnvelope.getSignatureContents().get(1).attachDetachedDocument(
-                            inputEnvelope.getSignatureContents().get(1).getDocumentsManifest().getDocumentReferences().get(0).getUri(),
-                            inputEnvelope.getSignatureContents().get(0).getManifest().getInputStream()
+                            inputEnvelope.getSignatureContents().get(1)
+                                    .getDocumentsManifest().getDocumentReferences().get(0).getUri(),
+                            inputEnvelope.getSignatureContents().get(0)
+                                    .getManifest().getInputStream()
                     );
-                    writeEnvelopeToAndReadFromStream(inputEnvelope, packagingFactory_);
+                    writeEnvelopeToAndReadFromStream(inputEnvelope, factory);
                 }
             }
         }
@@ -522,9 +528,9 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
 
     private boolean compareSignatureContentListOrder(Envelope envelope) {
         SignatureContent previous = null;
-        for (SignatureContent content : envelope.getSignatureContents()){
-            if(previous != null && !((KSISignature)previous.getEnvelopeSignature().getSignature()).getAggregationTime().before(
-                    ((KSISignature)content.getEnvelopeSignature().getSignature()).getAggregationTime())) {
+        for (SignatureContent content : envelope.getSignatureContents()) {
+            if (previous != null && !((KSISignature) previous.getEnvelopeSignature().getSignature()).getAggregationTime().before(
+                    ((KSISignature) content.getEnvelopeSignature().getSignature()).getAggregationTime())) {
                 return false;
             }
             previous = content;
