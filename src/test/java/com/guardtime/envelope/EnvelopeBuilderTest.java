@@ -27,7 +27,6 @@ import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.signature.EnvelopeSignature;
-import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.ksi.hashing.DataHash;
 
 import org.junit.Before;
@@ -38,7 +37,6 @@ import org.mockito.stubbing.Answer;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
@@ -227,24 +225,5 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
                 assertEquals(1, documentPaths.size());
             }
         }
-    }
-
-    private EnvelopePackagingFactory getEnvelopePackagingFactory() throws IOException, SignatureException {
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
-                .withSignatureFactory(mockedSignatureFactory)
-                .withVerificationPolicy(null)
-                .withIndexProviderFactory(new IncrementingIndexProviderFactory())
-                .build();
-
-        EnvelopeSignature mockedSignature = mock(EnvelopeSignature.class);
-        when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mockedSignature);
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-                invocationOnMock.getArgumentAt(0, OutputStream.class).write("someData".getBytes());
-                return null;
-            }
-        }) .when(mockedSignature).writeTo(any(OutputStream.class));
-        return packagingFactory;
     }
 }
