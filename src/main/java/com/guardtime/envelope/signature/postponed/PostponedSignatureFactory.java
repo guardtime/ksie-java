@@ -54,13 +54,13 @@ public class PostponedSignatureFactory implements SignatureFactory {
 
     @Override
     public EnvelopeSignature create(DataHash hash) {
-        return new PostponedSignature(hash);
+        return new PostponedSignature<Object>(hash);
     }
 
     @Override
     public EnvelopeSignature read(InputStream input) throws SignatureException {
         try {
-            return new PostponedSignature(new DataHash(Util.toByteArray(input)));
+            return new PostponedSignature<Object>(new DataHash(Util.toByteArray(input)));
         } catch (IOException e) {
             throw new SignatureException(e);
         }
@@ -69,7 +69,7 @@ public class PostponedSignatureFactory implements SignatureFactory {
     @Override
     public void extend(EnvelopeSignature envelopeSignature, ExtendingPolicy extender) throws SignatureException {
         if (realFactory == null) {
-            throw new UnsupportedOperationException("Not supported if SignatureFactory is not provided to constructor!");
+            throw new IllegalStateException("Not supported if SignatureFactory is not provided to constructor!");
         }
         realFactory.extend(envelopeSignature, extender);
     }
@@ -81,15 +81,21 @@ public class PostponedSignatureFactory implements SignatureFactory {
 
     /**
      * Replaces placeholder underlying signature in {@link EnvelopeSignature} for provided {@param signatureContent}.
-     * Requires that a real {@link SignatureFactory} is provided during object construction.
+     *
+     * @throws IllegalStateException    - When no {@link SignatureFactory} is provided to constructor
+     * @throws SignatureException       - When trying to replace signature of placeholder which has already been filled.
+     * @throws IllegalArgumentException - When trying to replace signature of placeholder with signature that has non-matching
+     * {@link DataHash}.
      */
     public void sign(SignatureContent signatureContent) throws SignatureException {
         if (realFactory == null) {
-            throw new UnsupportedOperationException("Not supported if SignatureFactory is not provided to constructor!");
+            throw new IllegalStateException("Not supported if SignatureFactory is not provided to constructor!");
         }
         PostponedSignature postponedSignature = (PostponedSignature) signatureContent.getEnvelopeSignature();
         EnvelopeSignature signature = realFactory.create(postponedSignature.getSignedDataHash());
-        postponedSignature.sign(signature);
+        if (!postponedSignature.sign(signature)) {
+            throw new SignatureException("Failed to assign signature to placeholder as it already has a signature!");
+        }
     }
 
 }

@@ -20,6 +20,7 @@
 package com.guardtime.envelope.signature.postponed;
 
 import com.guardtime.envelope.signature.EnvelopeSignature;
+import com.guardtime.envelope.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.IOException;
@@ -30,12 +31,13 @@ import java.io.OutputStream;
  * {@link EnvelopeSignature} implementation with a delegated EnvelopeSignature as the underlying signature.
  * Acts as a placeholder until it is provided with a proper EnvelopeSignature. This allows for postponing signing.
  */
-class PostponedSignature implements EnvelopeSignature {
+class PostponedSignature<T> implements EnvelopeSignature<T> {
 
     private final DataHash dataHash;
-    private EnvelopeSignature internalSignature = null;
+    private EnvelopeSignature<T> internalSignature = null;
 
     PostponedSignature(DataHash hash) {
+        Util.notNull(hash, "Data hash");
         this.dataHash = hash;
     }
 
@@ -53,7 +55,7 @@ class PostponedSignature implements EnvelopeSignature {
     }
 
     @Override
-    public Object getSignature() {
+    public T getSignature() {
         if (internalSignature != null) {
             return internalSignature.getSignature();
         }
@@ -77,18 +79,33 @@ class PostponedSignature implements EnvelopeSignature {
     }
 
     @Override
-    public int compareTo(Object o) {
-        return 0;
+    public int compareTo(EnvelopeSignature<T> o) {
+        if (internalSignature != null) {
+            return internalSignature.compareTo(o);
+        }
+        if (o.getSignature() == null) {
+            // also an unsigned signature. compare hashes to maintain ordering
+            return getSignedDataHash().toString().compareTo(o.getSignedDataHash().toString());
+        }
+        return 1;
     }
 
     /**
      * Assigns the real {@link EnvelopeSignature} to be used as delegate.
+     *
+     * @throws IllegalArgumentException - When the provided {@link EnvelopeSignature} has non-matching
+     * {@link EnvelopeSignature#getSignedDataHash()} output.
      */
-    void sign(EnvelopeSignature realSignature) {
+    boolean sign(EnvelopeSignature realSignature) {
+        if (!realSignature.getSignedDataHash().equals(dataHash)) {
+            throw new IllegalArgumentException("Provided signatures Data hash does not match!");
+        }
+
         if (internalSignature != null) {
-            throw new UnsupportedOperationException();
+            return false;
         }
         this.internalSignature = realSignature;
+        return true;
     }
 
 }

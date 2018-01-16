@@ -83,7 +83,7 @@ public class PostponedSigningIntegrationTest extends AbstractCommonIntegrationTe
     }
 
     @Test
-    public void testSigning_OK() throws Exception {
+    public void testSigning() throws Exception {
         for (SignatureContent content : testEnvelope.getSignatureContents()) {
             postponedSignatureFactory.sign(content);
         }
@@ -91,7 +91,7 @@ public class PostponedSigningIntegrationTest extends AbstractCommonIntegrationTe
     }
 
     @Test
-    public void testSigningAndStoring_OK() throws Exception {
+    public void testSigningAndStoring() throws Exception {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         new ZipEnvelopeWriter().write(testEnvelope, bos);
         try (ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray())) {
@@ -104,24 +104,28 @@ public class PostponedSigningIntegrationTest extends AbstractCommonIntegrationTe
     }
 
     @Test
-    public void testVerificationWithoutSigning_NOK() {
+    public void testVerificationWithoutSigning() {
         verify(NOK);
     }
 
     @Test
-    public void testSigningWithInvalidHash_NOK() throws Exception {
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-                DataHash hash = new DataHash(HashAlgorithm.SHA2_256, "16161616161616161616161616161616".getBytes());
-                return signatureFactory.create(hash);
+    public void testSigningWithInvalidHash_ThrowsIllegalArgumentException() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Provided signatures Data hash does not match!");
+        try {
+            Mockito.doAnswer(new Answer() {
+                @Override
+                public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                    DataHash hash = new DataHash(HashAlgorithm.SHA2_256, "16161616161616161616161616161616".getBytes());
+                    return signatureFactory.create(hash);
+                }
+            }).when(spySignatureFactory).create(any(DataHash.class));
+            for (SignatureContent content : testEnvelope.getSignatureContents()) {
+                postponedSignatureFactory.sign(content);
             }
-        }).when(spySignatureFactory).create(any(DataHash.class));
-        for (SignatureContent content : testEnvelope.getSignatureContents()) {
-            postponedSignatureFactory.sign(content);
+        } finally {
+            Mockito.reset(spySignatureFactory);
         }
-        verify(NOK);
-        Mockito.reset(spySignatureFactory);
     }
 
 
