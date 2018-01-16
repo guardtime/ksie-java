@@ -68,6 +68,9 @@ public class AbstractEnvelopeTest {
     protected static final String ENVELOPE_WITH_ONE_DOCUMENT = "envelopes/one-document.ksie";
     protected static final String ENVELOPE_WITH_UNKNOWN_FILES = "envelopes/unknown-files.ksie";
     protected static final String ENVELOPE_WITH_MULTIPLE_SIGNATURES = "envelopes/multiple-signatures.ksie";
+    protected static final String ENVELOPE_WITH_MULTIPLE_SIGNATURES_WITH_SAME_SIGNING_TIME = "envelopes/multiple-signatures-with-same-aggregation-time.ksie";
+    protected static final String ENVELOPE_WITH_INTERNAL_FILE_AS_DOC_REFERENCE = "envelopes/doc-reference-to-existing-internal-file.ksie";
+    protected static final String ENVELOPE_WITH_UNUSED_INTERNAL_FILE_AS_DOC_REFERENCE = "envelopes/doc-reference-to-not-existing-internal-file.ksie";
     protected static final String ENVELOPE_WITH_RANDOM_UUID_INDEXES = "envelopes/random-uuid-indexes.ksie";
     protected static final String ENVELOPE_WITH_MULTIPLE_ANNOTATIONS = "envelopes/multiple-annotations.ksie";
     protected static final String ENVELOPE_WITH_MIXED_INDEX_TYPES = "envelopes/with-mixed-index-types.ksie";
