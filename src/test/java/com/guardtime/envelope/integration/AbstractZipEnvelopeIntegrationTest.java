@@ -31,6 +31,7 @@ import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.SignatureContent;
+import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidPackageException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
@@ -292,7 +293,11 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
                             inputEnvelope.getSignatureContents().get(0)
                                     .getManifest().getInputStream()
                     );
-                    writeEnvelopeToAndReadFromStream(inputEnvelope, factory);
+                    try {
+                        writeEnvelopeToAndReadFromStream(inputEnvelope, factory);
+                    } catch (EnvelopeReadingException e) {
+                        //As expected.
+                    }
                 }
             }
         }
