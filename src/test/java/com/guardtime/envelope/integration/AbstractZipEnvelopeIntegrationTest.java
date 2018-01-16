@@ -175,7 +175,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
 
             packagingFactoryWithUuid.addSignature(existingEnvelope,
                     singletonList(document),
-                    singletonList(STRING_ENVELOPE_ANNOTATION));
+                    singletonList(stringEnvelopeAnnotation ));
 
             Assert.assertTrue(compareSignatureContentListOrder(existingEnvelope));
         }
@@ -193,7 +193,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
 
             packagingFactoryWithUuid.addSignature(existingEnvelope,
                     singletonList(document),
-                    singletonList(STRING_ENVELOPE_ANNOTATION));
+                    singletonList(stringEnvelopeAnnotation ));
 
             Assert.assertTrue(compareSignatureContentListOrder(existingEnvelope));
         }
@@ -208,7 +208,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         ){
             packagingFactoryWithIncIndex.addSignature(envelope,
                     singletonList(document),
-                    singletonList(STRING_ENVELOPE_ANNOTATION));
+                    singletonList(stringEnvelopeAnnotation ));
             KSISignature signature0 = (KSISignature) envelope.getSignatureContents().get(0).getEnvelopeSignature().getSignature();
             KSISignature signature1 = (KSISignature) envelope.getSignatureContents().get(1).getEnvelopeSignature().getSignature();
             KSISignature signature2 = (KSISignature) envelope.getSignatureContents().get(2).getEnvelopeSignature().getSignature();
@@ -266,7 +266,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         ){
             packagingFactory_.addSignature(envelope,
                     singletonList(document),
-                    singletonList(STRING_ENVELOPE_ANNOTATION));
+                    singletonList(stringEnvelopeAnnotation ));
 
             assertNotNull(envelope);
             int contentCount = envelope.getSignatureContents().size();
