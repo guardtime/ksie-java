@@ -237,7 +237,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         }
     }
 
-    //TODO KSIE-98: Should fail up on adding in the future.
+    //TODO KSIE-98: Should fail in the future - this should not be allowed.
     @Test
     public void testNotUsedInternalFileReferencedAsDocument() throws  Exception{
         try (FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_UNUSED_INTERNAL_FILE_AS_DOC_REFERENCE));
@@ -250,7 +250,8 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         }
     }
 
-    //TODO KSIE-98: Should fail up on adding in the future. And thus becomes obsolete.
+    //TODO: KSIE-98:Should fail in the future - this should not be allowed
+    //TODO      and thus becomes obsolete as previous test would cover this.
     @Test
     public void testNotUsedInternalFileReferencedAsDocumentAndAdd() throws  Exception{
         EnvelopePackagingFactory packagingFactory_ = new ZipEnvelopePackagingFactoryBuilder().
