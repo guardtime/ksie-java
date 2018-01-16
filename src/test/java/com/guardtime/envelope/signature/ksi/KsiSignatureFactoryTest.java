@@ -54,14 +54,14 @@ public class KsiSignatureFactoryTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testCreateFactory_ThrowsNullPointerException() throws Exception {
+    public void testCreateFactory_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("KSI must be present");
         new KsiSignatureFactory(null);
     }
 
     @Test
-    public void testCreateFactory_OK() throws Exception {
+    public void testCreateFactory_OK() {
         SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
         assertNotNull(signatureFactory);
     }
@@ -69,7 +69,10 @@ public class KsiSignatureFactoryTest extends AbstractEnvelopeTest {
     @Test
     public void testCreate() throws Exception {
         SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
-        DataHash testHash = new DataHash(HashAlgorithm.SHA2_256, "TestStringTestingStuffLongString".getBytes(StandardCharsets.UTF_8));
+        DataHash testHash = new DataHash(
+                HashAlgorithm.SHA2_256,
+                "TestStringTestingStuffLongString".getBytes(StandardCharsets.UTF_8)
+        );
         EnvelopeSignature signature = signatureFactory.create(testHash);
         assertNotNull(signature);
     }

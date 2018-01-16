@@ -58,7 +58,7 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
         private final Path tempDir;
         private boolean closed;
 
-        public TemporaryFileBasedParsingStore() throws IOException {
+        TemporaryFileBasedParsingStore() throws IOException {
             this.tempDir = Util.getTempDirectory();
         }
 
@@ -89,7 +89,10 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
                 File file = store.get(name);
                 return Files.newInputStream(file.toPath());
             } catch (IOException e) {
-                throw new IllegalStateException("Store has been corrupted! Expected to find file at '" + store.get(name).toPath() + "' for key '" + name + "'", e);
+                throw new IllegalStateException(
+                        "Store has been corrupted! Expected to find file at '" + store.get(name).toPath() +
+                                "' for key '" + name + "'", e
+                );
             }
         }
 
@@ -112,7 +115,7 @@ public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactor
 
         @Override
         public void transferFrom(ParsingStore that) throws ParsingStoreException {
-            for(String key : that.getStoredKeys()) {
+            for (String key : that.getStoredKeys()) {
                 try (InputStream stream = that.get(key)) {
                     store(key, stream);
                     that.remove(key);

@@ -22,7 +22,7 @@ package com.guardtime.envelope.util;
 /**
  * Represents a pair of objects.
  */
-public class Pair<L, R> {
+public final class Pair<L, R> {
 
     private L left;
     private R right;

@@ -169,7 +169,8 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
         }
     }
 
-    private Map<String, SingleAnnotationManifest> formatSingleAnnotationManifestsListToMap(List<SingleAnnotationManifest> annotationManifests) {
+    private Map<String, SingleAnnotationManifest> formatSingleAnnotationManifestsListToMap(
+            List<SingleAnnotationManifest> annotationManifests) {
         Map<String, SingleAnnotationManifest> returnable = new HashMap<>();
         for (SingleAnnotationManifest manifest : annotationManifests) {
             returnable.put(manifest.getPath(), manifest);

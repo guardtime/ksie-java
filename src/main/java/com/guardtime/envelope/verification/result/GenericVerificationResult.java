@@ -25,7 +25,8 @@ public class GenericVerificationResult implements RuleVerificationResult {
     private final String testedElement;
     private String ruleMessage;
 
-    public GenericVerificationResult(VerificationResult result, String ruleName, String ruleMessage, String testedElement, Exception exception) {
+    public GenericVerificationResult(VerificationResult result, String ruleName, String ruleMessage, String testedElement,
+                                     Exception exception) {
         this(result, ruleName, ruleMessage, testedElement);
         this.ruleMessage = exception.getMessage();
     }

@@ -45,6 +45,9 @@ public class PublicationKsiEnvelopeSignatureExtendingPolicy implements Extending
 
     public KSISignature getExtendedSignature(KSISignature ksiSignature) throws SignatureException {
         try {
+            if (ksiSignature.getAggregationTime().after(publicationRecord.getPublicationTime())) {
+                throw new SignatureException("Publication time is before signature!");
+            }
             return ksi.extend(ksiSignature, publicationRecord);
         } catch (KSIException e) {
             throw new SignatureException(e);

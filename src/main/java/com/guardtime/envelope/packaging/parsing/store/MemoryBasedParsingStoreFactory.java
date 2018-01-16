@@ -36,7 +36,7 @@ import java.util.Set;
 public class MemoryBasedParsingStoreFactory implements ParsingStoreFactory {
 
     @Override
-    public ParsingStore create() throws ParsingStoreException {
+    public ParsingStore create() {
         return new MemoryBasedParsingStore();
     }
 
@@ -78,14 +78,14 @@ public class MemoryBasedParsingStoreFactory implements ParsingStoreFactory {
 
         @Override
         public void transferFrom(ParsingStore that) throws ParsingStoreException {
-            for(String key : that.getStoredKeys()) {
+            for (String key : that.getStoredKeys()) {
                 store(key, that.get(key));
                 that.remove(key);
             }
         }
 
         @Override
-        public void close() throws Exception {
+        public void close() {
             this.store = new HashMap<>();
         }
     }

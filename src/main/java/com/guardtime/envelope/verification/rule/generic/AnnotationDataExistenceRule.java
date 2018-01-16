@@ -31,7 +31,6 @@ import com.guardtime.envelope.verification.result.RuleVerificationResult;
 import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.envelope.verification.result.VerificationResultFilter;
 import com.guardtime.envelope.verification.rule.AbstractRule;
-import com.guardtime.envelope.verification.rule.RuleTerminatingException;
 import com.guardtime.envelope.verification.rule.RuleType;
 import com.guardtime.envelope.verification.rule.state.RuleState;
 import com.guardtime.envelope.verification.rule.state.RuleStateProvider;
@@ -59,7 +58,7 @@ public class AnnotationDataExistenceRule extends AbstractRule<SignatureContent> 
     }
 
     @Override
-    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) {
         for (FileReference reference : verifiable.getAnnotationsManifest().getSingleAnnotationManifestReferences()) {
             String manifestUri = reference.getUri();
             if (anyRuleFailed(holder, manifestUri)) continue;

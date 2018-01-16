@@ -35,7 +35,9 @@ public class SingleHashAlgorithmProvider implements HashAlgorithmProvider {
      */
     public SingleHashAlgorithmProvider(HashAlgorithm hashAlgorithm) {
         if (!hashAlgorithm.getStatus().equals(HashAlgorithm.Status.NORMAL)) {
-            throw new IllegalArgumentException("Invalid HashAlgorithm provided! Only accept with status 'NORMAL', not '" + hashAlgorithm.getStatus() + "'");
+            throw new IllegalArgumentException(
+                    "Invalid HashAlgorithm provided! Only accept with status 'NORMAL', not '" + hashAlgorithm.getStatus() + "'"
+            );
         }
         this.algorithm = hashAlgorithm;
     }

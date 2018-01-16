@@ -34,6 +34,7 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.publication.inmemory.PublicationsFilePublicationRecord;
 import com.guardtime.ksi.unisignature.KSISignature;
+import com.guardtime.ksi.unisignature.inmemory.LegacyIdentity;
 
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -43,13 +44,14 @@ import java.util.Date;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testVerifyOriginalEnvelopeIsExtended() throws Exception {
-        try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTIPLE_SIGNATURES)){
+        try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTIPLE_SIGNATURES)) {
             KsiEnvelopeSignatureExtendingPolicy policy = new KsiEnvelopeSignatureExtendingPolicy(ksi);
             EnvelopeSignatureExtender extender = new EnvelopeSignatureExtender(new KsiSignatureFactory(ksi), policy);
             extender.extend(envelope);
@@ -66,9 +68,10 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
             assertSignaturesExtendedStatus(envelope, false);
             ExtendedEnvelope extendedEnvelope = extender.extend(envelope);
             for (ExtendedSignatureContent content : extendedEnvelope.getExtendedSignatureContents()) {
-                if (content.getManifest().getSignatureReference().getUri().equals("META-INF/signature-1.ksi")) {
+                String uri = content.getManifest().getSignatureReference().getUri();
+                if (uri.equals("META-INF/signature-1.ksi")) {
                     assertEquals(true, content.isExtended());
-                } else if (content.getManifest().getSignatureReference().getUri().equals("META-INF/signature-01-02-03-04-05.ksi")) {
+                } else if (uri.equals("META-INF/signature-01-02-03-04-05.ksi")) {
                     assertEquals(false, content.isExtended());
                 }
             }
@@ -83,7 +86,10 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
 
     @Test
     public void testExtendingWithPublicationKsiEnvelopeSignatureExtender() throws Exception {
-        PublicationData publicationData = new PublicationData("AAAAAA-CXMCNI-AAJIV3-RB5OEJ-JBK57H-SJ42PI-IB2RE7-2CA2TM-H5W3EF-TF2BX7-HRNRP5-Q2E754"); // June 2016 publication string
+        PublicationData publicationData = new PublicationData(
+                //June 2016 publication string
+                "AAAAAA-CXMCNI-AAJIV3-RB5OEJ-JBK57H-SJ42PI-IB2RE7-2CA2TM-H5W3EF-TF2BX7-HRNRP5-Q2E754"
+        );
         PublicationsFilePublicationRecord publicationRecord = new PublicationsFilePublicationRecord(publicationData);
         ExtendingPolicy policy = new PublicationKsiEnvelopeSignatureExtendingPolicy(ksi, publicationRecord);
         doExtendingTest(signatureFactory, policy);
@@ -91,7 +97,10 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
 
     @Test
     public void testExtendingWithPublicationKsiEnvelopeSignatureExtender_WithOlderPublicationString() throws Exception {
-        PublicationData publicationData = new PublicationData("AAAAAA-CVFWVA-AAPV2S-SN3JLW-YEKPW3-AUSQP6-PF65K5-KVGZZA-7UYTOV-27VX54-VVJQFG-VCK6GR"); // Apr 2015 publication string
+        PublicationData publicationData = new PublicationData(
+                //April 2015 publication string
+                "AAAAAA-CVFWVA-AAPV2S-SN3JLW-YEKPW3-AUSQP6-PF65K5-KVGZZA-7UYTOV-27VX54-VVJQFG-VCK6GR"
+        );
         PublicationsFilePublicationRecord publicationRecord = new PublicationsFilePublicationRecord(publicationData);
         ExtendingPolicy policy = new PublicationKsiEnvelopeSignatureExtendingPolicy(ksi, publicationRecord);
         doExtendingTest(ENVELOPE_WITH_MULTIPLE_EXTENDABLE_SIGNATURES, signatureFactory, policy, false);
@@ -99,8 +108,8 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
 
     @Test
     public void testExtendingWithInvalidSignature() throws Exception {
-        ExtendingPolicy policy = Mockito.mock(ExtendingPolicy.class);
-        when(policy.getExtendedSignature(Mockito.any(Object.class))).thenReturn(Mockito.mock(KSISignature.class));
+        ExtendingPolicy policy = mock(ExtendingPolicy.class);
+        when(policy.getExtendedSignature(Mockito.any(Object.class))).thenReturn(mock(KSISignature.class));
         doExtendingTest(ENVELOPE_WITH_ONE_DOCUMENT, signatureFactory, policy, false);
     }
 
@@ -108,41 +117,43 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
     public void testExtendingWithNotExtendedSignature_Nok() throws Exception {
         KSISignature mockedSignature = getMockedSignature(ENVELOPE_WITH_ONE_DOCUMENT);
         when(mockedSignature.isExtended()).thenReturn(false);
-        doExtendingTest(ENVELOPE_WITH_ONE_DOCUMENT, signatureFactory, false, mockedSignature);
+        doExtendingTest(ENVELOPE_WITH_ONE_DOCUMENT, signatureFactory, mockedSignature);
     }
 
     @Test
     public void testExtendingWithDifferentInputHash_Nok() throws Exception {
         KSISignature mockedSignature = getMockedSignature(ENVELOPE_WITH_ONE_DOCUMENT);
         when(mockedSignature.getInputHash()).thenReturn(new DataHash(HashAlgorithm.SHA2_512, new byte[64]));
-        doExtendingTest(ENVELOPE_WITH_ONE_DOCUMENT, signatureFactory, false, mockedSignature);
+        doExtendingTest(ENVELOPE_WITH_ONE_DOCUMENT, signatureFactory, mockedSignature);
     }
 
     @Test
     public void testExtendingWithDifferentAggregationTime_Nok() throws Exception {
         KSISignature mockedSignature = getMockedSignature(ENVELOPE_WITH_ONE_DOCUMENT);
         when(mockedSignature.getAggregationTime()).thenReturn(new Date());
-        doExtendingTest(ENVELOPE_WITH_ONE_DOCUMENT, signatureFactory, false, mockedSignature);
+        doExtendingTest(ENVELOPE_WITH_ONE_DOCUMENT, signatureFactory, mockedSignature);
     }
 
     @Test
     public void testExtendingWithDifferentIdentity_Nok() throws Exception {
         KSISignature mockedSignature = getMockedSignature(ENVELOPE_WITH_ONE_DOCUMENT);
-        when(mockedSignature.getIdentity()).thenReturn("Invalid identity.");
-        doExtendingTest(ENVELOPE_WITH_ONE_DOCUMENT, signatureFactory, false, mockedSignature);
+        when(mockedSignature.getAggregationHashChainIdentity())
+                .thenReturn(new LegacyIdentity[]{new LegacyIdentity("Invalid identity")});
+        doExtendingTest(ENVELOPE_WITH_ONE_DOCUMENT, signatureFactory, mockedSignature);
     }
 
-    private void doExtendingTest(String envelopeName, SignatureFactory factory, boolean extendedStatusAfterExtending, KSISignature signature) throws Exception {
-        ExtendingPolicy mockedPolicy = Mockito.mock(ExtendingPolicy.class);
+    private void doExtendingTest(String envelopeName, SignatureFactory factory, KSISignature signature) throws Exception {
+        ExtendingPolicy mockedPolicy = mock(ExtendingPolicy.class);
         when(mockedPolicy.getExtendedSignature(Mockito.any(Object.class))).thenReturn(signature);
-        doExtendingTest(envelopeName, factory, mockedPolicy, extendedStatusAfterExtending);
+        doExtendingTest(envelopeName, factory, mockedPolicy, false);
     }
 
     private void doExtendingTest(SignatureFactory factory, ExtendingPolicy policy) throws Exception {
         doExtendingTest(ENVELOPE_WITH_MULTIPLE_EXTENDABLE_SIGNATURES, factory, policy, true);
     }
 
-    private void doExtendingTest(String envelopeName, SignatureFactory factory, ExtendingPolicy policy, boolean extendedStatusAfterExtending) throws Exception {
+    private void doExtendingTest(String envelopeName, SignatureFactory factory, ExtendingPolicy policy,
+                                 boolean extendedStatusAfterExtending) throws Exception {
         EnvelopeSignatureExtender extender = new EnvelopeSignatureExtender(factory, policy);
         try (Envelope envelope = getEnvelope(envelopeName)) {
             assertSignaturesExtendedStatus(envelope, false);
@@ -164,9 +175,9 @@ public class ExtendingServiceIntegrationTest extends AbstractCommonIntegrationTe
         try (Envelope envelope = getEnvelope(envelopeName)) {
             KSISignature signature = (KSISignature) envelope.getSignatureContents().get(0).getEnvelopeSignature().getSignature();
 
-            KSISignature mockedSignature = Mockito.mock(KSISignature.class);
+            KSISignature mockedSignature = mock(KSISignature.class);
             when(mockedSignature.getAggregationTime()).thenReturn(signature.getAggregationTime());
-            when(mockedSignature.getIdentity()).thenReturn(signature.getIdentity());
+            when(mockedSignature.getAggregationHashChainIdentity()).thenReturn(signature.getAggregationHashChainIdentity());
             when(mockedSignature.isExtended()).thenReturn(true);
             when(mockedSignature.getInputHash()).thenReturn(signature.getInputHash());
             return mockedSignature;

@@ -70,7 +70,8 @@ public class TlvEnvelopeManifestFactory implements
 
     @Override
     public TlvManifest createManifest(DocumentsManifest documentsManifest, AnnotationsManifest annotationManifest,
-                                      SignatureFactoryType factoryType, String signatureName, String manifestName) throws InvalidManifestException {
+                                      SignatureFactoryType factoryType, String signatureName, String manifestName)
+            throws InvalidManifestException {
         Util.notNull(documentsManifest, "Documents manifest");
         Util.notNull(annotationManifest, "Annotations manifest");
         return new TlvManifest(

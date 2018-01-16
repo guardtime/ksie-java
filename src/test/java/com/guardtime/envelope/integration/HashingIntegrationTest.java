@@ -60,12 +60,12 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     private static final String ENVELOPE_DOCUMENT_FILE_NAME = "StreamFile.txt";
     private static final String ENVELOPE_DOCUMENT_MIME_TYPE = "Stream";
     private static final String INPUT_STREAM_STRING = "Input from stream.";
-    private final Annotation ENVELOPE_ANNOTATION = new StringAnnotation(
+    private final Annotation envelopeAnnotation = new StringAnnotation(
             EnvelopeAnnotationType.FULLY_REMOVABLE,
             ENVELOPE_ANNOTATION_CONTENT,
             ENVELOPE_ANNOTATION_TYPE_DOMAIN
     );
-    private final Document ENVELOPE_DOCUMENT = new StreamDocument(
+    private final Document envelopeDocument = new StreamDocument(
             new ByteArrayInputStream(INPUT_STREAM_STRING.getBytes(StandardCharsets.UTF_8)),
             ENVELOPE_DOCUMENT_MIME_TYPE,
             ENVELOPE_DOCUMENT_FILE_NAME
@@ -74,8 +74,8 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
 
     @After
     public void cleanUp() throws Exception {
-        ENVELOPE_ANNOTATION.close();
-        ENVELOPE_DOCUMENT.close();
+        envelopeAnnotation.close();
+        envelopeDocument.close();
         if (envelope != null) {
             envelope.close();
         }
@@ -245,11 +245,12 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testUseSeveralHashingAlgorithms() throws Exception {
-        List<HashAlgorithm> hashes = Arrays.asList(HashAlgorithm.SHA1,
+        List<HashAlgorithm> hashes = Arrays.asList(
                 HashAlgorithm.RIPEMD_160,
                 HashAlgorithm.SHA2_256,
                 HashAlgorithm.SHA2_384,
-                HashAlgorithm.SHA2_512);
+                HashAlgorithm.SHA2_512
+        );
         HashAlgorithmProvider provider = new TestHashAlgorithmProvider(
                 hashes, hashes, HashAlgorithm.SHA2_256, HashAlgorithm.SHA2_256);
 
@@ -280,7 +281,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testDifferentHashingAlgorithmsForDifferentParts() throws Exception {
         List<HashAlgorithm> fileReferenceHashAlgorithms = singletonList(HashAlgorithm.RIPEMD_160);
-        List<HashAlgorithm> documentReferenceHashAlgorithms = singletonList(HashAlgorithm.SHA1);
+        List<HashAlgorithm> documentReferenceHashAlgorithms = singletonList(HashAlgorithm.SHA2_512);
         HashAlgorithm annotationDataReferenceHashAlgorithm = HashAlgorithm.SHA2_384;
         HashAlgorithm signingHashAlgorithm = HashAlgorithm.SHA2_512;
         HashAlgorithmProvider provider = new TestHashAlgorithmProvider(
@@ -320,8 +321,8 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
         HashAlgorithm hashAlgorithm = HashAlgorithm.SHA3_512;
         HashAlgorithmProvider hashAlgorithmProvider = new TestHashAlgorithmProvider(hashAlgorithm);
         EnvelopeBuilder builder = new EnvelopeBuilder(getEnvelopePackagingFactory(hashAlgorithmProvider));
-        builder.withAnnotation(ENVELOPE_ANNOTATION);
-        builder.withDocument(ENVELOPE_DOCUMENT);
+        builder.withAnnotation(envelopeAnnotation);
+        builder.withDocument(envelopeDocument);
         builder.build();
     }
 
@@ -329,7 +330,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
      public void testUsingNotImplementedHashingAlgorithmInList_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Hash algorithm SM3 is not implemented");
-        List<HashAlgorithm> hashAlgorithmList = Arrays.asList(HashAlgorithm.SHA1, HashAlgorithm.SHA2_256, HashAlgorithm.SM3);
+        List<HashAlgorithm> hashAlgorithmList = Arrays.asList(HashAlgorithm.SHA2_256, HashAlgorithm.SM3);
         HashAlgorithm hashAlgorithm = HashAlgorithm.SHA2_512;
         HashAlgorithmProvider hashAlgorithmProvider = new TestHashAlgorithmProvider(
                 hashAlgorithmList,
@@ -338,27 +339,27 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
                 hashAlgorithm
         );
         EnvelopeBuilder builder = new EnvelopeBuilder(getEnvelopePackagingFactory(hashAlgorithmProvider));
-        builder.withAnnotation(ENVELOPE_ANNOTATION);
-        builder.withDocument(ENVELOPE_DOCUMENT);
+        builder.withAnnotation(envelopeAnnotation);
+        builder.withDocument(envelopeDocument);
         builder.build();
     }
 
     private EnvelopePackagingFactory getEnvelopePackagingFactory(HashAlgorithmProvider provider) throws Exception {
         EnvelopeManifestFactory envelopeManifestFactory = new TlvEnvelopeManifestFactory(provider);
-        return new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(signatureFactory).
-                withManifestFactory(envelopeManifestFactory).
-                build();
+        return new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withManifestFactory(envelopeManifestFactory)
+                .build();
     }
 
     private void setUpEnvelope(HashAlgorithmProvider provider) throws Exception {
         EnvelopeBuilder builder = new EnvelopeBuilder(getEnvelopePackagingFactory(provider));
-        builder.withAnnotation(ENVELOPE_ANNOTATION);
-        builder.withDocument(ENVELOPE_DOCUMENT);
+        builder.withAnnotation(envelopeAnnotation);
+        builder.withDocument(envelopeDocument);
         this.envelope = builder.build();
     }
 
-    private void checkDataHashList(List<HashAlgorithm> expectedHashAlgorithms, List<DataHash> dataHashes) throws Exception {
+    private void checkDataHashList(List<HashAlgorithm> expectedHashAlgorithms, List<DataHash> dataHashes) {
         Assert.assertEquals(expectedHashAlgorithms.size(), dataHashes.size());
         List<HashAlgorithm> foundAlgorithms = new LinkedList<>();
         for (DataHash dataHash : dataHashes) {

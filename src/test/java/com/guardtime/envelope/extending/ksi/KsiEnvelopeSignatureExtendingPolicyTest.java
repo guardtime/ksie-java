@@ -30,7 +30,7 @@ import org.mockito.Mockito;
 public class KsiEnvelopeSignatureExtendingPolicyTest extends AbstractEnvelopeTest {
 
     @Test
-    public void testCreatingKsiEnvelopeSignatureExtenderWithoutKsi_ThrowsNullPointerException() throws Exception {
+    public void testCreatingKsiEnvelopeSignatureExtenderWithoutKsi_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("KSI");
         new KsiEnvelopeSignatureExtendingPolicy(null);

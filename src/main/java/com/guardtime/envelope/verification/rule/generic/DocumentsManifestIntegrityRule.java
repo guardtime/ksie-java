@@ -20,7 +20,6 @@
 package com.guardtime.envelope.verification.rule.generic;
 
 import com.guardtime.envelope.EnvelopeElement;
-import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.packaging.SignatureContent;
@@ -40,7 +39,7 @@ import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_DATA
 
 /**
  * This rule verifies the validity of the datamanifest which contains records for all {@link
- * Document}s associated with a signature.
+ * com.guardtime.envelope.document.Document}s associated with a signature.
  * It expects to find successful results for rules verifying existence of
  * {@link com.guardtime.envelope.manifest.DocumentsManifest}.
  */
@@ -55,7 +54,7 @@ public class DocumentsManifestIntegrityRule extends AbstractRule<SignatureConten
     }
 
     @Override
-    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
+    protected void verifyRule(ResultHolder holder, SignatureContent verifiable) {
         EnvelopeElement documentsManifest = verifiable.getDocumentsManifest();
         Manifest manifest = verifiable.getManifest();
         FileReference documentsManifestReference = manifest.getDocumentsManifestReference();

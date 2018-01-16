@@ -47,7 +47,8 @@ public class TrustedHashListIntegrityRule extends AbstractRule<Pair<EnvelopeElem
     }
 
     @Override
-    protected void verifyRule(ResultHolder holder, Pair<EnvelopeElement, FileReference> verifiable) throws RuleTerminatingException {
+    protected void verifyRule(ResultHolder holder, Pair<EnvelopeElement, FileReference> verifiable)
+            throws RuleTerminatingException {
         FileReference reference = verifiable.getRight();
         VerificationResult verificationResult = getVerificationResult(reference.getHashList(), verifiable.getLeft());
         holder.addResult(new GenericVerificationResult(verificationResult, getName(), getErrorMessage(), reference.getUri()));

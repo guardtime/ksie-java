@@ -64,13 +64,13 @@ public class SignatureSignsManifestRuleTest {
     }
 
     @Test
-    public void testValidSignatureContent() throws Exception {
+    public void testValidSignatureContent() {
         when(mockEnvelopeSignature.getSignedDataHash()).thenReturn(nullDataHash);
         assertRuleResult(VerificationResult.OK);
     }
 
     @Test
-    public void testInvalidSignatureContent() throws Exception {
+    public void testInvalidSignatureContent() {
         when(mockEnvelopeSignature.getSignedDataHash()).thenReturn(new DataHash(HashAlgorithm.SHA2_384, new byte[48]));
         assertRuleResult(VerificationResult.NOK);
     }
