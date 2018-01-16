@@ -15,7 +15,7 @@
         <mockito.version>1.10.19</mockito.version>
         <slf4j.version>1.7.12</slf4j.version>
         <ksi.sdk.version>4.11.153</ksi.sdk.version>
-        <jacoco.version>0.7.9</jacoco.version>
+        <jacoco.version>0.8.0</jacoco.version>
     </properties>
 
     <dependencies>
@@ -93,9 +93,13 @@
                         <goals>
                             <goal>test</goal>
                         </goals>
+                        <configuration>
+                            <argLine>${surefireArgLine}</argLine>
+                        </configuration>
                     </execution>
                 </executions>
                 <configuration>
+                    <argLine>-XX:MaxPermSize=512m</argLine>
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>
                     </excludes>
@@ -118,6 +122,9 @@
                             <goal>integration-test</goal>
                             <goal>verify</goal>
                         </goals>
+                        <configuration>
+                            <argLine>${failsafeArgLine}</argLine>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
