@@ -143,55 +143,55 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     public void testCreateZipPackagingFactoryWithoutManifestFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Manifest factory must be present");
-        new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withManifestFactory(null).
-                build();
+        new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withManifestFactory(null)
+                .build();
     }
 
     @Test
     public void testCreateZipPackagingFactoryWithoutParsingStoreFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Parsing store factory must be present");
-        new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withManifestFactory(mockedManifestFactory).
-                withParsingStoreFactory(null).
-                build();
+        new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withManifestFactory(mockedManifestFactory)
+                .withParsingStoreFactory(null)
+                .build();
     }
 
     @Test
     public void testCreateZipPackagingFactoryWithoutIndexProviderFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Index provider factory must be present");
-        new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withIndexProviderFactory(null).
-                build();
+        new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withIndexProviderFactory(null)
+                .build();
     }
 
     @Test
     public void testCreateZipPackagingFactoryWithoutEnvelopeReader_Ok() throws Exception {
-        new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withEnvelopeReader(null).
-                build();
+        new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withEnvelopeReader(null)
+                .build();
     }
 
     @Test
     public void testCreatePackagingFactoryWithNoVerificationPolicy_Ok() throws Exception {
-        new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withVerificationPolicy(null).
-                build();
+        new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .build();
     }
 
     @Test
     public void testCreatePackagingFactoryWithNotDefaultVerificationPolicy_Ok() throws Exception {
-        new ZipEnvelopePackagingFactoryBuilder().
-                withSignatureFactory(mockedSignatureFactory).
-                withVerificationPolicy(new LimitedInternalVerificationPolicy()).
-                build();
+        new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(new LimitedInternalVerificationPolicy())
+                .build();
     }
 
     @Test
