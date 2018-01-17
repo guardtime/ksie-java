@@ -35,6 +35,7 @@ import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.InvalidPackageException;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.signature.SignatureFactoryType;
+import com.guardtime.envelope.verification.policy.LimitedInternalVerificationPolicy;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.KSISignature;
@@ -132,14 +133,24 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     }
 
     @Test
-    public void testCreatePackagingFactoryWithoutSignatureFactory_ThrowsNullPointerException() throws Exception {
+    public void testCreateZipPackagingFactoryWithoutSignatureFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Signature factory must be present");
         new ZipEnvelopePackagingFactoryBuilder().withSignatureFactory(null).build();
     }
 
     @Test
-    public void testCreatePackagingFactoryWithoutParsingStoreFactory_ThrowsNullPointerException() throws Exception {
+    public void testCreateZipPackagingFactoryWithoutManifestFactory_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Manifest factory must be present");
+        new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withManifestFactory(null)
+                .build();
+    }
+
+    @Test
+    public void testCreateZipPackagingFactoryWithoutParsingStoreFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Parsing store factory must be present");
         new ZipEnvelopePackagingFactoryBuilder()
@@ -150,22 +161,36 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     }
 
     @Test
-    public void testCreatePackagingFactoryWithoutManifestFactory_ThrowsNullPointerException() throws Exception {
-        expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("Manifest factory must be present");
-        new ZipEnvelopePackagingFactoryBuilder()
-                .withSignatureFactory(mockedSignatureFactory)
-                .withManifestFactory(null)
-                .build();
-    }
-
-    @Test
-    public void testCreatePackagingFactoryWithoutIndexProviderFactory_ThrowsNullPointerException() throws Exception {
+    public void testCreateZipPackagingFactoryWithoutIndexProviderFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Index provider factory must be present");
         new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(mockedSignatureFactory)
                 .withIndexProviderFactory(null)
+                .build();
+    }
+
+    @Test
+    public void testCreateZipPackagingFactoryWithoutEnvelopeReader_Ok() throws Exception {
+        new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withEnvelopeReader(null)
+                .build();
+    }
+
+    @Test
+    public void testCreatePackagingFactoryWithNoVerificationPolicy_Ok() throws Exception {
+        new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(null)
+                .build();
+    }
+
+    @Test
+    public void testCreatePackagingFactoryWithNotDefaultVerificationPolicy_Ok() throws Exception {
+        new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withVerificationPolicy(new LimitedInternalVerificationPolicy())
                 .build();
     }
 
