@@ -31,6 +31,7 @@ import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.SignatureContent;
+import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidPackageException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
@@ -50,6 +51,7 @@ import java.util.Map;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
@@ -104,7 +106,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     }
 
     @Test
-    public void testVerifyEnvelopeWithEmptyMimetype() throws Exception {
+    public void testReadEnvelopeWithEmptyMimetype() throws Exception {
         expectedException.expect(InvalidPackageException.class);
         expectedException.expectMessage("Parsed Envelope has invalid MIME type. Can't process it!");
         try (Envelope ignored = getEnvelope(ENVELOPE_WITH_MIMETYPE_IS_EMPTY)) {
@@ -378,6 +380,22 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     @Test
     public void testCreateEnvelopeWhereDocumentIsWrittenToSubDirectory_Ok() throws Exception {
         createEnvelopeWriteItToAndReadFromStream("SubDir/AddedDocument.txt");
+    }
+
+    @Test
+    public void testReadAndWriteMangledEnvelope() throws Exception {
+        expectedException.expect(IOException.class); // TODO: Replace with some more specific EnvelopeWritingException
+        try (
+                InputStream inputStream = new FileInputStream(loadFile(ENVELOPE_WITH_BROKEN_SIGNATURE_CONTENT));
+                Envelope envelope = defaultPackagingFactory.read(inputStream)
+        ) {
+        } catch (EnvelopeReadingException e) {
+            Envelope envelope = e.getEnvelope();
+            assertFalse(envelope.getSignatureContents().isEmpty());
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            envelopeWriter.write(envelope, bos);
+            envelope.close();
+        }
     }
 
     private List<Document> getEnvelopeDocument(String fileName) {

@@ -57,6 +57,8 @@ public class ZipEnvelopeWriter implements EnvelopeWriter {
             writeMimeTypeEntry(zipOutputStream, writtenFiles);
             writeSignatureContents(envelope.getSignatureContents(), zipOutputStream, writtenFiles);
             writeUnknownFiles(envelope.getUnknownFiles(), zipOutputStream, writtenFiles);
+        } catch (NullPointerException e) {
+            throw new IOException(e);
         }
     }
 
