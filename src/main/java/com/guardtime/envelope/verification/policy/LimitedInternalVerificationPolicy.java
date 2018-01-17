@@ -12,6 +12,7 @@ public class LimitedInternalVerificationPolicy extends AbstractVerificationPolic
 
     public LimitedInternalVerificationPolicy() {
         RuleStateProvider stateProvider = new DefaultRuleStateProvider();
+        signatureContentRules.addAll(CommonPolicyRuleSets.getBasicSignatureRules(stateProvider));
         signatureContentRules.addAll(CommonPolicyRuleSets.getManifestRules(stateProvider));
         signatureContentRules.addAll(CommonPolicyRuleSets.getAnnotationRules(stateProvider));
     }
