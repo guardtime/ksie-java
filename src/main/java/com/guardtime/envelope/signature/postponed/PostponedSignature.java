@@ -20,6 +20,7 @@
 package com.guardtime.envelope.signature.postponed;
 
 import com.guardtime.envelope.signature.EnvelopeSignature;
+import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.envelope.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 
@@ -64,22 +65,16 @@ class PostponedSignature<T> implements EnvelopeSignature<T> {
 
     @Override
     public DataHash getSignedDataHash() {
-        if (internalSignature == null) {
-            return dataHash;
-        }
-        return internalSignature.getSignedDataHash();
+        return dataHash;
     }
 
     @Override
     public boolean isExtended() {
-        if (internalSignature == null) {
-            return false;
-        }
-        return internalSignature.isExtended();
+        return internalSignature != null && internalSignature.isExtended();
     }
 
     @Override
-    public int compareTo(EnvelopeSignature<T> o) {
+    public int compareTo(EnvelopeSignature o) {
         if (internalSignature != null) {
             return internalSignature.compareTo(o);
         }
@@ -94,18 +89,19 @@ class PostponedSignature<T> implements EnvelopeSignature<T> {
      * Assigns the real {@link EnvelopeSignature} to be used as delegate.
      *
      * @throws IllegalArgumentException - When the provided {@link EnvelopeSignature} has non-matching
+     * @throws SignatureException - When trying to replace signature of placeholder which has already been filled.
      * {@link EnvelopeSignature#getSignedDataHash()} output.
      */
-    boolean sign(EnvelopeSignature realSignature) {
-        if (!realSignature.getSignedDataHash().equals(dataHash)) {
+    void sign(EnvelopeSignature signature) throws SignatureException {
+        if (internalSignature != null) {
+            throw new SignatureException("Failed to assign signature to placeholder as it already has a signature!");
+        }
+
+        if (!signature.getSignedDataHash().equals(dataHash)) {
             throw new IllegalArgumentException("Provided signatures Data hash does not match!");
         }
 
-        if (internalSignature != null) {
-            return false;
-        }
-        this.internalSignature = realSignature;
-        return true;
+        this.internalSignature = signature;
     }
 
 }
