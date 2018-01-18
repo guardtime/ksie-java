@@ -104,5 +104,4 @@ public class PostponedSignatureFactory implements SignatureFactory {
         EnvelopeSignature signature = signatureFactory.create(postponedSignature.getSignedDataHash());
         postponedSignature.sign(signature);
     }
-
 }

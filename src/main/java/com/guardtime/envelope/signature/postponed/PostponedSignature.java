@@ -77,7 +77,7 @@ class PostponedSignature<T> implements EnvelopeSignature<T> {
     }
 
     @Override
-    public int compareTo(EnvelopeSignature o) {
+    public int compareTo(EnvelopeSignature<T> o) {
         if (internalSignature != null) {
             return internalSignature.compareTo(o);
         }
@@ -106,5 +106,4 @@ class PostponedSignature<T> implements EnvelopeSignature<T> {
 
         this.internalSignature = signature;
     }
-
 }

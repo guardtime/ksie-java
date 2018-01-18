@@ -38,7 +38,6 @@ import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
 import com.guardtime.envelope.verification.policy.LimitedInternalVerificationPolicy;
 import com.guardtime.ksi.unisignature.KSISignature;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
