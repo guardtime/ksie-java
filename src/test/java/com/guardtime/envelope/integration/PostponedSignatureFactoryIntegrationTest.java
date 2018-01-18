@@ -22,6 +22,7 @@ package com.guardtime.envelope.integration;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.SignatureContent;
+import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
 import com.guardtime.envelope.signature.SignatureFactory;
@@ -34,7 +35,6 @@ import com.guardtime.envelope.verification.rule.signature.ksi.KsiSignatureVerifi
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.verifier.policies.InternalVerificationPolicy;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +44,8 @@ import org.mockito.stubbing.Answer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 import static com.guardtime.envelope.verification.result.VerificationResult.NOK;
 import static com.guardtime.envelope.verification.result.VerificationResult.OK;
@@ -52,7 +54,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.spy;
 
-public class PostponedSigningIntegrationTest extends AbstractCommonIntegrationTest {
+public class PostponedSignatureFactoryIntegrationTest extends AbstractCommonIntegrationTest {
     private EnvelopePackagingFactory postponedPackagingFactory;
     private PostponedSignatureFactory postponedSignatureFactory;
     private Envelope testEnvelope;
@@ -80,6 +82,45 @@ public class PostponedSigningIntegrationTest extends AbstractCommonIntegrationTe
     @After
     public void cleanUp() throws Exception {
         testEnvelope.close();
+    }
+
+    @Test
+    public void testReadPostponedEnvelopeWithNotPostponedFactory() throws Exception {
+        expectedException.expect(EnvelopeReadingException.class);
+        expectedException.expectMessage("Reading envelope encountered errors!");
+        try (
+                InputStream inputStream = new FileInputStream(loadFile(ENVELOPE_POSTPONED));
+                Envelope ignored = packagingFactory.read(inputStream)
+        ) {
+            //Empty
+        }
+
+    }
+
+    @Test
+    public void testReadNotPostponedEnvelopeWithPostponedFactory() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Hash algorithm id '-120' is unknown");
+        try (
+                InputStream inputStream = new FileInputStream(loadFile(ENVELOPE_WITH_ONE_DOCUMENT));
+                Envelope ignored = postponedPackagingFactory.read(inputStream)
+        ) {
+            //Empty
+        }
+    }
+
+    @Test
+    public void testReadPostponedEnvelope() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Provided SignatureContent does not hold PostponedSignature type of EnvelopeSignature");
+        try (
+                InputStream inputStream = new FileInputStream(loadFile(ENVELOPE_WITH_ONE_DOCUMENT));
+                Envelope envelope = packagingFactory.read(inputStream)
+        ) {
+            for (SignatureContent content : envelope.getSignatureContents()) {
+                postponedSignatureFactory.sign(content);
+            }
+        }
     }
 
     @Test
