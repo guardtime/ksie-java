@@ -85,12 +85,11 @@ public class PostponedSignatureFactory implements SignatureFactory {
     /**
      * Replaces placeholder underlying signature in {@link EnvelopeSignature} for provided {@param signatureContent}.
      *
-     * @throws IllegalStateException    - When no {@link SignatureFactory} is provided to constructor
      * @throws SignatureException       - When trying to replace placeholder signature which has already been filled.
+     * @throws IllegalStateException    - When no {@link SignatureFactory} is provided to constructor
      * @throws IllegalArgumentException - When trying to replace placeholder signature with signature that has non-matching
      * {@link DataHash} OR provided {@link SignatureContent} does not hold {@link EnvelopeSignature} with type of
      * {@link PostponedSignature}.
-     * .
      */
     public void sign(SignatureContent signatureContent) throws SignatureException {
         if (signatureFactory == null) {
