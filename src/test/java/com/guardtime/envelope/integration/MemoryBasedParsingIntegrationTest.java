@@ -36,7 +36,7 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class ZipEnvelopeMemoryBasedParsingIntegrationTest extends AbstractZipEnvelopeIntegrationTest {
+public class MemoryBasedParsingIntegrationTest extends AbstractZipEnvelopeIntegrationTest {
 
     private EnvelopePackagingFactory packagingFactory;
 
