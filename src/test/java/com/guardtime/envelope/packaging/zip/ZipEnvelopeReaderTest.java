@@ -47,10 +47,10 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -63,7 +63,7 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
 
     private ZipEnvelopeReader reader;
     private Envelope envelope;
-    private List<Throwable> exceptions;
+    private List<Throwable> exceptions = emptyList();
 
 
     @Before
@@ -254,13 +254,6 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
         assertExceptionsContainMessage("No content stored for entry 'META-INF/annotmanifest-2.tlv'!");
     }
 
-
-    @Test
-    public void testReadInvalidSingleAnnotationManifest() throws Exception {
-        setUpEnvelope(ENVELOPE_WITH_MISSING_ANNOTATION, false);
-        assertExceptionsContainMessage("No content stored for entry 'META-INF/annotation-1.tlv'!");
-    }
-
     @Test
     public void testReadInvalidSignature() throws Exception {
         when(mockKsi.read(any(InputStream.class))).thenThrow(SignatureException.class);
@@ -275,8 +268,6 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
         setUpEnvelope(ENVELOPE_WITH_BROKEN_SIGNATURE_CONTENT, false);
         assertExceptionsContainMessage("Failed to parse content of stream as EnvelopeSignature.");
         assertExceptionsContainMessage("Failed to parse content of stream as EnvelopeSignature.");
-        assertExceptionsContainMessage("No content stored for entry 'META-INF/annotation-1.tlv'!");
-        assertExceptionsContainMessage("No content stored for entry 'META-INF/annotation-2.tlv'!");
         assertExceptionsContainMessage("No content stored for entry 'META-INF/annotmanifest-2.tlv'!");
     }
 
