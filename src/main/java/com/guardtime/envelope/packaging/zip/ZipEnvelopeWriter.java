@@ -58,7 +58,7 @@ public class ZipEnvelopeWriter implements EnvelopeWriter {
             writeSignatureContents(envelope.getSignatureContents(), zipOutputStream, writtenFiles);
             writeUnknownFiles(envelope.getUnknownFiles(), zipOutputStream, writtenFiles);
         } catch (NullPointerException e) {
-            throw new IOException(e);
+            throw new IOException("Aborting Envelope writing. Encountered missing value!", e);
         }
     }
 

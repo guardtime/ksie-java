@@ -542,17 +542,18 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
 
     @Test
     public void testReadAndWriteMangledEnvelope() throws Exception {
-        expectedException.expect(IOException.class); // TODO: Replace with some more specific EnvelopeWritingException
+        expectedException.expect(IOException.class);
+        expectedException.expectMessage("Aborting Envelope writing.");
         try (
                 InputStream inputStream = new FileInputStream(loadFile(ENVELOPE_WITH_BROKEN_SIGNATURE_CONTENT));
                 Envelope envelope = defaultPackagingFactory.read(inputStream)
         ) {
         } catch (EnvelopeReadingException e) {
-            Envelope envelope = e.getEnvelope();
-            assertFalse(envelope.getSignatureContents().isEmpty());
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            envelopeWriter.write(envelope, bos);
-            envelope.close();
+            try (Envelope envelope = e.getEnvelope()) {
+                assertFalse(envelope.getSignatureContents().isEmpty());
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                envelopeWriter.write(envelope, bos);
+            }
         }
     }
 
