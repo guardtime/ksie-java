@@ -22,7 +22,7 @@ package com.guardtime.envelope.integration;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
 import com.guardtime.envelope.packaging.parsing.store.TemporaryFileBasedParsingStoreFactory;
 
-public class ZipEnvelopeTempFileBasedParsingIntegrationTest extends AbstractZipEnvelopeIntegrationTest {
+public class TempFileBasedParsingIntegrationTest extends AbstractZipEnvelopeIntegrationTest {
 
     @Override
     protected ParsingStoreFactory getParsingStoreFactory() {

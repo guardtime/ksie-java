@@ -1,5 +1,6 @@
 package com.guardtime.envelope.verification.policy;
 
+import com.guardtime.envelope.verification.rule.generic.SignatureSignsManifestRule;
 import com.guardtime.envelope.verification.rule.state.DefaultRuleStateProvider;
 import com.guardtime.envelope.verification.rule.state.RuleStateProvider;
 
@@ -12,9 +13,8 @@ public class LimitedInternalVerificationPolicy extends AbstractVerificationPolic
 
     public LimitedInternalVerificationPolicy() {
         RuleStateProvider stateProvider = new DefaultRuleStateProvider();
-        signatureContentRules.addAll(CommonPolicyRuleSets.getBasicSignatureRules(stateProvider));
+        signatureContentRules.add(new SignatureSignsManifestRule(stateProvider));
         signatureContentRules.addAll(CommonPolicyRuleSets.getManifestRules(stateProvider));
         signatureContentRules.addAll(CommonPolicyRuleSets.getAnnotationRules(stateProvider));
     }
-
 }

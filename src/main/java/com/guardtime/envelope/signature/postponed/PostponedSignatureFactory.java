@@ -39,17 +39,20 @@ import java.io.InputStream;
  */
 public class PostponedSignatureFactory implements SignatureFactory {
 
-    private final SignatureFactoryType realType;
-    private final SignatureFactory realFactory;
+    private final SignatureFactoryType factoryType;
+    private final SignatureFactory signatureFactory;
 
-    public PostponedSignatureFactory(SignatureFactoryType realType) {
-        this.realType = realType;
-        this.realFactory = null;
+    public PostponedSignatureFactory(SignatureFactoryType factoryType) {
+        this.factoryType = factoryType;
+        this.signatureFactory = null;
     }
 
-    public PostponedSignatureFactory(SignatureFactory realFactory) {
-        this.realType = realFactory.getSignatureFactoryType();
-        this.realFactory = realFactory;
+    public PostponedSignatureFactory(SignatureFactory factory) {
+        if (factory.getClass().equals(this.getClass())) {
+            throw new IllegalArgumentException("Provided SignatureFactory may not be " + this.getClass().getSimpleName());
+        }
+        this.factoryType = factory.getSignatureFactoryType();
+        this.signatureFactory = factory;
     }
 
     @Override
@@ -68,34 +71,37 @@ public class PostponedSignatureFactory implements SignatureFactory {
 
     @Override
     public void extend(EnvelopeSignature envelopeSignature, ExtendingPolicy extender) throws SignatureException {
-        if (realFactory == null) {
+        if (signatureFactory == null) {
             throw new IllegalStateException("Not supported if SignatureFactory is not provided to constructor!");
         }
-        realFactory.extend(envelopeSignature, extender);
+        signatureFactory.extend(envelopeSignature, extender);
     }
 
     @Override
     public SignatureFactoryType getSignatureFactoryType() {
-        return realType;
+        return factoryType;
     }
 
     /**
      * Replaces placeholder underlying signature in {@link EnvelopeSignature} for provided {@param signatureContent}.
      *
+     * @throws SignatureException       - When trying to replace placeholder signature which has already been filled.
      * @throws IllegalStateException    - When no {@link SignatureFactory} is provided to constructor
-     * @throws SignatureException       - When trying to replace signature of placeholder which has already been filled.
-     * @throws IllegalArgumentException - When trying to replace signature of placeholder with signature that has non-matching
-     * {@link DataHash}.
+     * @throws IllegalArgumentException - When trying to replace placeholder signature with signature that has non-matching
+     * {@link DataHash} OR provided {@link SignatureContent} does not hold {@link EnvelopeSignature} with type of
+     * {@link PostponedSignature}.
      */
     public void sign(SignatureContent signatureContent) throws SignatureException {
-        if (realFactory == null) {
+        if (signatureFactory == null) {
             throw new IllegalStateException("Not supported if SignatureFactory is not provided to constructor!");
         }
-        PostponedSignature postponedSignature = (PostponedSignature) signatureContent.getEnvelopeSignature();
-        EnvelopeSignature signature = realFactory.create(postponedSignature.getSignedDataHash());
-        if (!postponedSignature.sign(signature)) {
-            throw new SignatureException("Failed to assign signature to placeholder as it already has a signature!");
+        if (!(signatureContent.getEnvelopeSignature() instanceof PostponedSignature)) {
+            throw new IllegalArgumentException(
+                    "Provided SignatureContent does not hold PostponedSignature type of EnvelopeSignature"
+            );
         }
+        PostponedSignature postponedSignature = (PostponedSignature) signatureContent.getEnvelopeSignature();
+        EnvelopeSignature signature = signatureFactory.create(postponedSignature.getSignedDataHash());
+        postponedSignature.sign(signature);
     }
-
 }

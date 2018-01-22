@@ -21,6 +21,7 @@ package com.guardtime.envelope.verification.rule.generic;
 
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.packaging.SignatureContent;
+import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.util.DataHashException;
 import com.guardtime.envelope.verification.result.GenericVerificationResult;
 import com.guardtime.envelope.verification.result.ResultHolder;
@@ -47,8 +48,12 @@ public class SignatureSignsManifestRule extends AbstractRule<SignatureContent> {
     protected void verifyRule(ResultHolder holder, SignatureContent verifiable) throws RuleTerminatingException {
         VerificationResult result = getFailureVerificationResult();
         Manifest manifest = verifiable.getManifest();
+        EnvelopeSignature envelopeSignature = verifiable.getEnvelopeSignature();
+        if (envelopeSignature == null) {
+            throw new RuleTerminatingException("There is no EnvelopeSignature in content!");
+        }
         try {
-            DataHash signedHash = verifiable.getEnvelopeSignature().getSignedDataHash();
+            DataHash signedHash = envelopeSignature.getSignedDataHash();
             DataHash realHash = manifest.getDataHash(signedHash.getAlgorithm());
             if (realHash.equals(signedHash)) {
                 result = VerificationResult.OK;

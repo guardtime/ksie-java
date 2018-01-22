@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
 
 public class PostponedSignatureFactoryTest extends AbstractEnvelopeTest {
 
-    public static final DataHash DATA_HASH = new DataHash(HashAlgorithm.SHA2_256, "32323232323232323232323232323232".getBytes());
+    private static final DataHash DATA_HASH = new DataHash(HashAlgorithm.SHA2_256, new byte[HashAlgorithm.SHA2_256.getLength()]);
     private PostponedSignatureFactory limitedFactory = new PostponedSignatureFactory(mock(SignatureFactoryType.class));
     private final KSI mockKsi = mock(KSI.class);
     private SignatureFactory spySignatureFactory = spy(new KsiSignatureFactory(mockKsi));
@@ -66,6 +66,13 @@ public class PostponedSignatureFactoryTest extends AbstractEnvelopeTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Not supported if SignatureFactory is not provided to constructor!");
         limitedFactory.sign(mock(SignatureContent.class));
+    }
+
+    @Test
+    public void testCreatePostponedFactoryWithPostponedFactory() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Provided SignatureFactory may not be PostponedSignatureFactory");
+        new PostponedSignatureFactory(new PostponedSignatureFactory(spySignatureFactory));
     }
 
     @Test
@@ -127,5 +134,4 @@ public class PostponedSignatureFactoryTest extends AbstractEnvelopeTest {
         when(mockKsi.sign(any(DataHash.class))).thenReturn(mockKsiSignature);
         return mockSignatureContent;
     }
-
 }

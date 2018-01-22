@@ -70,6 +70,8 @@ public class AbstractEnvelopeTest {
     protected static final String ENVELOPE_WITH_RANDOM_UUID_INDEXES = "envelopes/random-uuid-indexes.ksie";
     protected static final String ENVELOPE_WITH_MULTIPLE_ANNOTATIONS = "envelopes/multiple-annotations.ksie";
     protected static final String ENVELOPE_WITH_MIXED_INDEX_TYPES = "envelopes/with-mixed-index-types.ksie";
+    protected static final String ENVELOPE_POSTPONED = "envelopes/postponed-envelope.ksie";
+    protected static final String ENVELOPE_POSTPONED_INVALID_SIGNATURE = "envelopes/postponed-envelope-invalid-signature.ksie";
     protected static final String ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION = "envelopes/non-removable-annotation.ksie";
     protected static final String ENVELOPE_WITH_MULTIPLE_SIGNATURES_WITH_SAME_SIGNING_TIME =
             "envelopes/multiple-signatures-with-same-aggregation-time.ksie";
