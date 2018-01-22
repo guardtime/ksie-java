@@ -85,6 +85,7 @@ public class PostponedSignatureFactoryIntegrationTest extends AbstractCommonInte
         testEnvelope.close();
     }
 
+    // TODO: KSIE-102 Exceptions and messages must be unified.
     @Test
     public void testReadPostponedEnvelopeUsingNonPostponedFactory() throws Exception {
         expectedException.expect(EnvelopeReadingException.class);
@@ -97,6 +98,7 @@ public class PostponedSignatureFactoryIntegrationTest extends AbstractCommonInte
         }
     }
 
+    // TODO: KSIE-102 Exceptions and messages must be unified.
     @Test
     public void testReadSignedEnvelopeUsingPostponedFactory() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
@@ -109,6 +111,7 @@ public class PostponedSignatureFactoryIntegrationTest extends AbstractCommonInte
         }
     }
 
+    // TODO: KSIE-102 Exceptions and messages must be unified.
     @Test
     public void testReadPostponedEnvelopeWithInvalidSignature() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
@@ -121,6 +124,7 @@ public class PostponedSignatureFactoryIntegrationTest extends AbstractCommonInte
         }
     }
 
+    // TODO: KSIE-102 Exceptions and messages must be unified.
     @Test
     public void testReadPostponedEnvelope() throws Exception {
         expectedException.expect(IllegalArgumentException.class);

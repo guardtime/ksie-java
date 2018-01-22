@@ -5,8 +5,6 @@ import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
-
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.mockito.Mockito.mock;
@@ -37,13 +35,10 @@ public class PostponedSignatureTest extends AbstractEnvelopeTest {
         EnvelopeSignature mockSignature = mock(EnvelopeSignature.class);
         when(mockSignature.getSignedDataHash()).thenReturn(DATA_HASH);
         signature.sign(mockSignature);
-        try {
-            signature.sign(mockSignature);
-        } catch (SignatureException e) {
-            Assert.assertTrue(e.getMessage().startsWith(
-                    "Failed to assign signature to placeholder as it already has a signature!"
-            ));
-        }
+
+        expectedException.expect(SignatureException.class);
+        expectedException.expectMessage("Failed to assign signature to placeholder as it already has a signature!");
+        signature.sign(mockSignature);
     }
 
     @Test
