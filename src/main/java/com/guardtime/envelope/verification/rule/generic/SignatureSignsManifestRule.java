@@ -38,7 +38,7 @@ import com.guardtime.ksi.hashing.DataHash;
  */
 public class SignatureSignsManifestRule extends AbstractRule<SignatureContent> {
 
-    private static final String NAME = RuleType.KSIE_VERIFY_MANIFEST_HASH.getName();
+    private static final String NAME = RuleType.KSIE_VERIFY_MANIFEST.getName();
 
     public SignatureSignsManifestRule(RuleStateProvider stateProvider) {
         super(stateProvider.getStateForRule(NAME));
@@ -73,7 +73,7 @@ public class SignatureSignsManifestRule extends AbstractRule<SignatureContent> {
 
     @Override
     public String getErrorMessage() {
-        return "Manifest hash differs from the one signed!";
+        return "Manifest hash differs from signed hash.";
     }
 
 }
