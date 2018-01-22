@@ -32,6 +32,9 @@ import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.ksi.util.Util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +49,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class ZipEnvelopeWriter implements EnvelopeWriter {
+
+    private static final Logger logger = LoggerFactory.getLogger(EnvelopeWriter.class);
 
     @Override
     public void write(Envelope envelope, OutputStream output) throws IOException {
@@ -87,9 +92,9 @@ public class ZipEnvelopeWriter implements EnvelopeWriter {
             writeEntry(documentsManifest.getPath(), documentsManifest.getInputStream(), output, writtenFiles);
             writeEntry(annotationsManifest.getPath(), annotationsManifest.getInputStream(), output, writtenFiles);
             writeSignature(signatureContent.getEnvelopeSignature(), manifest, output, writtenFiles);
-            writeDocuments(signatureContent.getDocuments(), output, writtenFiles);
             writeSingleAnnotationManifests(signatureContent.getSingleAnnotationManifests(), output, writtenFiles);
             writeAnnotations(signatureContent.getAnnotations(), output, writtenFiles);
+            writeDocuments(signatureContent.getDocuments(), output, writtenFiles);
         }
     }
 
@@ -159,6 +164,7 @@ public class ZipEnvelopeWriter implements EnvelopeWriter {
     private void writeEntry(String path, InputStream input, ZipOutputStream output, Set<String> writtenFiles) throws IOException {
         if (writtenFiles.contains(path)) {
             // Skip since the file has already been written from another SignatureContent
+            logger.debug("Skipping already written file: '{}'", path);
             return;
         }
         output.putNextEntry(new ZipEntry(path));
