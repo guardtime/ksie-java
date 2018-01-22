@@ -23,6 +23,7 @@ import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
+import com.guardtime.envelope.packaging.parsing.handler.ContentParsingException;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
 import com.guardtime.envelope.signature.SignatureFactory;
@@ -36,6 +37,7 @@ import com.guardtime.envelope.verification.rule.signature.ksi.KsiSignatureVerifi
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.verifier.policies.InternalVerificationPolicy;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -85,48 +87,35 @@ public class PostponedSignatureFactoryIntegrationTest extends AbstractCommonInte
         testEnvelope.close();
     }
 
-    // TODO: KSIE-102 Exceptions and messages must be unified.
     @Test
     public void testReadPostponedEnvelopeUsingNonPostponedFactory() throws Exception {
-        expectedException.expect(EnvelopeReadingException.class);
-        expectedException.expectMessage("Reading envelope encountered errors!");
-        try (
-                InputStream inputStream = new FileInputStream(loadFile(ENVELOPE_POSTPONED));
-                Envelope ignored = packagingFactory.read(inputStream)
-        ) {
-            //Empty
-        }
+        testEnvelopeParsingException(
+                ENVELOPE_POSTPONED,
+                ContentParsingException.class,
+                "Failed to parse content of stream as EnvelopeSignature."
+        );
     }
 
-    // TODO: KSIE-102 Exceptions and messages must be unified.
     @Test
     public void testReadSignedEnvelopeUsingPostponedFactory() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Hash algorithm id '-120' is unknown");
-        try (
-                InputStream inputStream = new FileInputStream(loadFile(ENVELOPE_WITH_ONE_DOCUMENT));
-                Envelope ignored = postponedPackagingFactory.read(inputStream)
-        ) {
-            //Empty
-        }
+        testEnvelopeParsingException(
+                ENVELOPE_WITH_ONE_DOCUMENT,
+                ContentParsingException.class,
+                "Failed to parse content of stream as EnvelopeSignature."
+        );
     }
 
-    // TODO: KSIE-102 Exceptions and messages must be unified.
     @Test
     public void testReadPostponedEnvelopeWithInvalidSignature() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Hash size(43) does not match SHA-256 size(32)");
-        try (
-                InputStream inputStream = new FileInputStream(loadFile(ENVELOPE_POSTPONED_INVALID_SIGNATURE));
-                Envelope ignored = postponedPackagingFactory.read(inputStream)
-        ) {
-            //Empty
-        }
+        testEnvelopeParsingException(
+                ENVELOPE_POSTPONED_INVALID_SIGNATURE,
+                ContentParsingException.class,
+                "Failed to parse content of stream as EnvelopeSignature."
+        );
     }
 
-    // TODO: KSIE-102 Exceptions and messages must be unified.
     @Test
-    public void testReadPostponedEnvelope() throws Exception {
+    public void testSignNormalEnvelopeWithPostponedSignatureFactory() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Provided SignatureContent does not hold PostponedSignature type of EnvelopeSignature");
         try (
@@ -185,9 +174,25 @@ public class PostponedSignatureFactoryIntegrationTest extends AbstractCommonInte
         }
     }
 
+    private void testEnvelopeParsingException(String path, Class clazz, String msg) throws Exception {
+        try (
+                InputStream inputStream = new FileInputStream(loadFile(path));
+                Envelope ignored = packagingFactory.read(inputStream)
+        ) {
+            //Empty
+        } catch (EnvelopeReadingException e) {
+            Envelope envelope = e.getEnvelope();
+            for (Throwable exception : e.getExceptions()) {
+                assertEquals(clazz, exception.getClass());
+                assertEquals(msg, exception.getMessage());
+            }
+            envelope.close();
+        }
+    }
 
     private void verify(VerificationResult expected) {
         VerifiedEnvelope verifiedEnvelope = verifier.verify(testEnvelope);
         assertEquals(expected, verifiedEnvelope.getVerificationResult());
     }
+
 }
