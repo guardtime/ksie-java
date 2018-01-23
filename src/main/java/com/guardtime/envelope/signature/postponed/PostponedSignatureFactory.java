@@ -64,7 +64,7 @@ public class PostponedSignatureFactory implements SignatureFactory {
     public EnvelopeSignature read(InputStream input) throws SignatureException {
         try {
             return new PostponedSignature<Object>(new DataHash(Util.toByteArray(input)));
-        } catch (IOException e) {
+        } catch (IllegalArgumentException | IOException e) {
             throw new SignatureException(e);
         }
     }
