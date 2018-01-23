@@ -38,7 +38,7 @@ import com.guardtime.envelope.verification.rule.state.RuleStateProvider;
  * Will terminate verification upon non OK results.
  */
 public class SignatureIntegrityRule extends AbstractRule<SignatureContent> {
-    private static final String NAME = RuleType.KSIE_VERIFY_MANIFEST.getName();
+    private static final String NAME = RuleType.KSIE_VERIFY_SIGNATURE.getName();
     private final SignatureVerifier verifier;
 
     public SignatureIntegrityRule(RuleStateProvider stateProvider, SignatureVerifier verifier) {
@@ -81,7 +81,7 @@ public class SignatureIntegrityRule extends AbstractRule<SignatureContent> {
     }
 
     public String getErrorMessage() {
-        return "Signature mismatch.";
+        return "Signature is invalid.";
     }
 
     private class WrappedSignatureResult implements SignatureResult {

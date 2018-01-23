@@ -152,9 +152,9 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
                 } else if (uri.equals("META-INF/signature-01-02-03-04-05.ksi")) {
                     verifyFailingRule(
                             content.getResults(),
-                            "KSIE_VERIFY_MANIFEST",
+                            "KSIE_VERIFY_SIGNATURE",
                             "META-INF/signature-01-02-03-04-05.ksi",
-                            "Signature mismatch."
+                            "Signature is invalid."
                     );
                     Assert.assertEquals(VerificationResult.NOK, content.getVerificationResult());
                 } else {
