@@ -6,7 +6,7 @@
 
     <groupId>com.guardtime.envelope</groupId>
     <artifactId>ksie-java</artifactId>
-    <version>0.2.153-SNAPSHOT</version>
+    <version>0.2.154-SNAPSHOT</version>
 
     <name>KSIE Java SDK</name>
 
