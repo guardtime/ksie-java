@@ -19,6 +19,11 @@
 
 package com.guardtime.envelope;
 
+
+/**
+ * List of exceptions to throw.
+ */
+
 public class EnvelopeException extends Exception {
 
     public EnvelopeException(Throwable cause) {

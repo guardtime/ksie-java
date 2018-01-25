@@ -60,6 +60,10 @@ public class EnvelopeBuilder {
 
     /**
      * Expects a {@link Envelope} as parameter to be expanded by new documents and annotations.
+     *
+     * @param existingEnvelope the existing {@link Envelope} to be expanded.
+     *
+     * @return The same {@link EnvelopeBuilder}.
      */
     public EnvelopeBuilder withExistingEnvelope(Envelope existingEnvelope) {
         this.existingEnvelope = existingEnvelope;

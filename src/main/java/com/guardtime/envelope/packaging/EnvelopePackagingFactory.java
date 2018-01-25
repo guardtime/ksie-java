@@ -139,7 +139,7 @@ public final class EnvelopePackagingFactory {
      * documents, annotations and a signature for the added elements and adds it to the {@param existingEnvelope}.
      *
      * @param existingEnvelope    An instance of {@link Envelope} which already has
-     *                             {@link EnvelopeSignature}(s)
+     *                             {@link EnvelopeSignature}(s).
      * @param files                List of {@link Document} to be added and signed. Can NOT be null.
      * @param annotations          List of {@link Annotation} to be added and signed. Can be null.
      * @throws InvalidPackageException When the input data can not be processed or signing fails.
