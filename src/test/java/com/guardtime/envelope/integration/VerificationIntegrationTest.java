@@ -557,7 +557,8 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         }
     }
 
-    private void verifyFailingRule(List<RuleVerificationResult> results, String ruleName, String testedElement, String message, boolean skipOk) {
+    private void verifyFailingRule(List<RuleVerificationResult> results, String ruleName, String testedElement,
+                                   String message, boolean skipOk) {
         for (RuleVerificationResult result : results) {
             if (result.getRuleName().equals(ruleName) &&
                     result.getTestedElementPath().equals(testedElement) &&
