@@ -117,6 +117,24 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     }
 
     @Test
+    public void testReadEnvelopeWithMissingDocumentManifest() throws Exception {
+        expectedException.expect(EnvelopeReadingException.class);
+        expectedException.expectMessage("Reading envelope encountered errors!");
+        try (Envelope ignored = getEnvelope(ENVELOPE_WITH_MISSING_DOCUMENTS_MANIFEST)) {
+            //empty
+        }
+    }
+
+    @Test
+    public void testReadEnvelopeWithMissingAnnotationsManifest() throws Exception {
+        expectedException.expect(EnvelopeReadingException.class);
+        expectedException.expectMessage("Reading envelope encountered errors!");
+        try (Envelope ignored = getEnvelope(ENVELOPE_WITH_MISSING_ANNOTATIONS_MANIFEST)) {
+            //empty
+        }
+    }
+
+    @Test
     public void testCreateEnvelope() throws Exception {
         try (
                 Envelope envelope = new EnvelopeBuilder(defaultPackagingFactory)
@@ -545,8 +563,9 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         expectedException.expectMessage("Aborting Envelope writing.");
         try (
                 InputStream inputStream = new FileInputStream(loadFile(ENVELOPE_WITH_BROKEN_SIGNATURE_CONTENT));
-                Envelope envelope = defaultPackagingFactory.read(inputStream)
+                Envelope ignored = defaultPackagingFactory.read(inputStream)
         ) {
+            //Empty
         } catch (EnvelopeReadingException e) {
             try (Envelope envelope = e.getEnvelope()) {
                 assertFalse(envelope.getSignatureContents().isEmpty());
