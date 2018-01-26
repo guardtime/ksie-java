@@ -126,8 +126,6 @@ public class HandlerSet {
             return handler.parse(stream, path);
         } catch (IOException e) {
             throw new ContentParsingException("Failed to access data for '" + path + "'!");
-        } finally {
-            parsingStore.remove(path);
         }
     }
 
@@ -139,4 +137,12 @@ public class HandlerSet {
         return parsingStore.get(path);
     }
 
+    /**
+     * Clears parsingStore of content that has already been parsed.
+     */
+    public void clear() {
+        for (String key : requestedKeys) {
+            parsingStore.remove(key);
+        }
+    }
 }

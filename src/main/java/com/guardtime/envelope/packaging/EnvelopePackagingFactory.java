@@ -60,6 +60,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -154,26 +155,15 @@ public final class EnvelopePackagingFactory {
         verifyEnvelope(existingEnvelope);
     }
 
-    private SignatureContent verifyAndSign(List<Document> files, List<Annotation> annotations,
+    private SignatureContent verifyAndSign(List<Document> documentList, List<Annotation> annotations,
                                            Envelope existingEnvelope) throws InvalidPackageException {
-        Util.notEmpty(files, "Document files");
-        validateDocumentFilenames(files);
-        HashSet<Document> documents = new HashSet<>(files);
-
-        IndexProvider indexProvider;
-        if (existingEnvelope != null) {
-            for (SignatureContent content : existingEnvelope.getSignatureContents()) {
-                documents.addAll(content.getDocuments().values());
-            }
-            indexProvider = indexProviderFactory.create(existingEnvelope);
-        } else {
-            indexProvider = indexProviderFactory.create();
-        }
-        verifyNoDuplicateDocumentNames(documents);
+        Util.notEmpty(documentList, "Document files");
+        validateDocuments(documentList, existingEnvelope);
+        IndexProvider indexProvider = getIndexProvider(existingEnvelope);
 
         try {
             return new ContentSigner(
-                    files,
+                    documentList,
                     annotations,
                     indexProvider,
                     manifestFactory,
@@ -186,14 +176,53 @@ public final class EnvelopePackagingFactory {
         }
     }
 
-    private void validateDocumentFilenames(List<Document> files) {
-        for (Document document : files) {
+    private void validateDocuments(List<Document> documentList, Envelope existingEnvelope) {
+        Set<Document> documentSet = new HashSet<>(documentList);
+        List<String> allowedDocumentNames = new ArrayList<>();
+        if (existingEnvelope != null) {
+            for (SignatureContent content : existingEnvelope.getSignatureContents()) {
+                documentSet.addAll(content.getDocuments().values());
+                allowedDocumentNames.add(content.getManifest().getSignatureReference().getUri());
+                allowedDocumentNames.add(content.getManifest().getPath());
+                allowedDocumentNames.add(content.getDocumentsManifest().getPath());
+                allowedDocumentNames.add(content.getAnnotationsManifest().getPath());
+            }
+            documentSet.addAll(existingEnvelope.getUnknownFiles()); // Don't allow existing unknown file to clash
+        }
+        verifyNoDuplicateDocumentNames(documentSet);
+        validateDocumentFilenames(documentSet, allowedDocumentNames);
+    }
+
+    private void verifyNoDuplicateDocumentNames(Set<Document> documents) throws IllegalArgumentException {
+        Set<String> uniqueDocumentNames = new HashSet<>();
+        for (Document doc : documents) {
+            uniqueDocumentNames.add(doc.getFileName());
+        }
+
+        if (uniqueDocumentNames.size() < documents.size()) {
+            throw new IllegalArgumentException("Found multiple documents with same name!");
+        }
+    }
+
+    private void validateDocumentFilenames(Collection<Document> documentList, List<String> allowedDocumentNames) {
+        for (Document document : documentList) {
             String filename = document.getFileName();
+            if (allowedDocumentNames.contains(filename)) {
+                continue;
+            }
             if (filename.equals(META_INF) ||
                     filename.startsWith(META_INF + "/") ||
                     filename.equals(MIME_TYPE_ENTRY_NAME)) {
                 throw new IllegalArgumentException("File name is not valid! File name: " + filename);
             }
+        }
+    }
+
+    private IndexProvider getIndexProvider(Envelope existingEnvelope) {
+        if (existingEnvelope != null) {
+            return indexProviderFactory.create(existingEnvelope);
+        } else {
+            return indexProviderFactory.create();
         }
     }
 
@@ -217,17 +246,6 @@ public final class EnvelopePackagingFactory {
                 }
             }
             throw new InvalidPackageException("Created envelope did not pass internal verification");
-        }
-    }
-
-    private void verifyNoDuplicateDocumentNames(Set<Document> documents) throws IllegalArgumentException {
-        Set<String> uniqueDocumentNames = new HashSet<>();
-        for (Document doc : documents) {
-            uniqueDocumentNames.add(doc.getFileName());
-        }
-
-        if (uniqueDocumentNames.size() < documents.size()) {
-            throw new IllegalArgumentException("Found multiple documents with same name!");
         }
     }
 
