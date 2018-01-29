@@ -35,7 +35,6 @@ import com.guardtime.envelope.packaging.parsing.handler.MimeTypeHandler;
 import com.guardtime.envelope.packaging.parsing.handler.SignatureHandler;
 import com.guardtime.envelope.packaging.parsing.handler.SingleAnnotationManifestHandler;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.signature.SignatureFactory;
 
@@ -51,8 +50,10 @@ import static com.guardtime.envelope.packaging.EnvelopeWriter.MIME_TYPE_ENTRY_NA
 
 /**
  * Helper that manages different {@link ContentHandler} instances and parsed in envelope content.
+ * Converts entries in ParsingStore to appropriate {@link com.guardtime.envelope.EnvelopeElement} by using different
+ * {@link ContentHandler}s.
  */
-public class HandlerSet {
+class EnvelopeElementExtractor {
     private final ParsingStore parsingStore;
     private final MimeTypeHandler mimeTypeHandler;
     private final ManifestHandler manifestHandler;
@@ -62,7 +63,7 @@ public class HandlerSet {
     private final SignatureHandler signatureHandler;
     private final Set<String> requestedKeys = new HashSet<>();
 
-    HandlerSet(EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory, ParsingStore store) {
+    EnvelopeElementExtractor(EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory, ParsingStore store) {
         this.mimeTypeHandler = new MimeTypeHandler();
         this.manifestHandler = new ManifestHandler(manifestFactory);
         this.documentsManifestHandler = new DocumentsManifestHandler(manifestFactory);
@@ -71,10 +72,6 @@ public class HandlerSet {
         this.signatureHandler = new SignatureHandler(signatureFactory);
         this.parsingStore = store;
 
-    }
-
-    public void add(String name, InputStream input) throws ParsingStoreException {
-        parsingStore.store(name, input);
     }
 
     public List<UnknownDocument> getUnrequestedFiles() {
@@ -121,6 +118,14 @@ public class HandlerSet {
         return parse(signatureHandler, path);
     }
 
+    public InputStream getDocumentStream(String path) throws ContentParsingException {
+        return getInputStream(path);
+    }
+
+    public InputStream getAnnotationDataStream(String path) throws ContentParsingException {
+        return getInputStream(path);
+    }
+
     private  <T> T parse(ContentHandler<T> handler, String path) throws ContentParsingException {
         try (InputStream stream = getInputStream(path)) {
             return handler.parse(stream, path);
@@ -131,12 +136,11 @@ public class HandlerSet {
         }
     }
 
-    public InputStream getInputStream(String path) throws ContentParsingException {
+    private InputStream getInputStream(String path) throws ContentParsingException {
         requestedKeys.add(path);
         if (!parsingStore.contains(path)) {
             throw new ContentParsingException("No content stored for entry '" + path + "'!");
         }
         return parsingStore.get(path);
     }
-
 }
