@@ -301,6 +301,42 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
+    public void testVerifyEnvelopeWithMissingAnnotations() throws Exception {
+        try (Envelope envelope = getEnvelope(ENVELOPE_WITH_MISSING_ANNOTATION)) {
+            VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
+            Assert.assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
+            verifyFailingRule(
+                    verifiedEnvelope.getResults(),
+                    "KSIE_VERIFY_ANNOTATION_EXISTS",
+                    "META-INF/annotation-1.tlv",
+                    "Annotation meta-data missing.",
+                    true
+            );
+            verifyFailingRule(
+                    verifiedEnvelope.getResults(),
+                    "KSIE_VERIFY_ANNOTATION_EXISTS",
+                    "META-INF/annotation-2.tlv",
+                    "Annotation meta-data missing.",
+                    true
+            );
+        }
+    }
+
+    @Test
+    public void testVerifyEnvelopeWithMissingNonRemovableAnnotationData() throws Exception {
+        try (Envelope envelope = getEnvelope(ENVELOPE_WITH_MISSING_ANNOTATION_DATA_NON_REMOVABLE)) {
+            VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
+            Assert.assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
+            verifyFailingRule(
+                    verifiedEnvelope.getResults(),
+                    "KSIE_VERIFY_ANNOTATION_DATA_EXISTS",
+                    "META-INF/annotation-1.dat",
+                    "Annotation data missing."
+            );
+        }
+    }
+
+    @Test
     public void testEnvelopeWithInvalidSignature_VerificationFails() throws Exception {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_WRONG_SIGNATURE_FILE)) {
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
@@ -521,16 +557,21 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         }
     }
 
-    private void verifyFailingRule(List<RuleVerificationResult> results, String ruleName, String testedElement, String message) {
+    private void verifyFailingRule(List<RuleVerificationResult> results, String ruleName, String testedElement,
+                                   String message, boolean skipOk) {
         for (RuleVerificationResult result : results) {
             if (result.getRuleName().equals(ruleName) &&
                     result.getTestedElementPath().equals(testedElement) &&
                     result.getRuleErrorMessage().equals(message)) {
                 Assert.assertEquals(VerificationResult.NOK, result.getVerificationResult());
-            } else {
+            } else if (!skipOk) {
                 Assert.assertEquals(VerificationResult.OK, result.getVerificationResult());
             }
         }
+    }
+
+    private void verifyFailingRule(List<RuleVerificationResult> results, String ruleName, String testedElement, String message) {
+        verifyFailingRule(results, ruleName, testedElement, message, false);
     }
 
     private EnvelopeVerifier getEnvelopeVerifier(Policy policy) {
