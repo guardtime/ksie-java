@@ -47,11 +47,9 @@ import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.unisignature.verifier.PolicyVerificationResult;
 import com.guardtime.ksi.unisignature.verifier.VerificationErrorCode;
 import com.guardtime.ksi.unisignature.verifier.VerificationResultCode;
-import com.guardtime.ksi.unisignature.verifier.policies.CalendarBasedVerificationPolicy;
-import com.guardtime.ksi.unisignature.verifier.policies.KeyBasedVerificationPolicy;
+import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicy;
+import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicyAdapter;
 import com.guardtime.ksi.unisignature.verifier.policies.Policy;
-import com.guardtime.ksi.unisignature.verifier.policies.PublicationsFileBasedVerificationPolicy;
-import com.guardtime.ksi.unisignature.verifier.policies.UserProvidedPublicationBasedVerificationPolicy;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -77,7 +75,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     @Before
     public void setUpVerifier() {
         this.defaultPolicy = new DefaultVerificationPolicy(
-                new KsiSignatureVerifier(ksi, new com.guardtime.ksi.unisignature.verifier.policies.InternalVerificationPolicy())
+                new KsiSignatureVerifier(ContextAwarePolicyAdapter.createInternalPolicy())
         );
         this.verifier = new EnvelopeVerifier(defaultPolicy);
     }
@@ -142,7 +140,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     public void testVerifyingEnvelopeWithValidAndInvalidSignatures() throws Exception {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTI_CONTENT_ONE_SIGNATURE_IS_INVALID)) {
             EnvelopeVerifier verifier = new EnvelopeVerifier(
-                    new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, new KeyBasedVerificationPolicy()))
+                    new DefaultVerificationPolicy(new KsiSignatureVerifier(ContextAwarePolicyAdapter.createKeyPolicy(ksi)))
             );
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             for (VerifiedSignatureContent content : verifiedEnvelope.getVerifiedSignatureContents()) {
@@ -358,7 +356,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testUsingInternalVerification() throws Exception {
-        Policy signatureVerificationPolicy = new com.guardtime.ksi.unisignature.verifier.policies.InternalVerificationPolicy();
+        ContextAwarePolicy signatureVerificationPolicy = ContextAwarePolicyAdapter.createInternalPolicy();
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_WRONG_SIGNATURE_FILE)) {
             EnvelopeVerifier verifier = getEnvelopeVerifier(signatureVerificationPolicy);
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
@@ -379,7 +377,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testUsingCalendarBasedVerification() throws Exception {
-        Policy signatureVerificationPolicy = new CalendarBasedVerificationPolicy();
+        ContextAwarePolicy signatureVerificationPolicy = ContextAwarePolicyAdapter.createCalendarPolicy(ksi);
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_SIGNATURE_FILE)) {
             EnvelopeVerifier verifier = getEnvelopeVerifier(signatureVerificationPolicy);
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
@@ -400,7 +398,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testUsingKeyBasedVerification_NOK() throws Exception {
-        Policy signatureVerificationPolicy = new KeyBasedVerificationPolicy();
+        ContextAwarePolicy signatureVerificationPolicy = ContextAwarePolicyAdapter.createKeyPolicy(ksi);
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_SIGNATURE_FILE)) {
             EnvelopeVerifier verifier = getEnvelopeVerifier(signatureVerificationPolicy);
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
@@ -421,16 +419,12 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testUsingUserPublicationBasedVerification_NOK() throws Exception {
-        Policy signatureVerificationPolicy = new UserProvidedPublicationBasedVerificationPolicy();
+        ContextAwarePolicy signatureVerificationPolicy = ContextAwarePolicyAdapter.createUserProvidedPublicationPolicy(
+                new PublicationData("AAAAAA-CX4K4D-6AMFWE-EMMHOH-WZT2ZR-Q5MUMQ-DGYCW5-LV5IID-GA672M-LHP5GW-GUGHQN-DA7CGV")
+        );
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_AND_EXTENDED_SIGNATURE_FILE)) {
             VerificationPolicy policy = new DefaultVerificationPolicy(
-                    new KsiSignatureVerifier(
-                            ksi,
-                            signatureVerificationPolicy,
-                            new PublicationData(
-                                    "AAAAAA-CX4K4D-6AMFWE-EMMHOH-WZT2ZR-Q5MUMQ-DGYCW5-LV5IID-GA672M-LHP5GW-GUGHQN-DA7CGV"
-                            )
-                    )
+                    new KsiSignatureVerifier(signatureVerificationPolicy)
             );
             EnvelopeVerifier verifier = new EnvelopeVerifier(policy);
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
@@ -451,7 +445,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testUsingPublicationFileBasedVerification() throws Exception {
-        Policy signatureVerificationPolicy = new PublicationsFileBasedVerificationPolicy();
+        ContextAwarePolicy signatureVerificationPolicy = ContextAwarePolicyAdapter.createPublicationsFilePolicy(ksi, ksi);
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_SIGNATURE_FILE)) {
             EnvelopeVerifier verifier = getEnvelopeVerifier(signatureVerificationPolicy);
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
@@ -473,7 +467,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testEnvelopeWithValidSignature_VerificationSucceeds() throws Exception {
         VerificationPolicy policy = new DefaultVerificationPolicy(
-                new KsiSignatureVerifier(ksi, new CalendarBasedVerificationPolicy())
+                new KsiSignatureVerifier(ContextAwarePolicyAdapter.createCalendarPolicy(ksi))
         );
         EnvelopeVerifier envelopeVerifier = new EnvelopeVerifier(policy);
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_ONE_DOCUMENT)) {
@@ -574,9 +568,9 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         verifyFailingRule(results, ruleName, testedElement, message, false);
     }
 
-    private EnvelopeVerifier getEnvelopeVerifier(Policy policy) {
+    private EnvelopeVerifier getEnvelopeVerifier(ContextAwarePolicy policy) {
         VerificationPolicy envelopePolicy = new DefaultVerificationPolicy(
-                new KsiSignatureVerifier(ksi, policy)
+                new KsiSignatureVerifier(policy)
         );
         return new EnvelopeVerifier(envelopePolicy);
     }
@@ -604,7 +598,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     private void baseTestCreateEnvelopeUsingEmptyEnvelopeDocumentAndAddDocumentData(
             VerificationResult verificationResult, byte[] expectedDocumentContent, byte[] addedDocumentContent) throws Exception {
         EnvelopeVerifier envelopeVerifier =
-                getEnvelopeVerifier(new com.guardtime.ksi.unisignature.verifier.policies.InternalVerificationPolicy());
+                getEnvelopeVerifier(ContextAwarePolicyAdapter.createInternalPolicy());
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
                 .withVerificationPolicy(new LimitedInternalVerificationPolicy())
