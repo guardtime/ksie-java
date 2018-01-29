@@ -48,17 +48,17 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SignatureContentHandler {
+class SignatureContentComposer {
 
-    private static final Logger logger = LoggerFactory.getLogger(SignatureContentHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(SignatureContentComposer.class);
 
-    private final HandlerSet handler;
+    private final EnvelopeElementExtractor handler;
 
-    public SignatureContentHandler(HandlerSet handlerSet) {
-        this.handler = handlerSet;
+    SignatureContentComposer(EnvelopeElementExtractor envelopeElementExtractor) {
+        this.handler = envelopeElementExtractor;
     }
 
-    public Pair<SignatureContent, List<Throwable>> get(String manifestPath, ParsingStoreFactory parsingStoreFactory)
+    public Pair<SignatureContent, List<Throwable>> compose(String manifestPath, ParsingStoreFactory parsingStoreFactory)
             throws ContentParsingException, ParsingStoreException {
         SignatureContentGroup group = new SignatureContentGroup(manifestPath, parsingStoreFactory.create());
         SignatureContent signatureContent = new SignatureContent.Builder()
@@ -134,7 +134,7 @@ public class SignatureContentHandler {
         private Document fetchDocumentFromHandler(FileReference reference) {
             if (invalidReference(reference)) return null;
             String documentUri = reference.getUri();
-            try (InputStream stream = handler.getInputStream(documentUri)) {
+            try (InputStream stream = handler.getDocumentStream(documentUri)) {
                 parsingStore.store(documentUri, stream);
                 return new ParsedDocument(parsingStore, documentUri, reference.getMimeType(), documentUri);
             } catch (ContentParsingException | ParsingStoreException | IOException e) {
@@ -185,7 +185,7 @@ public class SignatureContentHandler {
             }
             AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
             String uri = annotationDataReference.getUri();
-            try (InputStream stream = handler.getInputStream(uri)) {
+            try (InputStream stream = handler.getAnnotationDataStream(uri)) {
                 parsingStore.store(uri, stream);
                 Annotation annotation = new ParsedAnnotation(parsingStore, uri, annotationDataReference.getDomain(), type);
                 annotation.setPath(uri);
