@@ -101,7 +101,7 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
                 .setPublicationsFileTrustedCertSelector(new X509CertificateSubjectRdnSelector("E=publications@guardtime.com"))
                 .setPublicationsFilePkiTrustStore(TRUST_STORE_FILE, TRUST_STORE_PASSWORD)
                 .build();
-        signatureFactory = new KsiSignatureFactory(ksi);
+        signatureFactory = new KsiSignatureFactory(ksi, ksi);
         packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
                 .build();

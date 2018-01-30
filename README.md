@@ -30,14 +30,14 @@ Optionally other specifiers can be set:
 Following is the example of creating a packaging factory for ZIP based envelopes with TLV manifest structures and KSI based signatures, which will be the basis for the rest of the code examples:
 
 ```java
-KSI ksi;
-/* Initialize KSI
+Signer signer;
+Reader reader;
+/* Initialize KSI Signer and Reader
 ...
 */
-SignatureFactory signatureFactory = new KsiSignatureFactory(ksi);
+SignatureFactory signatureFactory = new KsiSignatureFactory(signer, reader);
 ZipEnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().withSignatureFactory(signatureFactory).build();
 ```
-
 
 ### Creating the Envelope
 
@@ -115,7 +115,11 @@ For extending it is necessary to specify the `SignatureFactory` implementation t
 The following example shows extending of all signatures in an envelope.
 
 ```java
-ExtendingPolicy extendingPolicy = new KsiEnvelopeSignatureExtendingPolicy(ksi)
+Extender extender;
+/* Initialize KSI Extender
+...
+*/
+ExtendingPolicy extendingPolicy = new KsiEnvelopeSignatureExtendingPolicy(extender)
 EnvelopeSignatureExtender signatureExtender = new EnvelopeSignatureExtender(signatureFactory, extendingPolicy)
 ExtendedEnvelope extendedEnvelope = signatureExtender.extend(Envelope);
 extendedEnvelope.isExtended();
@@ -129,11 +133,15 @@ extendedEnvelope.getExtendedSignatureContents().get(0).isExtended();
 The following example shows a simple verification for an envelope.
 
 ```java
+ContextAwarePolicy contextAwarePolicy;
+/* Initialize KSI verification context e.g. ContextAwarePolicyAdapter.createInternalPolicy()
+...
+*/
 List<Rule> implicitRules;
 /* Initialize array and specify any rules deemed missing and necessary from the DefaultVerificationPolicy
 ...
 */
-Rule signatureRule = new KsiPolicyBasedSignatureIntegrityRule(ksi, KeyBasedVerificationPolicy());
+Rule signatureRule = new KsiPolicyBasedSignatureIntegrityRule(contextAwarePolicy);
 DefaultVerificationPolicy policy = new DefaultVerificationPolicy(signatureRule, new MimeTypeIntegrityRule(packagingFactory), implicitRules);
 EnvelopeVerifier verifier = new EnvelopeVerifier(policy);
 VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);

@@ -30,14 +30,14 @@ import org.mockito.Mockito;
 public class KsiEnvelopeSignatureExtendingPolicyTest extends AbstractEnvelopeTest {
 
     @Test
-    public void testCreatingKsiEnvelopeSignatureExtenderWithoutKsi_ThrowsNullPointerException() {
+    public void testCreatingKsiEnvelopeSignatureExtenderWithoutExtender_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("KSI");
+        expectedException.expectMessage("Extender");
         new KsiEnvelopeSignatureExtendingPolicy(null);
     }
 
     @Test
-    public void testExtendingDelegatesToKsi() throws Exception {
+    public void testExtendingDelegatesToExtender() throws Exception {
         KSI mockKsi = Mockito.mock(KSI.class);
         ExtendingPolicy<KSISignature> extendingPolicy = new KsiEnvelopeSignatureExtendingPolicy(mockKsi);
         extendingPolicy.getExtendedSignature(Mockito.mock(KSISignature.class));

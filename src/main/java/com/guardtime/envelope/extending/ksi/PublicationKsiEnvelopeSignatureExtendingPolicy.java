@@ -23,7 +23,7 @@ import com.guardtime.envelope.extending.ExtendingPolicy;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.envelope.util.Util;
-import com.guardtime.ksi.KSI;
+import com.guardtime.ksi.Extender;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.publication.PublicationRecord;
 import com.guardtime.ksi.unisignature.KSISignature;
@@ -34,12 +34,12 @@ import com.guardtime.ksi.unisignature.KSISignature;
  */
 public class PublicationKsiEnvelopeSignatureExtendingPolicy implements ExtendingPolicy<KSISignature> {
     private final PublicationRecord publicationRecord;
-    protected final KSI ksi;
+    protected final Extender extender;
 
-    public PublicationKsiEnvelopeSignatureExtendingPolicy(KSI ksi, PublicationRecord publicationRecord) {
-        Util.notNull(ksi, "KSI");
+    public PublicationKsiEnvelopeSignatureExtendingPolicy(Extender extender, PublicationRecord publicationRecord) {
+        Util.notNull(extender, "Extender");
         Util.notNull(publicationRecord, "Publication record");
-        this.ksi = ksi;
+        this.extender = extender;
         this.publicationRecord = publicationRecord;
     }
 
@@ -48,7 +48,7 @@ public class PublicationKsiEnvelopeSignatureExtendingPolicy implements Extending
             if (ksiSignature.getAggregationTime().after(publicationRecord.getPublicationTime())) {
                 throw new SignatureException("Publication time is before signature!");
             }
-            return ksi.extend(ksiSignature, publicationRecord);
+            return extender.extend(ksiSignature, publicationRecord);
         } catch (KSIException e) {
             throw new SignatureException(e);
         }

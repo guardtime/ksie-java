@@ -36,7 +36,7 @@ import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.envelope.verification.rule.signature.ksi.KsiSignatureVerifier;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
-import com.guardtime.ksi.unisignature.verifier.policies.InternalVerificationPolicy;
+import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicyAdapter;
 
 import org.junit.After;
 import org.junit.Before;
@@ -78,7 +78,7 @@ public class PostponedSignatureFactoryIntegrationTest extends AbstractCommonInte
         );
 
         verifier = new EnvelopeVerifier(
-                new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, new InternalVerificationPolicy()))
+                new DefaultVerificationPolicy(new KsiSignatureVerifier(ContextAwarePolicyAdapter.createInternalPolicy()))
         );
     }
 

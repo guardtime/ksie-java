@@ -23,25 +23,25 @@ import com.guardtime.envelope.extending.ExtendingPolicy;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.envelope.util.Util;
-import com.guardtime.ksi.KSI;
+import com.guardtime.ksi.Extender;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.unisignature.KSISignature;
 
 /**
  * Extends all {@link KSISignature}s in {@link Envelope} to the "closest" publication
- * in publication file available to provided {@link KSI}.
+ * in publication file available to provided {@link Extender}.
  */
 public class KsiEnvelopeSignatureExtendingPolicy implements ExtendingPolicy<KSISignature> {
-    protected final KSI ksi;
+    protected final Extender extender;
 
-    public KsiEnvelopeSignatureExtendingPolicy(KSI ksi) {
-        Util.notNull(ksi, "KSI");
-        this.ksi = ksi;
+    public KsiEnvelopeSignatureExtendingPolicy(Extender extender) {
+        Util.notNull(extender, "Extender");
+        this.extender = extender;
     }
 
     public KSISignature getExtendedSignature(KSISignature ksiSignature) throws SignatureException {
         try {
-            return ksi.extend(ksiSignature);
+            return extender.extend(ksiSignature);
         } catch (KSIException e) {
             throw new SignatureException(e);
         }
