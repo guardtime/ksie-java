@@ -38,7 +38,7 @@ import java.util.List;
 import static com.guardtime.envelope.util.Util.notNull;
 
 /**
- * Helper for creating a envelope with the provided documents and annotations.
+ * Helper for creating an envelope with the provided documents and annotations.
  */
 public class EnvelopeBuilder {
 
@@ -52,6 +52,8 @@ public class EnvelopeBuilder {
 
     /**
      * Expects a {@link EnvelopePackagingFactory} as parameter to be used for creating the envelope.
+     *
+     * @param packagingFactory
      */
     public EnvelopeBuilder(EnvelopePackagingFactory packagingFactory) {
         notNull(packagingFactory, "Packaging factory");

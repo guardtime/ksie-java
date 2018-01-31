@@ -21,7 +21,7 @@ package com.guardtime.envelope;
 
 
 /**
- * List of exceptions to throw.
+ * List of KSIE exceptions to throw.
  */
 
 public class EnvelopeException extends Exception {
