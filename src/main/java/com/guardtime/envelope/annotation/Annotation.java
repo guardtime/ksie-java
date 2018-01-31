@@ -25,8 +25,14 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Represents annotations that can be used in envelope. Combines annotation data and annotation
+ * Represents annotations that can be used in the envelope. Combines annotation data and annotation
  * meta-data into one object.
+ * <p>
+ * Annotation can be any key-value pair that the user finds to be reasonable to describe the signed data.
+ * E.g. information about the author and/or contents of the document to be signed.
+ * While creating the annotation, the {@link EnvelopeAnnotationType} should be chosen wisely according to the user's needs:
+ * removable, partly removable, non-removable.
+ * </p>
  */
 public interface Annotation extends AutoCloseable, EnvelopeElement {
 
@@ -35,13 +41,15 @@ public interface Annotation extends AutoCloseable, EnvelopeElement {
     String getDomain();
 
     /**
-     * Returns {@link InputStream} containing the annotation data.
-     * @throws IOException when there is a problem creating or accessing the InputStream.
+     * @return {@link InputStream} containing the annotation data.
+     * @throws IOException when there is a problem creating or accessing the {@link InputStream}.
      */
     InputStream getInputStream() throws IOException;
 
     /**
      * Sets the path value used by {@link EnvelopeElement#getPath()}.
+     *
+     * @param path
      */
     void setPath(String path);
 

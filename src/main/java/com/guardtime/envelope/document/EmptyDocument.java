@@ -30,11 +30,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents a document in a envelope which doesn't store the document data in the envelope.
+ * Represents a document in a envelope which doesn't store the document data in the same envelope.
  */
 public class EmptyDocument extends AbstractDocument {
     private final Map<HashAlgorithm, DataHash> dataHashMap;
 
+    /**
+     * Creates a new {@link EmptyDocument} with the given properties.
+     *
+     * @param fileName name of the {@link EmptyDocument}
+     * @param mimeType
+     * @param hashes
+     */
     public EmptyDocument(String fileName, String mimeType, List<DataHash> hashes) {
         super(mimeType, fileName);
         Util.notEmpty(hashes, "Data hash list");
