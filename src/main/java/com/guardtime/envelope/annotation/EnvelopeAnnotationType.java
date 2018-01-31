@@ -28,14 +28,14 @@ import java.util.Map;
 public enum EnvelopeAnnotationType {
 
     /**
-     * The whole annotation, meaning its value and the TLV element containing its meta-data, can be removed from the envelope
+     * The whole annotation, meaning its value and its meta-data, can be removed from the envelope
      * without breaking the integrity of the envelope's contents.
      */
     FULLY_REMOVABLE("ksie10/removable-fully"),
 
     /**
      * The value of the annotation can be removed without breaking the integrity of the envelope.
-     * The TLV element containing the annotation's meta-data must stay intact.
+     * The annotation's meta-data must stay intact.
      */
     VALUE_REMOVABLE("ksie10/removable-value"),
 
