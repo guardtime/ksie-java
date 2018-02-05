@@ -53,5 +53,11 @@ public interface Document extends EnvelopeElement, AutoCloseable {
      * Returns true for any document that's InputSteam can be accessed and data extracted from it.
      */
     boolean isWritable();
+
+    @Override
+    boolean equals(Object o);
+
+    @Override
+    int hashCode();
 }
 

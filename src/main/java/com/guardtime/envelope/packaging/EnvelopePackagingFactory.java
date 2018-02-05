@@ -178,7 +178,7 @@ public final class EnvelopePackagingFactory {
 
     private void validateDocuments(List<Document> documentList, Envelope existingEnvelope) {
         Set<Document> documentSet = new HashSet<>(documentList);
-        List<String> allowedDocumentNames = new ArrayList<>();
+        Set<String> allowedDocumentNames = new HashSet<>();
         if (existingEnvelope != null) {
             for (SignatureContent content : existingEnvelope.getSignatureContents()) {
                 documentSet.addAll(content.getDocuments().values());
@@ -204,7 +204,7 @@ public final class EnvelopePackagingFactory {
         }
     }
 
-    private void validateDocumentFilenames(Collection<Document> documentList, List<String> allowedDocumentNames) {
+    private void validateDocumentFilenames(Collection<Document> documentList, Set<String> allowedDocumentNames) {
         for (Document document : documentList) {
             String filename = document.getFileName();
             if (allowedDocumentNames.contains(filename)) {

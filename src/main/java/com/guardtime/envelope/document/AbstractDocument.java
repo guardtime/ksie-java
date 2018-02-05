@@ -27,6 +27,7 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.guardtime.envelope.util.Util.notNull;
@@ -98,18 +99,26 @@ public abstract class AbstractDocument implements Document {
 
     @Override
     public boolean equals(Object o) {
-        try {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-            Document that = (Document) o;
+        Document that = (Document) o;
 
-            if (getFileName() != null ? !getFileName().equals(that.getFileName()) : that.getFileName() != null) return false;
-            if (getMimeType() != null ? !getMimeType().equals(that.getMimeType()) : that.getMimeType() != null) return false;
-            return this.getDataHash(HASH_ALGORITHM).equals(that.getDataHash(HASH_ALGORITHM));
-        } catch (DataHashException e) {
-            return false;
+        if (getFileName() != null ? !getFileName().equals(that.getFileName()) : that.getFileName() != null) return false;
+        if (getMimeType() != null ? !getMimeType().equals(that.getMimeType()) : that.getMimeType() != null) return false;
+        for (HashAlgorithm algorithm : HashAlgorithm.getImplementedHashAlgorithms()) {
+            if (algorithm.isDeprecated(new Date())) {
+                continue;
+            }
+            try {
+                if (!this.getDataHash(algorithm).equals(that.getDataHash(algorithm))) {
+                    return false;
+                }
+            } catch (DataHashException e) {
+                // ignore since it is an EmptyDocument that can't generate new hash
+            }
         }
+        return true;
     }
 
     @Override
