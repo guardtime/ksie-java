@@ -25,7 +25,8 @@ import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.envelope.signature.SignatureFactory;
 import com.guardtime.envelope.signature.SignatureFactoryType;
 import com.guardtime.envelope.util.Util;
-import com.guardtime.ksi.KSI;
+import com.guardtime.ksi.Reader;
+import com.guardtime.ksi.Signer;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.unisignature.KSISignature;
@@ -33,24 +34,26 @@ import com.guardtime.ksi.unisignature.KSISignature;
 import java.io.InputStream;
 
 /**
- * Uses {@link KSI} for the underlying signature logic.
+ * Uses KSI {@link Signer} and {@link Reader} for the underlying signature handling logic.
  */
 public class KsiSignatureFactory implements SignatureFactory {
 
     private static final KsiSignatureFactoryType SIGNATURE_FACTORY_TYPE = new KsiSignatureFactoryType();
 
-    private final KSI ksi;
+    private final Signer signer;
+    private final Reader reader;
 
-    public KsiSignatureFactory(KSI ksi) {
-        Util.notNull(ksi, "KSI");
-        this.ksi = ksi;
+    public KsiSignatureFactory(Signer signer, Reader reader) {
+        this.signer = signer;
+        this.reader = reader;
     }
 
     @Override
     public KsiEnvelopeSignature create(DataHash hash) throws SignatureException {
-        Util.notNull(ksi, "DataHash");
+        Util.notNull(signer, "Signer");
+        Util.notNull(hash, "DataHash");
         try {
-            KSISignature signature = ksi.sign(hash);
+            KSISignature signature = signer.sign(hash);
             return new KsiEnvelopeSignature(signature);
         } catch (KSIException e) {
             throw new SignatureException(e);
@@ -59,9 +62,10 @@ public class KsiSignatureFactory implements SignatureFactory {
 
     @Override
     public KsiEnvelopeSignature read(InputStream input) throws SignatureException {
-        Util.notNull(ksi, "Input stream");
+        Util.notNull(reader, "Reader");
+        Util.notNull(input, "Input stream");
         try {
-            KSISignature signature = ksi.read(input);
+            KSISignature signature = reader.read(input);
             return new KsiEnvelopeSignature(signature);
         } catch (KSIException e) {
             throw new SignatureException(e);

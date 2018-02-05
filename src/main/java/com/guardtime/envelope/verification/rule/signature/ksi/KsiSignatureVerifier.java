@@ -27,29 +27,20 @@ import com.guardtime.envelope.verification.result.SignatureResult;
 import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.envelope.verification.rule.RuleTerminatingException;
 import com.guardtime.envelope.verification.rule.signature.SignatureVerifier;
-import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
-import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.unisignature.KSISignature;
-import com.guardtime.ksi.unisignature.verifier.policies.Policy;
+import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicy;
 
 public class KsiSignatureVerifier implements SignatureVerifier<KSISignature> {
 
-    protected final KSI ksi;
-    protected final Policy policy;
-    private PublicationData publication;
+    protected final com.guardtime.ksi.SignatureVerifier verifier = new com.guardtime.ksi.SignatureVerifier();
+    protected final ContextAwarePolicy contextAwarePolicy;
 
-    public KsiSignatureVerifier(KSI ksi, Policy policy) {
-        this(ksi, policy, null);
-    }
-
-    public KsiSignatureVerifier(KSI ksi, Policy policy, PublicationData publicationData) {
-        Util.notNull(ksi, "KSI instance");
-        this.ksi = ksi;
-        this.policy = policy;
-        this.publication = publicationData;
+    public KsiSignatureVerifier(ContextAwarePolicy policy) {
+        Util.notNull(policy, "Context aware policy");
+        this.contextAwarePolicy = policy;
     }
 
     @Override
@@ -65,7 +56,7 @@ public class KsiSignatureVerifier implements SignatureVerifier<KSISignature> {
             HashAlgorithm hashAlgorithm = signature.getInputHash().getAlgorithm();
             DataHash realHash = manifest.getDataHash(hashAlgorithm);
             com.guardtime.ksi.unisignature.verifier.VerificationResult ksiVerificationResult =
-                    ksi.verify(signature, policy, realHash, publication);
+                    verifier.verify(signature, realHash, contextAwarePolicy);
             if (ksiVerificationResult.isOk()) {
                 ruleResult = VerificationResult.OK;
             }

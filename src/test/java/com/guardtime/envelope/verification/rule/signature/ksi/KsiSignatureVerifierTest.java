@@ -22,65 +22,36 @@ package com.guardtime.envelope.verification.rule.signature.ksi;
 import com.guardtime.envelope.AbstractEnvelopeTest;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.signature.EnvelopeSignature;
-import com.guardtime.envelope.verification.result.SignatureResult;
 import com.guardtime.envelope.verification.rule.RuleTerminatingException;
 import com.guardtime.envelope.verification.rule.signature.SignatureVerifier;
-import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
-import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.unisignature.KSISignature;
-import com.guardtime.ksi.unisignature.verifier.VerificationResult;
-import com.guardtime.ksi.unisignature.verifier.policies.Policy;
+import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicy;
 
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class KsiSignatureVerifierTest extends AbstractEnvelopeTest {
 
     @Test
-    public void testCreateWithoutKSI_ThrowsNullPointerException() {
+    public void testCreateWithoutContext_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("KSI");
-        new KsiSignatureVerifier(null, null);
+        expectedException.expectMessage("Context aware policy");
+        new KsiSignatureVerifier(null);
     }
 
     @Test
     public void testIsSupportedReturnsTrueForKSISignatures() {
         EnvelopeSignature mockEnvelopeSignature = Mockito.mock(EnvelopeSignature.class);
         when(mockEnvelopeSignature.getSignature()).thenReturn(Mockito.mock(KSISignature.class));
-        SignatureVerifier verifier = new KsiSignatureVerifier(Mockito.mock(KSI.class), Mockito.mock(Policy.class));
+        SignatureVerifier verifier = new KsiSignatureVerifier(Mockito.mock(ContextAwarePolicy.class));
 
         assertTrue(verifier.isSupported(mockEnvelopeSignature));
-    }
-
-    @Test
-    public void testVerifyUsesPublicationData() throws Exception {
-        KSI mockKsi = Mockito.mock(KSI.class);
-        Policy policy = Mockito.mock(Policy.class);
-        Manifest mockManifest = Mockito.mock(Manifest.class);
-        KSISignature mockSignature = Mockito.mock(KSISignature.class);
-        PublicationData publicationData = Mockito.mock(PublicationData.class);
-        DataHash nullDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
-
-
-        when(mockSignature.getInputHash()).thenReturn(nullDataHash);
-        when(mockManifest.getDataHash(HashAlgorithm.SHA2_256)).thenReturn(nullDataHash);
-        when(mockKsi.verify(any(KSISignature.class), any(Policy.class), any(DataHash.class), any(PublicationData.class)))
-                .thenReturn(Mockito.mock(VerificationResult.class));
-
-
-        SignatureVerifier<KSISignature> verifier = new KsiSignatureVerifier(mockKsi, policy, publicationData);
-        verifier.getSignatureVerificationResult(mockSignature, mockManifest);
-        verify(mockKsi, times(1)).verify(mockSignature, policy, nullDataHash, publicationData);
     }
 
     @Test
@@ -88,46 +59,17 @@ public class KsiSignatureVerifierTest extends AbstractEnvelopeTest {
         expectedException.expect(RuleTerminatingException.class);
         expectedException.expectMessage("Failed to verify KSI signature.");
 
-        KSI mockKsi = Mockito.mock(KSI.class);
         Manifest mockManifest = Mockito.mock(Manifest.class);
         KSISignature mockSignature = Mockito.mock(KSISignature.class);
         DataHash nullDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
 
-
         when(mockSignature.getInputHash()).thenReturn(nullDataHash);
         when(mockManifest.getDataHash(HashAlgorithm.SHA2_256)).thenReturn(nullDataHash);
-        when(mockKsi.verify(any(KSISignature.class), any(Policy.class), any(DataHash.class), any(PublicationData.class)))
-                .thenThrow(KSIException.class);
 
-        SignatureVerifier<KSISignature> verifier = new KsiSignatureVerifier(mockKsi, Mockito.mock(Policy.class));
+        ContextAwarePolicy mockPolicy = Mockito.mock(ContextAwarePolicy.class);
+        when(mockPolicy.getPolicyContext()).thenThrow(KSIException.class);
+        SignatureVerifier<KSISignature> verifier = new KsiSignatureVerifier(mockPolicy);
         verifier.getSignatureVerificationResult(mockSignature, mockManifest);
-    }
-
-    @Test
-    public void testVerifyReturnsResult() throws Exception {
-        KSI mockKsi = Mockito.mock(KSI.class);
-        Policy policy = Mockito.mock(Policy.class);
-        Manifest mockManifest = Mockito.mock(Manifest.class);
-        KSISignature mockSignature = Mockito.mock(KSISignature.class);
-        PublicationData publicationData = Mockito.mock(PublicationData.class);
-        DataHash nullDataHash = new DataHash(HashAlgorithm.SHA2_256, new byte[32]);
-        VerificationResult mockKsiVerificationResult = Mockito.mock(VerificationResult.class);
-
-
-        when(mockSignature.getInputHash()).thenReturn(nullDataHash);
-        when(mockManifest.getDataHash(HashAlgorithm.SHA2_256)).thenReturn(nullDataHash);
-        when(mockKsiVerificationResult.isOk()).thenReturn(true);
-        when(mockKsi.verify(any(KSISignature.class), any(Policy.class), any(DataHash.class), any(PublicationData.class)))
-                .thenReturn(mockKsiVerificationResult);
-
-
-        SignatureVerifier<KSISignature> verifier = new KsiSignatureVerifier(mockKsi, policy, publicationData);
-        SignatureResult result = verifier.getSignatureVerificationResult(mockSignature, mockManifest);
-
-        assertEquals(mockSignature, result.getSignature());
-        assertEquals(com.guardtime.envelope.verification.result.VerificationResult.OK, result.getSimplifiedResult());
-        assertEquals(mockKsiVerificationResult, result.getFullResult());
-
     }
 
 }

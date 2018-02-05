@@ -68,14 +68,14 @@ public abstract class EnvelopeReader {
     public Envelope read(InputStream input) throws IOException, InvalidPackageException, ParsingStoreException {
         EnvelopeReadingException readingException = new EnvelopeReadingException("Reading envelope encountered errors!");
         ParsingStore parsingStore = parsingStoreFactory.create();
-        HandlerSet handlerSet = new HandlerSet(manifestFactory, signatureFactory, parsingStore);
+        parseInputStream(input, parsingStore, readingException);
+        EnvelopeElementExtractor envelopeElementExtractor =
+                new EnvelopeElementExtractor(manifestFactory, signatureFactory, parsingStore);
 
-        parseInputStream(input, handlerSet, readingException);
-
-        List<SignatureContent> contents = buildSignatures(handlerSet, readingException);
-        validateMimeType(handlerSet);
-        List<UnknownDocument> unknownFiles = handlerSet.getUnrequestedFiles();
-        handlerSet.clear();
+        List<SignatureContent> contents = buildSignatures(envelopeElementExtractor, readingException);
+        validateMimeType(envelopeElementExtractor);
+        List<UnknownDocument> unknownFiles = envelopeElementExtractor.getUnrequestedFiles();
+        envelopeElementExtractor.clear();
         Envelope envelope = new Envelope(contents, unknownFiles, parsingStore);
         readingException.setEnvelope(envelope);
 
@@ -89,7 +89,14 @@ public abstract class EnvelopeReader {
         return envelope;
     }
 
-    protected abstract void parseInputStream(InputStream input, HandlerSet handlerSet, EnvelopeReadingException readingException)
+    /**
+     * Processes input stream containing envelope and stores each entry in envelope to parsing store.
+     * @param input            {@link InputStream} containing {@link Envelope}.
+     * @param store            Stores all parsed entries. Implementation must add each entry to store(key, stream) method.
+     * @param readingException Holds all expectable exceptions if any occurr.
+     * @throws IOException     When error occurs during accessing of InputStream.
+     */
+    protected abstract void parseInputStream(InputStream input, ParsingStore store, EnvelopeReadingException readingException)
             throws IOException;
 
     private boolean containsValidContents(List<SignatureContent> signatureContents) {
@@ -118,9 +125,9 @@ public abstract class EnvelopeReader {
                 content.getAnnotationsManifest() != null;
     }
 
-    private void validateMimeType(HandlerSet handlerSet) throws InvalidPackageException {
+    private void validateMimeType(EnvelopeElementExtractor envelopeElementExtractor) throws InvalidPackageException {
         try {
-            byte[] content = handlerSet.getMimeTypeContent();
+            byte[] content = envelopeElementExtractor.getMimeTypeContent();
             String parsedMimeType = new String(content);
             if (!parsedMimeType.equals(getMimeType())) {
                 throw new InvalidPackageException("Parsed Envelope has invalid MIME type. Can't process it!");
@@ -133,14 +140,15 @@ public abstract class EnvelopeReader {
 
     protected abstract String getMimeType();
 
-    private List<SignatureContent> buildSignatures(HandlerSet handlerSet, EnvelopeReadingException readingException) {
-        Set<String> parsedManifestUriSet = handlerSet.getManifestUris();
-        SignatureContentHandler signatureContentHandler = new SignatureContentHandler(handlerSet);
+    private List<SignatureContent> buildSignatures(EnvelopeElementExtractor envelopeElementExtractor,
+                                                   EnvelopeReadingException readingException) {
+        Set<String> parsedManifestUriSet = envelopeElementExtractor.getManifestUris();
+        SignatureContentComposer signatureContentComposer = new SignatureContentComposer(envelopeElementExtractor);
         List<SignatureContent> signatures = new LinkedList<>();
         for (String manifestUri : parsedManifestUriSet) {
             try {
                 Pair<SignatureContent, List<Throwable>> signatureContentVectorPair =
-                        signatureContentHandler.get(manifestUri, parsingStoreFactory);
+                        signatureContentComposer.compose(manifestUri, parsingStoreFactory);
                 signatures.add(signatureContentVectorPair.getLeft());
                 readingException.addExceptions(signatureContentVectorPair.getRight());
             } catch (ContentParsingException | ParsingStoreException e) {

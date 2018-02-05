@@ -51,7 +51,7 @@ public class PostponedSignatureFactoryTest extends AbstractEnvelopeTest {
     private static final DataHash DATA_HASH = new DataHash(HashAlgorithm.SHA2_256, new byte[HashAlgorithm.SHA2_256.getLength()]);
     private PostponedSignatureFactory limitedFactory = new PostponedSignatureFactory(mock(SignatureFactoryType.class));
     private final KSI mockKsi = mock(KSI.class);
-    private SignatureFactory spySignatureFactory = spy(new KsiSignatureFactory(mockKsi));
+    private SignatureFactory spySignatureFactory = spy(new KsiSignatureFactory(mockKsi, mockKsi));
     private PostponedSignatureFactory fullFactory = new PostponedSignatureFactory(spySignatureFactory);
 
     @Test

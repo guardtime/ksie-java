@@ -47,28 +47,36 @@ public class KsiSignatureFactoryTest extends AbstractEnvelopeTest {
     @Mock
     private KSISignature mockSignature;
 
+    private SignatureFactory signatureFactory;
+
     @Before
     public void setUpMockKsi() throws KSIException {
         when(mockKsi.sign(Mockito.any(DataHash.class))).thenReturn(mockSignature);
         when(mockKsi.read(Mockito.any(byte[].class))).thenReturn(mockSignature);
+        signatureFactory = new KsiSignatureFactory(mockKsi, mockKsi);
     }
 
     @Test
-    public void testCreateFactory_ThrowsNullPointerException() {
+    public void testCreateFactoryWithoutSigner_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("KSI must be present");
-        new KsiSignatureFactory(null);
+        expectedException.expectMessage("Signer must be present");
+        new KsiSignatureFactory(null, null).create(null);
+    }
+
+    @Test
+    public void testCreateFactoryWithoutReader_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Reader must be present");
+        new KsiSignatureFactory(null, null).read(null);
     }
 
     @Test
     public void testCreateFactory_OK() {
-        SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
         assertNotNull(signatureFactory);
     }
 
     @Test
     public void testCreate() throws Exception {
-        SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
         DataHash testHash = new DataHash(
                 HashAlgorithm.SHA2_256,
                 "TestStringTestingStuffLongString".getBytes(StandardCharsets.UTF_8)
@@ -79,7 +87,6 @@ public class KsiSignatureFactoryTest extends AbstractEnvelopeTest {
 
     @Test
     public void testRead() throws Exception {
-        SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi);
         EnvelopeSignature signature = signatureFactory.read(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)));
         assertNotNull(signature);
     }

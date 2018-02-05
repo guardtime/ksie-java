@@ -38,9 +38,9 @@ import static org.mockito.Mockito.when;
 public class PublicationKsiEnvelopeSignatureExtendingPolicyTest extends AbstractEnvelopeTest {
 
     @Test
-    public void testPublicationKsiEnvelopeSignatureExtenderWithoutKsi_ThrowsNullPointerException() {
+    public void testPublicationKsiEnvelopeSignatureExtenderWithoutExtender_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("KSI");
+        expectedException.expectMessage("Extender");
         new PublicationKsiEnvelopeSignatureExtendingPolicy(null, mock(PublicationRecord.class));
     }
 
@@ -52,7 +52,7 @@ public class PublicationKsiEnvelopeSignatureExtendingPolicyTest extends Abstract
     }
 
     @Test
-    public void testExtendingDelegatesToKsi() throws Exception {
+    public void testExtendingDelegatesToExtender() throws Exception {
         KSI mockKsi = mock(KSI.class);
         PublicationRecord mockPublicationRecord = mock(PublicationRecord.class);
         when(mockPublicationRecord.getPublicationTime()).thenReturn(new Date(5000));

@@ -103,6 +103,10 @@ public class AbstractEnvelopeTest {
     protected static final String ENVELOPE_WITH_BROKEN_SIGNATURE_CONTENT = "envelopes/invalid/broken-signature-content.ksie";
     protected static final String ENVELOPE_WITH_DOCUMENT_MISSING_MIMETYPE = "envelopes/invalid/document-missing-mimetype.ksie";
     protected static final String ENVELOPE_WITH_DIFFERENT_SIGNATURE_EXTENSION = "envelopes/different-signature-extension.ksie";
+    protected static final String ENVELOPE_WITH_MISSING_ANNOTATION_DATA_NON_REMOVABLE =
+            "envelopes/invalid/missing-annotation-data-non-removable.ksie";
+    protected static final String ENVELOPE_WITH_MISSING_ANNOTATIONS_MANIFEST =
+            "envelopes/invalid/missing-annotations-manifest.ksie";
     protected static final String ENVELOPE_WITH_NO_DOCUMENT_URI_IN_MANIFEST =
             "envelopes/invalid/no-document-uri-in-manifest.ksie";
     protected static final String ENVELOPE_WITH_MIMETYPE_CONTAINS_INVALID_VALUE =
