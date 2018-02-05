@@ -31,7 +31,7 @@ public class SingleHashAlgorithmProvider implements HashAlgorithmProvider {
     private final HashAlgorithm algorithm;
 
     /**
-     * @param hashAlgorithm    The {@link HashAlgorithm} to be used as output by the created instance.
+     * @param hashAlgorithm the {@link HashAlgorithm} to be used as output by the created instance.
      */
     public SingleHashAlgorithmProvider(HashAlgorithm hashAlgorithm) {
         if (!hashAlgorithm.getStatus().equals(HashAlgorithm.Status.NORMAL)) {

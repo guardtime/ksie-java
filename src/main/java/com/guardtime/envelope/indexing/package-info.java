@@ -17,21 +17,7 @@
  * reserves and retains all trademark rights.
  */
 
-package com.guardtime.envelope.indexing;
-
-import com.guardtime.envelope.packaging.Envelope;
-
 /**
- *
+ * Classes and interfaces for various indexing
  */
-
-public interface IndexProviderFactory {
-
-    IndexProvider create();
-
-    /**
-     * Creates new {@link IndexProvider} based on provided envelope. Verifies the provided {@link Envelope} has indexes
-     * that are supported by the created {@link IndexProvider} and if needed extracts the starting point for indexes.
-     */
-    IndexProvider create(Envelope envelope);
-}
+package com.guardtime.envelope.indexing;

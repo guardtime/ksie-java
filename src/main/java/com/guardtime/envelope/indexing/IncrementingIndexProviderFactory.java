@@ -39,8 +39,8 @@ import static com.guardtime.envelope.packaging.EntryNameProvider.SIGNATURE_FORMA
 import static com.guardtime.envelope.packaging.EntryNameProvider.SINGLE_ANNOTATION_MANIFEST_FORMAT;
 
 /**
- * Produces {@link IndexProvider} that provides integer values that increment for each index. Continues from last used index of
- * provided {@link Envelope}
+ * Produces a {@link IndexProvider} that provides integer values that increment for each index. Continues from last used index of
+ * provided {@link Envelope}.
  */
 public class IncrementingIndexProviderFactory implements IndexProviderFactory {
 

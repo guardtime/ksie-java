@@ -43,6 +43,9 @@ public final class Util {
 
     /**
      * Checks that the given input is not null.
+     *
+     * @param o object to be checked.
+     * @param name name of the object.
      * @throws NullPointerException when the input is null.
      */
     public static void notNull(Object o, String name) {
@@ -53,6 +56,10 @@ public final class Util {
 
     /**
      * Checks that the given input is not null and is not empty.
+     *
+     * @param o object to be checked.
+     * @param name name of the object.
+     *
      * @throws NullPointerException when the input is null.
      * @throws IllegalArgumentException when the input is empty.
      */
@@ -64,7 +71,12 @@ public final class Util {
     }
 
     /**
-     * Hashes the inputStream with the given algorithm and returns the produced {@link DataHash}
+     * Hashes the inputStream with the given algorithm.
+     *
+     * @param inputStream data to be hashed.
+     * @param algorithm hash algorithm to be used for hashing. See {@link com.guardtime.envelope.hash.HashAlgorithmProvider} for available algorithms.
+     *
+     * @return The {@link DataHash} of the inputStream.
      */
     public static DataHash hash(InputStream inputStream, HashAlgorithm algorithm) {
         try {
@@ -78,6 +90,8 @@ public final class Util {
 
     /**
      * Creates a temporary file with given prefix and suffix that will be deleted when the program exits.
+     *
+     * @return The temporary file.
      * @throws IOException when the file can't be created.
      */
     public static File createTempFile() throws IOException {
