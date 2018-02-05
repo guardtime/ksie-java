@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Guardtime, Inc.
+ * Copyright 2013-2018 Guardtime, Inc.
  *
  * This file is part of the Guardtime client SDK.
  *
@@ -23,12 +23,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Annotation types define annotation persistence.
+ * Annotation types that define annotation persistence.
  */
 public enum EnvelopeAnnotationType {
 
+    /**
+     * The whole annotation, meaning its value and its meta-data, can be removed from the envelope
+     * without breaking the integrity of the envelope's contents.
+     */
     FULLY_REMOVABLE("ksie10/removable-fully"),
+
+    /**
+     * The value of the annotation can be removed without breaking the integrity of the envelope.
+     * The annotation's meta-data must stay intact.
+     */
     VALUE_REMOVABLE("ksie10/removable-value"),
+
+    /**
+     * No part of the annotation can be removed without breaking the integrity of the envelope.
+     */
     NON_REMOVABLE("ksie10/removable-none");
 
     private String content;

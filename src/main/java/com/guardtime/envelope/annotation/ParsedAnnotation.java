@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Guardtime, Inc.
+ * Copyright 2013-2018 Guardtime, Inc.
  *
  * This file is part of the Guardtime client SDK.
  *
@@ -27,8 +27,8 @@ import java.io.InputStream;
 import static com.guardtime.envelope.util.Util.notNull;
 
 /**
- * Represents a {@link Annotation} that has been parsed in. Uses a {@link ParsingStore} from where to access the data of
- * the {@link Annotation}
+ * Represents an {@link Annotation} that has been parsed in. Uses a {@link ParsingStore} from where to access the data of
+ * the {@link Annotation}.
  */
 public class ParsedAnnotation extends AbstractAnnotation {
 

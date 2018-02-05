@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Guardtime, Inc.
+ * Copyright 2013-2018 Guardtime, Inc.
  *
  * This file is part of the Guardtime client SDK.
  *
@@ -23,16 +23,17 @@ import com.guardtime.envelope.util.DataHashException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
+
+
 public interface EnvelopeElement {
 
     /**
-     * Returns the path of the element within the {@link com.guardtime.envelope.packaging.Envelope}
+     * @return The path of the element within the {@link com.guardtime.envelope.packaging.Envelope}.
      */
     String getPath();
 
     /**
-     * (Optional)
-     * Returns {@link DataHash} for given algorithm based on object data.
+     * @return {@link DataHash} for given algorithm based on object data.
      * @throws DataHashException when the given algorithm can't be used for generating a hash or the data can't be accessed.
      */
     DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException;

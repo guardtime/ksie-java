@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Guardtime, Inc.
+ * Copyright 2013-2018 Guardtime, Inc.
  *
  * This file is part of the Guardtime client SDK.
  *
@@ -29,7 +29,7 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * Represents document data that is to be used in a envelope.
+ * Represents document data that is to be used in an envelope.
  */
 public interface Document extends EnvelopeElement, AutoCloseable {
 
@@ -38,19 +38,21 @@ public interface Document extends EnvelopeElement, AutoCloseable {
     String getMimeType();
 
     /**
-     * Returns {@link InputStream} containing document.
+     * @return {@link InputStream} containing document.
      * @throws IOException when creating or accessing InputStream fails.
      */
     InputStream getInputStream() throws IOException;
 
     /**
-     * Will return as many {@link DataHash}es as it can for provided {@link HashAlgorithm}s.
-     * If no {@link DataHash}es can be generated then a {@link DataHashException} will be thrown.
+     * @param algorithmList
+     *
+     * @return As many {@link DataHash}es as it can for provided {@link HashAlgorithm}s.
+     * @throws {@link DataHashException}, if no {@link DataHash} can be generated.
      */
     List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws IOException, DataHashException;
 
     /**
-     * Returns true for any document that's InputSteam can be accessed and data extracted from it.
+     * @return True for any document that's {@link InputStream} can be accessed and data extracted from it.
      */
     boolean isWritable();
 }

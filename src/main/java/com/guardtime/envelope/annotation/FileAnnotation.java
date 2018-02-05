@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Guardtime, Inc.
+ * Copyright 2013-2018 Guardtime, Inc.
  *
  * This file is part of the Guardtime client SDK.
  *
@@ -27,11 +27,20 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Annotation that is based on File as the data source.
+ * Annotation that is based on {@link File} as the data source.
  */
 public class FileAnnotation extends AbstractAnnotation {
 
     private final File file;
+
+    /**
+     * Adds data and type to the annotation.
+     *
+     * @param file the {@link File} containing the annotation value.
+     * @param domain ???
+     * @param type annotation type, indicating the persistence of the annotation, see {@link EnvelopeAnnotationType} for details.
+     *
+     */
 
     public FileAnnotation(File file, String domain, EnvelopeAnnotationType type) {
         super(domain, type);

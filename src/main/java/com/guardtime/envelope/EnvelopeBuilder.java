@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Guardtime, Inc.
+ * Copyright 2013-2018 Guardtime, Inc.
  *
  * This file is part of the Guardtime client SDK.
  *
@@ -38,7 +38,7 @@ import java.util.List;
 import static com.guardtime.envelope.util.Util.notNull;
 
 /**
- * Helper for creating a envelope with the provided documents and annotations.
+ * Helper for creating an envelope with the provided documents and annotations.
  */
 public class EnvelopeBuilder {
 
@@ -52,6 +52,8 @@ public class EnvelopeBuilder {
 
     /**
      * Expects a {@link EnvelopePackagingFactory} as parameter to be used for creating the envelope.
+     *
+     * @param packagingFactory
      */
     public EnvelopeBuilder(EnvelopePackagingFactory packagingFactory) {
         notNull(packagingFactory, "Packaging factory");
@@ -60,6 +62,10 @@ public class EnvelopeBuilder {
 
     /**
      * Expects a {@link Envelope} as parameter to be expanded by new documents and annotations.
+     *
+     * @param existingEnvelope the existing {@link Envelope} to be expanded.
+     *
+     * @return The same {@link EnvelopeBuilder}.
      */
     public EnvelopeBuilder withExistingEnvelope(Envelope existingEnvelope) {
         this.existingEnvelope = existingEnvelope;

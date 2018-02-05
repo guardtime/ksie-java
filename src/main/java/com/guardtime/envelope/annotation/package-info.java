@@ -17,18 +17,7 @@
  * reserves and retains all trademark rights.
  */
 
-package com.guardtime.envelope.packaging.exception;
-
-import com.guardtime.envelope.EnvelopeException;
-
-public class EnvelopeMergingException extends EnvelopeException {
-
-    public EnvelopeMergingException(String message) {
-        super(message);
-    }
-
-    public EnvelopeMergingException(String message, Throwable throwable) {
-        super(message, throwable);
-    }
-
-}
+/**
+ * Classes and interfaces to create and add annotations, i.e. context, to the KSI envelope
+ */
+package com.guardtime.envelope.annotation;
