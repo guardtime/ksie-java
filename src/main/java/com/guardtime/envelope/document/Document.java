@@ -55,5 +55,6 @@ public interface Document extends EnvelopeElement, AutoCloseable {
      * @return True for any document that's {@link InputStream} can be accessed and data extracted from it.
      */
     boolean isWritable();
+
 }
 

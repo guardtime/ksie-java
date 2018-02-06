@@ -75,6 +75,7 @@ public abstract class EnvelopeReader {
         List<SignatureContent> contents = buildSignatures(envelopeElementExtractor, readingException);
         validateMimeType(envelopeElementExtractor);
         List<UnknownDocument> unknownFiles = envelopeElementExtractor.getUnrequestedFiles();
+        envelopeElementExtractor.clear();
         Envelope envelope = new Envelope(contents, unknownFiles, parsingStore);
         readingException.setEnvelope(envelope);
 
