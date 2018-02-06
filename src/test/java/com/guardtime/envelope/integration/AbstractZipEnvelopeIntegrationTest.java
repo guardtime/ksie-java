@@ -32,7 +32,7 @@ import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
-import com.guardtime.envelope.packaging.exception.InvalidPackageException;
+import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
@@ -91,7 +91,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
 
     @Test
     public void testReadEnvelopeWithMissingManifest() throws Exception {
-        expectedException.expect(InvalidPackageException.class);
+        expectedException.expect(InvalidEnvelopeException.class);
         expectedException.expectMessage("Reading envelope encountered errors!");
         try (Envelope ignored = getEnvelope(ENVELOPE_WITH_MISSING_MANIFEST)) {
             //empty
@@ -100,7 +100,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
 
     @Test
     public void testReadEnvelopeWithMissingMimetype() throws Exception {
-        expectedException.expect(InvalidPackageException.class);
+        expectedException.expect(InvalidEnvelopeException.class);
         expectedException.expectMessage("No parsable MIME type.");
         try (Envelope ignored = getEnvelope(ENVELOPE_WITH_MISSING_MIMETYPE)) {
             //empty
@@ -109,7 +109,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
 
     @Test
     public void testReadEnvelopeWithEmptyMimetype() throws Exception {
-        expectedException.expect(InvalidPackageException.class);
+        expectedException.expect(InvalidEnvelopeException.class);
         expectedException.expectMessage("Parsed Envelope has invalid MIME type. Can't process it!");
         try (Envelope ignored = getEnvelope(ENVELOPE_WITH_MIMETYPE_IS_EMPTY)) {
             //empty

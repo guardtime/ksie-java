@@ -21,6 +21,9 @@ package com.guardtime.envelope.manifest;
 
 import com.guardtime.envelope.EnvelopeException;
 
+/**
+ * For issues when creating or parsing a manifest.
+ */
 public class InvalidManifestException extends EnvelopeException {
 
     public InvalidManifestException(String message, Throwable cause) {
@@ -34,4 +37,5 @@ public class InvalidManifestException extends EnvelopeException {
     public InvalidManifestException(Throwable cause) {
         super(cause);
     }
+
 }

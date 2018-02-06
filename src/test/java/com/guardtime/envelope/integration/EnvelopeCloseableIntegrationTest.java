@@ -26,7 +26,7 @@ import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.extending.ExtendedEnvelope;
 import com.guardtime.envelope.packaging.Envelope;
-import com.guardtime.envelope.packaging.exception.InvalidPackageException;
+import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.util.Util;
 import com.guardtime.envelope.verification.VerifiedEnvelope;
 import com.guardtime.envelope.verification.result.ResultHolder;
@@ -179,7 +179,7 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
 
     @Test
     public void testCreateEnvelopeFromExistingAndAlteredTempFile_ThrowsInvalidPackageException() throws Exception {
-        expectedException.expect(InvalidPackageException.class);
+        expectedException.expect(InvalidEnvelopeException.class);
         expectedException.expectMessage("Created envelope did not pass internal verification");
         try (
                 Document document = new StreamDocument(new ByteArrayInputStream(new byte[3]), "qwerty", "qwert.file");

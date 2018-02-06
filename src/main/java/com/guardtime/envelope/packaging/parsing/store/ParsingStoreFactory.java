@@ -23,5 +23,12 @@ package com.guardtime.envelope.packaging.parsing.store;
  * Helper used to create new instances of {@link ParsingStore}
  */
 public interface ParsingStoreFactory {
+
+    /**
+     * @return An instance of {@link ParsingStore}.
+     * @throws ParsingStoreException When allocating resources for data storage fails or other errors are encountered during
+     * creation of {@link ParsingStore}.
+     */
     ParsingStore create() throws ParsingStoreException;
+
 }

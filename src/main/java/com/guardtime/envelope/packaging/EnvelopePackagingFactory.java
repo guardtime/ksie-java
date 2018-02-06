@@ -35,7 +35,7 @@ import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.manifest.tlv.TlvEnvelopeManifestFactory;
 import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
-import com.guardtime.envelope.packaging.exception.InvalidPackageException;
+import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.packaging.parsing.EnvelopeReader;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
@@ -98,24 +98,24 @@ public final class EnvelopePackagingFactory {
     }
 
     /**
-     * Parses an {@link InputStream} to produce a {@link Envelope}.
+     * Parses an {@link InputStream} to produce an {@link Envelope}.
      *
      * @param inputStream    An {@link InputStream} that contains a valid/parsable {@link Envelope}. This InputStream will be
      *                       closed after reading.
      * @return An instance of {@link Envelope} based on the data from {@link InputStream}. Does not verify
      *         the envelope/signature(s).
-     * @throws InvalidPackageException      When the {@link InputStream} does not contain a parsable {@link Envelope}.
-     * @throws EnvelopeReadingException    When there were issues parsing some elements of the {@link Envelope}. The parsed
+     * @throws InvalidEnvelopeException      When the {@link InputStream} does not contain a parsable {@link Envelope}.
+     * @throws EnvelopeReadingException      When there were issues parsing some elements of the {@link Envelope}. The parsed
      *         envelope and all encountered exceptions can be retrieved from this exception.
      */
-    public Envelope read(InputStream inputStream) throws InvalidPackageException {
+    public Envelope read(InputStream inputStream) throws InvalidEnvelopeException {
         Util.notNull(inputStream, "Input stream");
         try {
             return envelopeReader.read(inputStream);
         } catch (IOException e) {
-            throw new InvalidPackageException("Failed to parse InputStream", e);
+            throw new InvalidEnvelopeException("Failed to parse InputStream", e);
         } catch (ParsingStoreException e) {
-            throw new InvalidPackageException("Failed to create parsing store for envelope data", e);
+            throw new InvalidEnvelopeException("Failed to create parsing store for envelope data", e);
         }
     }
 
@@ -125,9 +125,9 @@ public final class EnvelopePackagingFactory {
      * @param files          List of {@link Document} to be added and signed. Can NOT be null.
      * @param annotations    List of {@link Annotation} to be added and signed. Can be null.
      * @return A new {@link Envelope} which contains the documents and annotations and a signature covering them.
-     * @throws InvalidPackageException  When the input data can not be processed or signing fails.
+     * @throws InvalidEnvelopeException  When the input data can not be processed or signing fails.
      */
-    public Envelope create(List<Document> files, List<Annotation> annotations) throws InvalidPackageException {
+    public Envelope create(List<Document> files, List<Annotation> annotations) throws InvalidEnvelopeException {
         SignatureContent signatureContent = verifyAndSign(files, annotations, null);
         Envelope envelope = new Envelope(signatureContent);
         verifyEnvelope(envelope);
@@ -142,12 +142,12 @@ public final class EnvelopePackagingFactory {
      *                             {@link EnvelopeSignature}(s).
      * @param files                List of {@link Document} to be added and signed. Can NOT be null.
      * @param annotations          List of {@link Annotation} to be added and signed. Can be null.
-     * @throws InvalidPackageException When the input data can not be processed or signing fails.
+     * @throws InvalidEnvelopeException When the input data can not be processed or signing fails.
      * @throws EnvelopeMergingException When there are issues adding the newly created {@link SignatureContent} to
      * {@param existingEnvelope}.
      */
     public void addSignature(Envelope existingEnvelope, List<Document> files, List<Annotation> annotations)
-            throws InvalidPackageException, EnvelopeMergingException {
+            throws InvalidEnvelopeException, EnvelopeMergingException {
         Util.notNull(existingEnvelope, "Envelope");
         SignatureContent signatureContent = verifyAndSign(files, annotations, existingEnvelope);
         existingEnvelope.add(signatureContent);
@@ -155,7 +155,7 @@ public final class EnvelopePackagingFactory {
     }
 
     private SignatureContent verifyAndSign(List<Document> files, List<Annotation> annotations,
-                                           Envelope existingEnvelope) throws InvalidPackageException {
+                                           Envelope existingEnvelope) throws InvalidEnvelopeException {
         Util.notEmpty(files, "Document files");
         validateDocumentFilenames(files);
         HashSet<Document> documents = new HashSet<>(files);
@@ -180,9 +180,9 @@ public final class EnvelopePackagingFactory {
                     signatureFactory
             ).sign();
         } catch (DataHashException | InvalidManifestException e) {
-            throw new InvalidPackageException("Failed to create internal structure!", e);
+            throw new InvalidEnvelopeException("Failed to create internal structure!", e);
         } catch (SignatureException e) {
-            throw new InvalidPackageException("Failed to acquire signature!", e);
+            throw new InvalidEnvelopeException("Failed to acquire signature!", e);
         }
     }
 
@@ -197,7 +197,7 @@ public final class EnvelopePackagingFactory {
         }
     }
 
-    private void verifyEnvelope(Envelope envelope) throws InvalidPackageException {
+    private void verifyEnvelope(Envelope envelope) throws InvalidEnvelopeException {
         if (this.verificationPolicy == null) {
             return;
         }
@@ -216,7 +216,7 @@ public final class EnvelopePackagingFactory {
                     logger.warn("Failed rule '{}' for '{}' ", res.getRuleName(), res.getTestedElementPath());
                 }
             }
-            throw new InvalidPackageException("Created envelope did not pass internal verification");
+            throw new InvalidEnvelopeException("Created envelope did not pass internal verification");
         }
     }
 

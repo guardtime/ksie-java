@@ -19,8 +19,14 @@
 
 package com.guardtime.envelope.packaging.exception;
 
+/**
+ * Indicates an issue with {@link com.guardtime.envelope.manifest.SingleAnnotationManifest}s when merging
+ * {@link com.guardtime.envelope.packaging.Envelope}s.
+ */
 public class SingleAnnotationManifestMergingException extends EnvelopeMergingException {
+
     public SingleAnnotationManifestMergingException(String path) {
         super("New SignatureContent has clashing SingleAnnotationManifest! Path: " + path);
     }
+
 }
