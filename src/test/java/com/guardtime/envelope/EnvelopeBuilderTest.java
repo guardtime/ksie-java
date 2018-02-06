@@ -178,7 +178,7 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
     public void testCreateWithExistingEnvelopeWithMultipleDocumentsWithSameFileName_ThrowsIllegalArgumentException()
             throws Exception {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Found multiple documents with same name!");
+        expectedException.expectMessage("Found multiple documents with same name and non-matching data hash!");
         try (
                 Document document = new StreamDocument(
                         new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)),

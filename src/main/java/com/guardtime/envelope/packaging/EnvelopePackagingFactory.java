@@ -53,6 +53,7 @@ import com.guardtime.envelope.verification.policy.VerificationPolicy;
 import com.guardtime.envelope.verification.result.RuleVerificationResult;
 import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +63,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -177,36 +179,59 @@ public final class EnvelopePackagingFactory {
     }
 
     private void validateDocuments(List<Document> documentList, Envelope existingEnvelope) {
-        Set<Document> documentSet = new HashSet<>(documentList);
+        Map<String, List<Document>> documentMap = new HashMap<>();
+        addToMapWithDuplicateCheck(documentMap, documentList);
         Set<String> allowedDocumentNames = new HashSet<>();
         if (existingEnvelope != null) {
+            addToMapWithDuplicateCheck(documentMap, existingEnvelope.getUnknownFiles());
             for (SignatureContent content : existingEnvelope.getSignatureContents()) {
-                documentSet.addAll(content.getDocuments().values());
+                addToMapWithDuplicateCheck(documentMap, content.getDocuments().values());
                 allowedDocumentNames.add(content.getManifest().getSignatureReference().getUri());
                 allowedDocumentNames.add(content.getManifest().getPath());
                 allowedDocumentNames.add(content.getDocumentsManifest().getPath());
                 allowedDocumentNames.add(content.getAnnotationsManifest().getPath());
             }
-            documentSet.addAll(existingEnvelope.getUnknownFiles()); // Don't allow existing unknown file to clash
         }
-        verifyNoDuplicateDocumentNames(documentSet);
-        validateDocumentFilenames(documentSet, allowedDocumentNames);
+        validateDocumentFilenames(documentMap.keySet(), allowedDocumentNames);
     }
 
-    private void verifyNoDuplicateDocumentNames(Set<Document> documents) throws IllegalArgumentException {
-        Set<String> uniqueDocumentNames = new HashSet<>();
+    private void addToMapWithDuplicateCheck(Map<String, List<Document>> documentMap, Collection<? extends Document> documents) {
         for (Document doc : documents) {
-            uniqueDocumentNames.add(doc.getFileName());
-        }
-
-        if (uniqueDocumentNames.size() < documents.size()) {
-            throw new IllegalArgumentException("Found multiple documents with same name!");
+            if (documentMap.containsKey(doc.getFileName())) {
+                for (Document other : documentMap.get(doc.getFileName())) {
+                    boolean result = false;
+                    for (HashAlgorithm algorithm : HashAlgorithm.getImplementedHashAlgorithms()) {
+                        // check the algorithm is usable
+                        if (algorithm.isDeprecated(new Date())) {
+                            continue;
+                        }
+                        try {
+                            if (!doc.getDataHash(algorithm).equals(other.getDataHash(algorithm))) {
+                                throw new IllegalArgumentException(
+                                        "Found multiple documents with same name and non-matching data hash!"
+                                );
+                            }
+                            result = true;
+                        } catch (DataHashException e) {
+                            // ignore since EmptyEnvelope or similar
+                        }
+                    }
+                    if (!result) {
+                        throw new IllegalArgumentException(
+                                "Found multiple documents with same name and no matching data hashes!"
+                        );
+                    }
+                }
+            } else {
+                List<Document> newList = new ArrayList<>();
+                newList.add(doc);
+                documentMap.put(doc.getFileName(), newList);
+            }
         }
     }
 
-    private void validateDocumentFilenames(Collection<Document> documentList, Set<String> allowedDocumentNames) {
-        for (Document document : documentList) {
-            String filename = document.getFileName();
+    private void validateDocumentFilenames(Collection<String> documentList, Set<String> allowedDocumentNames) {
+        for (String filename : documentList) {
             if (allowedDocumentNames.contains(filename)) {
                 continue;
             }

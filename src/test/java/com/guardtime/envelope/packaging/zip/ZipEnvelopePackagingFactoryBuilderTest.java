@@ -283,7 +283,7 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     @Test
     public void testCreateEnvelopeWithMultipleDocumentsWithSameName_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Found multiple documents with same name!");
+        expectedException.expectMessage("Found multiple documents with same name and non-matching data hash!");
 
         List<Document> documents = Arrays.asList(
                 (Document) new StreamDocument(
@@ -335,7 +335,7 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     public void testCreateEnvelopeWithExistingEnvelopeWithDocumentsWithSameName_ThrowsIllegalArgumentException()
             throws Exception {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Found multiple documents with same name!");
+        expectedException.expectMessage("Found multiple documents with same name and non-matching data hash!");
         try (
                 Document document = new StreamDocument(
                         new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)),

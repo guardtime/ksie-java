@@ -54,10 +54,5 @@ public interface Document extends EnvelopeElement, AutoCloseable {
      */
     boolean isWritable();
 
-    @Override
-    boolean equals(Object o);
-
-    @Override
-    int hashCode();
 }
 
