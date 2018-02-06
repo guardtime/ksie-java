@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Wrapper exception that contains exceptions encoutered during {@link Envelope} parsing. Also contains an {@link Envelope} if
+ * Wrapper exception that contains exceptions encountered during {@link Envelope} reading. Also contains an {@link Envelope} if
  * one could still be compiled despite the encountered exceptions.
  */
 public class EnvelopeReadingException extends InvalidEnvelopeException {

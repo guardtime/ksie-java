@@ -76,8 +76,7 @@ public abstract class EnvelopeReader {
      * @throws EnvelopeReadingException When there were issues parsing some elements of the {@link Envelope}. The parsed
      *         envelope and all encountered exceptions can be retrieved from this exception.
      * @throws IOException              When errors occur accessing data in provided {@link InputStream}.
-     * @throws ParsingStoreException    When errors are encountered when interacting with the {@link ParsingStore} to be used by
-     * the parsed in {@link Envelope}.
+     * @throws ParsingStoreException    When errors are encountered while interacting with the {@link ParsingStore}.
      */
     public Envelope read(InputStream input) throws IOException, InvalidEnvelopeException, ParsingStoreException {
         EnvelopeReadingException readingException = new EnvelopeReadingException("Reading envelope encountered errors!");
