@@ -195,6 +195,9 @@ public final class EnvelopePackagingFactory {
         validateDocumentFilenames(documentMap.keySet(), allowedDocumentNames);
     }
 
+    /**
+     * Adds content of documents collection to documentMap. Checks for duplicate existance based on filename and datahash.
+     */
     private void addToMapWithDuplicateCheck(Map<String, List<Document>> documentMap, Collection<? extends Document> documents) {
         for (Document doc : documents) {
             if (documentMap.containsKey(doc.getFileName())) {
@@ -222,6 +225,7 @@ public final class EnvelopePackagingFactory {
                         );
                     }
                 }
+                documentMap.get(doc.getFileName()).add(doc);
             } else {
                 List<Document> newList = new ArrayList<>();
                 newList.add(doc);
