@@ -24,12 +24,12 @@ import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.verification.rule.RuleTerminatingException;
 import com.guardtime.envelope.verification.rule.signature.SignatureVerifier;
+import com.guardtime.ksi.Verifier;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicy;
-
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -37,19 +37,27 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 public class KsiSignatureVerifierTest extends AbstractEnvelopeTest {
+    private static Verifier signatureVerifier = new com.guardtime.ksi.SignatureVerifier();
 
     @Test
     public void testCreateWithoutContext_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Context aware policy");
-        new KsiSignatureVerifier(null);
+        new KsiSignatureVerifier(signatureVerifier, null);
+    }
+
+    @Test
+    public void testCreateWithoutSignatureVerifier_ThrowsNullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Signature verifier");
+        new KsiSignatureVerifier(null, Mockito.mock(ContextAwarePolicy.class));
     }
 
     @Test
     public void testIsSupportedReturnsTrueForKSISignatures() {
         EnvelopeSignature mockEnvelopeSignature = Mockito.mock(EnvelopeSignature.class);
         when(mockEnvelopeSignature.getSignature()).thenReturn(Mockito.mock(KSISignature.class));
-        SignatureVerifier verifier = new KsiSignatureVerifier(Mockito.mock(ContextAwarePolicy.class));
+        SignatureVerifier verifier = new KsiSignatureVerifier(signatureVerifier, Mockito.mock(ContextAwarePolicy.class));
 
         assertTrue(verifier.isSupported(mockEnvelopeSignature));
     }
@@ -68,7 +76,7 @@ public class KsiSignatureVerifierTest extends AbstractEnvelopeTest {
 
         ContextAwarePolicy mockPolicy = Mockito.mock(ContextAwarePolicy.class);
         when(mockPolicy.getPolicyContext()).thenThrow(KSIException.class);
-        SignatureVerifier<KSISignature> verifier = new KsiSignatureVerifier(mockPolicy);
+        SignatureVerifier<KSISignature> verifier = new KsiSignatureVerifier(signatureVerifier, mockPolicy);
         verifier.getSignatureVerificationResult(mockSignature, mockManifest);
     }
 
