@@ -49,10 +49,10 @@ public class SignatureSignsManifestRule extends AbstractRule<SignatureContent> {
         VerificationResult result = getFailureVerificationResult();
         Manifest manifest = verifiable.getManifest();
         EnvelopeSignature envelopeSignature = verifiable.getEnvelopeSignature();
-        if (envelopeSignature == null) {
-            throw new RuleTerminatingException("There is no EnvelopeSignature in content!");
-        }
         try {
+            if (envelopeSignature == null) {
+                throw new RuleTerminatingException("There is no EnvelopeSignature in content!");
+            }
             DataHash signedHash = envelopeSignature.getSignedDataHash();
             DataHash realHash = manifest.getDataHash(signedHash.getAlgorithm());
             if (realHash.equals(signedHash)) {
