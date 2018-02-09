@@ -53,6 +53,7 @@ import com.guardtime.envelope.verification.policy.VerificationPolicy;
 import com.guardtime.envelope.verification.result.RuleVerificationResult;
 import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -154,26 +157,15 @@ public final class EnvelopePackagingFactory {
         verifyEnvelope(existingEnvelope);
     }
 
-    private SignatureContent verifyAndSign(List<Document> files, List<Annotation> annotations,
+    private SignatureContent verifyAndSign(List<Document> documentList, List<Annotation> annotations,
                                            Envelope existingEnvelope) throws InvalidEnvelopeException {
-        Util.notEmpty(files, "Document files");
-        validateDocumentFilenames(files);
-        HashSet<Document> documents = new HashSet<>(files);
-
-        IndexProvider indexProvider;
-        if (existingEnvelope != null) {
-            for (SignatureContent content : existingEnvelope.getSignatureContents()) {
-                documents.addAll(content.getDocuments().values());
-            }
-            indexProvider = indexProviderFactory.create(existingEnvelope);
-        } else {
-            indexProvider = indexProviderFactory.create();
-        }
-        verifyNoDuplicateDocumentNames(documents);
+        Util.notEmpty(documentList, "Document files");
+        validateDocuments(documentList, existingEnvelope);
+        IndexProvider indexProvider = getIndexProvider(existingEnvelope);
 
         try {
             return new ContentSigner(
-                    files,
+                    documentList,
                     annotations,
                     indexProvider,
                     manifestFactory,
@@ -186,14 +178,80 @@ public final class EnvelopePackagingFactory {
         }
     }
 
-    private void validateDocumentFilenames(List<Document> files) {
-        for (Document document : files) {
-            String filename = document.getFileName();
+    private void validateDocuments(List<Document> documentList, Envelope existingEnvelope) {
+        Map<String, List<Document>> documentMap = new HashMap<>();
+        addToMapWithDuplicateCheck(documentMap, documentList);
+        Set<String> allowedDocumentNames = new HashSet<>();
+        if (existingEnvelope != null) {
+            addToMapWithDuplicateCheck(documentMap, existingEnvelope.getUnknownFiles());
+            for (SignatureContent content : existingEnvelope.getSignatureContents()) {
+                addToMapWithDuplicateCheck(documentMap, content.getDocuments().values());
+                allowedDocumentNames.add(content.getManifest().getSignatureReference().getUri());
+                allowedDocumentNames.add(content.getManifest().getPath());
+                allowedDocumentNames.add(content.getDocumentsManifest().getPath());
+                allowedDocumentNames.add(content.getAnnotationsManifest().getPath());
+            }
+        }
+        validateDocumentFilenames(documentMap.keySet(), allowedDocumentNames);
+    }
+
+    /**
+     * Adds content of documents collection to documentMap. Checks for duplicate existance based on filename and datahash.
+     */
+    private void addToMapWithDuplicateCheck(Map<String, List<Document>> documentMap, Collection<? extends Document> documents) {
+        for (Document doc : documents) {
+            if (documentMap.containsKey(doc.getFileName())) {
+                for (Document other : documentMap.get(doc.getFileName())) {
+                    boolean result = false;
+                    for (HashAlgorithm algorithm : HashAlgorithm.getImplementedHashAlgorithms()) {
+                        // check the algorithm is usable
+                        if (algorithm.isDeprecated(new Date())) {
+                            continue;
+                        }
+                        try {
+                            if (!doc.getDataHash(algorithm).equals(other.getDataHash(algorithm))) {
+                                throw new IllegalArgumentException(
+                                        "Found multiple documents with same name and non-matching data hash!"
+                                );
+                            }
+                            result = true;
+                        } catch (DataHashException e) {
+                            // ignore since EmptyEnvelope or similar
+                        }
+                    }
+                    if (!result) {
+                        throw new IllegalArgumentException(
+                                "Found multiple documents with same name and no matching data hashes!"
+                        );
+                    }
+                }
+                documentMap.get(doc.getFileName()).add(doc);
+            } else {
+                List<Document> newList = new ArrayList<>();
+                newList.add(doc);
+                documentMap.put(doc.getFileName(), newList);
+            }
+        }
+    }
+
+    private void validateDocumentFilenames(Collection<String> documentList, Set<String> allowedDocumentNames) {
+        for (String filename : documentList) {
+            if (allowedDocumentNames.contains(filename)) {
+                continue;
+            }
             if (filename.equals(META_INF) ||
                     filename.startsWith(META_INF + "/") ||
                     filename.equals(MIME_TYPE_ENTRY_NAME)) {
                 throw new IllegalArgumentException("File name is not valid! File name: " + filename);
             }
+        }
+    }
+
+    private IndexProvider getIndexProvider(Envelope existingEnvelope) {
+        if (existingEnvelope != null) {
+            return indexProviderFactory.create(existingEnvelope);
+        } else {
+            return indexProviderFactory.create();
         }
     }
 
@@ -217,17 +275,6 @@ public final class EnvelopePackagingFactory {
                 }
             }
             throw new InvalidEnvelopeException("Created envelope did not pass internal verification");
-        }
-    }
-
-    private void verifyNoDuplicateDocumentNames(Set<Document> documents) throws IllegalArgumentException {
-        Set<String> uniqueDocumentNames = new HashSet<>();
-        for (Document doc : documents) {
-            uniqueDocumentNames.add(doc.getFileName());
-        }
-
-        if (uniqueDocumentNames.size() < documents.size()) {
-            throw new IllegalArgumentException("Found multiple documents with same name!");
         }
     }
 

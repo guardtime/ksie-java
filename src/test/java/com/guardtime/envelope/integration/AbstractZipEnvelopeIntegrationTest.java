@@ -265,7 +265,6 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         }
     }
 
-    //TODO KSIE-98: Should fail in the future - this should not be allowed.
     @Test
     public void testNotUsedInternalFileReferencedAsDocument() throws  Exception {
         try (FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_UNUSED_INTERNAL_FILE_AS_DOC_REFERENCE));
@@ -275,10 +274,10 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         }
     }
 
-    //TODO: KSIE-98:Should fail in the future - this should not be allowed
-    //TODO      and thus becomes obsolete as previous test would cover this.
     @Test
-    public void testNotUsedInternalFileReferencedAsDocumentAndAdd() throws  Exception {
+    public void testNotUsedInternalFileReferencedAsDocumentAndAdd_ThrowsIllegalArgumentException() throws  Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("File name is not valid! File name: META-INF/manifest-3.tlv");
         EnvelopePackagingFactory factory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
                 .withIndexProviderFactory(new IncrementingIndexProviderFactory())
@@ -448,7 +447,9 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
     }
 
     @Test
-    public void testAddDocumentsToExistingEnvelopeWithOneContentRemoved_OK() throws Exception {
+    public void testAddDocumentsToExistingEnvelopeWithOneContentRemoved_ThrowsIllegalArgumentException() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("File name is not valid! File name: META-INF/");
         try (
                 Envelope existingEnvelope = packagingFactoryWithIncIndex.read(
                         new FileInputStream(loadFile(ENVELOPE_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED))
