@@ -27,6 +27,7 @@ import com.guardtime.envelope.verification.result.SignatureResult;
 import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.envelope.verification.rule.RuleTerminatingException;
 import com.guardtime.envelope.verification.rule.signature.SignatureVerifier;
+import com.guardtime.ksi.Verifier;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -35,11 +36,13 @@ import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicy;
 
 public class KsiSignatureVerifier implements SignatureVerifier<KSISignature> {
 
-    protected final com.guardtime.ksi.SignatureVerifier verifier = new com.guardtime.ksi.SignatureVerifier();
+    protected final com.guardtime.ksi.Verifier verifier;
     protected final ContextAwarePolicy contextAwarePolicy;
 
-    public KsiSignatureVerifier(ContextAwarePolicy policy) {
+    public KsiSignatureVerifier(Verifier verifier, ContextAwarePolicy policy) {
         Util.notNull(policy, "Context aware policy");
+        Util.notNull(verifier, "Signature verifier");
+        this.verifier = verifier;
         this.contextAwarePolicy = policy;
     }
 

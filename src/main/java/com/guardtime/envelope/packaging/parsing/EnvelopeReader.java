@@ -93,7 +93,7 @@ public abstract class EnvelopeReader {
      * Processes input stream containing envelope and stores each entry in envelope to parsing store.
      * @param input            {@link InputStream} containing {@link Envelope}.
      * @param store            Stores all parsed entries. Implementation must add each entry to store(key, stream) method.
-     * @param readingException Holds all expectable exceptions if any occurr.
+     * @param readingException Holds all expectable exceptions if any occurs.
      * @throws IOException     When error occurs during accessing of InputStream.
      */
     protected abstract void parseInputStream(InputStream input, ParsingStore store, EnvelopeReadingException readingException)

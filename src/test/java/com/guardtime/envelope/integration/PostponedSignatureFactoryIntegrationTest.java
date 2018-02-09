@@ -78,7 +78,7 @@ public class PostponedSignatureFactoryIntegrationTest extends AbstractCommonInte
         );
 
         verifier = new EnvelopeVerifier(
-                new DefaultVerificationPolicy(new KsiSignatureVerifier(ContextAwarePolicyAdapter.createInternalPolicy()))
+                new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, ContextAwarePolicyAdapter.createInternalPolicy()))
         );
     }
 

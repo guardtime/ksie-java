@@ -49,7 +49,7 @@ import static com.guardtime.envelope.packaging.EnvelopeWriter.MIME_TYPE_ENTRY_NA
 
 
 /**
- * Helper that manages different {@link ContentHandler} instances and parsed in envelope content.
+ * Helper that manages different {@link ContentHandler} instances and parsed envelope contents.
  * Converts entries in ParsingStore to appropriate {@link com.guardtime.envelope.EnvelopeElement} by using different
  * {@link ContentHandler}s.
  */
