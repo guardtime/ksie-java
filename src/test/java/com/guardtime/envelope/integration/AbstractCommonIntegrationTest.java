@@ -36,8 +36,11 @@ import com.guardtime.ksi.service.client.http.HttpClientSettings;
 import com.guardtime.ksi.service.http.simple.SimpleHttpClient;
 import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
 
+import org.junit.Assert;
 import org.junit.Before;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -128,4 +131,21 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
         }
     }
 
+    /*
+    Created envelope will be closed.
+     */
+    void writeEnvelopeToAndReadFromStream(Envelope envelope, EnvelopePackagingFactory packagingFactory)
+            throws Exception {
+        Assert.assertNotNull(envelope);
+        int contentCount = envelope.getSignatureContents().size();
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            envelopeWriter.write(envelope, bos);
+            try (
+                    ByteArrayInputStream stream = new ByteArrayInputStream(bos.toByteArray());
+                    Envelope inputEnvelope = packagingFactory.read(stream)) {
+                Assert.assertNotNull(inputEnvelope);
+                Assert.assertEquals(contentCount, inputEnvelope.getSignatureContents().size());
+            }
+        }
+    }
 }
