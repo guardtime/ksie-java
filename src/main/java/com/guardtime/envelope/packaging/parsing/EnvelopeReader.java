@@ -25,7 +25,7 @@ import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
-import com.guardtime.envelope.packaging.exception.InvalidPackageException;
+import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.packaging.parsing.handler.ContentParsingException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
@@ -65,7 +65,20 @@ public abstract class EnvelopeReader {
         this.parsingStoreFactory = storeFactory;
     }
 
-    public Envelope read(InputStream input) throws IOException, InvalidPackageException, ParsingStoreException {
+    /**
+     *Parses an {@link InputStream} to produce an {@link Envelope}.
+     *
+     * @param input    An {@link InputStream} that contains a valid/parsable {@link Envelope}. This InputStream will be
+     *                       closed after reading.
+     * @return An instance of {@link Envelope} based on the data from {@link InputStream}. Does not verify
+     *         the envelope/signature(s).
+     * @throws InvalidEnvelopeException When the {@link InputStream} does not contain a parsable {@link Envelope}.
+     * @throws EnvelopeReadingException When there were issues parsing some elements of the {@link Envelope}. The parsed
+     *         envelope and all encountered exceptions can be retrieved from this exception.
+     * @throws IOException              When errors occur accessing data in provided {@link InputStream}.
+     * @throws ParsingStoreException    When errors are encountered while interacting with the {@link ParsingStore}.
+     */
+    public Envelope read(InputStream input) throws IOException, InvalidEnvelopeException, ParsingStoreException {
         EnvelopeReadingException readingException = new EnvelopeReadingException("Reading envelope encountered errors!");
         ParsingStore parsingStore = parsingStoreFactory.create();
         parseInputStream(input, parsingStore, readingException);
@@ -80,7 +93,7 @@ public abstract class EnvelopeReader {
         readingException.setEnvelope(envelope);
 
         if (!containsValidContents(contents)) {
-            readingException.addException(new InvalidPackageException("Parsed envelope was not valid"));
+            readingException.addException(new InvalidEnvelopeException("Parsed envelope was not valid"));
         }
 
         if (!readingException.getExceptions().isEmpty()) {
@@ -125,16 +138,16 @@ public abstract class EnvelopeReader {
                 content.getAnnotationsManifest() != null;
     }
 
-    private void validateMimeType(EnvelopeElementExtractor envelopeElementExtractor) throws InvalidPackageException {
+    private void validateMimeType(EnvelopeElementExtractor envelopeElementExtractor) throws InvalidEnvelopeException {
         try {
             byte[] content = envelopeElementExtractor.getMimeTypeContent();
             String parsedMimeType = new String(content);
             if (!parsedMimeType.equals(getMimeType())) {
-                throw new InvalidPackageException("Parsed Envelope has invalid MIME type. Can't process it!");
+                throw new InvalidEnvelopeException("Parsed Envelope has invalid MIME type. Can't process it!");
             }
         } catch (ContentParsingException e) {
             LOGGER.debug("Failed to parse MIME type. Reason: '{}", e.getMessage());
-            throw new InvalidPackageException("No parsable MIME type.", e);
+            throw new InvalidEnvelopeException("No parsable MIME type.", e);
         }
     }
 

@@ -32,7 +32,7 @@ import com.guardtime.envelope.manifest.tlv.TlvEnvelopeManifestFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.SignatureContent;
-import com.guardtime.envelope.packaging.exception.InvalidPackageException;
+import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.signature.SignatureFactoryType;
 import com.guardtime.envelope.verification.policy.LimitedInternalVerificationPolicy;
@@ -309,7 +309,7 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
 
     @Test
     public void testCreateVerifiesInvalidEnvelope_NOK() throws Exception {
-        expectedException.expect(InvalidPackageException.class);
+        expectedException.expect(InvalidEnvelopeException.class);
         expectedException.expectMessage("Created envelope did not pass internal verification");
         EnvelopePackagingFactory packagingFactory =
                 new ZipEnvelopePackagingFactoryBuilder().withSignatureFactory(mockedSignatureFactory).build();
@@ -377,7 +377,7 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
 
     @Test
     public void testReadFromBadStream_ThrowsInvalidPackageException() throws Exception {
-        expectedException.expect(InvalidPackageException.class);
+        expectedException.expect(InvalidEnvelopeException.class);
         expectedException.expectMessage("Failed to parse InputStream");
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(mockedSignatureFactory)

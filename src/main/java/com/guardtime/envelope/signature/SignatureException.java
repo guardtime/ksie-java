@@ -21,6 +21,9 @@ package com.guardtime.envelope.signature;
 
 import com.guardtime.envelope.EnvelopeException;
 
+/**
+ * Covers any issues encountered with {@link EnvelopeSignature}.
+ */
 public class SignatureException extends EnvelopeException {
 
     public SignatureException(Exception e) {

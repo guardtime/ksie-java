@@ -19,8 +19,14 @@
 
 package com.guardtime.envelope.packaging.exception;
 
+/**
+ * Indicates an issue with {@link com.guardtime.envelope.signature.EnvelopeSignature}s when merging
+ * {@link com.guardtime.envelope.packaging.Envelope}s
+ */
 public class SignatureMergingException extends EnvelopeMergingException {
+
     public SignatureMergingException(String s) {
         super(s);
     }
+
 }

@@ -21,6 +21,10 @@ package com.guardtime.envelope.verification.rule;
 
 import com.guardtime.envelope.EnvelopeException;
 
+/**
+ * To be used when verification process should be halted due to rule failure which dictates that no more verification rules can
+ * be executed or an unrecoverable error encountered during rule execution.
+ */
 public class RuleTerminatingException extends EnvelopeException {
 
     public RuleTerminatingException(String message) {
