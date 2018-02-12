@@ -267,7 +267,6 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
         when(mockKsi.read(any(InputStream.class))).thenThrow(SignatureException.class);
         setUpEnvelope(ENVELOPE_WITH_BROKEN_SIGNATURE_CONTENT, false);
         assertExceptionsContainMessage("Failed to parse content of stream as EnvelopeSignature.");
-        assertExceptionsContainMessage("Failed to parse content of stream as EnvelopeSignature.");
         assertExceptionsContainMessage("No content stored for entry 'META-INF/annotmanifest-2.tlv'!");
     }
 

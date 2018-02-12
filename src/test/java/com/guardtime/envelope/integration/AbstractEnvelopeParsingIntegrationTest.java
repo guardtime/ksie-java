@@ -36,8 +36,6 @@ import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
-import com.guardtime.envelope.verification.policy.LimitedInternalVerificationPolicy;
-import com.guardtime.ksi.unisignature.KSISignature;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,11 +50,8 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 
-public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
+public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCommonIntegrationTest {
     private EnvelopePackagingFactory packagingFactoryWithIncIndex;
     private EnvelopePackagingFactory packagingFactoryWithUuid;
     private EnvelopePackagingFactory defaultPackagingFactory;
@@ -178,149 +173,6 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
                         Envelope parsedInEnvelope = defaultPackagingFactory.read(inputStream)
                 ) {
                     assertSingleContentsWithSingleDocument(parsedInEnvelope);
-            }
-        }
-    }
-
-    @Test
-    public void testContentOrderWithTwoContents() throws Exception {
-        try (
-                FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_RANDOM_UUID_INDEXES));
-                Envelope existingEnvelope = packagingFactoryWithUuid.read(stream);
-                ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-                Document document = new StreamDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
-        ) {
-            Assert.assertTrue(compareSignatureContentListOrder(existingEnvelope));
-
-            packagingFactoryWithUuid.addSignature(
-                    existingEnvelope,
-                    singletonList(document),
-                    singletonList(stringEnvelopeAnnotation)
-            );
-
-            Assert.assertTrue(compareSignatureContentListOrder(existingEnvelope));
-        }
-    }
-
-    @Test
-    public void testContentOrderWithThreeContents() throws Exception {
-        try (
-                FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_MIXED_INDEX_TYPES_IN_CONTENTS));
-                Envelope existingEnvelope = packagingFactoryWithUuid.read(stream);
-                ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-                Document document = new StreamDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
-        ) {
-            Assert.assertTrue(compareSignatureContentListOrder(existingEnvelope));
-
-            packagingFactoryWithUuid.addSignature(
-                    existingEnvelope,
-                    singletonList(document),
-                    singletonList(stringEnvelopeAnnotation)
-            );
-
-            Assert.assertTrue(compareSignatureContentListOrder(existingEnvelope));
-        }
-    }
-
-    @Test
-    public void testDocumentOrderWithSameSigningTimes() throws Exception {
-        try (FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_MULTIPLE_SIGNATURES_WITH_SAME_SIGNING_TIME));
-              Envelope envelope = packagingFactoryWithIncIndex.read(stream);
-              ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-              Document document = new StreamDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
-        ) {
-            packagingFactoryWithIncIndex.addSignature(
-                    envelope,
-                    singletonList(document),
-                    singletonList(stringEnvelopeAnnotation)
-            );
-            KSISignature signature0 = (KSISignature) envelope.getSignatureContents().get(0).getEnvelopeSignature().getSignature();
-            KSISignature signature1 = (KSISignature) envelope.getSignatureContents().get(1).getEnvelopeSignature().getSignature();
-            KSISignature signature2 = (KSISignature) envelope.getSignatureContents().get(2).getEnvelopeSignature().getSignature();
-
-            Assert.assertFalse(signature0.getAggregationTime().after(signature1.getAggregationTime()));
-            Assert.assertFalse(signature0.getAggregationTime().before(signature1.getAggregationTime()));
-
-            Assert.assertTrue(signature2.getAggregationTime().after(signature0.getAggregationTime()));
-            Assert.assertTrue(signature2.getAggregationTime().after(signature1.getAggregationTime()));
-
-            Assert.assertTrue(envelope.getSignatureContents().get(0).getManifest().getSignatureReference().getUri()
-                    .startsWith("META-INF/signature-1.ksi"));
-            Assert.assertTrue(envelope.getSignatureContents().get(1).getManifest().getSignatureReference().getUri()
-                    .startsWith("META-INF/signature-2.ksi"));
-            Assert.assertTrue(envelope.getSignatureContents().get(2).getManifest().getSignatureReference().getUri()
-                    .startsWith("META-INF/signature-3.ksi"));
-        }
-    }
-
-    @Test
-    public void testInternalFileReferencedAsDocument() throws  Exception {
-        try (FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_INTERNAL_FILE_AS_DOC_REFERENCE));
-             Envelope envelope = packagingFactoryWithIncIndex.read(stream)
-        ) {
-            SignatureContent content = envelope.getSignatureContents().get(1);
-            content.detachDocument(content.getDocuments().values().iterator().next().getFileName());
-
-            writeEnvelopeToAndReadFromStream(envelope, packagingFactoryWithIncIndex);
-        }
-    }
-
-    @Test
-    public void testNotUsedInternalFileReferencedAsDocument() throws  Exception {
-        try (FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_UNUSED_INTERNAL_FILE_AS_DOC_REFERENCE));
-             Envelope envelope = packagingFactoryWithIncIndex.read(stream)
-        ) {
-            writeEnvelopeToAndReadFromStream(envelope, packagingFactoryWithIncIndex);
-        }
-    }
-
-    @Test
-    public void testNotUsedInternalFileReferencedAsDocumentAndAdd_ThrowsIllegalArgumentException() throws  Exception {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("File name is not valid! File name: META-INF/manifest-3.tlv");
-        EnvelopePackagingFactory factory = new ZipEnvelopePackagingFactoryBuilder()
-                .withSignatureFactory(signatureFactory)
-                .withIndexProviderFactory(new IncrementingIndexProviderFactory())
-                .withParsingStoreFactory(parsingStoreFactory)
-                .withVerificationPolicy(new LimitedInternalVerificationPolicy())
-                .build();
-        try (FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_UNUSED_INTERNAL_FILE_AS_DOC_REFERENCE));
-             Envelope envelope = factory.read(stream);
-             ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-             Document document = new StreamDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
-        ) {
-            factory.addSignature(
-                    envelope,
-                    singletonList(document),
-                    singletonList(stringEnvelopeAnnotation)
-            );
-
-            assertNotNull(envelope);
-            int contentCount = envelope.getSignatureContents().size();
-            try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-                envelopeWriter.write(envelope, bos);
-                try (
-                        ByteArrayInputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
-                        Envelope inputEnvelope = factory.read(inputStream)) {
-                    assertNotNull(inputEnvelope);
-                    Assert.assertEquals(contentCount, inputEnvelope.getSignatureContents().size());
-                    //Detach doc
-                    inputEnvelope.getSignatureContents().get(1).detachDocument(
-                            inputEnvelope.getSignatureContents().get(1)
-                                    .getDocumentsManifest().getDocumentReferences().get(0).getUri());
-                    //Attach doc
-                    inputEnvelope.getSignatureContents().get(1).attachDetachedDocument(
-                            inputEnvelope.getSignatureContents().get(1)
-                                    .getDocumentsManifest().getDocumentReferences().get(0).getUri(),
-                            inputEnvelope.getSignatureContents().get(0)
-                                    .getManifest().getInputStream()
-                    );
-                    try {
-                        writeEnvelopeToAndReadFromStream(inputEnvelope, factory);
-                    } catch (EnvelopeReadingException e) {
-                        //As expected.
-                    }
-                }
             }
         }
     }
@@ -569,7 +421,7 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
             //Empty
         } catch (EnvelopeReadingException e) {
             try (Envelope envelope = e.getEnvelope()) {
-                assertFalse(envelope.getSignatureContents().isEmpty());
+                Assert.assertFalse(envelope.getSignatureContents().isEmpty());
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 envelopeWriter.write(envelope, bos);
             }
@@ -584,29 +436,17 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
         ));
     }
 
-    private boolean compareSignatureContentListOrder(Envelope envelope) {
-        SignatureContent previous = null;
-        for (SignatureContent content : envelope.getSignatureContents()) {
-            if (previous != null && !((KSISignature) previous.getEnvelopeSignature().getSignature()).getAggregationTime().before(
-                    ((KSISignature) content.getEnvelopeSignature().getSignature()).getAggregationTime())) {
-                return false;
-            }
-            previous = content;
-        }
-        return true;
-    }
-
     private void assertSingleContentsWithSingleDocumentWithName(Envelope envelope, String testFileName) {
         List<? extends SignatureContent> contents = envelope.getSignatureContents();
-        assertNotNull(contents);
-        assertEquals(1, contents.size());
+        Assert.assertNotNull(contents);
+        Assert.assertEquals(1, contents.size());
 
         SignatureContent content = contents.get(0);
-        assertNotNull(content);
+        Assert.assertNotNull(content);
         Map<String, Document> documents = content.getDocuments();
-        assertEquals(1, documents.size());
+        Assert.assertEquals(1, documents.size());
         if (testFileName != null) {
-            assertNotNull(documents.get(testFileName));
+            Assert.assertNotNull(documents.get(testFileName));
         }
     }
 
@@ -629,24 +469,6 @@ public abstract class AbstractZipEnvelopeIntegrationTest extends AbstractCommonI
                 singletonList(stringEnvelopeAnnotation)
         )) {
             writeEnvelopeToAndReadFromStream(envelope, packagingFactoryWithIncIndex);
-        }
-    }
-
-    /*
-    Created envelope will be closed.
-     */
-    private void writeEnvelopeToAndReadFromStream(Envelope envelope, EnvelopePackagingFactory packagingFactory)
-            throws Exception {
-        assertNotNull(envelope);
-        int contentCount = envelope.getSignatureContents().size();
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-            envelopeWriter.write(envelope, bos);
-            try (
-                    ByteArrayInputStream stream = new ByteArrayInputStream(bos.toByteArray());
-                    Envelope inputEnvelope = packagingFactory.read(stream)) {
-                assertNotNull(inputEnvelope);
-                Assert.assertEquals(contentCount, inputEnvelope.getSignatureContents().size());
-            }
         }
     }
 }
