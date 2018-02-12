@@ -128,9 +128,11 @@ public final class EnvelopePackagingFactory {
      * @param files          List of {@link Document} to be added and signed. Can NOT be null.
      * @param annotations    List of {@link Annotation} to be added and signed. Can be null.
      * @return A new {@link Envelope} which contains the documents and annotations and a signature covering them.
-     * @throws InvalidEnvelopeException  When the input data can not be processed or signing fails.
+     * @throws InvalidEnvelopeException When composing the {@link Envelope} fails or its verification fails.
+     * @throws SignatureException When acquiring root signature from signing service fails.
      */
-    public Envelope create(List<Document> files, List<Annotation> annotations) throws InvalidEnvelopeException {
+    public Envelope create(List<Document> files, List<Annotation> annotations)
+            throws InvalidEnvelopeException, SignatureException {
         SignatureContent signatureContent = verifyAndSign(files, annotations, null);
         Envelope envelope = new Envelope(signatureContent);
         verifyEnvelope(envelope);
@@ -139,18 +141,18 @@ public final class EnvelopePackagingFactory {
 
     /**
      * Creates a {@link SignatureContent} that contains the new set of
-     * documents, annotations and a signature for the added elements and adds it to the {@param existingEnvelope}.
+     * documents, annotations and a signature for the added elements and adds it to the existingEnvelope.
      *
-     * @param existingEnvelope    An instance of {@link Envelope} which already has
-     *                             {@link EnvelopeSignature}(s).
+     * @param existingEnvelope    An instance of {@link Envelope} which already has {@link EnvelopeSignature}(s).
      * @param files                List of {@link Document} to be added and signed. Can NOT be null.
      * @param annotations          List of {@link Annotation} to be added and signed. Can be null.
-     * @throws InvalidEnvelopeException When the input data can not be processed or signing fails.
+     * @throws InvalidEnvelopeException When composing the {@link Envelope} fails or its verification fails.
      * @throws EnvelopeMergingException When there are issues adding the newly created {@link SignatureContent} to
-     * {@param existingEnvelope}.
+     * existingEnvelope.
+     * @throws SignatureException When acquiring root signature from signing service fails.
      */
     public void addSignature(Envelope existingEnvelope, List<Document> files, List<Annotation> annotations)
-            throws InvalidEnvelopeException, EnvelopeMergingException {
+            throws InvalidEnvelopeException, EnvelopeMergingException, SignatureException {
         Util.notNull(existingEnvelope, "Envelope");
         SignatureContent signatureContent = verifyAndSign(files, annotations, existingEnvelope);
         existingEnvelope.add(signatureContent);
@@ -158,7 +160,7 @@ public final class EnvelopePackagingFactory {
     }
 
     private SignatureContent verifyAndSign(List<Document> documentList, List<Annotation> annotations,
-                                           Envelope existingEnvelope) throws InvalidEnvelopeException {
+                                           Envelope existingEnvelope) throws InvalidEnvelopeException, SignatureException {
         Util.notEmpty(documentList, "Document files");
         validateDocuments(documentList, existingEnvelope);
         IndexProvider indexProvider = getIndexProvider(existingEnvelope);
@@ -173,8 +175,6 @@ public final class EnvelopePackagingFactory {
             ).sign();
         } catch (DataHashException | InvalidManifestException e) {
             throw new InvalidEnvelopeException("Failed to create internal structure!", e);
-        } catch (SignatureException e) {
-            throw new InvalidEnvelopeException("Failed to acquire signature!", e);
         }
     }
 

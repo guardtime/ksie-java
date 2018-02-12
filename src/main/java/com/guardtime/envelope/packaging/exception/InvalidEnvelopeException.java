@@ -22,8 +22,7 @@ package com.guardtime.envelope.packaging.exception;
 import com.guardtime.envelope.EnvelopeException;
 
 /**
- * Indicates that there is an unrecoverable internal error with the {@link com.guardtime.envelope.packaging.Envelope} that is
- * preventing it from being parsed or written.
+ * Indicates that there is an unrecoverable internal error with the {@link com.guardtime.envelope.packaging.Envelope}.
  */
 public class InvalidEnvelopeException extends EnvelopeException {
 
