@@ -78,10 +78,10 @@ public abstract class AbstractAnnotation implements Annotation {
 
     @Override
     public String toString() {
-        return this.getClass().toString() +
-                " {type=\'" + type.getContent() + "\'" +
-                ", domain=\'" + domain + "\'" +
-                ", content=\'" + getContent() + "\'}";
+        return this.getClass().getSimpleName() +
+                " {type= \'" + type.getContent() + '\'' +
+                ", domain= \'" + getDomain() + '\'' +
+                ", content= \'" + getContent() + "\'}";
     }
 
     private String getContent() {

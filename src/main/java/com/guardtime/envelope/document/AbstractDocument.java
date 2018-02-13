@@ -92,9 +92,9 @@ public abstract class AbstractDocument implements Document {
 
     @Override
     public String toString() {
-        return this.getClass().toString() +
-                " {fileName=\'" + fileName +
-                "\', mimeType=\'" + mimeType + "\'}";
+        return this.getClass().getSimpleName() +
+                " {fileName= \'" + getFileName() + '\'' +
+                ", mimeType= \'" + getMimeType() + "\'}";
     }
 
     @Override

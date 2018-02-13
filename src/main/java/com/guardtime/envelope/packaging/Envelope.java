@@ -204,4 +204,14 @@ public class Envelope implements AutoCloseable {
     public boolean isClosed() {
         return closed;
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + " {" +
+                "signatureContents= " + signatureContents +
+                ", closed= " + closed +
+                ", unknownFiles= " + unknownFiles +
+                '}';
+    }
+
 }

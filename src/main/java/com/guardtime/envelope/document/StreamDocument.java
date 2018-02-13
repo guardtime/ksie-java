@@ -88,13 +88,6 @@ public class StreamDocument implements Document {
         return !closed;
     }
 
-    @Override
-    public String toString() {
-        return "{type=Stream" +
-                ", fileName=" + envelopeDocument.getFileName() +
-                ", mimeType=" + envelopeDocument.getMimeType() + "}";
-    }
-
     protected File copy(InputStream input) {
         try {
             File tempFile = createTempFile();

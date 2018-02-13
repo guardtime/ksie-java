@@ -215,6 +215,19 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
         return compared;
     }
 
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + " {" +
+                "manifest= " + manifest.getPath() + '\'' +
+                ", signature= " + manifest.getSignatureReference().getUri() +
+                ", documentsManifest= " + documentsManifest.getPath() + '\'' +
+                ", annotationsManifest= " + annotationsManifest.getPath() + '\'' +
+                ", documents= '" + documents.keySet() +
+                ", singleAnnotationManifests= " + singleAnnotationManifestMap.keySet() +
+                ", annotations= " + annotations.keySet() +
+                '}';
+    }
+
     public static class Builder {
 
         private List<Document> documents;

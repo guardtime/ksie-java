@@ -42,4 +42,12 @@ public class KsiSignatureFactoryType implements SignatureFactoryType {
         return KSI_SIGNATURE_MIME_TYPE;
     }
 
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + " {" +
+                "name= \'" + getName() + '\'' +
+                ", fileExtension= \'" + getSignatureFileExtension() + '\'' +
+                ", mimeType= \'" + getSignatureMimeType() + "\'}";
+    }
+
 }
