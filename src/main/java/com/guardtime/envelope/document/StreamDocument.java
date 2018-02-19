@@ -42,6 +42,12 @@ public class StreamDocument implements Document {
     private FileDocument envelopeDocument;
     private boolean closed;
 
+    /**
+     * Creates {@link Document} with provided MIME-type and file name. Uses provided {@link InputStream} as data source.
+     * @param input     The data source of the {@link Document}.
+     * @param mimeType  The MIME-type of the {@link Document}.
+     * @param fileName  The file name to be used for the {@link Document}.
+     */
     public StreamDocument(InputStream input, String mimeType, String fileName) {
         notNull(input, "Input stream");
         notNull(mimeType, "MIME type");
@@ -78,7 +84,7 @@ public class StreamDocument implements Document {
     }
 
     @Override
-    public List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws IOException, DataHashException {
+    public List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws DataHashException {
         checkClosed();
         return envelopeDocument.getDataHashList(algorithmList);
     }

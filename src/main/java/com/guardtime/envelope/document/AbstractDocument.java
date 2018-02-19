@@ -32,6 +32,10 @@ import java.util.List;
 
 import static com.guardtime.envelope.util.Util.notNull;
 
+
+/**
+ * Generic implementation for {@link Document} that is lacking {@link Document#getInputStream()} implementation.
+ */
 public abstract class AbstractDocument implements Document {
 
     public static final HashAlgorithm HASH_ALGORITHM = HashAlgorithm.SHA2_256;
@@ -39,6 +43,12 @@ public abstract class AbstractDocument implements Document {
     protected final String mimeType;
     protected final String fileName;
 
+    /**
+     *
+     * Creates {@link Document} with provided MIME-type and file name.
+     * @param mimeType The MIME-type of the {@link Document}.
+     * @param fileName The file name to be used for the {@link Document}.
+     */
     protected AbstractDocument(String mimeType, String fileName) {
         notNull(mimeType, "MIME type");
         notNull(fileName, "File name");

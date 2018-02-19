@@ -32,7 +32,14 @@ public class StringAnnotation extends AbstractAnnotation {
 
     private final String content;
 
-    public StringAnnotation(EnvelopeAnnotationType type, String content, String domain) {
+    /**
+     * Creates {@link Annotation} with provided type, domain and given {@link String} as value.
+     * @param content The {@link String} content of the {@link Annotation}.
+     * @param domain The key of the annotation key-value pair. To prevent key conflicts, the prefix x.y.z. is reserved to the
+     *               entity controlling the Internet domain name z.y.x.
+     * @param type annotation type, indicating the persistence of the annotation, see {@link EnvelopeAnnotationType} for details.
+     */
+    public StringAnnotation(String content, String domain, EnvelopeAnnotationType type) {
         super(domain, type);
         notNull(content, "Content");
         this.content = content;

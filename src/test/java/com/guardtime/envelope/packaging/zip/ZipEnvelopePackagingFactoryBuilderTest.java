@@ -80,9 +80,9 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     public void setUp() throws Exception {
         super.setUp();
         annotationList.add(new StringAnnotation(
-                EnvelopeAnnotationType.NON_REMOVABLE,
                 ANNOTATION_CONTENT,
-                ANNOTATION_DOMAIN_COM_GUARDTIME
+                ANNOTATION_DOMAIN_COM_GUARDTIME,
+                EnvelopeAnnotationType.NON_REMOVABLE
         ));
         documentList.add(testDocumentHelloText);
     }
@@ -234,9 +234,9 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
         documentsList.add(testDocumentHelloPdf);
         List<Annotation> annotationsList = new ArrayList<>(annotationList);
         annotationsList.add(new StringAnnotation(
-                EnvelopeAnnotationType.VALUE_REMOVABLE,
                 "moreContent",
-                "com.guardtime.test.inner"
+                "com.guardtime.test.inner",
+                EnvelopeAnnotationType.VALUE_REMOVABLE
         ));
 
         try (Envelope envelope = createInternallyValidEnvelope(documentsList, annotationsList)) {
@@ -262,9 +262,9 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
             documentsList.add(streamDocument);
             List<Annotation> annotationsList = new ArrayList<>(annotationList);
             annotationsList.add(new StringAnnotation(
-                    EnvelopeAnnotationType.VALUE_REMOVABLE,
                     "moreContent",
-                    "com.guardtime.test.inner"
+                    "com.guardtime.test.inner",
+                    EnvelopeAnnotationType.VALUE_REMOVABLE
             ));
 
             try (Envelope newEnvelope = createInternallyValidEnvelope(documentsList, annotationsList, envelope)) {

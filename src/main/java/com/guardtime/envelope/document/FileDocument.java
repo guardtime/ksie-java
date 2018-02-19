@@ -33,10 +33,21 @@ public class FileDocument extends AbstractDocument {
 
     private final File file;
 
+    /**
+     * Creates {@link Document} with provided MIME-type and file.
+     * @param mimeType The MIME-type of the {@link Document}.
+     * @param file     The {@link File} to be used for the {@link Document} data and name.
+     */
     public FileDocument(File file, String mimeType) {
         this(file, mimeType, null);
     }
 
+    /**
+     * Creates {@link Document} with provided MIME-type and file and file name.
+     * @param file     The {@link File} to be used for the {@link Document} data.
+     * @param mimeType The MIME-type of the {@link Document}.
+     * @param fileName The file name to be used for the {@link Document}.
+     */
     public FileDocument(File file, String mimeType, String fileName) {
         super(mimeType, getFileName(file, fileName));
         this.file = file;

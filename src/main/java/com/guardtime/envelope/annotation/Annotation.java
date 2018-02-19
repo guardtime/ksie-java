@@ -36,8 +36,14 @@ import java.io.InputStream;
  */
 public interface Annotation extends AutoCloseable, EnvelopeElement {
 
+    /**
+     * @return Type of annotation as represented by {@link EnvelopeAnnotationType} ENUM.
+     */
     EnvelopeAnnotationType getAnnotationType();
 
+    /**
+     * @return Key of the annotation key-value pair.
+     */
     String getDomain();
 
     /**
@@ -48,8 +54,8 @@ public interface Annotation extends AutoCloseable, EnvelopeElement {
 
     /**
      * Sets the path value used by {@link EnvelopeElement#getPath()}.
-     *
-     * @param path
+     * Used internally by {@link com.guardtime.envelope.packaging.EnvelopePackagingFactory}.
+     * @param path Path of the annotation data within an {@link com.guardtime.envelope.packaging.Envelope}
      */
     void setPath(String path);
 

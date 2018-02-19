@@ -34,22 +34,30 @@ public class StringAnnotationTest extends AbstractEnvelopeTest {
     public void testCreateStringAnnotationWithoutInputString_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Content must be present");
-        new StringAnnotation(EnvelopeAnnotationType.NON_REMOVABLE, null, ANNOTATION_DOMAIN_COM_GUARDTIME);
+        new StringAnnotation(
+                null,
+                ANNOTATION_DOMAIN_COM_GUARDTIME,
+                EnvelopeAnnotationType.NON_REMOVABLE
+        );
     }
 
     @Test
     public void testCreateStringAnnotationWithoutAnnotationType_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Annotation type must be present");
-        new StringAnnotation(null, "Example Content", ANNOTATION_DOMAIN_COM_GUARDTIME);
+        new StringAnnotation(
+                "Example Content",
+                ANNOTATION_DOMAIN_COM_GUARDTIME,
+                null
+        );
     }
 
     @Test
     public void testCreateNewFileAnnotation() throws Exception {
         StringAnnotation annotation = new StringAnnotation(
-                EnvelopeAnnotationType.NON_REMOVABLE,
                 "Example Content",
-                ANNOTATION_DOMAIN_COM_GUARDTIME
+                ANNOTATION_DOMAIN_COM_GUARDTIME,
+                EnvelopeAnnotationType.NON_REMOVABLE
         );
         assertEquals(ANNOTATION_DOMAIN_COM_GUARDTIME, annotation.getDomain());
         assertEquals(EnvelopeAnnotationType.NON_REMOVABLE, annotation.getAnnotationType());

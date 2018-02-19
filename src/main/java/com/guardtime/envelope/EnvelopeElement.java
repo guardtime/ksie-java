@@ -23,8 +23,10 @@ import com.guardtime.envelope.util.DataHashException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
-
-
+/**
+ * Umbrella interface for any expected element of an {@link com.guardtime.envelope.packaging.Envelope}.
+ * Contains generic methods that all components of an {@link com.guardtime.envelope.packaging.Envelope} must implement.
+ */
 public interface EnvelopeElement {
 
     /**
