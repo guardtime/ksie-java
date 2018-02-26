@@ -30,9 +30,9 @@ import java.util.ListIterator;
  * Keeps all the records in the list sorted. Performs sorting at every insert.
  * Ignores duplicates.
  *
- * @param <E>  List entry type.
+ * @param <E>  List entry type. Must implement {@link Comparable}!
  *
- * NB! Does not allow inserting at specified index!
+ * NB! Does not allow inserting at specified index! All added values will be sorted into correct location in list at insert-time.
  */
 public class SortedList<E extends Comparable<? super E>> implements List<E> {
     private final List<E> delegate;
