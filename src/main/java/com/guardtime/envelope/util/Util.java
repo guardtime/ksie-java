@@ -74,7 +74,8 @@ public final class Util {
      * Hashes the inputStream with the given algorithm.
      *
      * @param inputStream data to be hashed.
-     * @param algorithm hash algorithm to be used for hashing. See {@link com.guardtime.envelope.hash.HashAlgorithmProvider} for available algorithms.
+     * @param algorithm hash algorithm to be used for hashing. See {@link com.guardtime.envelope.hash.HashAlgorithmProvider}
+     *                  for available algorithms.
      *
      * @return The {@link DataHash} of the inputStream.
      */
