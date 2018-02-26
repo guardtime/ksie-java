@@ -27,9 +27,10 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
- * Keeps all records in list sorted. Performs sorting at every insert.
+ * Keeps all the records in the list sorted. Performs sorting at every insert.
  * Ignores duplicates.
- * @param <E>  List entry type
+ *
+ * @param <E>  List entry type.
  *
  * NB! Does not allow inserting at specified index!
  */

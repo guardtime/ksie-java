@@ -31,26 +31,26 @@ import java.util.List;
 public interface HashAlgorithmProvider {
 
     /**
-     * Returns a {@link List} of all {@link HashAlgorithm}s to be used for creating {@link
+     * @return A {@link List} of all {@link HashAlgorithm}s to be used for creating {@link
      * com.guardtime.ksi.hashing.DataHash}es for {@link com.guardtime.envelope.manifest.FileReference}.
      */
     List<HashAlgorithm> getFileReferenceHashAlgorithms();
 
     /**
-     * Returns a {@link List} of all {@link HashAlgorithm}s to be used for creating {@link
+     * @return A {@link List} of all {@link HashAlgorithm}s to be used for creating {@link
      * com.guardtime.ksi.hashing.DataHash}es for {@link com.guardtime.envelope.manifest.FileReference} used
      * specifically for {@link Document}s.
      */
     List<HashAlgorithm> getDocumentReferenceHashAlgorithms();
 
     /**
-     * Returns a {@link HashAlgorithm} to be used for creating {@link
+     * @return A {@link HashAlgorithm} to be used for creating {@link
      * com.guardtime.ksi.hashing.DataHash} for {@link com.guardtime.envelope.manifest.AnnotationDataReference}.
      */
     HashAlgorithm getAnnotationDataReferenceHashAlgorithm();
 
     /**
-     * Returns a {@link HashAlgorithm} to be used when creating signature for the envelope.
+     * @return A {@link HashAlgorithm} to be used when creating signature for the envelope.
      */
     HashAlgorithm getSigningHashAlgorithm();
 }

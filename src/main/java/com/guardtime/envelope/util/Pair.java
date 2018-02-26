@@ -37,22 +37,24 @@ public final class Pair<L, R> {
     /**
      * Static factory method for creating a {@link Pair} instance.
      *
-     * @param left  left value. Can not be null
-     * @param right right value. Can not be null
+     * @param left  left value. Can not be null.
+     * @param right right value. Can not be null.
+     *
+     * @return The newly created {@link Pair}.
      */
     public static <L, R> Pair<L, R> of(L left, R right) {
         return new Pair(left, right);
     }
 
     /**
-     * Method for accessing the left value of the {@link Pair}
+     * @return The left value of the {@link Pair}.
      */
     public L getLeft() {
         return left;
     }
 
     /**
-     * Method for accessing the right value of the {@link Pair}
+     * @return The right value of the {@link Pair}.
      */
     public R getRight() {
         return right;

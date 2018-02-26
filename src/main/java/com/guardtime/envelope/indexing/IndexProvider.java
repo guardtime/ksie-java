@@ -19,6 +19,10 @@
 
 package com.guardtime.envelope.indexing;
 
+/**
+ * Provides the means to create various indexes.
+ */
+
 public interface IndexProvider {
 
     String getNextDocumentsManifestIndex();
