@@ -110,7 +110,11 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
                         "byte inputstream",
                         "byte-input-stream.bis"
                 );
-                Annotation annotation = new StringAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "content", "domain.com")
+                Annotation annotation = new StringAnnotation(
+                        "content",
+                        "domain.com",
+                        EnvelopeAnnotationType.FULLY_REMOVABLE
+                )
         ) {
             packagingFactory.addSignature(existingEnvelope, singletonList(document), singletonList(annotation));
             for (File doc : ksieTempFiles) {
@@ -135,7 +139,11 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
                         "byte inputstream",
                         "byte-input-stream.bis"
                 );
-                Annotation annotation = new StringAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "content", "domain.com")
+                Annotation annotation = new StringAnnotation(
+                        "content",
+                        "domain.com",
+                        EnvelopeAnnotationType.FULLY_REMOVABLE
+                )
         ) {
             packagingFactory.addSignature(existingEnvelope, singletonList(document), singletonList(annotation));
             for (File doc : getKsieTempFiles()) {
@@ -184,9 +192,9 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         try (
                 Document document = new StreamDocument(new ByteArrayInputStream(new byte[3]), "qwerty", "qwert.file");
                 Annotation annotation = new StringAnnotation(
-                        EnvelopeAnnotationType.FULLY_REMOVABLE,
                         "qwerty file",
-                        "qwerty.domain.com"
+                        "qwerty.domain.com",
+                        EnvelopeAnnotationType.FULLY_REMOVABLE
                 );
                 Envelope envelope = getEnvelope(ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION)
         ) {
