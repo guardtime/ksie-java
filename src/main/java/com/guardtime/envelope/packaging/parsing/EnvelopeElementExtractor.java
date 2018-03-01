@@ -49,7 +49,7 @@ import static com.guardtime.envelope.packaging.EnvelopeWriter.MIME_TYPE_ENTRY_NA
 
 
 /**
- * Helper that manages different {@link ContentHandler} instances and parsed in envelope content.
+ * Helper that manages different {@link ContentHandler} instances and parsed envelope contents.
  * Converts entries in ParsingStore to appropriate {@link com.guardtime.envelope.EnvelopeElement} by using different
  * {@link ContentHandler}s.
  */
@@ -131,8 +131,6 @@ class EnvelopeElementExtractor {
             return handler.parse(stream, path);
         } catch (IOException e) {
             throw new ContentParsingException("Failed to access data for '" + path + "'!");
-        } finally {
-            parsingStore.remove(path);
         }
     }
 
@@ -142,5 +140,14 @@ class EnvelopeElementExtractor {
             throw new ContentParsingException("No content stored for entry '" + path + "'!");
         }
         return parsingStore.get(path);
+    }
+
+    /**
+     * Clears parsingStore of content that has already been parsed.
+     */
+    public void clear() {
+        for (String key : requestedKeys) {
+            parsingStore.remove(key);
+        }
     }
 }

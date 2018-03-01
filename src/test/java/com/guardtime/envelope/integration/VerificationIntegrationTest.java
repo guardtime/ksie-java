@@ -75,7 +75,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     @Before
     public void setUpVerifier() {
         this.defaultPolicy = new DefaultVerificationPolicy(
-                new KsiSignatureVerifier(ContextAwarePolicyAdapter.createInternalPolicy())
+                new KsiSignatureVerifier(ksi, ContextAwarePolicyAdapter.createInternalPolicy())
         );
         this.verifier = new EnvelopeVerifier(defaultPolicy);
     }
@@ -140,7 +140,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     public void testVerifyingEnvelopeWithValidAndInvalidSignatures() throws Exception {
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_MULTI_CONTENT_ONE_SIGNATURE_IS_INVALID)) {
             EnvelopeVerifier verifier = new EnvelopeVerifier(
-                    new DefaultVerificationPolicy(new KsiSignatureVerifier(ContextAwarePolicyAdapter.createKeyPolicy(ksi)))
+                    new DefaultVerificationPolicy(new KsiSignatureVerifier(ksi, ContextAwarePolicyAdapter.createKeyPolicy(ksi)))
             );
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
             for (VerifiedSignatureContent content : verifiedEnvelope.getVerifiedSignatureContents()) {
@@ -424,7 +424,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         );
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_CHANGED_AND_EXTENDED_SIGNATURE_FILE)) {
             VerificationPolicy policy = new DefaultVerificationPolicy(
-                    new KsiSignatureVerifier(signatureVerificationPolicy)
+                    new KsiSignatureVerifier(ksi, signatureVerificationPolicy)
             );
             EnvelopeVerifier verifier = new EnvelopeVerifier(policy);
             VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
@@ -467,7 +467,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testEnvelopeWithValidSignature_VerificationSucceeds() throws Exception {
         VerificationPolicy policy = new DefaultVerificationPolicy(
-                new KsiSignatureVerifier(ContextAwarePolicyAdapter.createCalendarPolicy(ksi))
+                new KsiSignatureVerifier(ksi, ContextAwarePolicyAdapter.createCalendarPolicy(ksi))
         );
         EnvelopeVerifier envelopeVerifier = new EnvelopeVerifier(policy);
         try (Envelope envelope = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_ONE_DOCUMENT)) {
@@ -570,7 +570,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
 
     private EnvelopeVerifier getEnvelopeVerifier(ContextAwarePolicy policy) {
         VerificationPolicy envelopePolicy = new DefaultVerificationPolicy(
-                new KsiSignatureVerifier(policy)
+                new KsiSignatureVerifier(ksi, policy)
         );
         return new EnvelopeVerifier(envelopePolicy);
     }
@@ -610,10 +610,11 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
                         "txt",
                         singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(expectedDocumentContent).getHash()));
                 Annotation annotation = new StringAnnotation(
-                        EnvelopeAnnotationType.NON_REMOVABLE,
                         "Document is not with envelope. Envelope was created with empty envelope document. " +
                                 "Document itself can be added later on if needed.",
-                        "com.guardtime.com");
+                        "com.guardtime.com",
+                        EnvelopeAnnotationType.NON_REMOVABLE
+                );
                 Envelope envelope = packagingFactory.create(singletonList(document), singletonList(annotation));
                 InputStream stream = new ByteArrayInputStream(addedDocumentContent)
         ) {

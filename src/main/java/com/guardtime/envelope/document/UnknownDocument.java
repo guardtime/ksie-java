@@ -19,5 +19,9 @@
 
 package com.guardtime.envelope.document;
 
+/**
+ * For representing any data in an {@link com.guardtime.envelope.packaging.Envelope} that is not associated with any
+ * {@link com.guardtime.envelope.packaging.SignatureContent}.
+ */
 public interface UnknownDocument extends Document {
 }

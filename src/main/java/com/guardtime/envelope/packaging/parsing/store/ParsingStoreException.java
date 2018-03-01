@@ -21,7 +21,11 @@ package com.guardtime.envelope.packaging.parsing.store;
 
 import com.guardtime.envelope.EnvelopeException;
 
+/**
+ * For issues encountered when interacting with a {@link ParsingStore}.
+ */
 public class ParsingStoreException extends EnvelopeException {
+
     public ParsingStoreException(String message, Throwable cause) {
         super(message, cause);
     }
@@ -29,4 +33,5 @@ public class ParsingStoreException extends EnvelopeException {
     public ParsingStoreException(String message) {
         super(message);
     }
+
 }

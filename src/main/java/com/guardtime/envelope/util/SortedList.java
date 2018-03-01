@@ -182,4 +182,9 @@ public class SortedList<E extends Comparable<? super E>> implements List<E> {
     private void sort() {
         Collections.sort(delegate);
     }
+
+    @Override
+    public String toString() {
+        return delegate.toString();
+    }
 }

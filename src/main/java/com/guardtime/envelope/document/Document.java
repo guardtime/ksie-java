@@ -44,16 +44,17 @@ public interface Document extends EnvelopeElement, AutoCloseable {
     InputStream getInputStream() throws IOException;
 
     /**
-     * @param algorithmList
+     * @param algorithmList List of all {@link HashAlgorithm}s to be used for generating {@link DataHash}es.
      *
      * @return As many {@link DataHash}es as it can for provided {@link HashAlgorithm}s.
      * @throws {@link DataHashException}, if no {@link DataHash} can be generated.
      */
-    List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws IOException, DataHashException;
+    List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws DataHashException;
 
     /**
      * @return True for any document that's {@link InputStream} can be accessed and data extracted from it.
      */
     boolean isWritable();
+
 }
 

@@ -33,6 +33,9 @@ import java.io.InputStream;
 import static com.guardtime.envelope.util.Util.notNull;
 import static com.guardtime.ksi.util.Util.toByteArray;
 
+/**
+ * Generic implementation for {@link Annotation} that is lacking {@link Annotation#getInputStream()} implementation.
+ */
 public abstract class AbstractAnnotation implements Annotation {
     protected static final Logger logger = LoggerFactory.getLogger(Annotation.class);
 
@@ -41,6 +44,12 @@ public abstract class AbstractAnnotation implements Annotation {
     private DataHash dataHash;
     private String path;
 
+    /**
+     * Creates {@link Annotation} with provided type and domain.
+     * @param domain The key of the annotation key-value pair. To prevent key conflicts, the prefix x.y.z. is reserved to the
+     *               entity controlling the Internet domain name z.y.x.
+     * @param type annotation type, indicating the persistence of the annotation, see {@link EnvelopeAnnotationType} for details.
+     */
     public AbstractAnnotation(String domain, EnvelopeAnnotationType type) {
         notNull(domain, "Domain");
         notNull(type, "Annotation type");
@@ -78,10 +87,10 @@ public abstract class AbstractAnnotation implements Annotation {
 
     @Override
     public String toString() {
-        return this.getClass().toString() +
-                " {type=\'" + type.getContent() + "\'" +
-                ", domain=\'" + domain + "\'" +
-                ", content=\'" + getContent() + "\'}";
+        return this.getClass().getSimpleName() +
+                " {type= \'" + type.getContent() + '\'' +
+                ", domain= \'" + getDomain() + '\'' +
+                ", content= \'" + getContent() + "\'}";
     }
 
     private String getContent() {

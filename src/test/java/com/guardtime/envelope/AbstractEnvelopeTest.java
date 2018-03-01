@@ -162,9 +162,10 @@ public class AbstractEnvelopeTest {
 
     @Before
     public void setUpDocumentsAndAnnotations() {
-        stringEnvelopeAnnotation = new StringAnnotation(EnvelopeAnnotationType.NON_REMOVABLE,
+        stringEnvelopeAnnotation = new StringAnnotation(
                 ANNOTATION_CONTENT,
-                ANNOTATION_DOMAIN_COM_GUARDTIME
+                ANNOTATION_DOMAIN_COM_GUARDTIME,
+                EnvelopeAnnotationType.NON_REMOVABLE
         );
         testDocumentHelloText = new StreamDocument(
                 new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),

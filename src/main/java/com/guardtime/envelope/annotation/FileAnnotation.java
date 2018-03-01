@@ -34,12 +34,11 @@ public class FileAnnotation extends AbstractAnnotation {
     private final File file;
 
     /**
-     * Adds data and type to the annotation.
+     * Creates annotation of given type, specific file as a data source.
      *
      * @param file the {@link File} containing the annotation value.
-     * @param domain ???
+     * @param domain the annotation key.
      * @param type annotation type, indicating the persistence of the annotation, see {@link EnvelopeAnnotationType} for details.
-     *
      */
 
     public FileAnnotation(File file, String domain, EnvelopeAnnotationType type) {

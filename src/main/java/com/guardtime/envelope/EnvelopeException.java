@@ -21,9 +21,9 @@ package com.guardtime.envelope;
 
 
 /**
- * List of KSIE exceptions to throw.
+ * Base exception class for all exceptions related to KSIE.
+ * Preferably a more specific exception is used!
  */
-
 public class EnvelopeException extends Exception {
 
     public EnvelopeException(Throwable cause) {
@@ -37,4 +37,5 @@ public class EnvelopeException extends Exception {
     public EnvelopeException(String message) {
         super(message);
     }
+
 }

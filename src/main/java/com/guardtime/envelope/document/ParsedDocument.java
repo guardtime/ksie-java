@@ -35,12 +35,21 @@ public class ParsedDocument extends AbstractDocument implements UnknownDocument 
     private final ParsingStore parsingStore;
     private final String key;
 
-    public ParsedDocument(ParsingStore store, String key, String mimeType, String fileName) {
+    /**
+     *
+     * Creates {@link Document} with provided MIME-type and file name. The data for the {@link Document} is contained in the
+     * provided {@link ParsingStore} and can be accessed with the provided key.
+     * @param store             The {@link ParsingStore} that contains the document data.
+     * @param parsingStoreKey   The key for the data in {@link ParsingStore} of the document.
+     * @param mimeType          The MIME-type of the {@link Document}.
+     * @param fileName          The file name to be used for the {@link Document}.
+     */
+    public ParsedDocument(ParsingStore store, String parsingStoreKey, String mimeType, String fileName) {
         super(mimeType, fileName);
         notNull(store, "Parsing store");
-        notNull(key, "Parsing store key");
+        notNull(parsingStoreKey, "Parsing store key");
         this.parsingStore = store;
-        this.key = key;
+        this.key = parsingStoreKey;
     }
 
     @Override

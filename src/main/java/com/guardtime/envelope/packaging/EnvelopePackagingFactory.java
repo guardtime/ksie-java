@@ -35,7 +35,7 @@ import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.manifest.tlv.TlvEnvelopeManifestFactory;
 import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
-import com.guardtime.envelope.packaging.exception.InvalidPackageException;
+import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.packaging.parsing.EnvelopeReader;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
@@ -53,6 +53,7 @@ import com.guardtime.envelope.verification.policy.VerificationPolicy;
 import com.guardtime.envelope.verification.result.RuleVerificationResult;
 import com.guardtime.envelope.verification.result.VerificationResult;
 import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -98,24 +101,24 @@ public final class EnvelopePackagingFactory {
     }
 
     /**
-     * Parses an {@link InputStream} to produce a {@link Envelope}.
+     * Parses an {@link InputStream} to produce an {@link Envelope}.
      *
      * @param inputStream    An {@link InputStream} that contains a valid/parsable {@link Envelope}. This InputStream will be
      *                       closed after reading.
      * @return An instance of {@link Envelope} based on the data from {@link InputStream}. Does not verify
      *         the envelope/signature(s).
-     * @throws InvalidPackageException      When the {@link InputStream} does not contain a parsable {@link Envelope}.
-     * @throws EnvelopeReadingException    When there were issues parsing some elements of the {@link Envelope}. The parsed
+     * @throws InvalidEnvelopeException      When the {@link InputStream} does not contain a parsable {@link Envelope}.
+     * @throws EnvelopeReadingException      When there were issues parsing some elements of the {@link Envelope}. The parsed
      *         envelope and all encountered exceptions can be retrieved from this exception.
      */
-    public Envelope read(InputStream inputStream) throws InvalidPackageException {
+    public Envelope read(InputStream inputStream) throws InvalidEnvelopeException {
         Util.notNull(inputStream, "Input stream");
         try {
             return envelopeReader.read(inputStream);
         } catch (IOException e) {
-            throw new InvalidPackageException("Failed to parse InputStream", e);
+            throw new InvalidEnvelopeException("Failed to parse InputStream", e);
         } catch (ParsingStoreException e) {
-            throw new InvalidPackageException("Failed to create parsing store for envelope data", e);
+            throw new InvalidEnvelopeException("Failed to create parsing store for envelope data", e);
         }
     }
 
@@ -125,9 +128,11 @@ public final class EnvelopePackagingFactory {
      * @param files          List of {@link Document} to be added and signed. Can NOT be null.
      * @param annotations    List of {@link Annotation} to be added and signed. Can be null.
      * @return A new {@link Envelope} which contains the documents and annotations and a signature covering them.
-     * @throws InvalidPackageException  When the input data can not be processed or signing fails.
+     * @throws InvalidEnvelopeException When composing the {@link Envelope} fails or its verification fails.
+     * @throws SignatureException When acquiring root signature from signing service fails.
      */
-    public Envelope create(List<Document> files, List<Annotation> annotations) throws InvalidPackageException {
+    public Envelope create(List<Document> files, List<Annotation> annotations)
+            throws InvalidEnvelopeException, SignatureException {
         SignatureContent signatureContent = verifyAndSign(files, annotations, null);
         Envelope envelope = new Envelope(signatureContent);
         verifyEnvelope(envelope);
@@ -136,59 +141,104 @@ public final class EnvelopePackagingFactory {
 
     /**
      * Creates a {@link SignatureContent} that contains the new set of
-     * documents, annotations and a signature for the added elements and adds it to the {@param existingEnvelope}.
+     * documents, annotations and a signature for the added elements and adds it to the existingEnvelope.
      *
-     * @param existingEnvelope    An instance of {@link Envelope} which already has
-     *                             {@link EnvelopeSignature}(s).
+     * @param existingEnvelope    An instance of {@link Envelope} which already has {@link EnvelopeSignature}(s).
      * @param files                List of {@link Document} to be added and signed. Can NOT be null.
      * @param annotations          List of {@link Annotation} to be added and signed. Can be null.
-     * @throws InvalidPackageException When the input data can not be processed or signing fails.
+     * @throws InvalidEnvelopeException When composing the {@link Envelope} fails or its verification fails.
      * @throws EnvelopeMergingException When there are issues adding the newly created {@link SignatureContent} to
-     * {@param existingEnvelope}.
+     * existingEnvelope.
+     * @throws SignatureException When acquiring root signature from signing service fails.
      */
     public void addSignature(Envelope existingEnvelope, List<Document> files, List<Annotation> annotations)
-            throws InvalidPackageException, EnvelopeMergingException {
+            throws InvalidEnvelopeException, EnvelopeMergingException, SignatureException {
         Util.notNull(existingEnvelope, "Envelope");
         SignatureContent signatureContent = verifyAndSign(files, annotations, existingEnvelope);
         existingEnvelope.add(signatureContent);
         verifyEnvelope(existingEnvelope);
     }
 
-    private SignatureContent verifyAndSign(List<Document> files, List<Annotation> annotations,
-                                           Envelope existingEnvelope) throws InvalidPackageException {
-        Util.notEmpty(files, "Document files");
-        validateDocumentFilenames(files);
-        HashSet<Document> documents = new HashSet<>(files);
-
-        IndexProvider indexProvider;
-        if (existingEnvelope != null) {
-            for (SignatureContent content : existingEnvelope.getSignatureContents()) {
-                documents.addAll(content.getDocuments().values());
-            }
-            indexProvider = indexProviderFactory.create(existingEnvelope);
-        } else {
-            indexProvider = indexProviderFactory.create();
-        }
-        verifyNoDuplicateDocumentNames(documents);
+    private SignatureContent verifyAndSign(List<Document> documentList, List<Annotation> annotations,
+                                           Envelope existingEnvelope) throws InvalidEnvelopeException, SignatureException {
+        Util.notEmpty(documentList, "Document files");
+        validateDocuments(documentList, existingEnvelope);
+        IndexProvider indexProvider = getIndexProvider(existingEnvelope);
 
         try {
             return new ContentSigner(
-                    files,
+                    documentList,
                     annotations,
                     indexProvider,
                     manifestFactory,
                     signatureFactory
             ).sign();
         } catch (DataHashException | InvalidManifestException e) {
-            throw new InvalidPackageException("Failed to create internal structure!", e);
-        } catch (SignatureException e) {
-            throw new InvalidPackageException("Failed to acquire signature!", e);
+            throw new InvalidEnvelopeException("Failed to create internal structure!", e);
         }
     }
 
-    private void validateDocumentFilenames(List<Document> files) {
-        for (Document document : files) {
-            String filename = document.getFileName();
+    private void validateDocuments(List<Document> documentList, Envelope existingEnvelope) {
+        Map<String, List<Document>> documentMap = new HashMap<>();
+        addToMapWithDuplicateCheck(documentMap, documentList);
+        Set<String> allowedDocumentNames = new HashSet<>();
+        if (existingEnvelope != null) {
+            addToMapWithDuplicateCheck(documentMap, existingEnvelope.getUnknownFiles());
+            for (SignatureContent content : existingEnvelope.getSignatureContents()) {
+                addToMapWithDuplicateCheck(documentMap, content.getDocuments().values());
+                allowedDocumentNames.add(content.getManifest().getSignatureReference().getUri());
+                allowedDocumentNames.add(content.getManifest().getPath());
+                allowedDocumentNames.add(content.getDocumentsManifest().getPath());
+                allowedDocumentNames.add(content.getAnnotationsManifest().getPath());
+            }
+        }
+        validateDocumentFilenames(documentMap.keySet(), allowedDocumentNames);
+    }
+
+    /**
+     * Adds content of documents collection to documentMap. Checks for duplicate existance based on filename and datahash.
+     */
+    private void addToMapWithDuplicateCheck(Map<String, List<Document>> documentMap, Collection<? extends Document> documents) {
+        for (Document doc : documents) {
+            if (documentMap.containsKey(doc.getFileName())) {
+                for (Document other : documentMap.get(doc.getFileName())) {
+                    boolean result = false;
+                    for (HashAlgorithm algorithm : HashAlgorithm.getImplementedHashAlgorithms()) {
+                        // check the algorithm is usable
+                        if (algorithm.isDeprecated(new Date())) {
+                            continue;
+                        }
+                        try {
+                            if (!doc.getDataHash(algorithm).equals(other.getDataHash(algorithm))) {
+                                throw new IllegalArgumentException(
+                                        "Found multiple documents with same name and non-matching data hash!"
+                                );
+                            }
+                            result = true;
+                        } catch (DataHashException e) {
+                            // ignore since EmptyEnvelope or similar
+                        }
+                    }
+                    if (!result) {
+                        throw new IllegalArgumentException(
+                                "Found multiple documents with same name and no matching data hashes!"
+                        );
+                    }
+                }
+                documentMap.get(doc.getFileName()).add(doc);
+            } else {
+                List<Document> newList = new ArrayList<>();
+                newList.add(doc);
+                documentMap.put(doc.getFileName(), newList);
+            }
+        }
+    }
+
+    private void validateDocumentFilenames(Collection<String> documentList, Set<String> allowedDocumentNames) {
+        for (String filename : documentList) {
+            if (allowedDocumentNames.contains(filename)) {
+                continue;
+            }
             if (filename.equals(META_INF) ||
                     filename.startsWith(META_INF + "/") ||
                     filename.equals(MIME_TYPE_ENTRY_NAME)) {
@@ -197,7 +247,15 @@ public final class EnvelopePackagingFactory {
         }
     }
 
-    private void verifyEnvelope(Envelope envelope) throws InvalidPackageException {
+    private IndexProvider getIndexProvider(Envelope existingEnvelope) {
+        if (existingEnvelope != null) {
+            return indexProviderFactory.create(existingEnvelope);
+        } else {
+            return indexProviderFactory.create();
+        }
+    }
+
+    private void verifyEnvelope(Envelope envelope) throws InvalidEnvelopeException {
         if (this.verificationPolicy == null) {
             return;
         }
@@ -216,18 +274,7 @@ public final class EnvelopePackagingFactory {
                     logger.warn("Failed rule '{}' for '{}' ", res.getRuleName(), res.getTestedElementPath());
                 }
             }
-            throw new InvalidPackageException("Created envelope did not pass internal verification");
-        }
-    }
-
-    private void verifyNoDuplicateDocumentNames(Set<Document> documents) throws IllegalArgumentException {
-        Set<String> uniqueDocumentNames = new HashSet<>();
-        for (Document doc : documents) {
-            uniqueDocumentNames.add(doc.getFileName());
-        }
-
-        if (uniqueDocumentNames.size() < documents.size()) {
-            throw new IllegalArgumentException("Found multiple documents with same name!");
+            throw new InvalidEnvelopeException("Created envelope did not pass internal verification");
         }
     }
 

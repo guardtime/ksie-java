@@ -25,7 +25,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class EnvelopeReadingException extends InvalidPackageException {
+/**
+ * Wrapper exception that contains exceptions encountered during {@link Envelope} reading. Also contains an {@link Envelope} if
+ * one could still be compiled despite the encountered exceptions.
+ */
+public class EnvelopeReadingException extends InvalidEnvelopeException {
+
     private final List<Throwable> exceptions = new ArrayList<>();
     private Envelope envelope;
 
@@ -52,4 +57,5 @@ public class EnvelopeReadingException extends InvalidPackageException {
     public void addExceptions(Collection<Throwable> throwables) {
         exceptions.addAll(throwables);
     }
+
 }

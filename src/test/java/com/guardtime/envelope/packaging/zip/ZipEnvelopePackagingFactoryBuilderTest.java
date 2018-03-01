@@ -32,7 +32,7 @@ import com.guardtime.envelope.manifest.tlv.TlvEnvelopeManifestFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.SignatureContent;
-import com.guardtime.envelope.packaging.exception.InvalidPackageException;
+import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.signature.SignatureFactoryType;
 import com.guardtime.envelope.verification.policy.LimitedInternalVerificationPolicy;
@@ -80,9 +80,9 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     public void setUp() throws Exception {
         super.setUp();
         annotationList.add(new StringAnnotation(
-                EnvelopeAnnotationType.NON_REMOVABLE,
                 ANNOTATION_CONTENT,
-                ANNOTATION_DOMAIN_COM_GUARDTIME
+                ANNOTATION_DOMAIN_COM_GUARDTIME,
+                EnvelopeAnnotationType.NON_REMOVABLE
         ));
         documentList.add(testDocumentHelloText);
     }
@@ -234,9 +234,9 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
         documentsList.add(testDocumentHelloPdf);
         List<Annotation> annotationsList = new ArrayList<>(annotationList);
         annotationsList.add(new StringAnnotation(
-                EnvelopeAnnotationType.VALUE_REMOVABLE,
                 "moreContent",
-                "com.guardtime.test.inner"
+                "com.guardtime.test.inner",
+                EnvelopeAnnotationType.VALUE_REMOVABLE
         ));
 
         try (Envelope envelope = createInternallyValidEnvelope(documentsList, annotationsList)) {
@@ -262,9 +262,9 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
             documentsList.add(streamDocument);
             List<Annotation> annotationsList = new ArrayList<>(annotationList);
             annotationsList.add(new StringAnnotation(
-                    EnvelopeAnnotationType.VALUE_REMOVABLE,
                     "moreContent",
-                    "com.guardtime.test.inner"
+                    "com.guardtime.test.inner",
+                    EnvelopeAnnotationType.VALUE_REMOVABLE
             ));
 
             try (Envelope newEnvelope = createInternallyValidEnvelope(documentsList, annotationsList, envelope)) {
@@ -283,7 +283,7 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     @Test
     public void testCreateEnvelopeWithMultipleDocumentsWithSameName_ThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Found multiple documents with same name!");
+        expectedException.expectMessage("Found multiple documents with same name and non-matching data hash!");
 
         List<Document> documents = Arrays.asList(
                 (Document) new StreamDocument(
@@ -309,7 +309,7 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
 
     @Test
     public void testCreateVerifiesInvalidEnvelope_NOK() throws Exception {
-        expectedException.expect(InvalidPackageException.class);
+        expectedException.expect(InvalidEnvelopeException.class);
         expectedException.expectMessage("Created envelope did not pass internal verification");
         EnvelopePackagingFactory packagingFactory =
                 new ZipEnvelopePackagingFactoryBuilder().withSignatureFactory(mockedSignatureFactory).build();
@@ -335,7 +335,7 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     public void testCreateEnvelopeWithExistingEnvelopeWithDocumentsWithSameName_ThrowsIllegalArgumentException()
             throws Exception {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Found multiple documents with same name!");
+        expectedException.expectMessage("Found multiple documents with same name and non-matching data hash!");
         try (
                 Document document = new StreamDocument(
                         new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)),
@@ -377,7 +377,7 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
 
     @Test
     public void testReadFromBadStream_ThrowsInvalidPackageException() throws Exception {
-        expectedException.expect(InvalidPackageException.class);
+        expectedException.expect(InvalidEnvelopeException.class);
         expectedException.expectMessage("Failed to parse InputStream");
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(mockedSignatureFactory)

@@ -77,4 +77,12 @@ public abstract class AbstractRule<V> implements Rule<V> {
     protected VerificationResultFilter getFilter(ResultHolder holder, V verifiable) {
         return ResultHolder.NONE;
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + " {" +
+                "name= \'" + getName() + '\'' +
+                ", state= \'" + state + "\'}";
+    }
+
 }

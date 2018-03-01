@@ -27,10 +27,15 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.guardtime.envelope.util.Util.notNull;
 
+
+/**
+ * Generic implementation for {@link Document} that is lacking {@link Document#getInputStream()} implementation.
+ */
 public abstract class AbstractDocument implements Document {
 
     public static final HashAlgorithm HASH_ALGORITHM = HashAlgorithm.SHA2_256;
@@ -38,6 +43,12 @@ public abstract class AbstractDocument implements Document {
     protected final String mimeType;
     protected final String fileName;
 
+    /**
+     *
+     * Creates {@link Document} with provided MIME-type and file name.
+     * @param mimeType The MIME-type of the {@link Document}.
+     * @param fileName The file name to be used for the {@link Document}.
+     */
     protected AbstractDocument(String mimeType, String fileName) {
         notNull(mimeType, "MIME type");
         notNull(fileName, "File name");
@@ -91,25 +102,33 @@ public abstract class AbstractDocument implements Document {
 
     @Override
     public String toString() {
-        return this.getClass().toString() +
-                " {fileName=\'" + fileName +
-                "\', mimeType=\'" + mimeType + "\'}";
+        return this.getClass().getSimpleName() +
+                " {fileName= \'" + getFileName() + '\'' +
+                ", mimeType= \'" + getMimeType() + "\'}";
     }
 
     @Override
     public boolean equals(Object o) {
-        try {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-            Document that = (Document) o;
+        Document that = (Document) o;
 
-            if (getFileName() != null ? !getFileName().equals(that.getFileName()) : that.getFileName() != null) return false;
-            if (getMimeType() != null ? !getMimeType().equals(that.getMimeType()) : that.getMimeType() != null) return false;
-            return this.getDataHash(HASH_ALGORITHM).equals(that.getDataHash(HASH_ALGORITHM));
-        } catch (DataHashException e) {
-            return false;
+        if (getFileName() != null ? !getFileName().equals(that.getFileName()) : that.getFileName() != null) return false;
+        if (getMimeType() != null ? !getMimeType().equals(that.getMimeType()) : that.getMimeType() != null) return false;
+        for (HashAlgorithm algorithm : HashAlgorithm.getImplementedHashAlgorithms()) {
+            if (algorithm.isDeprecated(new Date())) {
+                continue;
+            }
+            try {
+                if (!this.getDataHash(algorithm).equals(that.getDataHash(algorithm))) {
+                    return false;
+                }
+            } catch (DataHashException e) {
+                // ignore since it is an EmptyDocument that can't generate new hash
+            }
         }
+        return true;
     }
 
     @Override

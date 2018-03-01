@@ -61,9 +61,9 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     private static final String ENVELOPE_DOCUMENT_MIME_TYPE = "Stream";
     private static final String INPUT_STREAM_STRING = "Input from stream.";
     private final Annotation envelopeAnnotation = new StringAnnotation(
-            EnvelopeAnnotationType.FULLY_REMOVABLE,
             ENVELOPE_ANNOTATION_CONTENT,
-            ENVELOPE_ANNOTATION_TYPE_DOMAIN
+            ENVELOPE_ANNOTATION_TYPE_DOMAIN,
+            EnvelopeAnnotationType.FULLY_REMOVABLE
     );
     private final Document envelopeDocument = new StreamDocument(
             new ByteArrayInputStream(INPUT_STREAM_STRING.getBytes(StandardCharsets.UTF_8)),
@@ -373,7 +373,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
         }
     }
 
-    private void checkDataHashList(HashAlgorithm expectedHashAlgorithm, List<DataHash> dataHashes) throws Exception {
+    private void checkDataHashList(HashAlgorithm expectedHashAlgorithm, List<DataHash> dataHashes) {
         checkDataHashList(singletonList(expectedHashAlgorithm), dataHashes);
     }
 }
