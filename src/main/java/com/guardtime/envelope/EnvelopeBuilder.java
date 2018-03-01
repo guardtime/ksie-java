@@ -53,7 +53,7 @@ public class EnvelopeBuilder {
     /**
      * Expects a {@link EnvelopePackagingFactory} as parameter to be used for creating the envelope.
      *
-     * @param packagingFactory
+     * @param packagingFactory The factory to be used for processing builder values and constructing an {@link Envelope}.
      */
     public EnvelopeBuilder(EnvelopePackagingFactory packagingFactory) {
         notNull(packagingFactory, "Packaging factory");

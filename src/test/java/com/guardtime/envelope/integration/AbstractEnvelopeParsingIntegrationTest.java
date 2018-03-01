@@ -312,7 +312,11 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                         "Doc.doc"
                 );
                 Annotation envelopeAnnotation =
-                        new StringAnnotation(EnvelopeAnnotationType.FULLY_REMOVABLE, "annotation 101", "com.guardtime")
+                        new StringAnnotation(
+                                "annotation 101",
+                                "com.guardtime",
+                                EnvelopeAnnotationType.FULLY_REMOVABLE
+                        )
         ) {
             packagingFactoryWithIncIndex.addSignature(
                     existingEnvelope,
@@ -334,9 +338,9 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                         "Doc.doc"
                 );
                 Annotation envelopeAnnotation = new StringAnnotation(
-                        EnvelopeAnnotationType.FULLY_REMOVABLE,
                         "annotation 101",
-                        "com.guardtime"
+                        "com.guardtime",
+                        EnvelopeAnnotationType.FULLY_REMOVABLE
                 )
         ) {
             packagingFactoryWithIncIndex.addSignature(

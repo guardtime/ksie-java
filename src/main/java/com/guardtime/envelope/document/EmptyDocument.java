@@ -40,7 +40,7 @@ public class EmptyDocument extends AbstractDocument {
      *
      * @param fileName name of the {@link EmptyDocument}.
      * @param mimeType MIME type of the file, can be freely chosen.
-     * @param hashes one or more hashes of the original document.
+     * @param hashes list of {@link DataHash} that are generated from the data associated with the document.
      */
     public EmptyDocument(String fileName, String mimeType, List<DataHash> hashes) {
         super(mimeType, fileName);

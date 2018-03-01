@@ -32,14 +32,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a {@link Document} that has been signed.
+ * Wrapper for a {@link Document} which creates a backward link to the {@link SignatureContent} that contains
+ * the Document and that provides the {@link EnvelopeSignature} for the document.
+ * Helper class to allow for simpler association between a {@link Document} and {@link EnvelopeSignature} and
+ * any related {@link Annotation}s.
  */
-
 
 public class SignedDocument implements Document {
     private final Document delegated;
     private final SignatureContent content;
 
+    /**
+     * Creates {@link Document} wrapper from provided original {@link Document} and provided {@link SignatureContent}.
+     * @param original the wrapped {@link Document}.
+     * @param content  the {@link SignatureContent} that contains and signs this {@link Document}.
+     */
     public SignedDocument(Document original, SignatureContent content) {
         this.delegated = original;
         this.content = content;
@@ -61,7 +68,7 @@ public class SignedDocument implements Document {
     }
 
     @Override
-    public List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws IOException, DataHashException {
+    public List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws DataHashException {
         return delegated.getDataHashList(algorithmList);
     }
 
@@ -85,10 +92,16 @@ public class SignedDocument implements Document {
         delegated.close();
     }
 
+    /**
+     * @return The {@link EnvelopeSignature} that is associated with, e.g. signs this {@link Document}.
+     */
     public EnvelopeSignature getSignature() {
         return content.getEnvelopeSignature();
     }
 
+    /**
+     * @return List of {@link Annotation}s that are associated with this {@link Document}.
+     */
     public List<Annotation> getAnnotations() {
         return new ArrayList<>(content.getAnnotations().values());
     }

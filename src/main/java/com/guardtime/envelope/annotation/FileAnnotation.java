@@ -39,7 +39,6 @@ public class FileAnnotation extends AbstractAnnotation {
      * @param file the {@link File} containing the annotation value.
      * @param domain the annotation key.
      * @param type annotation type, indicating the persistence of the annotation, see {@link EnvelopeAnnotationType} for details.
-     *
      */
 
     public FileAnnotation(File file, String domain, EnvelopeAnnotationType type) {

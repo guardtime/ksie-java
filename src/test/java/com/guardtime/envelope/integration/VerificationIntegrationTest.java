@@ -610,10 +610,11 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
                         "txt",
                         singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(expectedDocumentContent).getHash()));
                 Annotation annotation = new StringAnnotation(
-                        EnvelopeAnnotationType.NON_REMOVABLE,
                         "Document is not with envelope. Envelope was created with empty envelope document. " +
                                 "Document itself can be added later on if needed.",
-                        "com.guardtime.com");
+                        "com.guardtime.com",
+                        EnvelopeAnnotationType.NON_REMOVABLE
+                );
                 Envelope envelope = packagingFactory.create(singletonList(document), singletonList(annotation));
                 InputStream stream = new ByteArrayInputStream(addedDocumentContent)
         ) {
