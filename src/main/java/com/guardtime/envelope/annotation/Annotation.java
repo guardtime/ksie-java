@@ -23,7 +23,7 @@ import com.guardtime.envelope.EnvelopeElement;
 
 import java.io.IOException;
 import java.io.InputStream;
-s
+
 /**
  * Represents annotations that can be used in the envelope. Combines annotation data and annotation
  * meta-data into one object.
