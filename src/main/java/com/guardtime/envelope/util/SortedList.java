@@ -32,7 +32,8 @@ import java.util.ListIterator;
  *
  * @param <E>  List entry type. Must implement {@link Comparable}!
  *
- * NB! Does not allow inserting at specified index! All added values will be sorted into correct location in list at insert-time.
+ * NB! Does not allow inserting at specified index!
+ * All added values will be sorted into correct location in list at insert-time.
  */
 public class SortedList<E extends Comparable<? super E>> implements List<E> {
     private final List<E> delegate;

@@ -22,8 +22,8 @@ package com.guardtime.envelope.indexing;
 import com.guardtime.envelope.packaging.Envelope;
 
 /**
- * {@link IndexProvider} factory for creating correct index provider based on default values or provided {@link Envelope} as
- * baseline.
+ * {@link IndexProvider} factory for creating correct index provider based on default
+ * values or provided {@link Envelope} as baseline.
  */
 
 public interface IndexProviderFactory {
@@ -33,7 +33,8 @@ public interface IndexProviderFactory {
     /**
      * Creates new {@link IndexProvider} based on provided envelope. Verifies the provided {@link Envelope} has indexes
      * that are supported by the created {@link IndexProvider} and if needed extracts the starting point for indexes.
-     * @param envelope  The base {@link Envelope} to use for verifying index type and identifying next indexes.
+     *
+     * @param envelope  the base {@link Envelope} to use for verifying index type and identifying next indexes.
      */
     IndexProvider create(Envelope envelope);
 }
