@@ -34,7 +34,7 @@ import static com.guardtime.envelope.util.Util.createTempFile;
 import static com.guardtime.envelope.util.Util.notNull;
 
 /**
- * Document that is based on a {@link InputStream}.
+ * Represents a {@link Document} that is based on a {@link InputStream}.
  */
 public class StreamDocument implements Document {
 

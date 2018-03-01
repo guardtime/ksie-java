@@ -31,6 +31,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a {@link Document} that has been signed.
+ */
+
+
 public class SignedDocument implements Document {
     private final Document delegated;
     private final SignatureContent content;

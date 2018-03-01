@@ -26,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 import static com.guardtime.envelope.util.Util.notNull;
 
 /**
- * Annotation that is based on a String as the data source.
+ * Represents an {@link Annotation} that is based on a String as the data source.
  */
 public class StringAnnotation extends AbstractAnnotation {
 
