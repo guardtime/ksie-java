@@ -41,7 +41,7 @@ import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifyUni
 import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifyUniqueness;
 
 /**
- * Envelope that encompasses documents, annotations and structure elements that links the annotations to the documents
+ * Envelope that encompasses documents, annotations and structure elements that link the annotations to the documents
  * and signatures that validate the content of the envelope.
  */
 public class Envelope implements AutoCloseable {
@@ -72,21 +72,21 @@ public class Envelope implements AutoCloseable {
     }
 
     /**
-     * Returns sorted list of {@link SignatureContent} contained in this envelope.
+     * @return Sorted list of {@link SignatureContent} contained in this envelope.
      */
     public List<SignatureContent> getSignatureContents() {
         return Collections.unmodifiableList(signatureContents);
     }
 
     /**
-     * Returns the {@link SignatureContent} at {@param index} and removes it from this {@link Envelope}.
+     * @return The {@link SignatureContent} at {@param index} and removes it from this {@link Envelope}.
      */
     public boolean removeSignatureContent(SignatureContent content) {
         return signatureContents.remove(content);
     }
 
     /**
-     * Returns List of all {@link UnknownDocument} that were not associated with any structure elements or signatures but were
+     * @return List of all {@link UnknownDocument} that were not associated with any structure elements or signatures but were
      * contained in the {@link Envelope}
      */
     public List<UnknownDocument> getUnknownFiles() {
@@ -115,7 +115,7 @@ public class Envelope implements AutoCloseable {
 
     /**
      * Adds the {@link SignatureContent} to this {@link Envelope}. Also takes ownership of the resources associated with the
-     * {@link SignatureContent} and as such any external calls to close() on those resources may lead to unexpected behaviour.
+     * {@link SignatureContent} and as such any external calls to <code>close()</code> on those resources may lead to unexpected behaviour.
      * @throws EnvelopeMergingException when the {@link SignatureContent} can not be added into the {@link Envelope} due to
      * clashing file paths or any other reason.
      */
