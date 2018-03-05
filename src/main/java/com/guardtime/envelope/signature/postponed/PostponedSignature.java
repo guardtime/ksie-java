@@ -43,8 +43,8 @@ class PostponedSignature<T> implements EnvelopeSignature<T> {
     }
 
     /**
-     * Delegates to real {@link EnvelopeSignature} if one is present. Otherwise will write a placeholder string that can be later
-     * replaced with real signature.
+     * Delegates to real {@link EnvelopeSignature} if one is present.
+     * Otherwise will write a placeholder string that can be later replaced with the real signature.
      */
     @Override
     public void writeTo(OutputStream output) throws IOException {
@@ -91,8 +91,8 @@ class PostponedSignature<T> implements EnvelopeSignature<T> {
     /**
      * Assigns the real {@link EnvelopeSignature} to be used as delegate.
      *
-     * @throws SignatureException - When trying to replace signature of placeholder which has already been filled.
-     * @throws IllegalArgumentException - When the provided {@link EnvelopeSignature} has non-matching
+     * @throws SignatureException When trying to replace signature of placeholder which has already been filled.
+     * @throws IllegalArgumentException When the provided {@link EnvelopeSignature} has non-matching
      * {@link EnvelopeSignature#getSignedDataHash()} output.
      */
     void sign(EnvelopeSignature signature) throws SignatureException {
