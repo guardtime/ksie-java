@@ -30,14 +30,14 @@ import java.io.InputStream;
 public interface SingleAnnotationManifest extends EnvelopeElement {
 
     /**
-     * Returns a reference pointing to annotation data in the envelope.
+     * @return A reference pointing to the annotation data in the envelope.
      */
     AnnotationDataReference getAnnotationReference();
 
     FileReference getDocumentsManifestReference();
 
     /**
-     * Returns InputStream containing this manifest.
+     * @return InputStream containing this manifest.
      * @throws IOException when the InputStream can't be created or accessed.
      */
     InputStream getInputStream() throws IOException;
