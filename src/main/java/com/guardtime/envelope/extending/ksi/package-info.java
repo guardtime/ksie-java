@@ -17,23 +17,7 @@
  * reserves and retains all trademark rights.
  */
 
-package com.guardtime.envelope.extending;
-
-import com.guardtime.envelope.signature.SignatureException;
-
 /**
- * Extending policy to link signature with a trust anchor.
- * <p>
- * @param <O>    Signature class that is extended
- * </p>
+ * Extending implementation for the KSI signatures
  */
-public interface ExtendingPolicy<O> {
-
-    /**
-     *
-     * @param signature to be extended.
-     * @return An extended version of the input signature.
-     * @throws SignatureException when extending fails for any reason.
-     */
-    O getExtendedSignature(O signature) throws SignatureException;
-}
+package com.guardtime.envelope.extending.ksi;

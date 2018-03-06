@@ -47,7 +47,7 @@ public class ExtendedSignatureContent extends SignatureContent {
     }
 
     /**
-     * Returns true if the {@link EnvelopeSignature} is extended.
+     * @return True, if the {@link EnvelopeSignature} is extended.
      */
     public boolean isExtended() {
         return getEnvelopeSignature().isExtended();
