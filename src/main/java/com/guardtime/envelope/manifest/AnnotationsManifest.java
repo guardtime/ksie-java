@@ -33,7 +33,7 @@ public interface AnnotationsManifest extends EnvelopeElement {
     List<? extends FileReference> getSingleAnnotationManifestReferences();
 
     /**
-     * Returns InputStream containing this manifest.
+     * @return InputStream containing this manifest.
      * @throws IOException when the InputStream can't be created or accessed.
      */
     InputStream getInputStream() throws IOException;
