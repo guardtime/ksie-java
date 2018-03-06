@@ -220,8 +220,8 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
         return this.getClass().getSimpleName() + " {" +
                 "manifest= " + manifest.getPath() + '\'' +
                 ", signature= " + manifest.getSignatureReference().getUri() +
-                ", documentsManifest= " + documentsManifest.getPath() + '\'' +
-                ", annotationsManifest= " + annotationsManifest.getPath() + '\'' +
+                ", documentsManifest= " + documentsManifest != null ? documentsManifest.getPath() : "null" + '\'' +
+                ", annotationsManifest= " + annotationsManifest != null ? annotationsManifest.getPath() : "null" + '\'' +
                 ", documents= '" + documents.keySet() +
                 ", singleAnnotationManifests= " + singleAnnotationManifestMap.keySet() +
                 ", annotations= " + annotations.keySet() +

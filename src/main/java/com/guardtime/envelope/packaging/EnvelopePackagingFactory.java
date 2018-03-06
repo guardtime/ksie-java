@@ -190,6 +190,8 @@ public final class EnvelopePackagingFactory {
                 allowedDocumentNames.add(content.getManifest().getPath());
                 allowedDocumentNames.add(content.getDocumentsManifest().getPath());
                 allowedDocumentNames.add(content.getAnnotationsManifest().getPath());
+                allowedDocumentNames.addAll(content.getSingleAnnotationManifests().keySet());
+                allowedDocumentNames.addAll(content.getAnnotations().keySet());
             }
         }
         validateDocumentFilenames(documentMap.keySet(), allowedDocumentNames);

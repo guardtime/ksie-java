@@ -23,6 +23,8 @@ import com.guardtime.envelope.util.DataHashException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
+import java.io.IOException;
+import java.io.InputStream;
 
 
 public interface EnvelopeElement {
@@ -37,4 +39,12 @@ public interface EnvelopeElement {
      * @throws DataHashException when the given algorithm can't be used for generating a hash or the data can't be accessed.
      */
     DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException;
+
+
+    /**
+     * @return {@link InputStream} containing data of object. Same data that is used for calculating {@link DataHash} by
+     * {@link EnvelopeElement#getDataHash(HashAlgorithm)}.
+     * @throws IOException When there are issues accessing object data.
+     */
+    InputStream getInputStream() throws IOException;
 }

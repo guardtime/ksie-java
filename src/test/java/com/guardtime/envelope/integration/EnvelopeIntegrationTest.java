@@ -1,15 +1,19 @@
 package com.guardtime.envelope.integration;
 
 import com.guardtime.envelope.EnvelopeBuilder;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.InternalDocument;
 import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
+import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.parsing.store.MemoryBasedParsingStoreFactory;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
+import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
 import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.envelope.signature.ksi.KsiSignatureFactory;
 import com.guardtime.envelope.verification.policy.LimitedInternalVerificationPolicy;
@@ -22,15 +26,19 @@ import com.guardtime.ksi.service.client.http.CredentialsAwareHttpSettings;
 import com.guardtime.ksi.service.http.simple.SimpleHttpSigningClient;
 import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicyAdapter;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 
 import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
@@ -207,6 +215,25 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
                         //As expected.
                     }
                 }
+            }
+        }
+    }
+
+    @Test
+    public void testAnnotationAsReferredDocument_OK() throws Exception {
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream("randomData".getBytes());
+                Document doc = new StreamDocument(inputStream, "application/random", "someFile.file");
+                Envelope envelope = packagingFactory.create(singletonList(doc), singletonList(stringEnvelopeAnnotation))) {
+            Annotation annotation = envelope.getSignatureContents().get(0).getAnnotations().values().iterator().next();
+            Document doc2 = new InternalDocument(annotation);
+            packagingFactory.addSignature(envelope, singletonList(doc2), Collections.<Annotation>emptyList());
+            assertEquals(2, envelope.getSignatureContents().size());
+            EnvelopeWriter writer = new ZipEnvelopeWriter();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            writer.write(envelope, bos);
+
+            try (Envelope envelope1 = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
+                assertEquals(2, envelope1.getSignatureContents().size());
             }
         }
     }
