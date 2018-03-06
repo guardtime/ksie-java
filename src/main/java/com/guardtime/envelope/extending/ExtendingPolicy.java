@@ -23,13 +23,16 @@ import com.guardtime.envelope.signature.SignatureException;
 
 /**
  * Extending policy to link signature with a trust anchor.
+ * <p>
  * @param <O>    Signature class that is extended
+ * </p>
  */
 public interface ExtendingPolicy<O> {
 
     /**
-     * Returns an extended version of the input signature.
+     *
      * @param signature to be extended.
+     * @return An extended version of the input signature.
      * @throws SignatureException when extending fails for any reason.
      */
     O getExtendedSignature(O signature) throws SignatureException;

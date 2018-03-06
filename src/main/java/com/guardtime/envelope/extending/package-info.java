@@ -17,18 +17,7 @@
  * reserves and retains all trademark rights.
  */
 
-package com.guardtime.envelope.manifest;
-
 /**
- * Reference to a signature contained in an envelope.
+ * Interfaces and classes to perform signature extending
  */
-public interface SignatureReference {
-
-    String getUri();
-
-    /**
-     * @return MIME type of the signature.
-     */
-    String getType();
-
-}
+package com.guardtime.envelope.extending;

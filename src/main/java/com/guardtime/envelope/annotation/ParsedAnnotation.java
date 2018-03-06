@@ -35,12 +35,22 @@ public class ParsedAnnotation extends AbstractAnnotation {
     private final ParsingStore parsingStore;
     private final String key;
 
-    public ParsedAnnotation(ParsingStore store, String key, String domain, EnvelopeAnnotationType type) {
+    /**
+     * Creates {@link Annotation} with provided type and domain. The annotation value is provided via {@link ParsingStore} and
+     * the key of the data in the {@link ParsingStore}.
+     * @param store             The {@link ParsingStore} that contains the annotation data.
+     * @param parsingStoreKey   The key for the data in {@link ParsingStore} of the annotation.
+     * @param domain            The key of the annotation key-value pair. To prevent key conflicts, the prefix x.y.z. is
+     *                          reserved to the entity controlling the Internet domain name z.y.x.
+     * @param type              The annotation type, indicating the persistence of the annotation, see
+     *                          {@link EnvelopeAnnotationType} for details.
+     */
+    public ParsedAnnotation(ParsingStore store, String parsingStoreKey, String domain, EnvelopeAnnotationType type) {
         super(domain, type);
         notNull(store, "Parsing store");
-        notNull(key, "Parsing store key");
+        notNull(parsingStoreKey, "Parsing store key");
         this.parsingStore = store;
-        this.key = key;
+        this.key = parsingStoreKey;
     }
 
     @Override

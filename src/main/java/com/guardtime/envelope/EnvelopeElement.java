@@ -26,7 +26,10 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import java.io.IOException;
 import java.io.InputStream;
 
-
+/**
+ * Umbrella interface for any expected element of an {@link com.guardtime.envelope.packaging.Envelope}.
+ * Contains generic methods that all components of an {@link com.guardtime.envelope.packaging.Envelope} must implement.
+ */
 public interface EnvelopeElement {
 
     /**

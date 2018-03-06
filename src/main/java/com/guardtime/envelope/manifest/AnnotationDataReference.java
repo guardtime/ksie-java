@@ -22,19 +22,19 @@ package com.guardtime.envelope.manifest;
 import com.guardtime.ksi.hashing.DataHash;
 
 /**
- * {@link SingleAnnotationManifest} internal reference used for referring to annotation data in envelope.
+ * {@link SingleAnnotationManifest} internal reference used for referring to annotation data in the envelope.
  */
 public interface AnnotationDataReference {
 
     /**
-     * Returns String representation of path to the annotation data in envelope.
+     * @return String representation of path to the annotation data in the envelope.
      */
     String getUri();
 
     String getDomain();
 
     /**
-     * Returns Hash of the annotation data.
+     * @return Hash of the annotation data.
      */
     DataHash getHash();
 
