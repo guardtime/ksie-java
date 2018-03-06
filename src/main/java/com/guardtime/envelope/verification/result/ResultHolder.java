@@ -66,7 +66,8 @@ public class ResultHolder {
 
     /**
      * @param content for which verification results must apply.
-     * @return The verification results specific to provided {@link SignatureContent} as well as generic results not specific to any
+     * @return The verification results specific to provided {@link SignatureContent}
+     * as well as generic results not specific to any
      * {@link SignatureContent}.
      */
     public List<RuleVerificationResult> getResults(SignatureContent content) {
