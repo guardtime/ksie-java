@@ -20,25 +20,26 @@
 package com.guardtime.envelope.verification.result;
 
 /**
- * Results produced during verification which group together the rule {@link VerificationResult} and rule data like rule
- * name and error message and path of the tested envelope component.
+ * Results produced during verification which group together the rule {@link VerificationResult} and rule data (e.g. rule
+ * name) and error message and path of the tested envelope component.
  */
 public interface RuleVerificationResult {
 
     VerificationResult getVerificationResult();
 
     /**
-     * Indicates which rule was used to produce this result by referring to the rules unique name string.
+     * Indicates which rule was used to produce this result.
+     * @return The rule's unique string name.
      */
     String getRuleName();
 
     /**
-     * Contains the message string provided by the rule which applies for a non OK result.
+     * @return The message string provided by the rule which applies for a non OK result.
      */
     String getRuleErrorMessage();
 
     /**
-     * Provides path of the element that the verification was performed on by the rule. This is a helper for
+     * @return The path of the element that the verification was performed on by the rule. This is a helper for
      * sorting/distinguishing between results for different elements contained in the envelope.
      */
     String getTestedElementPath();

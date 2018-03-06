@@ -25,8 +25,8 @@ import com.guardtime.envelope.verification.result.SignatureResult;
 import com.guardtime.envelope.verification.rule.RuleTerminatingException;
 
 /**
- * Provides signature specific verification for Envelope verification process.
- * @param <S>    Signature type that can be verified
+ * Provides signature specific verification for envelope verification process.
+ * @param <S>    signature type that can be verified
  */
 public interface SignatureVerifier<S> {
 

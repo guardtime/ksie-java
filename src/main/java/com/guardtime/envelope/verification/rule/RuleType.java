@@ -19,19 +19,65 @@
 
 package com.guardtime.envelope.verification.rule;
 
+/**
+ * Verification rule types. Verification policies can be different combinations of these rule types.
+ */
 public enum RuleType {
+    /**
+     * Does the data manifest exist?
+     */
     KSIE_VERIFY_DATA_MANIFEST_EXISTS("KSIE_VERIFY_DATA_MANIFEST_EXISTS"),
+    /**
+     * Does the hash of the associated data manifest match the hash in the manifest file?
+     */
     KSIE_VERIFY_DATA_MANIFEST("KSIE_VERIFY_DATA_MANIFEST"),
+    /**
+     * Does the data file exist?
+     */
     KSIE_VERIFY_DATA_EXISTS("KSIE_VERIFY_DATA_EXISTS"),
+    /**
+     * ???
+     */
     KSIE_VERIFY_DATA_HASH("KSIE_VERIFY_DATA_HASH"),
+    /**
+     * ???
+     */
     KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS("KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS"),
+    /**
+     * Does the hash of the associated annotation match the hash in the manifest file?
+     */
     KSIE_VERIFY_ANNOTATION_MANIFEST("KSIE_VERIFY_ANNOTATION_MANIFEST"),
+    /**
+     * Is the annotation meta-data mandatory (according to
+     * {@link com.guardtime.envelope.annotation.EnvelopeAnnotationType})
+     * and, if yes, does it exist?
+     */
     KSIE_VERIFY_ANNOTATION_EXISTS("KSIE_VERIFY_ANNOTATION_EXISTS"),
+    /**
+     * Does the annotation's meta-data hash match the hash in the annotation's manifest?
+     */
     KSIE_VERIFY_ANNOTATION("KSIE_VERIFY_ANNOTATION"),
+    /**
+     * Is the annotation data mandatory (according to
+     * {@link com.guardtime.envelope.annotation.EnvelopeAnnotationType})
+     * and, if yes, does it exist?
+     */
     KSIE_VERIFY_ANNOTATION_DATA_EXISTS("KSIE_VERIFY_ANNOTATION_DATA_EXISTS"),
+    /**
+     * Does the annotation's data hash match the hash in the annotation's manifest?
+     */
     KSIE_VERIFY_ANNOTATION_DATA("KSIE_VERIFY_ANNOTATION_DATA"),
+    /**
+     * Can the signature of the manifest be verified?
+     */
     KSIE_VERIFY_SIGNATURE("KSIE_VERIFY_SIGNATURE"),
+    /**
+     * Does the signature exist?
+     */
     KSIE_VERIFY_SIGNATURE_EXISTS("KSIE_VERIFY_SIGNATURE_EXISTS"),
+    /**
+     * Does the signature input hash match the manifest?
+     */
     KSIE_VERIFY_MANIFEST("KSIE_VERIFY_MANIFEST");
 
     private final String name;

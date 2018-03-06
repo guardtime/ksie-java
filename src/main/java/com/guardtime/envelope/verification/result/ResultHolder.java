@@ -53,7 +53,7 @@ public class ResultHolder {
     }
 
     /**
-     * Returns all verification results gathered.
+     * @return All verification results gathered.
      */
     public List<RuleVerificationResult> getResults() {
         List<RuleVerificationResult> allResults = new ArrayList<>();
@@ -65,9 +65,9 @@ public class ResultHolder {
     }
 
     /**
-     * Returns verification results specific to provided {@link SignatureContent} as well as generic results not specific to any
-     * {@link SignatureContent}.
      * @param content for which verification results must apply.
+     * @return The verification results specific to provided {@link SignatureContent} as well as generic results not specific to any
+     * {@link SignatureContent}.
      */
     public List<RuleVerificationResult> getResults(SignatureContent content) {
         List<RuleVerificationResult> contentVerificationResults = signatureContentResultsMap.get(content);
@@ -80,15 +80,15 @@ public class ResultHolder {
     }
 
     /**
-     * Returns root signature verification results specific to provided {@link SignatureContent}.
      * @param content for which root signature verification results must apply.
+     * @return Root signature verification results specific to provided {@link SignatureContent}.
      */
     public List<SignatureResult> getSignatureResults(SignatureContent content) {
         return signatureResultsMap.get(content);
     }
 
     /**
-     * Returns verification results that apply to a {@link Envelope} and not to any one
+     * @return Verification results that apply to an {@link Envelope} and not to any one
      * specific {@link SignatureContent}.
      */
     public List<RuleVerificationResult> getGeneralResults() {
@@ -97,6 +97,8 @@ public class ResultHolder {
 
     /**
      * Adds a {@link SignatureResult} to the result set for the provided {@link SignatureContent}.
+     * @param content to which the result is added.
+     * @param result to be added.
      */
     public void addSignatureResult(SignatureContent content, SignatureResult result) {
         List<SignatureResult> signatureResults = signatureResultsMap.get(content);
@@ -109,6 +111,7 @@ public class ResultHolder {
 
     /**
      * Adds the provided {@link RuleVerificationResult} to the general result set.
+     * @param ruleVerificationResult to be added to the result set.
      */
     public void addResult(RuleVerificationResult ruleVerificationResult) {
         envelopeResults.add(ruleVerificationResult);
@@ -116,6 +119,7 @@ public class ResultHolder {
 
     /**
      * Adds the provided list of {@link RuleVerificationResult}s to the general result set.
+     * @param ruleVerificationResults list to be added to the result set.
      */
     public void addResults(List<RuleVerificationResult> ruleVerificationResults) {
         envelopeResults.addAll(ruleVerificationResults);
@@ -123,6 +127,8 @@ public class ResultHolder {
 
     /**
      * Adds the provided {@link RuleVerificationResult} to the result set of the specified {@link SignatureContent}.
+     * @param content to which the result is added.
+     * @param ruleVerificationResult to be added.
      */
     public void addResult(SignatureContent content, RuleVerificationResult ruleVerificationResult) {
         List<RuleVerificationResult> results = signatureContentResultsMap.get(content);
@@ -135,6 +141,8 @@ public class ResultHolder {
 
     /**
      * Adds the provided list of {@link RuleVerificationResult}s to the result set of the specified {@link SignatureContent}.
+     * @param content to which the list of results is added.
+     * @param ruleVerificationResults to be added.
      */
     public void addResults(SignatureContent content, List<RuleVerificationResult> ruleVerificationResults) {
         List<RuleVerificationResult> results = signatureContentResultsMap.get(content);
@@ -169,6 +177,8 @@ public class ResultHolder {
     /**
      * Finds the highest priority {@link VerificationResult} that exists in the given list of {@link VerificationResult}s.
      * The priorities of {@link VerificationResult} go from highest (NOK) to lowest (OK).
+     * @param verificationResults list of verification results to sort through.
+     * @return The highest priority {@link VerificationResult}.
      */
     private VerificationResult findHighestPriorityResult(List<VerificationResult> verificationResults) {
         List<VerificationResult> sortedList = new ArrayList<>(verificationResults);

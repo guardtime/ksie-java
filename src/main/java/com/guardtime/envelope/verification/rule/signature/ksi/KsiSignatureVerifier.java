@@ -34,6 +34,10 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicy;
 
+/**
+ * Provides KSI signature specific verification.
+ */
+
 public class KsiSignatureVerifier implements SignatureVerifier<KSISignature> {
 
     protected final com.guardtime.ksi.Verifier verifier;

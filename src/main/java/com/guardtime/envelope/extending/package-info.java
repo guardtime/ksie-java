@@ -18,6 +18,6 @@
  */
 
 /**
- * Interfaces and classes to perform signature extending
+ * General interfaces and classes to perform signature extending
  */
 package com.guardtime.envelope.extending;

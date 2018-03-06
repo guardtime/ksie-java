@@ -18,6 +18,6 @@
  */
 
 /**
- * Interfaces and classes for creating and handling envelope structure manifests
+ * Creating and handling envelope structure manifests
  */
 package com.guardtime.envelope.manifest;

@@ -18,6 +18,6 @@
  */
 
 /**
- * Classes and interfaces for all possible signature implementations
+ * General classes and interfaces for all possible signature implementations
  */
 package com.guardtime.envelope.signature;

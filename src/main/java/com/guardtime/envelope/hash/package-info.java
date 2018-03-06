@@ -18,6 +18,6 @@
  */
 
 /**
- * Provides the hash algorithms to be used throughout the code
+ * The hash algorithm provider to be used throughout the code
  */
 package com.guardtime.envelope.hash;

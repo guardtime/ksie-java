@@ -23,7 +23,7 @@ import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.verification.rule.state.DefaultRuleStateProvider;
 
 /**
- * Verification policy that contains all verifications rules necessary for full internal verification of {@link Envelope}.
+ * Verification policy that contains all verification rules necessary for full internal verification of the {@link Envelope}.
  */
 public class InternalVerificationPolicy extends AbstractVerificationPolicy {
 
