@@ -25,28 +25,32 @@ import com.guardtime.ksi.hashing.DataHash;
 import java.io.InputStream;
 
 /**
- * Creates and reads signatures used in envelope.
+ * Creates and reads signatures used in {@link com.guardtime.envelope.packaging.Envelope}.
  */
 public interface SignatureFactory {
 
     /**
-     * Returns signature contained in a {@link EnvelopeSignature} implementation.
      * @param hash to be signed.
+     *
+     * @return The signature contained in an {@link EnvelopeSignature} implementation.
      * @throws SignatureException when creating the signature for the given hash fails.
      */
     EnvelopeSignature create(DataHash hash) throws SignatureException;
 
     /**
-     * Returns signature contained in a {@link EnvelopeSignature} implementation.
      * @param input stream from which the signature is to be read.
-     * @throws SignatureException reading the stream fails or constructing a signature from the read data fails.
+     *
+     * @return The signature contained in an {@link EnvelopeSignature} implementation.
+     * @throws SignatureException when reading the stream fails or constructing a signature from the read data fails.
      */
     EnvelopeSignature read(InputStream input) throws SignatureException;
 
     /**
-     * Updates the {@link EnvelopeSignature} to extend its underlying signature to a trust anchor
-     * @param envelopeSignature The signature to be extended.
-     * @param extender The extending logic for the underlying signature inside envelopeSignature.
+     * Updates the {@link EnvelopeSignature} to extend its underlying signature to a trust anchor.
+     *
+     * @param envelopeSignature the signature to be extended.
+     * @param extender the extending logic for the underlying signature inside {@link EnvelopeSignature}.
+     *
      * @throws SignatureException when the extending fails for any reason.
      */
     void extend(EnvelopeSignature envelopeSignature, ExtendingPolicy extender) throws SignatureException;

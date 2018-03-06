@@ -32,10 +32,13 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Implementation for a {@link SignatureFactory} that allows for postponing real signing.
+ * Implementation for a {@link SignatureFactory} that allows postponing of the real signing.
+ * <p>
  * Requires actual {@link SignatureFactory} for providing proper signatures once they are available.
+ * </p><p>
  * For creating placeholder {@link EnvelopeSignature}s a {@link SignatureFactoryType} or {@link SignatureFactory} must be
  * provided to indicate what type of signatures will eventually be used.
+ * </p>
  */
 public class PostponedSignatureFactory implements SignatureFactory {
 
@@ -83,11 +86,13 @@ public class PostponedSignatureFactory implements SignatureFactory {
     }
 
     /**
-     * Replaces placeholder underlying signature in {@link EnvelopeSignature} for provided {@param signatureContent}.
+     * Replaces placeholder underlying signature in {@link EnvelopeSignature} for provided signatureContent.
      *
-     * @throws SignatureException       - When trying to replace placeholder signature which has already been filled.
-     * @throws IllegalStateException    - When no {@link SignatureFactory} is provided to constructor
-     * @throws IllegalArgumentException - When trying to replace placeholder signature with signature that has non-matching
+     *  @param signatureContent content of the signature.
+     *
+     * @throws SignatureException       When trying to replace placeholder signature which has already been filled.
+     * @throws IllegalStateException    When no {@link SignatureFactory} is provided to constructor
+     * @throws IllegalArgumentException When trying to replace placeholder signature with signature that has non-matching
      * {@link DataHash} OR provided {@link SignatureContent} does not hold {@link EnvelopeSignature} with type of
      * {@link PostponedSignature}.
      */
