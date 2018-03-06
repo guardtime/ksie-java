@@ -26,14 +26,14 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Envelope structure manifest containing references to {@link AnnotationsManifest}, {@link DocumentsManifest} and
- * {@link EnvelopeSignature} contained in the envelope. This is the root manifest of
+ * Envelope structure manifest containing references to the {@link AnnotationsManifest}, {@link DocumentsManifest}, and
+ * {@link EnvelopeSignature} contained in the envelope. This is the root manifest of the
  * envelope structure.
  */
 public interface Manifest extends EnvelopeElement {
 
     /**
-     * Returns InputStream containing this manifest.
+     * @return InputStream containing this manifest.
      * @throws IOException when the InputStream can't be created or accessed.
      */
     InputStream getInputStream() throws IOException;

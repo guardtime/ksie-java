@@ -34,7 +34,8 @@ import com.guardtime.ksi.unisignature.KSISignature;
 import java.io.InputStream;
 
 /**
- * Uses KSI {@link Signer} and {@link Reader} for the underlying signature handling logic.
+ * Implementation of the {@link SignatureFactory} that uses KSI {@link Signer} and {@link Reader}
+ * for the underlying signature handling logic.
  */
 public class KsiSignatureFactory implements SignatureFactory {
 

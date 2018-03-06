@@ -17,18 +17,8 @@
  * reserves and retains all trademark rights.
  */
 
-package com.guardtime.envelope.manifest;
-
 /**
- * Reference to a signature contained in an envelope.
+ * Creating and handling of the manifests with TLV (Type Length Value) structure
  */
-public interface SignatureReference {
 
-    String getUri();
-
-    /**
-     * @return MIME type of the signature.
-     */
-    String getType();
-
-}
+package com.guardtime.envelope.manifest.tlv;

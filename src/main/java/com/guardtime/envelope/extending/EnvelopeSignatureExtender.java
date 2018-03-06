@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Extending for all signatures in a envelope.
+ * Extends all signatures in an envelope.
  */
 public class EnvelopeSignatureExtender {
     private static final Logger logger = LoggerFactory.getLogger(EnvelopeSignatureExtender.class);
@@ -46,9 +46,10 @@ public class EnvelopeSignatureExtender {
     }
 
     /**
-     * Extends each signature in input envelope and returns an {@link ExtendedEnvelope}.
-     * If a signature extending fails it is logged at INFO level and skipped.
-     * @param envelope    Envelope to be extended.
+     * Extends each signature in the input {@link Envelope} and returns an {@link ExtendedEnvelope}.
+     * If a signature extending fails, it is logged at INFO level and skipped.
+     * @param envelope envelope to be extended.
+     * @return The {@link ExtendedEnvelope}.
      */
     public ExtendedEnvelope extend(Envelope envelope) {
         for (SignatureContent content : envelope.getSignatureContents()) {

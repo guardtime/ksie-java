@@ -28,6 +28,7 @@ import com.guardtime.ksi.tlv.TLVElement;
 import com.guardtime.ksi.tlv.TLVParserException;
 import com.guardtime.ksi.tlv.TLVStructure;
 
+
 class TlvAnnotationDataReference extends TLVStructure implements AnnotationDataReference {
 
     public static final int ANNOTATION_REFERENCE = 0xb05;

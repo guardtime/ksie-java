@@ -42,7 +42,7 @@ public class ExtendedEnvelope extends Envelope {
     }
 
     /**
-     * Returns true if all {@link SignatureContent}s of this {@link Envelope} are extended.
+     * @return True, if all {@link SignatureContent}s of this {@link Envelope} are extended.
      */
     public boolean isFullyExtended() {
         for (ExtendedSignatureContent content : extendedSignatureContents) {

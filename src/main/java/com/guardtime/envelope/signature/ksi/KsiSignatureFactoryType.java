@@ -21,6 +21,10 @@ package com.guardtime.envelope.signature.ksi;
 
 import com.guardtime.envelope.signature.SignatureFactoryType;
 
+/**
+ * Helper class used to convey the KSI signature file extensions and MIME type.
+ */
+
 public class KsiSignatureFactoryType implements SignatureFactoryType {
 
     private static final String KSI_SIGNATURE_MIME_TYPE = "application/ksi-signature";

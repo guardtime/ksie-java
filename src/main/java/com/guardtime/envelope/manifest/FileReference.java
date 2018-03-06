@@ -33,7 +33,7 @@ public interface FileReference {
     String getMimeType();
 
     /**
-     * Returns list of {@link DataHash} of the referred file.
+     * @return List of {@link DataHash} of the referred file.
      */
     List<DataHash> getHashList();
 

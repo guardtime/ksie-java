@@ -28,29 +28,32 @@ import java.io.OutputStream;
  * General interface for all possible signature implementations.
  * @param <O>   Class of the underlying signature.
  *
+ * <p>
  * NB! compareTo should indicate which EnvelopeSignature was created first.
+ * </p>
  */
 public interface EnvelopeSignature<O> extends Comparable<EnvelopeSignature<O>> {
 
     /**
      * Write content of signature to output.
+     *
      * @param output stream to write signature to.
      * @throws IOException when the stream can't be written to.
      */
     void writeTo(OutputStream output) throws IOException;
 
     /**
-     * Returns the underlying signature object.
+     * @return The underlying signature object.
      */
     O getSignature();
 
     /**
-     * Returns the {@link DataHash} that is signed by the underlying signature.
+     * @return The {@link DataHash} that is signed by the underlying signature.
      */
     DataHash getSignedDataHash();
 
     /**
-     * Returns true if the underlying signature has been extended.
+     * @return True, if the underlying signature has been extended.
      */
     boolean isExtended();
 
