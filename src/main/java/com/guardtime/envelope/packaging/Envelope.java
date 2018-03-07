@@ -130,8 +130,9 @@ public class Envelope implements AutoCloseable {
     }
 
     /**
-     * Adds all {@link SignatureContent}s from input {@link Envelope} to this envelope. Also takes ownership of the resources associated with the
-     * {@link Envelope} and as such any external calls to close() on those resources may lead to unexpected behaviour.
+     * Adds all {@link SignatureContent}s from input {@link Envelope} to this envelope. Also takes ownership of the resources
+     * associated with the {@link Envelope} and as such any external calls to close() on those resources may lead to unexpected
+     * behaviour.
      *
      * @param envelope the input envelope whose content will be added.
      * @throws EnvelopeMergingException when any {@link SignatureContent} can not be added into the {@link Envelope} due to
