@@ -18,6 +18,6 @@
  */
 
 /**
- * Created by kadri on 5.03.18.
+ * Creating an envelope
  */
 package com.guardtime.envelope.packaging;

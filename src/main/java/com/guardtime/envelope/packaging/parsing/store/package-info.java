@@ -18,6 +18,6 @@
  */
 
 /**
- * Created by kadri on 5.03.18.
+ * Storing parsed data
  */
 package com.guardtime.envelope.packaging.parsing.store;

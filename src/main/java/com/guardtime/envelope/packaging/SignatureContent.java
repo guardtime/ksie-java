@@ -69,41 +69,44 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
     }
 
     /**
-     * Provides access to all {@link Document} contained by the structure.
-     *
-     * @return Map containing the name and the document.
+     * @return Map containing the {@link Document} contained by the structure, and the document's name.
      */
     public Map<String, Document> getDocuments() {
         return Collections.unmodifiableMap(documents);
     }
 
     /**
-     * Provides access to all {@link Annotation}s contained by the structure.
-     *
-     * @return Map containing path and annotation where path is used for envelope management.
+     * @return Map containing the {@link Annotation}s contained by the structure, and the paths to the annotation.
+     * Path is used for envelope management.
      */
     public Map<String, Annotation> getAnnotations() {
         return Collections.unmodifiableMap(annotations);
     }
 
     /**
-     * Provides access to the {@link EnvelopeSignature} which signs the structure and its content.
-     *
-     * @return The {@link EnvelopeSignature}.
+     * @return The {@link EnvelopeSignature} which signs the structure and its contents.
      */
     public EnvelopeSignature getEnvelopeSignature() {
         return signature;
     }
 
-
+    /**
+     * @return The {@link DocumentsManifest} contained by the structure.
+     */
     public DocumentsManifest getDocumentsManifest() {
         return documentsManifest;
     }
 
+    /**
+     * @return The {@link AnnotationsManifest} contained by the structure.
+     */
     public AnnotationsManifest getAnnotationsManifest() {
         return annotationsManifest;
     }
 
+    /**
+     * @return The structure's {@link Manifest}.
+     */
     public Manifest getManifest() {
         return manifest;
     }

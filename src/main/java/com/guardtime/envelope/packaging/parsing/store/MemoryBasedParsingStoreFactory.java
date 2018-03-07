@@ -31,7 +31,9 @@ import java.util.Set;
 
 /**
  * Keeps parsed data in memory.
+ * <p>
  * NB! There is no defence against too large data. Use with care!
+ * </p>
  */
 public class MemoryBasedParsingStoreFactory implements ParsingStoreFactory {
 

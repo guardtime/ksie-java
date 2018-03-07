@@ -18,6 +18,6 @@
  */
 
 /**
- * Created by kadri on 5.03.18.
+ * Set of packaging related exceptions
  */
 package com.guardtime.envelope.packaging.exception;

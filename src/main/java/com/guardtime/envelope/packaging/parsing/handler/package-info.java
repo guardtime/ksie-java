@@ -18,6 +18,6 @@
  */
 
 /**
- * Created by kadri on 5.03.18.
+ * Content handling (documents, annotations, manifests, etc)
  */
 package com.guardtime.envelope.packaging.parsing.handler;

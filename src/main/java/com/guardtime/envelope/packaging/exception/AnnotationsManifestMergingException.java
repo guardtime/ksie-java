@@ -21,7 +21,7 @@ package com.guardtime.envelope.packaging.exception;
 
 /**
  * Indicates an issue with {@link com.guardtime.envelope.manifest.AnnotationsManifest}s when merging
- * {@link com.guardtime.envelope.packaging.Envelope}s
+ * {@link com.guardtime.envelope.packaging.Envelope}s.
  */
 public class AnnotationsManifestMergingException extends EnvelopeMergingException {
 

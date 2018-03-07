@@ -25,12 +25,14 @@ import java.io.InputStream;
 import java.util.Set;
 
 /**
- * Data store that is meant to keep data from parsed in {@link Envelope}
+ * Data store that is meant to keep data from parsed in {@link Envelope}.
  */
 public interface ParsingStore extends AutoCloseable {
 
     /**
-     * Adds data from {@param stream} into store with {@param key}
+     * @param key the key to use to store the data read from the stream.
+     * @param stream the {@link InputStream} from which the data will be stored.
+     *
      * @throws ParsingStoreException when reading the stream fails.
      */
     void store(String key, InputStream stream) throws ParsingStoreException;
@@ -38,7 +40,8 @@ public interface ParsingStore extends AutoCloseable {
     Set<String> getStoredKeys();
 
     /**
-     * Produces an {@link InputStream} of the data stored with the key
+     * @param key the key used to store the data of interest.
+     * @return An {@link InputStream} of the data stored with the key.
      */
     InputStream get(String key);
 
@@ -47,8 +50,9 @@ public interface ParsingStore extends AutoCloseable {
     void remove(String key);
 
     /**
-     * Takes all the contents of {@param that} and adds it to this.
-     * @param that
+     * Takes all the contents of <code>that</code> and adds it to this.
+     * @param that ParsingStore containing the contents to be added.
+     * @throws ParsingStoreException when adding the content fails.
      */
     void transferFrom(ParsingStore that) throws ParsingStoreException;
 

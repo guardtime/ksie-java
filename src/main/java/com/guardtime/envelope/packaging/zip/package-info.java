@@ -18,6 +18,6 @@
  */
 
 /**
- * Created by kadri on 5.03.18.
+ * ZIP implementation of the envelope packaging
  */
 package com.guardtime.envelope.packaging.zip;

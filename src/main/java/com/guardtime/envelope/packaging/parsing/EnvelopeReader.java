@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Provides stream parsing logic for {@link EnvelopePackagingFactory}
+ * Provides stream parsing logic for {@link EnvelopePackagingFactory}.
  * Derivatives of this class must be stateless and reusable.
  */
 public abstract class EnvelopeReader {
@@ -68,15 +68,15 @@ public abstract class EnvelopeReader {
     /**
      *Parses an {@link InputStream} to produce an {@link Envelope}.
      *
-     * @param input    An {@link InputStream} that contains a valid/parsable {@link Envelope}. This InputStream will be
+     * @param input    an {@link InputStream} that contains a valid/parsable {@link Envelope}. This InputStream will be
      *                       closed after reading.
      * @return An instance of {@link Envelope} based on the data from {@link InputStream}. Does not verify
      *         the envelope/signature(s).
-     * @throws InvalidEnvelopeException When the {@link InputStream} does not contain a parsable {@link Envelope}.
-     * @throws EnvelopeReadingException When there were issues parsing some elements of the {@link Envelope}. The parsed
+     * @throws InvalidEnvelopeException when the {@link InputStream} does not contain a parsable {@link Envelope}.
+     * @throws EnvelopeReadingException when there were issues parsing some elements of the {@link Envelope}. The parsed
      *         envelope and all encountered exceptions can be retrieved from this exception.
-     * @throws IOException              When errors occur accessing data in provided {@link InputStream}.
-     * @throws ParsingStoreException    When errors are encountered while interacting with the {@link ParsingStore}.
+     * @throws IOException              when errors occur accessing data in provided {@link InputStream}.
+     * @throws ParsingStoreException    when errors are encountered while interacting with the {@link ParsingStore}.
      */
     public Envelope read(InputStream input) throws IOException, InvalidEnvelopeException, ParsingStoreException {
         EnvelopeReadingException readingException = new EnvelopeReadingException("Reading envelope encountered errors!");
@@ -105,9 +105,9 @@ public abstract class EnvelopeReader {
     /**
      * Processes input stream containing envelope and stores each entry in envelope to parsing store.
      * @param input            {@link InputStream} containing {@link Envelope}.
-     * @param store            Stores all parsed entries. Implementation must add each entry to store(key, stream) method.
-     * @param readingException Holds all expectable exceptions if any occurs.
-     * @throws IOException     When error occurs during accessing of InputStream.
+     * @param store            stores all parsed entries. Implementation must add each entry to store (key, stream) method.
+     * @param readingException holds all expectable exceptions if any occurs.
+     * @throws IOException     when error occurs during accessing of InputStream.
      */
     protected abstract void parseInputStream(InputStream input, ParsingStore store, EnvelopeReadingException readingException)
             throws IOException;

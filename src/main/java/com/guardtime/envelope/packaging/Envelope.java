@@ -79,7 +79,8 @@ public class Envelope implements AutoCloseable {
     }
 
     /**
-     * @return The {@link SignatureContent} at {@param index} and removes it from this {@link Envelope}.
+     * @param content the content to be removed.
+     * @return True, if the {@link SignatureContent} is removed.
      */
     public boolean removeSignatureContent(SignatureContent content) {
         return signatureContents.remove(content);
@@ -114,8 +115,11 @@ public class Envelope implements AutoCloseable {
     }
 
     /**
-     * Adds the {@link SignatureContent} to this {@link Envelope}. Also takes ownership of the resources associated with the
-     * {@link SignatureContent} and as such any external calls to <code>close()</code> on those resources may lead to unexpected behaviour.
+     * Adds the {@link SignatureContent} to this {@link Envelope}.
+     * Also takes ownership of the resources associated with the {@link SignatureContent} and
+     * as such any external calls to <code>close()</code> on those resources may lead to unexpected behaviour.
+     *
+     * @param content the content to be added.
      * @throws EnvelopeMergingException when the {@link SignatureContent} can not be added into the {@link Envelope} due to
      * clashing file paths or any other reason.
      */
@@ -126,8 +130,10 @@ public class Envelope implements AutoCloseable {
     }
 
     /**
-     * Adds all {@link SignatureContent}s from input {@link Envelope}. Also takes ownership of the resources associated with the
+     * Adds all {@link SignatureContent}s from input {@link Envelope} to this envelope. Also takes ownership of the resources associated with the
      * {@link Envelope} and as such any external calls to close() on those resources may lead to unexpected behaviour.
+     *
+     * @param envelope the input envelope whose content will be added.
      * @throws EnvelopeMergingException when any {@link SignatureContent} can not be added into the {@link Envelope} due to
      * clashing file paths or any other reason.
      */
@@ -169,6 +175,8 @@ public class Envelope implements AutoCloseable {
     /**
      * Adds all {@link SignatureContent}s to this {@link Envelope}. Also takes ownership of the resources associated with the
      * {@link SignatureContent}s and as such any external calls to close() on those resources may lead to unexpected behaviour.
+     *
+     * @param contents the content to be added.
      * @throws EnvelopeMergingException when any {@link SignatureContent} can not be added into the {@link Envelope} due to
      * clashing file paths or any other reason.
      */
@@ -185,7 +193,7 @@ public class Envelope implements AutoCloseable {
     }
 
     /**
-     * Returns a list of all {@link Document}s that are signed.
+     * @return The list of all {@link Document}s that are signed.
      */
     public List<SignedDocument> getSignedDocuments() {
         List<SignedDocument> signedDocuments = new ArrayList<>();
