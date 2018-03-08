@@ -43,8 +43,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Structure that groups together all envelope internal structure elements(manifests), documents, annotations and
- * signature that are directly connected to the signature.
+ * Structure that groups together all envelope internal structure elements (manifests), documents, annotations and
+ * signatures that are directly connected to the signature.
  */
 public class SignatureContent implements AutoCloseable, Comparable<SignatureContent> {
 
@@ -69,39 +69,44 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
     }
 
     /**
-     * Provides access to all {@link Document} contained by the structure.
-     *
-     * @return Map containing the name and the document.
+     * @return Map containing the {@link Document} contained by the structure, and the document's name.
      */
     public Map<String, Document> getDocuments() {
         return Collections.unmodifiableMap(documents);
     }
 
     /**
-     * Provides access to all {@link Annotation} contained by the structure.
-     *
-     * @return Map containing path and annotation where path is used for envelope management.
+     * @return Map containing the {@link Annotation}s contained by the structure, and the paths to the annotation.
+     * Path is used for envelope management.
      */
     public Map<String, Annotation> getAnnotations() {
         return Collections.unmodifiableMap(annotations);
     }
 
     /**
-     * Provides access to the {@link EnvelopeSignature} which signs the structure and its content.
+     * @return The {@link EnvelopeSignature} which signs the structure and its contents.
      */
     public EnvelopeSignature getEnvelopeSignature() {
         return signature;
     }
 
-
+    /**
+     * @return The {@link DocumentsManifest} contained by the structure.
+     */
     public DocumentsManifest getDocumentsManifest() {
         return documentsManifest;
     }
 
+    /**
+     * @return The {@link AnnotationsManifest} contained by the structure.
+     */
     public AnnotationsManifest getAnnotationsManifest() {
         return annotationsManifest;
     }
 
+    /**
+     * @return The structure's {@link Manifest}.
+     */
     public Manifest getManifest() {
         return manifest;
     }
@@ -111,9 +116,10 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
     }
 
     /**
-     * Attached data to a detached {@link Document}. Returns true after successful attachment.
-     * @param path Path of the {@link Document} to attach the data to.
-     * @param data Data stream to be attached to the {@link Document}. NB! Does NOT close the stream!
+     * Attaches data to a detached {@link Document}.
+     * @param path path of the {@link Document} to attach the data to.
+     * @param data data stream to be attached to the {@link Document}. NB! Does NOT close the stream!
+     * @return True, after successful attachment.
      */
     public boolean attachDetachedDocument(String path, InputStream data) {
         Document document = documents.get(path);
@@ -125,9 +131,10 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
     }
 
     /**
-     * Returns existing {@link Document} if present and replaces it with an {@link EmptyDocument} in the
-     * {@link SignatureContent}. If no document found or if the document is already detached null will be returned.
-     * @throws ParsingStoreException When detaching an instance of {@link ParsedDocument} fails.
+     * @param path path of the {@link Document}.
+     * @return Existing {@link Document} if present, and replaces it with an {@link EmptyDocument} in the
+     * {@link SignatureContent}. If no document found or if the document is already detached, null will be returned.
+     * @throws ParsingStoreException when detaching an instance of {@link ParsedDocument} fails.
      */
     public Document detachDocument(String path) throws ParsingStoreException {
         if (!documents.containsKey(path) || documents.get(path) instanceof EmptyDocument) {

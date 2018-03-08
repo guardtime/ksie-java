@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Writes a {@link Envelope} to {@link java.io.OutputStream}.
+ * Writes an {@link Envelope} to {@link java.io.OutputStream}.
  * Implementations of this interface must be stateless and reusable.
  */
 public interface EnvelopeWriter {

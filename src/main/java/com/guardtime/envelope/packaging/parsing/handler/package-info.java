@@ -17,16 +17,7 @@
  * reserves and retains all trademark rights.
  */
 
-package com.guardtime.envelope.packaging.exception;
-
 /**
- * Indicates an issue with {@link com.guardtime.envelope.manifest.AnnotationsManifest}s when merging
- * {@link com.guardtime.envelope.packaging.Envelope}s.
+ * Content handling (documents, annotations, manifests, etc)
  */
-public class AnnotationsManifestMergingException extends EnvelopeMergingException {
-
-    public AnnotationsManifestMergingException(String path) {
-        super("New SignatureContent has clashing AnnotationsManifest! Path: " + path);
-    }
-
-}
+package com.guardtime.envelope.packaging.parsing.handler;

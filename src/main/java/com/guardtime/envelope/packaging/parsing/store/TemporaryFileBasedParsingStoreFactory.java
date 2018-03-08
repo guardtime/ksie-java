@@ -36,8 +36,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Uses temporary files in system temp folder for maintaining data of parsed in {@link Envelope}
+ * Uses temporary files in system temp folder for maintaining data of parsed in {@link Envelope}.
+ * <p>
  * NB! Does not provide protection against malicious file modification in temp folder. Use with care!
+ * </p>
  */
 public class TemporaryFileBasedParsingStoreFactory implements ParsingStoreFactory {
 
