@@ -40,7 +40,7 @@ import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_DATA
 
 /**
  * This rule verifies that the tested {@link Document} is indeed present in the {@link
- * com.guardtime.envelope.packaging.Envelope}
+ * com.guardtime.envelope.packaging.Envelope}.
  * It expects to find successful results for rules verifying existence and integrity of
  * {@link com.guardtime.envelope.manifest.DocumentsManifest}.
  */

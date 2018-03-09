@@ -33,7 +33,7 @@ import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_ANNO
 
 /**
  * This rule verifies that the annotations manifest is actually present in the {@link
- * com.guardtime.envelope.packaging.Envelope}
+ * com.guardtime.envelope.packaging.Envelope}.
  */
 public class AnnotationsManifestExistenceRule extends AbstractRule<SignatureContent> {
 
