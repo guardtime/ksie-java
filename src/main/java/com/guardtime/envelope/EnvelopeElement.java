@@ -38,7 +38,8 @@ public interface EnvelopeElement {
     String getPath();
 
     /**
-     * @param algorithm hash algorithm to be used.
+     * @param algorithm hash algorithm to be used, see {@link com.guardtime.envelope.hash.HashAlgorithmProvider}
+     *                  for available algorithms.
      * @return {@link DataHash} for given algorithm based on object data.
      * @throws DataHashException when the given algorithm can't be used for generating a hash or the data can't be accessed.
      */

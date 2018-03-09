@@ -31,7 +31,7 @@ import com.guardtime.envelope.verification.rule.state.RuleStateProvider;
 
 /**
  * This rule verifies that the documents manifest is actually present in the {@link
- * com.guardtime.envelope.packaging.Envelope}
+ * com.guardtime.envelope.packaging.Envelope}.
  */
 public class DocumentsManifestExistenceRule extends AbstractRule<SignatureContent> {
 
