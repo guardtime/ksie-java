@@ -30,7 +30,7 @@ import com.guardtime.envelope.verification.rule.RuleType;
 import com.guardtime.envelope.verification.rule.state.RuleStateProvider;
 
 /**
- * Rule that verifies that there is a signature in the envelope for the given {@link SignatureContent}
+ * Rule that verifies that there is a signature in the envelope for the given {@link SignatureContent}.
  * Will terminate verification upon non OK results.
  */
 public class SignatureExistenceRule extends AbstractRule<SignatureContent> {

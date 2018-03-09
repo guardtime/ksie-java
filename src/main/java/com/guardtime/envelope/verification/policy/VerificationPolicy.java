@@ -26,8 +26,10 @@ import com.guardtime.envelope.verification.rule.Rule;
 import java.util.List;
 
 /**
- * Access interface for providing {@link Rule}s to be used for verifying a {@link Envelope}
+ * Access interface for providing {@link Rule}s to be used for verifying an {@link Envelope}.
+ * <p>
  * Contains rules to be performed on envelope to prove validity.
+ * </p>
  * As an example should contain rules for:
  * <ol>
  *   <li>verifying MIME-type</li>

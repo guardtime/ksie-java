@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * Helper class to verify {@link Envelope} based on a {@link VerificationPolicy}
+ * Helper class to verify {@link Envelope} based on a {@link VerificationPolicy}.
  */
 public class EnvelopeVerifier {
     private static final Logger logger = LoggerFactory.getLogger(EnvelopeVerifier.class);
@@ -48,8 +48,8 @@ public class EnvelopeVerifier {
 
     /**
      * Verifies the {@link Envelope} based on the rules provided by the {@link VerificationPolicy}.
-     * @param envelope  envelope to be verified
-     * @return {@link VerifiedEnvelope} based on all {@link RuleVerificationResult} gathered during verification.
+     * @param envelope  envelope to be verified.
+     * @return {@link VerifiedEnvelope} based on all {@link RuleVerificationResult}s gathered during verification.
      */
     public VerifiedEnvelope verify(Envelope envelope) {
         ResultHolder holder = new ResultHolder();

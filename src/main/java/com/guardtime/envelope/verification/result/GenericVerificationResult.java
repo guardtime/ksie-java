@@ -19,6 +19,9 @@
 
 package com.guardtime.envelope.verification.result;
 
+/**
+ * Basic implementation of {@link RuleVerificationResult} to be used in most cases.
+ */
 public class GenericVerificationResult implements RuleVerificationResult {
     private final VerificationResult result;
     private final String ruleName;

@@ -32,7 +32,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Encompasses all results from verifying a {@link Envelope}.
+ * Encompasses all results from verifying an {@link Envelope}.
  * Provides easier access to overall result of verification.
  */
 public class VerifiedEnvelope extends Envelope {
@@ -48,8 +48,8 @@ public class VerifiedEnvelope extends Envelope {
     }
 
     /**
-     * Provides access to all the {@link RuleVerificationResult} gathered during verification.
-     * @return List of {@link RuleVerificationResult}
+     * Provides access to all the {@link RuleVerificationResult}s gathered during verification.
+     * @return List of {@link RuleVerificationResult}s.
      */
     public List<RuleVerificationResult> getResults() {
         return resultHolder.getResults();
@@ -57,6 +57,7 @@ public class VerifiedEnvelope extends Envelope {
 
     /**
      * Provides access to the overall {@link VerificationResult} of the verification.
+     * @return Overall verification result.
      */
     public VerificationResult getVerificationResult() {
         return aggregateResult;

@@ -18,6 +18,6 @@
  */
 
 /**
- * Classes and interfaces to create and add annotations, i.e. context, to the KSI envelope
+ * Creating and adding annotations, i.e. context, to the KSI envelope
  */
 package com.guardtime.envelope.annotation;

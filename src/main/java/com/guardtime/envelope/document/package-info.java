@@ -18,6 +18,6 @@
  */
 
 /**
- * Classes and interfaces to add a data to the KSI envelope
+ * Adding data to the KSI envelope
  */
 package com.guardtime.envelope.document;

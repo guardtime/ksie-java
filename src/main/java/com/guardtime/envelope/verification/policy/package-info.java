@@ -17,30 +17,7 @@
  * reserves and retains all trademark rights.
  */
 
-package com.guardtime.envelope.verification.result;
-
 /**
- * Possible results for any given rule used to verify an envelope.
+ * Defining of the verification policies
  */
-public enum VerificationResult {
-    OK("RESULT_OK", 0),
-    WARN("RESULT_WARN", 1),
-    NOK("RESULT_NOK", 2);
-
-    private final String name;
-    private final int weight;
-
-    VerificationResult(String name, int weight) {
-        this.name = name;
-        this.weight = weight;
-    }
-
-    /**
-     * Compares <code>this</code> with <code>that</code> to determine which has higher priority.
-     * @param that    the other {@link VerificationResult} to compare with.
-     * @return True, when <code>this</code> has higher priority than <code>that</code>.
-     */
-    public boolean isMoreImportantThan(VerificationResult that) {
-        return this.weight > that.weight;
-    }
-}
+package com.guardtime.envelope.verification.policy;

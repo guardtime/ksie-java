@@ -45,9 +45,9 @@ import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_ANNO
 import static com.guardtime.envelope.verification.rule.RuleType.KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS;
 
 /**
- * This rule verifies that the annotation data is actually present in the {@link Envelope}
+ * This rule verifies that the annotation data is actually present in the {@link Envelope}.
  * It expects to find successful results for rules verifying existence and integrity of
- * {@link com.guardtime.envelope.manifest.AnnotationsManifest} and {@link SingleAnnotationManifest}
+ * {@link com.guardtime.envelope.manifest.AnnotationsManifest} and {@link SingleAnnotationManifest}.
  */
 public class AnnotationDataExistenceRule extends AbstractRule<SignatureContent> {
 
