@@ -46,8 +46,8 @@ import java.util.List;
 public abstract class CommonPolicyRuleSets {
 
     /**
-     * @param provider ???
-     * @param verifier ???
+     * @param provider provides {@link com.guardtime.envelope.verification.rule.state.RuleState}s for rules.
+     * @param verifier signature verifying implementation that is passed on to signature specific rules.
      * @return A list of all rules related to underlying signature verification.
      */
     public static List<Rule<SignatureContent>> getSignatureRules(RuleStateProvider provider, SignatureVerifier verifier) {
@@ -58,7 +58,7 @@ public abstract class CommonPolicyRuleSets {
     }
 
     /**
-     * @param provider ???
+     * @param provider provides {@link com.guardtime.envelope.verification.rule.state.RuleState}s for rules.
      * @return A list of basic rules to verify existence of underlying signature and its association to manifest.
      */
     public static List<Rule<SignatureContent>> getBasicSignatureRules(RuleStateProvider provider) {
@@ -69,7 +69,7 @@ public abstract class CommonPolicyRuleSets {
     }
 
     /**
-     * @param provider ???
+     * @param provider provides {@link com.guardtime.envelope.verification.rule.state.RuleState}s for rules.
      * @return Rules associated with document existence and integrity.
      */
     public static List<Rule<SignatureContent>> getDocumentRules(RuleStateProvider provider) {
@@ -80,7 +80,7 @@ public abstract class CommonPolicyRuleSets {
     }
 
     /**
-     * @param provider ???
+     * @param provider provides {@link com.guardtime.envelope.verification.rule.state.RuleState}s for rules.
      * @return Rules associated with annotation existence and integrity. Including per annotation manifest related rules.
      */
     public static List<Rule<SignatureContent>> getAnnotationRules(RuleStateProvider provider) {
@@ -93,7 +93,7 @@ public abstract class CommonPolicyRuleSets {
     }
 
     /**
-     * @param provider ???
+     * @param provider provides {@link com.guardtime.envelope.verification.rule.state.RuleState}s for rules.
      * @return Rules associated with documents and annotations manifests of the {@link com.guardtime.envelope.packaging.Envelope}.
      */
     public static List<Rule<SignatureContent>> getManifestRules(RuleStateProvider provider) {
@@ -106,7 +106,7 @@ public abstract class CommonPolicyRuleSets {
     }
 
     /**
-     * @param provider ???
+     * @param provider provides {@link com.guardtime.envelope.verification.rule.state.RuleState}s for rules.
      * @return Rules necessary for verifying internal integrity of the Envelope {@link com.guardtime.envelope.packaging.Envelope}.
      */
     public static List<Rule<SignatureContent>> getIntegrityRules(RuleStateProvider provider) {

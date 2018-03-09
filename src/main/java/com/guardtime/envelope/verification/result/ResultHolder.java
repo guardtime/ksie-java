@@ -29,6 +29,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * Helper class for gathering and accessing {@link RuleVerificationResult}s.
+ */
 public class ResultHolder {
 
     public static final VerificationResultFilter ALL = new VerificationResultFilter() {

@@ -24,59 +24,59 @@ package com.guardtime.envelope.verification.rule;
  */
 public enum RuleType {
     /**
-     * Does the data manifest exist?
+     * Verify the data manifest exists.
      */
     KSIE_VERIFY_DATA_MANIFEST_EXISTS("KSIE_VERIFY_DATA_MANIFEST_EXISTS"),
     /**
-     * Does the hash of the associated data manifest match the hash in the manifest file?
+     * Verify the hash of the data manifest against the hash in the manifest file.
      */
     KSIE_VERIFY_DATA_MANIFEST("KSIE_VERIFY_DATA_MANIFEST"),
     /**
-     * Does the data file exist?
+     * Verify the data file exist.
      */
     KSIE_VERIFY_DATA_EXISTS("KSIE_VERIFY_DATA_EXISTS"),
     /**
-     * ???
+     * Verify the hash(es) of data file against the hash(es) in the data manifest.
      */
     KSIE_VERIFY_DATA_HASH("KSIE_VERIFY_DATA_HASH"),
     /**
-     * ???
+     * Verify the annotation's manifest exists.
      */
     KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS("KSIE_VERIFY_ANNOTATION_MANIFEST_EXISTS"),
     /**
-     * Does the hash of the associated annotation match the hash in the manifest file?
+     * Verify the hash of the annotation's manifest against the hash in the manifest file.
      */
     KSIE_VERIFY_ANNOTATION_MANIFEST("KSIE_VERIFY_ANNOTATION_MANIFEST"),
     /**
      * Is the annotation meta-data mandatory (according to
      * {@link com.guardtime.envelope.annotation.EnvelopeAnnotationType})
-     * and, if yes, does it exist?
+     * and, if yes, does it exist.
      */
     KSIE_VERIFY_ANNOTATION_EXISTS("KSIE_VERIFY_ANNOTATION_EXISTS"),
     /**
-     * Does the annotation's meta-data hash match the hash in the annotation's manifest?
+     * Verify the annotation's meta-data hash match the hash in the annotation's manifest.
      */
     KSIE_VERIFY_ANNOTATION("KSIE_VERIFY_ANNOTATION"),
     /**
      * Is the annotation data mandatory (according to
      * {@link com.guardtime.envelope.annotation.EnvelopeAnnotationType})
-     * and, if yes, does it exist?
+     * and, if yes, does it exist.
      */
     KSIE_VERIFY_ANNOTATION_DATA_EXISTS("KSIE_VERIFY_ANNOTATION_DATA_EXISTS"),
     /**
-     * Does the annotation's data hash match the hash in the annotation's manifest?
+     * Verify the annotation data hash match the hash in the annotation meta-data.
      */
     KSIE_VERIFY_ANNOTATION_DATA("KSIE_VERIFY_ANNOTATION_DATA"),
     /**
-     * Can the signature of the manifest be verified?
+     * Verify the manifest signature.
      */
     KSIE_VERIFY_SIGNATURE("KSIE_VERIFY_SIGNATURE"),
     /**
-     * Does the signature exist?
+     * Verify the manifest signature exists.
      */
     KSIE_VERIFY_SIGNATURE_EXISTS("KSIE_VERIFY_SIGNATURE_EXISTS"),
     /**
-     * Does the signature input hash match the manifest?
+     * Verify KSI signature input hash matches the manifest.
      */
     KSIE_VERIFY_MANIFEST("KSIE_VERIFY_MANIFEST");
 

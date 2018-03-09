@@ -19,8 +19,15 @@
 
 package com.guardtime.envelope.verification.result;
 
+/**
+ * For filtering out the {@link RuleVerificationResult}s
+ */
 public interface VerificationResultFilter {
 
+    /**
+     * @param result result to be filtered.
+     * @return True if given {@link RuleVerificationResult} matches filter.
+     */
     boolean apply(RuleVerificationResult result);
 
 }

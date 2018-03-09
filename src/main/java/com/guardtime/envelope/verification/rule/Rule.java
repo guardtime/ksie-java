@@ -35,7 +35,9 @@ public interface Rule<V> {
      * @param verifiable object to be examined.
      * @param resultHolder that maintains all rule verification results.
      * @return True, unless the verification process is ignored.
-     * @throws RuleTerminatingException
+     * @throws RuleTerminatingException when the verification process at this level can not be continued due to the situation
+     * encountered during processing the rule. Passes any decision of continuing verification to higher level invoker of
+     * verification.
      */
     boolean verify(ResultHolder resultHolder, V verifiable) throws RuleTerminatingException;
 
