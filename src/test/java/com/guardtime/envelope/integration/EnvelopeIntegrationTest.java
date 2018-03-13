@@ -35,10 +35,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
 
@@ -221,8 +224,8 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testAnnotationAsReferredDocument_OK() throws Exception {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream("randomData".getBytes());
-                Document doc = new StreamDocument(inputStream, "application/random", "someFile.file");
-                Envelope envelope = packagingFactory.create(singletonList(doc), singletonList(stringEnvelopeAnnotation))) {
+             Document doc = new StreamDocument(inputStream, "application/random", "someFile.file");
+             Envelope envelope = packagingFactory.create(singletonList(doc), singletonList(stringEnvelopeAnnotation))) {
             Annotation annotation = envelope.getSignatureContents().get(0).getAnnotations().values().iterator().next();
             Document doc2 = new InternalDocument(annotation);
             packagingFactory.addSignature(envelope, singletonList(doc2), Collections.<Annotation>emptyList());
@@ -231,8 +234,49 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             writer.write(envelope, bos);
 
-            try (Envelope envelope1 = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
-                assertEquals(2, envelope1.getSignatureContents().size());
+            try (Envelope parsedEnvelope = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
+                assertEquals(2, parsedEnvelope.getSignatureContents().size());
+            }
+        }
+    }
+
+    @Test
+    public void testSameAnnotationInMultipleSignatures() throws Exception {
+        List<Annotation> annotations = singletonList(stringEnvelopeAnnotation);
+        try (Envelope envelope = packagingFactory.create(singletonList(testDocumentHelloText), annotations)) {
+            packagingFactory.addSignature(
+                    envelope,
+                    singletonList(testDocumentHelloPdf),
+                    annotations
+            );
+            assertEquals(2, envelope.getSignatureContents().size());
+            SignatureContent firstContent = envelope.getSignatureContents().get(0);
+            SignatureContent secondContent = envelope.getSignatureContents().get(1);
+            assertEquals(1, firstContent.getAnnotations().size());
+            assertEquals(1, secondContent.getAnnotations().size());
+            // same annotation (data)
+            assertEquals(
+                    firstContent.getAnnotations().values().iterator().next(),
+                    secondContent.getAnnotations().values().iterator().next()
+            );
+
+            envelope.removeSignatureContent(firstContent);
+            assertFalse(firstContent.getAnnotations().isEmpty());
+            assertFalse(secondContent.getAnnotations().isEmpty());
+
+            // writing shouldn't break stuff
+            EnvelopeWriter writer = new ZipEnvelopeWriter();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            writer.write(envelope, bos);
+            try (Envelope parsedEnvelope = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
+                assertEquals(1, parsedEnvelope.getSignatureContents().size());
+                assertEquals(1, parsedEnvelope.getSignatureContents().get(0).getAnnotations().size());
+                assertEquals(1, parsedEnvelope.getSignatureContents().get(0).getSingleAnnotationManifests().size());
+                assertTrue(
+                        annotations.get(0).equals(
+                            parsedEnvelope.getSignatureContents().get(0).getAnnotations().values().iterator().next()
+                        )
+                );
             }
         }
     }
