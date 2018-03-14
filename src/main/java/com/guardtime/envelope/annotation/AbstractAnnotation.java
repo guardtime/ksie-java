@@ -132,6 +132,12 @@ public abstract class AbstractAnnotation implements Annotation {
 
     @Override
     public int hashCode() {
+        DataHash dataHash = null;
+        try {
+            dataHash = getDataHash(HASH_ALGORITHM);
+        } catch (DataHashException e) {
+            // ignore data hash
+        }
         return Objects.hash(getDomain(), getAnnotationType(), dataHash, getPath());
     }
 }
