@@ -234,7 +234,8 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream("randomData".getBytes());
              Document doc = new StreamDocument(inputStream, "application/random", "someFile.file");
              Envelope envelope = packagingFactory.create(singletonList(doc), singletonList(stringEnvelopeAnnotation))) {
-            SingleAnnotationManifest annotationManifest = envelope.getSignatureContents().get(0).getSingleAnnotationManifests().values().iterator().next();
+            SingleAnnotationManifest annotationManifest =
+                    envelope.getSignatureContents().get(0).getSingleAnnotationManifests().values().iterator().next();
             addContentAndVerify(envelope, annotationManifest);
         }
     }
@@ -243,7 +244,8 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
     public void testAnnotationManifestAsReferredDocumentWhileAnnotationDataMissing_OK() throws Exception {
         try (FileInputStream fis = new FileInputStream(loadFile(ENVELOPE_WITH_MISSING_ANNOTATION_DATA));
              Envelope envelope = packagingFactory.read(fis)) {
-            SingleAnnotationManifest annotationManifest = envelope.getSignatureContents().get(0).getSingleAnnotationManifests().values().iterator().next();
+            SingleAnnotationManifest annotationManifest =
+                    envelope.getSignatureContents().get(0).getSingleAnnotationManifests().values().iterator().next();
             addContentAndVerify(envelope, annotationManifest);
         }
     }
