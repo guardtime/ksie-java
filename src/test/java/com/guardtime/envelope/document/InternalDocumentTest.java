@@ -24,7 +24,7 @@ public class InternalDocumentTest extends AbstractEnvelopeTest {
     @Test
     public void testNullFileName() {
         expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("File must be present");
+        expectedException.expectMessage("File name must be present");
         AbstractDocument mockDoc = Mockito.mock(AbstractDocument.class);
         new InternalDocument(mockDoc);
     }
