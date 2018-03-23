@@ -1,6 +1,7 @@
 package com.guardtime.envelope.document;
 
 import com.guardtime.envelope.EnvelopeElement;
+import com.guardtime.envelope.util.Util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,13 +16,18 @@ public class InternalDocument extends AbstractDocument {
     private final EnvelopeElement element;
 
     public InternalDocument(EnvelopeElement element) {
-        super(MIME_TYPE, element.getPath());
+        super(MIME_TYPE, extractPath(element));
         this.element = element;
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
         return element.getInputStream();
+    }
+
+    private static String extractPath(EnvelopeElement element) {
+        Util.notNull(element, "EnvelopeElement");
+        return element.getPath();
     }
 
 }
