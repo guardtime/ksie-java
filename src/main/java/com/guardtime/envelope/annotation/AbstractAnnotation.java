@@ -136,7 +136,7 @@ public abstract class AbstractAnnotation implements Annotation {
         try {
             dataHash = getDataHash(HASH_ALGORITHM);
         } catch (DataHashException e) {
-            // ignore data hash
+            throw new RuntimeException("Object hash calculation failed!", e);
         }
         return Objects.hash(getDomain(), getAnnotationType(), dataHash, getPath());
     }
