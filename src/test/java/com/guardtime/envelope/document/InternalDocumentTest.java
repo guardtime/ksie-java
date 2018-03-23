@@ -1,6 +1,7 @@
 package com.guardtime.envelope.document;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
+
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -15,13 +16,15 @@ public class InternalDocumentTest extends AbstractEnvelopeTest {
 
     @Test
     public void testElementNull() {
-        //TODO: Add expected results.
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("EnvelopeElement must be present");
         new InternalDocument(null);
     }
 
     @Test
     public void testNullFileName() {
-        //TODO: Add expected results.
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("File must be present");
         AbstractDocument mockDoc = Mockito.mock(AbstractDocument.class);
         new InternalDocument(mockDoc);
     }
