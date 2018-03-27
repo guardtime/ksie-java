@@ -1,11 +1,13 @@
 package com.guardtime.envelope.integration;
 
 import com.guardtime.envelope.EnvelopeBuilder;
+import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.document.InternalDocument;
 import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
+import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.EnvelopeWriter;
@@ -28,7 +30,6 @@ import com.guardtime.ksi.service.client.http.CredentialsAwareHttpSettings;
 import com.guardtime.ksi.service.http.simple.SimpleHttpSigningClient;
 import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicyAdapter;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -227,16 +228,41 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
              Document doc = new StreamDocument(inputStream, "application/random", "someFile.file");
              Envelope envelope = packagingFactory.create(singletonList(doc), singletonList(stringEnvelopeAnnotation))) {
             Annotation annotation = envelope.getSignatureContents().get(0).getAnnotations().values().iterator().next();
-            Document doc2 = new InternalDocument(annotation);
-            packagingFactory.addSignature(envelope, singletonList(doc2), Collections.<Annotation>emptyList());
-            assertEquals(2, envelope.getSignatureContents().size());
-            EnvelopeWriter writer = new ZipEnvelopeWriter();
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            writer.write(envelope, bos);
+            addContentAndVerify(envelope, annotation);
+        }
+    }
 
-            try (Envelope parsedEnvelope = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
-                assertEquals(2, parsedEnvelope.getSignatureContents().size());
-            }
+    @Test
+    public void testAnnotationManifestAsReferredDocument_OK() throws Exception {
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream("randomData".getBytes());
+             Document doc = new StreamDocument(inputStream, "application/random", "someFile.file");
+             Envelope envelope = packagingFactory.create(singletonList(doc), singletonList(stringEnvelopeAnnotation))) {
+            SingleAnnotationManifest annotationManifest =
+                    envelope.getSignatureContents().get(0).getSingleAnnotationManifests().values().iterator().next();
+            addContentAndVerify(envelope, annotationManifest);
+        }
+    }
+
+    @Test
+    public void testAnnotationManifestAsReferredDocumentWhileAnnotationDataMissing_OK() throws Exception {
+        try (FileInputStream fis = new FileInputStream(loadFile(ENVELOPE_WITH_MISSING_ANNOTATION_DATA));
+             Envelope envelope = packagingFactory.read(fis)) {
+            SingleAnnotationManifest annotationManifest =
+                    envelope.getSignatureContents().get(0).getSingleAnnotationManifests().values().iterator().next();
+            addContentAndVerify(envelope, annotationManifest);
+        }
+    }
+
+    private void addContentAndVerify(Envelope envelope, EnvelopeElement element) throws Exception {
+        Document doc2 = new InternalDocument(element);
+        packagingFactory.addSignature(envelope, singletonList(doc2), Collections.singletonList(stringEnvelopeAnnotation));
+        assertEquals(2, envelope.getSignatureContents().size());
+        EnvelopeWriter writer = new ZipEnvelopeWriter();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        writer.write(envelope, bos);
+
+        try (Envelope envelope1 = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
+            assertEquals(2, envelope1.getSignatureContents().size());
         }
     }
 
