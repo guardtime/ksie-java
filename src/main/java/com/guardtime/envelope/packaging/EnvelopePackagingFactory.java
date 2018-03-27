@@ -352,7 +352,9 @@ public final class EnvelopePackagingFactory {
                 return;
             }
             for (Annotation annotation : annotations) {
-                annotation.setPath(nameProvider.nextAnnotationDataFileName());
+                if (annotation.getPath() == null) {
+                    annotation.setPath(nameProvider.nextAnnotationDataFileName());
+                }
                 SingleAnnotationManifest singleAnnotationManifest = manifestFactory.createSingleAnnotationManifest(
                         documentsManifest,
                         annotation,

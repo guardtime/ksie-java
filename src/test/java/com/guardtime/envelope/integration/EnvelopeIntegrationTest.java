@@ -12,7 +12,9 @@ import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.SignatureContent;
+import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
+import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.packaging.parsing.store.MemoryBasedParsingStoreFactory;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
@@ -39,6 +41,7 @@ import java.util.Collections;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
@@ -222,8 +225,8 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testAnnotationAsReferredDocument_OK() throws Exception {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream("randomData".getBytes());
-                Document doc = new StreamDocument(inputStream, "application/random", "someFile.file");
-                Envelope envelope = packagingFactory.create(singletonList(doc), singletonList(stringEnvelopeAnnotation))) {
+             Document doc = new StreamDocument(inputStream, "application/random", "someFile.file");
+             Envelope envelope = packagingFactory.create(singletonList(doc), singletonList(stringEnvelopeAnnotation))) {
             Annotation annotation = envelope.getSignatureContents().get(0).getAnnotations().values().iterator().next();
             addContentAndVerify(envelope, annotation);
         }
@@ -261,6 +264,132 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
         try (Envelope envelope1 = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
             assertEquals(2, envelope1.getSignatureContents().size());
         }
+    }
+
+    @Test
+    public void testRemovingSignatureContentWithSameAnnotationDoesNotChangeAnnotation() throws Exception {
+        try (Envelope envelope =
+                     getEnvelopeWith2SignaturesWithSameAnnotation(stringEnvelopeAnnotation)) {
+            SignatureContent firstContent = envelope.getSignatureContents().get(0);
+            SignatureContent secondContent = envelope.getSignatureContents().get(1);
+
+            envelope.removeSignatureContent(firstContent);
+            assertFalse(firstContent.getAnnotations().isEmpty());
+            assertFalse(secondContent.getAnnotations().isEmpty());
+            assertEquals(
+                    stringEnvelopeAnnotation,
+                    firstContent.getAnnotations().values().iterator().next()
+            );
+            assertEquals(
+                    firstContent.getAnnotations().values().iterator().next(),
+                    secondContent.getAnnotations().values().iterator().next()
+            );
+        }
+    }
+
+    @Test
+    public void testWritingSplitEnvelopeWithSameAnnotationInMultipleSignatures() throws Exception {
+        try (Envelope envelope =
+                     getEnvelopeWith2SignaturesWithSameAnnotation(stringEnvelopeAnnotation)) {
+            SignatureContent firstContent = envelope.getSignatureContents().get(0);
+            envelope.removeSignatureContent(firstContent);
+            Envelope[] arr = new Envelope[]{envelope, new Envelope(firstContent)};
+            EnvelopeWriter writer = new ZipEnvelopeWriter();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            for (Envelope e : arr) {
+                bos.reset();
+                writer.write(e, bos);
+                try (Envelope parsedEnvelope = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
+                    assertEquals(1, parsedEnvelope.getSignatureContents().size());
+                    SignatureContent signatureContent = parsedEnvelope.getSignatureContents().get(0);
+                    assertEquals(1, signatureContent.getAnnotations().size());
+                    assertEquals(1, signatureContent.getSingleAnnotationManifests().size());
+                    assertEquals(stringEnvelopeAnnotation, signatureContent.getAnnotations().values().iterator().next());
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testReadingEnvelopeWithSameAnnotationInMultipleSignatures() throws Exception {
+        try (Envelope envelope =
+                     getEnvelopeWith2SignaturesWithSameAnnotation(stringEnvelopeAnnotation)) {
+            EnvelopeWriter writer = new ZipEnvelopeWriter();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            writer.write(envelope, bos);
+            try (Envelope parsedEnvelope = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
+                SignatureContent firstContent = parsedEnvelope.getSignatureContents().get(0);
+                SignatureContent secondContent = parsedEnvelope.getSignatureContents().get(1);
+                assertEquals(
+                        stringEnvelopeAnnotation,
+                        firstContent.getAnnotations().values().iterator().next()
+                );
+                assertEquals(
+                        firstContent.getAnnotations().values().iterator().next(),
+                        secondContent.getAnnotations().values().iterator().next()
+                );
+            }
+        }
+    }
+
+
+    @Test
+    public void testReadingEnvelopeWithSameAnnotationInMultipleSignaturesAndRemovingOneAndWriting() throws Exception {
+        try (Envelope envelope =
+                     getEnvelopeWith2SignaturesWithSameAnnotation(stringEnvelopeAnnotation)) {
+            EnvelopeWriter writer = new ZipEnvelopeWriter();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            writer.write(envelope, bos);
+            try (Envelope parsedEnvelope = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
+                SignatureContent firstContent = parsedEnvelope.getSignatureContents().get(0);
+                parsedEnvelope.removeSignatureContent(firstContent);
+                firstContent.close();
+                bos.reset();
+                writer.write(parsedEnvelope, bos);
+                try (Envelope reParsedEnvelope = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
+                    assertEquals(1, reParsedEnvelope.getSignatureContents().size());
+                    SignatureContent signatureContent = reParsedEnvelope.getSignatureContents().get(0);
+                    assertEquals(1, signatureContent.getAnnotations().size());
+                    assertEquals(1, signatureContent.getSingleAnnotationManifests().size());
+                    assertEquals(stringEnvelopeAnnotation, signatureContent.getAnnotations().values().iterator().next());
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testRemovingSignatureFromEnvelopeWithSameAnnotationInMultipleSignaturesAndWriting() throws Exception {
+        try (Envelope envelope =
+                     getEnvelopeWith2SignaturesWithSameAnnotation(stringEnvelopeAnnotation)) {
+            SignatureContent firstContent = envelope.getSignatureContents().get(0);
+            envelope.removeSignatureContent(firstContent);
+            firstContent.close();
+            EnvelopeWriter writer = new ZipEnvelopeWriter();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            writer.write(envelope, bos);
+            try (Envelope parsedEnvelope = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
+                assertEquals(1, parsedEnvelope.getSignatureContents().size());
+                SignatureContent signatureContent = parsedEnvelope.getSignatureContents().get(0);
+                assertEquals(1, signatureContent.getAnnotations().size());
+                assertEquals(1, signatureContent.getSingleAnnotationManifests().size());
+                assertEquals(stringEnvelopeAnnotation, signatureContent.getAnnotations().values().iterator().next());
+            }
+        }
+    }
+
+    private Envelope getEnvelopeWith2SignaturesWithSameAnnotation(Annotation annotation) throws InvalidEnvelopeException,
+            SignatureException,
+            EnvelopeMergingException {
+        Envelope envelope = packagingFactory.create(
+                singletonList(testDocumentHelloText),
+                singletonList(annotation)
+        );
+        packagingFactory.addSignature(
+                envelope,
+                singletonList(testDocumentHelloPdf),
+                singletonList(annotation)
+        );
+        return envelope;
     }
 
     private boolean compareSignatureContentListOrder(Envelope envelope) {

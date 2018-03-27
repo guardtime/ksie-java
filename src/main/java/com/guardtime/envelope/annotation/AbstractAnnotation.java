@@ -29,7 +29,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
+import static com.guardtime.envelope.document.AbstractDocument.HASH_ALGORITHM;
 import static com.guardtime.envelope.util.Util.notNull;
 import static com.guardtime.ksi.util.Util.toByteArray;
 
@@ -111,5 +113,31 @@ public abstract class AbstractAnnotation implements Annotation {
     @Override
     public void setPath(String path) {
         this.path = path;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AbstractAnnotation)) return false;
+        AbstractAnnotation that = (AbstractAnnotation) o;
+        try {
+            return getDomain().equals(that.getDomain()) &&
+                    getAnnotationType().equals(that.getAnnotationType()) &&
+                    getPath().equals(that.getPath()) &&
+                    getDataHash(HASH_ALGORITHM).equals(that.getDataHash(HASH_ALGORITHM));
+        } catch (DataHashException e) {
+            throw new RuntimeException("Data hash calculation for equality check failed!", e);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        DataHash dataHash = null;
+        try {
+            dataHash = getDataHash(HASH_ALGORITHM);
+        } catch (DataHashException e) {
+            throw new RuntimeException("Object hash calculation failed!", e);
+        }
+        return Objects.hash(getDomain(), getAnnotationType(), dataHash, getPath());
     }
 }
