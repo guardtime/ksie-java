@@ -126,7 +126,7 @@ public abstract class AbstractAnnotation implements Annotation {
                     getPath().equals(that.getPath()) &&
                     getDataHash(HASH_ALGORITHM).equals(that.getDataHash(HASH_ALGORITHM));
         } catch (DataHashException e) {
-            return false;
+            throw new RuntimeException("Data hash calculation for equality check failed!", e);
         }
     }
 
