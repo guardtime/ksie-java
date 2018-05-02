@@ -30,6 +30,16 @@ public class InternalDocumentTest extends AbstractEnvelopeTest {
     }
 
     @Test
+    public void testNullElement() throws IOException {
+        AbstractDocument mockDoc = Mockito.mock(AbstractDocument.class);
+        Mockito.when(mockDoc.getPath()).thenReturn("Doc");
+        InternalDocument document = new InternalDocument(mockDoc);
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("InternalDocument has null InputStream");
+        document.getInputStream();
+    }
+
+    @Test
     public void testCompareStreams() throws IOException {
         StreamDocument document = new StreamDocument(new ByteArrayInputStream(new byte[32]), "doc", "doc");
         InternalDocument internalDocument = new InternalDocument(document);
