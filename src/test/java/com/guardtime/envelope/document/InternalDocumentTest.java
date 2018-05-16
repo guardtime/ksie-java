@@ -1,6 +1,7 @@
 package com.guardtime.envelope.document;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
+import com.guardtime.envelope.EnvelopeElement;
 
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -27,6 +28,16 @@ public class InternalDocumentTest extends AbstractEnvelopeTest {
         expectedException.expectMessage("File name must be present");
         AbstractDocument mockDoc = Mockito.mock(AbstractDocument.class);
         new InternalDocument(mockDoc);
+    }
+
+    @Test
+    public void testNullElement() throws IOException {
+        expectedException.expect(IOException.class);
+        expectedException.expectMessage("No data for stream!");
+        EnvelopeElement mockElement = Mockito.mock(EnvelopeElement.class);
+        Mockito.when(mockElement.getPath()).thenReturn("internal.path");
+        InternalDocument document = new InternalDocument(mockElement);
+        document.getInputStream();
     }
 
     @Test

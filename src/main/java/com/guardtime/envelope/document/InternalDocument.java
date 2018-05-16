@@ -1,7 +1,10 @@
 package com.guardtime.envelope.document;
 
 import com.guardtime.envelope.EnvelopeElement;
+import com.guardtime.envelope.util.DataHashException;
 import com.guardtime.envelope.util.Util;
+import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +25,20 @@ public class InternalDocument extends AbstractDocument {
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return element.getInputStream();
+        InputStream inputStream = element.getInputStream();
+        if (inputStream == null) {
+            throw new IOException("No data for stream!");
+        }
+        return inputStream;
+    }
+
+    @Override
+    public DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException {
+        try {
+            return element.getDataHash(algorithm);
+        } catch (DataHashException e) {
+            return super.getDataHash(algorithm);
+        }
     }
 
     private static String extractPath(EnvelopeElement element) {
