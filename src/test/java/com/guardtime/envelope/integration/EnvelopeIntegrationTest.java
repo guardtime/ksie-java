@@ -240,12 +240,11 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
 
     @Test
     public void testEmptyDocumentAsReferredDocument_NOK() throws Exception {
+        expectedException.expect(InvalidEnvelopeException.class);
+        expectedException.expectMessage("Created envelope did not pass internal verification");
         try (Envelope envelope = getEnvelope(ENVELOPE_WITH_NO_DOCUMENTS)) {
-            Manifest man = envelope.getSignatureContents().get(0).getManifest();
-
-            expectedException.expect(NullPointerException.class);
-            expectedException.expectMessage("InternalDocument has null InputStream");
-            addContentAndVerify(envelope, man);
+            Document doc = envelope.getSignatureContents().get(0).getDocuments().values().iterator().next();
+            addContentAndVerify(envelope, doc);
         }
     }
 

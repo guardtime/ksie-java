@@ -1,6 +1,7 @@
 package com.guardtime.envelope.document;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
+import com.guardtime.envelope.EnvelopeElement;
 
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -31,11 +32,11 @@ public class InternalDocumentTest extends AbstractEnvelopeTest {
 
     @Test
     public void testNullElement() throws IOException {
-        AbstractDocument mockDoc = Mockito.mock(AbstractDocument.class);
-        Mockito.when(mockDoc.getPath()).thenReturn("Doc");
-        InternalDocument document = new InternalDocument(mockDoc);
-        expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("InternalDocument has null InputStream");
+        expectedException.expect(IOException.class);
+        expectedException.expectMessage("No data for stream!");
+        EnvelopeElement mockElement = Mockito.mock(EnvelopeElement.class);
+        Mockito.when(mockElement.getPath()).thenReturn("internal.path");
+        InternalDocument document = new InternalDocument(mockElement);
         document.getInputStream();
     }
 
