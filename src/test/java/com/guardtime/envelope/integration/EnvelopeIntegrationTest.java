@@ -13,7 +13,6 @@ import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.SignatureContent;
-import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.packaging.parsing.store.MemoryBasedParsingStoreFactory;
@@ -42,9 +41,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 
 public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
 
@@ -200,15 +196,15 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
                     singletonList(stringEnvelopeAnnotation)
             );
 
-            assertNotNull(envelope);
+            Assert.assertNotNull(envelope);
             int contentCount = envelope.getSignatureContents().size();
             try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
                 envelopeWriter.write(envelope, bos);
                 try (
                         ByteArrayInputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
                         Envelope inputEnvelope = limitedPackagingFactory.read(inputStream)) {
-                    assertNotNull(inputEnvelope);
-                    assertEquals(contentCount, inputEnvelope.getSignatureContents().size());
+                    Assert.assertNotNull(inputEnvelope);
+                    Assert.assertEquals(contentCount, inputEnvelope.getSignatureContents().size());
                     //Detach doc
                     inputEnvelope.getSignatureContents().get(1).detachDocument(
                             inputEnvelope.getSignatureContents().get(1)
@@ -279,23 +275,15 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
         }
     }
 
-    private void addContentAndVerify(EnvelopePackagingFactory factory, Envelope envelope,
-                                     EnvelopeElement element) throws Exception {
-        assertEquals(1, envelope.getSignatureContents().size());
-        Document doc2 = new InternalDocument(element);
-        factory.addSignature(envelope, singletonList(doc2), Collections.singletonList(stringEnvelopeAnnotation));
-        assertEquals(2, envelope.getSignatureContents().size());
-        EnvelopeWriter writer = new ZipEnvelopeWriter();
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        writer.write(envelope, bos);
-
-        try (Envelope envelope1 = factory.read(new ByteArrayInputStream(bos.toByteArray()))) {
-            assertEquals(2, envelope1.getSignatureContents().size());
+    @Test
+    public void testCreateSignatureWithSameAnnotationInTwoContents() throws Exception {
+        try (Envelope envelope =
+                     getEnvelopeWith2SignaturesWithSameAnnotation(stringEnvelopeAnnotation)) {
+            Assert.assertEquals(2, envelope.getSignatureContents().size());
+            for (SignatureContent content : envelope.getSignatureContents()) {
+                checkEnvelopeAnnotation(content);
+            }
         }
-    }
-
-    private void addContentAndVerify(Envelope envelope, EnvelopeElement element) throws Exception {
-        addContentAndVerify(packagingFactory, envelope, element);
     }
 
     @Test
@@ -306,39 +294,16 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
             SignatureContent secondContent = envelope.getSignatureContents().get(1);
 
             envelope.removeSignatureContent(firstContent);
-            assertFalse(firstContent.getAnnotations().isEmpty());
-            assertFalse(secondContent.getAnnotations().isEmpty());
-            assertEquals(
+            Assert.assertFalse(firstContent.getAnnotations().isEmpty());
+            Assert.assertFalse(secondContent.getAnnotations().isEmpty());
+            Assert.assertEquals(
                     stringEnvelopeAnnotation,
                     firstContent.getAnnotations().values().iterator().next()
             );
-            assertEquals(
+            Assert.assertEquals(
                     firstContent.getAnnotations().values().iterator().next(),
                     secondContent.getAnnotations().values().iterator().next()
             );
-        }
-    }
-
-    @Test
-    public void testWritingSplitEnvelopeWithSameAnnotationInMultipleSignatures() throws Exception {
-        try (Envelope envelope =
-                     getEnvelopeWith2SignaturesWithSameAnnotation(stringEnvelopeAnnotation)) {
-            SignatureContent firstContent = envelope.getSignatureContents().get(0);
-            envelope.removeSignatureContent(firstContent);
-            Envelope[] arr = new Envelope[]{envelope, new Envelope(firstContent)};
-            EnvelopeWriter writer = new ZipEnvelopeWriter();
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            for (Envelope e : arr) {
-                bos.reset();
-                writer.write(e, bos);
-                try (Envelope parsedEnvelope = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
-                    assertEquals(1, parsedEnvelope.getSignatureContents().size());
-                    SignatureContent signatureContent = parsedEnvelope.getSignatureContents().get(0);
-                    assertEquals(1, signatureContent.getAnnotations().size());
-                    assertEquals(1, signatureContent.getSingleAnnotationManifests().size());
-                    assertEquals(stringEnvelopeAnnotation, signatureContent.getAnnotations().values().iterator().next());
-                }
-            }
         }
     }
 
@@ -352,11 +317,11 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
             try (Envelope parsedEnvelope = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
                 SignatureContent firstContent = parsedEnvelope.getSignatureContents().get(0);
                 SignatureContent secondContent = parsedEnvelope.getSignatureContents().get(1);
-                assertEquals(
+                Assert.assertEquals(
                         stringEnvelopeAnnotation,
                         firstContent.getAnnotations().values().iterator().next()
                 );
-                assertEquals(
+                Assert.assertEquals(
                         firstContent.getAnnotations().values().iterator().next(),
                         secondContent.getAnnotations().values().iterator().next()
                 );
@@ -364,27 +329,30 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
         }
     }
 
+    @Test
+    public void testWritingSplitEnvelopeWithSameAnnotationInMultipleSignatures() throws Exception {
+        try (Envelope envelope =
+                     getEnvelopeWith2SignaturesWithSameAnnotation(stringEnvelopeAnnotation);
+             Envelope first = new Envelope(envelope.getSignatureContents().get(0));
+             Envelope second = new Envelope(envelope.getSignatureContents().get(1))) {
+
+            Envelope[] arr = new Envelope[]{first, second};
+            for (Envelope e : arr) {
+                checkEnvelopeWithOneContent(e);
+            }
+        }
+    }
 
     @Test
-    public void testReadingEnvelopeWithSameAnnotationInMultipleSignaturesAndRemovingOneAndWriting() throws Exception {
+    public void testWritingAndReadingEnvelopeWithSameAnnotationInMultipleSignatures() throws Exception {
         try (Envelope envelope =
                      getEnvelopeWith2SignaturesWithSameAnnotation(stringEnvelopeAnnotation)) {
             EnvelopeWriter writer = new ZipEnvelopeWriter();
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             writer.write(envelope, bos);
             try (Envelope parsedEnvelope = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
-                SignatureContent firstContent = parsedEnvelope.getSignatureContents().get(0);
-                parsedEnvelope.removeSignatureContent(firstContent);
-                firstContent.close();
-                bos.reset();
-                writer.write(parsedEnvelope, bos);
-                try (Envelope reParsedEnvelope = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
-                    assertEquals(1, reParsedEnvelope.getSignatureContents().size());
-                    SignatureContent signatureContent = reParsedEnvelope.getSignatureContents().get(0);
-                    assertEquals(1, signatureContent.getAnnotations().size());
-                    assertEquals(1, signatureContent.getSingleAnnotationManifests().size());
-                    assertEquals(stringEnvelopeAnnotation, signatureContent.getAnnotations().values().iterator().next());
-                }
+                Assert.assertNotNull(parsedEnvelope);
+                Assert.assertEquals(2, parsedEnvelope.getSignatureContents().size());
             }
         }
     }
@@ -396,32 +364,26 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
             SignatureContent firstContent = envelope.getSignatureContents().get(0);
             envelope.removeSignatureContent(firstContent);
             firstContent.close();
-            EnvelopeWriter writer = new ZipEnvelopeWriter();
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            writer.write(envelope, bos);
-            try (Envelope parsedEnvelope = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
-                assertEquals(1, parsedEnvelope.getSignatureContents().size());
-                SignatureContent signatureContent = parsedEnvelope.getSignatureContents().get(0);
-                assertEquals(1, signatureContent.getAnnotations().size());
-                assertEquals(1, signatureContent.getSingleAnnotationManifests().size());
-                assertEquals(stringEnvelopeAnnotation, signatureContent.getAnnotations().values().iterator().next());
-            }
+            checkEnvelopeWithOneContent(envelope);
         }
     }
 
-    private Envelope getEnvelopeWith2SignaturesWithSameAnnotation(Annotation annotation) throws InvalidEnvelopeException,
-            SignatureException,
-            EnvelopeMergingException {
-        Envelope envelope = packagingFactory.create(
-                singletonList(testDocumentHelloText),
-                singletonList(annotation)
-        );
-        packagingFactory.addSignature(
-                envelope,
-                singletonList(testDocumentHelloPdf),
-                singletonList(annotation)
-        );
-        return envelope;
+    private void addContentAndVerify(Envelope envelope, EnvelopeElement element) throws Exception {
+        addContentAndVerify(packagingFactory, envelope, element);
+    }
+
+    private void addContentAndVerify(EnvelopePackagingFactory packagingFactory, Envelope envelope, EnvelopeElement element)
+            throws Exception {
+        Document doc2 = new InternalDocument(element);
+        packagingFactory.addSignature(envelope, singletonList(doc2), Collections.singletonList(stringEnvelopeAnnotation));
+        Assert.assertEquals(2, envelope.getSignatureContents().size());
+        EnvelopeWriter writer = new ZipEnvelopeWriter();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        writer.write(envelope, bos);
+
+        try (Envelope envelope1 = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
+            Assert.assertEquals(2, envelope1.getSignatureContents().size());
+        }
     }
 
     private boolean compareSignatureContentListOrder(Envelope envelope) {
@@ -434,6 +396,24 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
             previous = content;
         }
         return true;
+    }
+
+    private void checkEnvelopeWithOneContent(Envelope envelope) throws Exception {
+        EnvelopeWriter writer = new ZipEnvelopeWriter();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        writer.write(envelope, bos);
+        try (Envelope parsedEnvelope = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
+            Assert.assertEquals(1, parsedEnvelope.getSignatureContents().size());
+            SignatureContent signatureContent = parsedEnvelope.getSignatureContents().get(0);
+            checkEnvelopeAnnotation(signatureContent);
+        }
+    }
+
+
+    private void checkEnvelopeAnnotation(SignatureContent content) {
+        Assert.assertEquals(1, content.getAnnotations().size());
+        Assert.assertEquals(1, content.getSingleAnnotationManifests().size());
+        Assert.assertEquals(stringEnvelopeAnnotation, content.getAnnotations().values().iterator().next());
     }
 
 }

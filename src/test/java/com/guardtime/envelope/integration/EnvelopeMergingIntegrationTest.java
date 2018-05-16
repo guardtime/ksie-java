@@ -27,6 +27,7 @@ import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.UuidIndexProviderFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
+import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.AnnotationMergingException;
 import com.guardtime.envelope.packaging.exception.AnnotationsManifestMergingException;
@@ -36,6 +37,7 @@ import com.guardtime.envelope.packaging.exception.ManifestMergingException;
 import com.guardtime.envelope.packaging.exception.SignatureMergingException;
 import com.guardtime.envelope.packaging.exception.SingleAnnotationManifestMergingException;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
+import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
 import com.guardtime.envelope.verification.VerifiedEnvelope;
 import com.guardtime.envelope.verification.result.ResultHolder;
 
@@ -45,7 +47,9 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -353,6 +357,62 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
         }
     }
 
+    @Test
+    public void testCheckMergingSourceEnvelopeContentCount() throws Exception {
+        try (Envelope first = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES);
+             Envelope second = getEnvelope(ENVELOPE_WITH_ONE_DOCUMENT)) {
+
+            first.add(second);
+            //TODO: KSIE-116: Should not clear up the content but just copy/duplicated to another,
+            // actual expected value is 1
+            Assert.assertEquals(0, second.getSignatureContents().size());
+        }
+    }
+
+    @Test
+    public void testAddContentToMergingSourceEnvelope() throws Exception {
+        try (Envelope first = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES);
+             Envelope second = getEnvelope(ENVELOPE_WITH_ONE_DOCUMENT)) {
+
+            first.add(second);
+            packagingFactory.addSignature(second, singletonList(testDocumentHelloText), singletonList(stringEnvelopeAnnotation));
+            //TODO: KSIE-116: Should not clear up the content but just copy/duplicated to another,
+            // actual expected value would be 2
+            Assert.assertEquals(1, second.getSignatureContents().size());
+        }
+    }
+
+    @Test
+    public void testMergeWithUnknownFiles() throws Exception {
+        try (Envelope first = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES);
+             Envelope second  = getEnvelope(ENVELOPE_WITH_MULTIPLE_SIGNATURES)) {
+
+            first.add(second);
+            //TODO: KSIE-116, KSIE-114: Should not clear up the content but just copy/duplicated to another,
+            // actual expected values would be 3/2/0/1
+            assertEquals(3, first.getSignatureContents().size());
+            assertEquals(0, second.getSignatureContents().size());
+            assertEquals(1, first.getUnknownFiles().size());
+            assertEquals(1, second.getUnknownFiles().size());
+        }
+    }
+
+    @Test
+    public void testMergingSplitEnvelopeWithSameAnnotationInMultipleSignatures() throws Exception {
+        try (Envelope original =
+                     getEnvelopeWith2SignaturesWithSameAnnotation(stringEnvelopeAnnotation);
+             Envelope first = new Envelope(original.getSignatureContents().get(0));
+             Envelope second = new Envelope(original.getSignatureContents().get(1))) {
+            first.add(second);
+            ByteArrayOutputStream baos  = new ByteArrayOutputStream();
+            EnvelopeWriter writer = new ZipEnvelopeWriter();
+            writer.write(first, baos);
+            try (Envelope envelope = packagingFactory.read(new ByteArrayInputStream(baos.toByteArray()))) {
+                compareEnvelopeBytes(original, envelope, 2);
+            }
+        }
+    }
+
     private void addContent(Envelope target, int expectedSize) throws Exception {
         try (Envelope source = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_NO_DOCUMENTS)) {
             target.add(source.getSignatureContents().get(0));
@@ -410,5 +470,16 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
         try (Envelope envelopeFromBos = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
             assertEquals(expectedSignatureContentsSize, envelopeFromBos.getSignatureContents().size());
         }
+    }
+
+    private void compareEnvelopeBytes(Envelope first, Envelope second, int contentCount) throws IOException {
+        Assert.assertEquals(contentCount, first.getSignatureContents().size());
+        Assert.assertEquals(contentCount, second.getSignatureContents().size());
+        EnvelopeWriter writer = new ZipEnvelopeWriter();
+        ByteArrayOutputStream firstStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream secondStream = new ByteArrayOutputStream();
+        writer.write(first, firstStream);
+        writer.write(second, secondStream);
+        Assert.assertTrue(Arrays.equals(firstStream.toByteArray(), secondStream.toByteArray()));
     }
 }

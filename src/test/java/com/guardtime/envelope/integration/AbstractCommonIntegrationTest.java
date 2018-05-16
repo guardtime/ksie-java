@@ -20,12 +20,16 @@
 package com.guardtime.envelope.integration;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
+import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.EnvelopeWriter;
+import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
+import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
+import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.envelope.signature.SignatureFactory;
 import com.guardtime.envelope.signature.ksi.KsiSignatureFactory;
 import com.guardtime.ksi.KSI;
@@ -47,6 +51,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
+
+import static java.util.Collections.singletonList;
 
 public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest {
 
@@ -147,5 +153,20 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
                 Assert.assertEquals(contentCount, inputEnvelope.getSignatureContents().size());
             }
         }
+    }
+
+    Envelope getEnvelopeWith2SignaturesWithSameAnnotation(Annotation annotation) throws InvalidEnvelopeException,
+            SignatureException,
+            EnvelopeMergingException {
+        Envelope envelope = packagingFactory.create(
+                singletonList(testDocumentHelloText),
+                singletonList(annotation)
+        );
+        packagingFactory.addSignature(
+                envelope,
+                singletonList(testDocumentHelloPdf),
+                singletonList(annotation)
+        );
+        return envelope;
     }
 }
