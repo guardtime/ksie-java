@@ -72,14 +72,6 @@ public class Envelope implements AutoCloseable {
     }
 
     /**
-     * @param content the content to be removed.
-     * @return True, if the {@link SignatureContent} is removed.
-     */
-    public boolean removeSignatureContent(SignatureContent content) {
-        return signatureContents.remove(content);
-    }
-
-    /**
      * @return List of all {@link UnknownDocument} that were not associated with any structure elements or signatures but were
      * contained in the {@link Envelope}
      */
@@ -117,8 +109,8 @@ public class Envelope implements AutoCloseable {
      */
     public void add(SignatureContent content) throws EnvelopeMergingException {
         verifyNewSignatureContentIsAcceptable(content, signatureContents);
-        verifyUniqueness(content, signatureContents);
-        signatureContents.add(content.clone());
+        verifyUniqueness(content, signatureContents, unknownFiles);
+        signatureContents.add(content);
     }
 
     /**

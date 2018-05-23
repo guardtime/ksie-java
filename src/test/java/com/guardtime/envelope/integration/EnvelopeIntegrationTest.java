@@ -286,27 +286,6 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     @Test
-    public void testRemovingSignatureContentWithSameAnnotationDoesNotChangeAnnotation() throws Exception {
-        try (Envelope envelope =
-                     getEnvelopeWith2SignaturesWithSameAnnotation(stringEnvelopeAnnotation)) {
-            SignatureContent firstContent = envelope.getSignatureContents().get(0);
-            SignatureContent secondContent = envelope.getSignatureContents().get(1);
-
-            envelope.removeSignatureContent(firstContent);
-            Assert.assertFalse(firstContent.getAnnotations().isEmpty());
-            Assert.assertFalse(secondContent.getAnnotations().isEmpty());
-            Assert.assertEquals(
-                    stringEnvelopeAnnotation,
-                    firstContent.getAnnotations().values().iterator().next()
-            );
-            Assert.assertEquals(
-                    firstContent.getAnnotations().values().iterator().next(),
-                    secondContent.getAnnotations().values().iterator().next()
-            );
-        }
-    }
-
-    @Test
     public void testReadingEnvelopeWithSameAnnotationInMultipleSignatures() throws Exception {
         try (Envelope envelope =
                      getEnvelopeWith2SignaturesWithSameAnnotation(stringEnvelopeAnnotation)) {
@@ -353,17 +332,6 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
                 Assert.assertNotNull(parsedEnvelope);
                 Assert.assertEquals(2, parsedEnvelope.getSignatureContents().size());
             }
-        }
-    }
-
-    @Test
-    public void testRemovingSignatureFromEnvelopeWithSameAnnotationInMultipleSignaturesAndWriting() throws Exception {
-        try (Envelope envelope =
-                     getEnvelopeWith2SignaturesWithSameAnnotation(stringEnvelopeAnnotation)) {
-            SignatureContent firstContent = envelope.getSignatureContents().get(0);
-            envelope.removeSignatureContent(firstContent);
-            firstContent.close();
-            checkEnvelopeWithOneContent(envelope);
         }
     }
 
