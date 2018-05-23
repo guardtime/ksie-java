@@ -37,9 +37,9 @@ import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.packaging.parsing.EnvelopeReader;
+import com.guardtime.envelope.packaging.parsing.store.MemoryBasedParsingStore;
+import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
-import com.guardtime.envelope.packaging.parsing.store.TemporaryFileBasedParsingStoreFactory;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.envelope.signature.SignatureFactory;
@@ -90,7 +90,7 @@ public final class EnvelopePackagingFactory {
         Util.notNull(builder.signatureFactory, "Signature factory");
         Util.notNull(builder.manifestFactory, "Manifest factory");
         Util.notNull(builder.indexProviderFactory, "Index provider factory");
-        Util.notNull(builder.parsingStoreFactory, "Parsing store factory");
+        Util.notNull(builder.parsingStore, "Parsing store");
         Util.notNull(builder.envelopeReader, "Envelope reader");
         this.signatureFactory = builder.signatureFactory;
         this.manifestFactory = builder.manifestFactory;
@@ -119,8 +119,6 @@ public final class EnvelopePackagingFactory {
             return envelopeReader.read(inputStream);
         } catch (IOException e) {
             throw new InvalidEnvelopeException("Failed to parse InputStream", e);
-        } catch (ParsingStoreException e) {
-            throw new InvalidEnvelopeException("Failed to create parsing store for envelope data", e);
         }
     }
 
@@ -372,7 +370,7 @@ public final class EnvelopePackagingFactory {
         protected SignatureFactory signatureFactory;
         protected EnvelopeManifestFactory manifestFactory = new TlvEnvelopeManifestFactory();
         protected IndexProviderFactory indexProviderFactory = new IncrementingIndexProviderFactory();
-        protected ParsingStoreFactory parsingStoreFactory = new TemporaryFileBasedParsingStoreFactory();
+        protected ParsingStore parsingStore = new MemoryBasedParsingStore();
         protected EnvelopeReader envelopeReader;
         protected VerificationPolicy verificationPolicy = new InternalVerificationPolicy();
 
@@ -391,8 +389,8 @@ public final class EnvelopePackagingFactory {
             return this;
         }
 
-        public Builder withParsingStoreFactory(ParsingStoreFactory factory) {
-            this.parsingStoreFactory = factory;
+        public Builder withParsingStoreFactory(ParsingStore store) {
+            this.parsingStore = store;
             return this;
         }
 

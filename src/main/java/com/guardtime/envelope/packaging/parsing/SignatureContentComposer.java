@@ -33,17 +33,12 @@ import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.parsing.handler.ContentParsingException;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.util.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,9 +53,9 @@ class SignatureContentComposer {
         this.handler = envelopeElementExtractor;
     }
 
-    public Pair<SignatureContent, List<Throwable>> compose(String manifestPath, ParsingStoreFactory parsingStoreFactory)
-            throws ContentParsingException, ParsingStoreException {
-        SignatureContentGroup group = new SignatureContentGroup(manifestPath, parsingStoreFactory.create());
+    public Pair<SignatureContent, List<Throwable>> compose(String manifestPath, ParsingStoreHandler parsingStoreHandler)
+            throws ContentParsingException {
+        SignatureContentGroup group = new SignatureContentGroup(manifestPath, parsingStoreHandler);
         SignatureContent signatureContent = new SignatureContent.Builder()
                 .withManifest(group.manifest)
                 .withDocumentsManifest(group.documentsManifest)
@@ -69,7 +64,6 @@ class SignatureContentComposer {
                 .withDocuments(group.documents)
                 .withAnnotations(group.annotations)
                 .withSignature(group.signature)
-                .withParsingStore(group.parsingStore)
                 .build();
 
         return Pair.of(signatureContent, group.exceptions);
@@ -85,11 +79,11 @@ class SignatureContentComposer {
         private List<Annotation> annotations = new LinkedList<>();
         private List<Document> documents = new LinkedList<>();
         private EnvelopeSignature signature;
-        private ParsingStore parsingStore;
+        private ParsingStoreHandler parsingStoreHandler;
 
 
-        SignatureContentGroup(String manifestPath, ParsingStore parsingStore) throws ContentParsingException {
-            this.parsingStore = parsingStore;
+        SignatureContentGroup(String manifestPath, ParsingStoreHandler storeHandler) throws ContentParsingException {
+            this.parsingStoreHandler = storeHandler;
             this.manifest = getManifest(manifestPath);
             this.documentsManifest = getDocumentsManifest();
             this.annotationsManifest = getAnnotationsManifest();
@@ -134,10 +128,9 @@ class SignatureContentComposer {
         private Document fetchDocumentFromHandler(FileReference reference) {
             if (invalidReference(reference)) return null;
             String documentUri = reference.getUri();
-            try (InputStream stream = handler.getDocumentStream(documentUri)) {
-                parsingStore.store(documentUri, stream);
-                return new ParsedDocument(parsingStore, documentUri, reference.getMimeType(), documentUri);
-            } catch (ContentParsingException | ParsingStoreException | IOException e) {
+            try {
+                return new ParsedDocument(handler.getParsingStoreReference(documentUri), reference.getMimeType(), documentUri);
+            } catch (ContentParsingException e) {
                 // either removed or was never present in the first place, verifier will decide
                 return new EmptyDocument(documentUri, reference.getMimeType(), reference.getHashList());
             }
@@ -185,15 +178,13 @@ class SignatureContentComposer {
             }
             AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
             String uri = annotationDataReference.getUri();
-            try (InputStream stream = handler.getAnnotationDataStream(uri)) {
-                parsingStore.store(uri, stream);
-                Annotation annotation = new ParsedAnnotation(parsingStore, uri, annotationDataReference.getDomain(), type);
-                annotation.setPath(uri);
-                return annotation;
-            } catch (ContentParsingException | ParsingStoreException | IOException e) {
-                logger.debug("Failed to parse annotation for '{}'. Reason: '{}", uri, e.getMessage());
-                return null;
-            }
+            Annotation annotation = new ParsedAnnotation(
+                    parsingStoreHandler.get(uri),
+                    annotationDataReference.getDomain(),
+                    type
+            );
+            annotation.setPath(uri);
+            return annotation;
         }
 
         private void fetchSignature() {

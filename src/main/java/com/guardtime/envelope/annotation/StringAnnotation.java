@@ -49,4 +49,9 @@ public class StringAnnotation extends AbstractAnnotation {
     public InputStream getInputStream() {
         return new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
     }
+
+    @Override
+    public Annotation clone() {
+        return new StringAnnotation(content, domain, type);
+    }
 }

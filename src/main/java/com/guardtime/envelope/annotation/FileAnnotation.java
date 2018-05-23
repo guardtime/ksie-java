@@ -51,4 +51,9 @@ public class FileAnnotation extends AbstractAnnotation {
     public InputStream getInputStream() throws IOException {
         return new FileInputStream(file);
     }
+
+    @Override
+    public Annotation clone() {
+        return new FileAnnotation(file, domain, type);
+    }
 }

@@ -46,4 +46,9 @@ public class InternalDocument extends AbstractDocument {
         return element.getPath();
     }
 
+    @Override
+    public Document clone() {
+        return new InternalDocument(element);
+    }
+
 }

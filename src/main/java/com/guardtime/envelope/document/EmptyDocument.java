@@ -25,6 +25,7 @@ import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +73,11 @@ public class EmptyDocument extends AbstractDocument {
     @Override
     public boolean isWritable() {
         return false;
+    }
+
+    @Override
+    public Document clone() {
+        return new EmptyDocument(fileName, mimeType, new ArrayList<>(dataHashMap.values()));
     }
 
 }

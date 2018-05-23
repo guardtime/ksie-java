@@ -23,7 +23,7 @@ import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
 import com.guardtime.envelope.annotation.StringAnnotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.StreamDocument;
+import com.guardtime.envelope.document.ParsedDocument;
 import com.guardtime.envelope.extending.ExtendedEnvelope;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
@@ -105,7 +105,7 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         Envelope existingEnvelope = getEnvelope(ENVELOPE_WITH_MULTIPLE_SIGNATURES);
         List<File> ksieTempFiles = getKsieTempFiles();
         try (
-                Document document = new StreamDocument(
+                Document document = new ParsedDocument(
                         new ByteArrayInputStream(new byte[313]),
                         "byte inputstream",
                         "byte-input-stream.bis"
@@ -134,7 +134,7 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         Envelope existingEnvelope = getEnvelope(ENVELOPE_WITH_MULTIPLE_SIGNATURES);
         List<File> ksieTempFiles = getKsieTempFiles();
         try (
-                Document document = new StreamDocument(
+                Document document = new ParsedDocument(
                         new ByteArrayInputStream(new byte[313]),
                         "byte inputstream",
                         "byte-input-stream.bis"
@@ -190,7 +190,7 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         expectedException.expect(InvalidEnvelopeException.class);
         expectedException.expectMessage("Created envelope did not pass internal verification");
         try (
-                Document document = new StreamDocument(new ByteArrayInputStream(new byte[3]), "qwerty", "qwert.file");
+                Document document = new ParsedDocument(new ByteArrayInputStream(new byte[3]), "qwerty", "qwert.file");
                 Annotation annotation = new StringAnnotation(
                         "qwerty file",
                         "qwerty.domain.com",

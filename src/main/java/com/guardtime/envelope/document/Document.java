@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * Represents document data that is to be used in an envelope.
  */
-public interface Document extends EnvelopeElement, AutoCloseable {
+public interface Document extends EnvelopeElement, AutoCloseable, Cloneable {
 
     String getFileName();
 
@@ -55,6 +55,8 @@ public interface Document extends EnvelopeElement, AutoCloseable {
      * @return True for any document that's {@link InputStream} can be accessed and data extracted from it.
      */
     boolean isWritable();
+
+    Document clone();
 
 }
 

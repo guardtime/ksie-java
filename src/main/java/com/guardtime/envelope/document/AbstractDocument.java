@@ -42,6 +42,7 @@ public abstract class AbstractDocument implements Document {
 
     protected final String mimeType;
     protected final String fileName;
+    private boolean closed = false;
 
     /**
      *
@@ -97,7 +98,7 @@ public abstract class AbstractDocument implements Document {
 
     @Override
     public boolean isWritable() {
-        return true;
+        return !closed;
     }
 
     @Override
@@ -145,12 +146,14 @@ public abstract class AbstractDocument implements Document {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         //Nothing to do here
+        this.closed = true;
     }
 
     @Override
     public String getPath() {
         return fileName;
     }
+
 }

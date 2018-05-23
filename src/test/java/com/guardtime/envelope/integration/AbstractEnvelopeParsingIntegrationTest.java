@@ -24,7 +24,7 @@ import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
 import com.guardtime.envelope.annotation.StringAnnotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.StreamDocument;
+import com.guardtime.envelope.document.ParsedDocument;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.UuidIndexProviderFactory;
 import com.guardtime.envelope.packaging.Envelope;
@@ -33,9 +33,10 @@ import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
+import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,11 +56,11 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
     private EnvelopePackagingFactory packagingFactoryWithIncIndex;
     private EnvelopePackagingFactory packagingFactoryWithUuid;
     private EnvelopePackagingFactory defaultPackagingFactory;
-    private ParsingStoreFactory parsingStoreFactory;
+    private ParsingStore parsingStore;
     private EnvelopeWriter envelopeWriter = new ZipEnvelopeWriter();
 
 
-    protected abstract ParsingStoreFactory getParsingStoreFactory();
+    protected abstract ParsingStore getParsingStore();
 
     protected EnvelopePackagingFactory getDefaultPackagingFactory() {
         return defaultPackagingFactory;
@@ -67,20 +68,20 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
 
     @Before
     public void setUpPackagingFactories() throws Exception {
-        parsingStoreFactory = getParsingStoreFactory();
+        parsingStore = getParsingStore();
         this.packagingFactoryWithIncIndex = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
                 .withIndexProviderFactory(new IncrementingIndexProviderFactory())
-                .withParsingStoreFactory(parsingStoreFactory)
+                .withParsingStoreFactory(parsingStore)
                 .build();
         this.packagingFactoryWithUuid = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
                 .withIndexProviderFactory(new UuidIndexProviderFactory())
-                .withParsingStoreFactory(parsingStoreFactory)
+                .withParsingStoreFactory(parsingStore)
                 .build();
         this.defaultPackagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
-                .withParsingStoreFactory(parsingStoreFactory)
+                .withParsingStoreFactory(parsingStore)
                 .build();
     }
 
@@ -233,7 +234,7 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                 FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_RANDOM_INCREMENTING_INDEXES));
                 Envelope existingEnvelope = defaultPackagingFactory.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-                Document document = new StreamDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
+                Document document = new ParsedDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
         ) {
             defaultPackagingFactory.addSignature(
                     existingEnvelope,
@@ -250,7 +251,7 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                 FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_RANDOM_UUID_INDEXES));
                 Envelope existingEnvelope = packagingFactoryWithUuid.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-                Document document = new StreamDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
+                Document document = new ParsedDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
         ) {
             packagingFactoryWithUuid.addSignature(
                     existingEnvelope,
@@ -267,7 +268,7 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                 FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_MIXED_INDEX_TYPES));
                 Envelope existingEnvelope = packagingFactoryWithUuid.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-                Document document = new StreamDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
+                Document document = new ParsedDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
         ) {
             packagingFactoryWithUuid.addSignature(
                     existingEnvelope,
@@ -285,7 +286,7 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                         packagingFactoryWithIncIndex.read(
                                 new FileInputStream(loadFile(ENVELOPE_WITH_MIXED_INDEX_TYPES_IN_CONTENTS))
                         );
-                Document document = new StreamDocument(
+                Document document = new ParsedDocument(
                         new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                         MIME_TYPE_APPLICATION_TXT,
                         "Doc.doc"
@@ -306,7 +307,7 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                 Envelope existingEnvelope = packagingFactoryWithIncIndex.read(
                         new FileInputStream(loadFile(ENVELOPE_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED))
                 );
-                Document document = new StreamDocument(
+                Document document = new ParsedDocument(
                         new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                         MIME_TYPE_APPLICATION_TXT,
                         "Doc.doc"
@@ -332,7 +333,7 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
         try (
                 Envelope existingEnvelope =
                         packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(ENVELOPE_WITH_UNKNOWN_FILES)));
-                Document document = new StreamDocument(
+                Document document = new ParsedDocument(
                         new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                         MIME_TYPE_APPLICATION_TXT,
                         "Doc.doc"
@@ -433,7 +434,7 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
     }
 
     private List<Document> getEnvelopeDocument(String fileName) {
-        return singletonList((Document) new StreamDocument(
+        return singletonList((Document) new ParsedDocument(
                 new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                 MIME_TYPE_APPLICATION_TXT,
                 fileName

@@ -25,7 +25,7 @@ import com.guardtime.envelope.packaging.parsing.store.TemporaryFileBasedParsingS
 public class TempFileBasedParsingIntegrationTest extends AbstractEnvelopeParsingIntegrationTest {
 
     @Override
-    protected ParsingStoreFactory getParsingStoreFactory() {
+    protected ParsingStoreFactory getParsingStore() {
         return new TemporaryFileBasedParsingStoreFactory();
     }
 }

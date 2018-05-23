@@ -20,41 +20,49 @@
 package com.guardtime.envelope.document;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
+import com.guardtime.envelope.packaging.parsing.store.ParsingStoreReference;
 import com.guardtime.envelope.util.Util;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
 
-public class StreamDocumentTest extends AbstractEnvelopeTest {
+public class ParsedDocumentTest extends AbstractEnvelopeTest {
 
     @Test
     public void testCreateStreamBasedEnvelopeDocumentWithoutInputStream_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Input stream must be present");
-        new StreamDocument(null, MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
+        new ParsedDocument((InputStream) null, MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
+    }
+    @Test
+    public void testCreateStreamBasedEnvelopeDocumentWithoutParsingStoreReference_ThrowsNullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Parsing store reference must be present");
+        new ParsedDocument((ParsingStoreReference) null, MIME_TYPE_APPLICATION_TXT, TEST_FILE_NAME_TEST_TXT);
     }
 
     @Test
     public void testCreateStreamBasedEnvelopeDocumentWithoutMimeType_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("MIME type must be present");
-        new StreamDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), null, TEST_FILE_NAME_TEST_TXT);
+        new ParsedDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), null, TEST_FILE_NAME_TEST_TXT);
     }
 
     @Test
     public void testCreateStreamBasedEnvelopeDocumentWithoutFileName_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("File name must be present");
-        new StreamDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, null);
+        new ParsedDocument(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, null);
     }
 
     @Test
     public void testCreateStreamBasedEnvelopeDocument() throws Exception {
-        try (StreamDocument document = new StreamDocument(
+        try (Document document = new ParsedDocument(
                 new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                 MIME_TYPE_APPLICATION_TXT,
                 TEST_FILE_NAME_TEST_TXT)

@@ -62,4 +62,10 @@ public class FileDocument extends AbstractDocument {
     public InputStream getInputStream() throws IOException {
         return new FileInputStream(file);
     }
+
+    @Override
+    public Document clone() {
+        return new FileDocument(file, mimeType);
+    }
+
 }

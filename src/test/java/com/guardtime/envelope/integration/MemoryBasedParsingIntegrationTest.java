@@ -47,7 +47,7 @@ public class MemoryBasedParsingIntegrationTest extends AbstractEnvelopeParsingIn
     }
 
     @Override
-    public ParsingStoreFactory getParsingStoreFactory() {
+    public ParsingStoreFactory getParsingStore() {
         return new MemoryBasedParsingStoreFactory();
     }
 
