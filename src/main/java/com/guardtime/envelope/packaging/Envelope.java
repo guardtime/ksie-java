@@ -21,12 +21,10 @@ package com.guardtime.envelope.packaging;
 
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.ParsedDocument;
 import com.guardtime.envelope.document.SignedDocument;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.util.SortedList;
 import com.guardtime.envelope.util.Util;
 
@@ -37,7 +35,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifyNewSignatureContentIsAcceptable;
-import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifyUniqueUnknownFiles;
 import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifyUniqueness;
 
 /**
@@ -79,14 +76,6 @@ public class Envelope implements AutoCloseable {
     }
 
     /**
-     * @param content the content to be removed.
-     * @return True, if the {@link SignatureContent} is removed.
-     */
-    public boolean removeSignatureContent(SignatureContent content) {
-        return signatureContents.remove(content);
-    }
-
-    /**
      * @return List of all {@link UnknownDocument} that were not associated with any structure elements or signatures but were
      * contained in the {@link Envelope}
      */
@@ -125,52 +114,8 @@ public class Envelope implements AutoCloseable {
      */
     public void add(SignatureContent content) throws EnvelopeMergingException {
         verifyNewSignatureContentIsAcceptable(content, signatureContents);
-        verifyUniqueness(content, signatureContents);
+        verifyUniqueness(content, signatureContents, unknownFiles);
         signatureContents.add(content);
-    }
-
-    /**
-     * Adds all {@link SignatureContent}s from input {@link Envelope} to this envelope. Also takes ownership of the resources
-     * associated with the {@link Envelope} and as such any external calls to close() on those resources may lead to unexpected
-     * behaviour.
-     *
-     * @param envelope the input envelope whose content will be added.
-     * @throws EnvelopeMergingException when any {@link SignatureContent} can not be added into the {@link Envelope} due to
-     * clashing file paths or any other reason.
-     */
-    public void add(Envelope envelope) throws EnvelopeMergingException {
-        verifyUniqueUnknownFiles(envelope, this);
-        List<SignatureContent> signatureContents = new ArrayList<>(envelope.getSignatureContents());
-        for (SignatureContent content : signatureContents) {
-            if (envelope.removeSignatureContent(content)) {
-                add(content);
-            }
-        }
-
-        if (parsingStore != null && envelope.getParsingStore() != null) {
-            for (UnknownDocument unknownDocument : envelope.getUnknownFiles()) {
-                unknownFiles.add(new ParsedDocument(
-                        parsingStore,
-                        unknownDocument.getFileName(),
-                        unknownDocument.getMimeType(),
-                        unknownDocument.getFileName()
-                ));
-            }
-            try {
-                parsingStore.transferFrom(envelope.getParsingStore());
-            } catch (ParsingStoreException e) {
-                throw new EnvelopeMergingException("Failed to take control of parsed data!", e);
-            }
-        } else if (envelope.getParsingStore() != null) {
-            parsingStore = envelope.getParsingStore();
-            unknownFiles = envelope.removeAllUnknownFiles();
-        }
-    }
-
-    private List<UnknownDocument> removeAllUnknownFiles() {
-        List<UnknownDocument> returnable = unknownFiles;
-        unknownFiles = Collections.emptyList();
-        return returnable;
     }
 
     /**

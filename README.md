@@ -36,7 +36,7 @@ Reader reader;
 ...
 */
 SignatureFactory signatureFactory = new KsiSignatureFactory(signer, reader);
-ZipEnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().withSignatureFactory(signatureFactory).build();
+EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().withSignatureFactory(signatureFactory).build();
 ```
 
 ### Creating the Envelope
