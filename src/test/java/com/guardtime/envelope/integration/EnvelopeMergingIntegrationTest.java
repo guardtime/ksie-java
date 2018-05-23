@@ -43,6 +43,7 @@ import com.guardtime.envelope.verification.result.ResultHolder;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -67,8 +68,6 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     /**
      * Envelopes - for creating file conflicts when trying to merge envelopes.
      */
-    private static final String[] ENVELOPES_FOR_UNKNOWN_FILE_CONFLICT =
-            {"envelopes/unknown-file-conflict.ksie", ENVELOPE_WITH_UNKNOWN_FILES};
     private static final String[] ENVELOPES_FOR_DOCUMENTS_MANIFEST_CONFLICT =
             {"envelopes/documents-manifest-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
     private static final String[] ENVELOPES_FOR_ANNOTATION_DATA_CONFLICT =
@@ -85,8 +84,6 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
             {"envelopes/signature-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
     private static final String[] ENVELOPES_FOR_MIX_CONFLICT_1 =
             {"envelopes/mix-conflict.ksie", ENVELOPE_WITH_MULTIPLE_ANNOTATIONS};
-    private static final String[] ENVELOPES_FOR_MIX_CONFLICT_2 =
-            {ENVELOPE_WITH_MULTIPLE_ANNOTATIONS, "envelopes/mix-conflict.ksie"};
 
     /**
      * Envelopes - merging those envelope should not yield any exception.
@@ -118,7 +115,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
              )) {
             int expectedSignatureContentsSize =
                     parsedEnvelope.getSignatureContents().size() + newEnvelope.getSignatureContents().size();
-            parsedEnvelope.add(newEnvelope);
+            parsedEnvelope.addAll(newEnvelope.getSignatureContents());
             assertSignatureContentsCount(parsedEnvelope, expectedSignatureContentsSize);
         }
     }
@@ -151,7 +148,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     public void testMergeEnvelopesWithDifferentIndexProviders1() throws Exception {
         try (Envelope envelope1 = getEnvelope(ENVELOPE_WITH_MIXED_INDEX_TYPES);
              Envelope envelope2 = getEnvelope(ENVELOPE_WITH_MIXED_INDEX_TYPES_IN_CONTENTS)) {
-            envelope1.add(envelope2);
+            envelope1.addAll(envelope2.getSignatureContents());
             Assert.assertEquals(4, envelope1.getSignatureContents().size());
         }
     }
@@ -160,7 +157,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     public void testMergeEnvelopesWithDifferentIndexProviders2() throws Exception {
         try (Envelope envelope1 = getEnvelope(ENVELOPE_WITH_MIXED_INDEX_TYPES);
              Envelope envelope2 = getEnvelope(ENVELOPE_WITH_MIXED_INDEX_TYPES_IN_CONTENTS)) {
-            envelope2.add(envelope1);
+            envelope2.addAll(envelope1.getSignatureContents());
             Assert.assertEquals(4, envelope2.getSignatureContents().size());
         }
     }
@@ -179,7 +176,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
                      "textDoc",
                      "2-" + Long.toString(new Date().getTime())
              )) {
-            uuidEnvelope.add(incEnvelope);
+            uuidEnvelope.addAll(incEnvelope.getSignatureContents());
             packagingFactory.addSignature(uuidEnvelope, singletonList(document2), singletonList(stringEnvelopeAnnotation));
             assertEquals(uuidEnvelope.getSignatureContents().size(), 4);
         }
@@ -193,7 +190,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
         ) {
             int expectedSignatureContentCount =
                     parsedEnvelope.getSignatureContents().size() + secondParsedEnvelope.getSignatureContents().size();
-            parsedEnvelope.add(secondParsedEnvelope);
+            parsedEnvelope.addAll(secondParsedEnvelope.getSignatureContents());
             envelopeWriter.write(parsedEnvelope, outputStream);
             assertNotNull(outputStream.toByteArray());
             assertTrue(outputStream.toByteArray().length > 0);
@@ -215,19 +212,10 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
                      "textDoc",
                      Long.toString(new Date().getTime())
              )) {
-            incEnvelope.add(uuidEnvelope);
+            incEnvelope.addAll(uuidEnvelope.getSignatureContents());
             incPackagingFactory.addSignature(incEnvelope, singletonList(document), singletonList(stringEnvelopeAnnotation));
             assertEquals(incEnvelope.getSignatureContents().size(), 3);
         }
-    }
-
-    @Test
-    public void testMergeEnvelopesUnknownFileConflict() throws Exception {
-        expectedException.expect(DocumentMergingException.class);
-        expectedException.expectMessage(
-                matchesRegex("New SignatureContent has clashing name for Document! Path: (META-INF/||sun/)sun.txt")
-        );
-        mergeEnvelopes(ENVELOPES_FOR_UNKNOWN_FILE_CONFLICT);
     }
 
     @Test
@@ -291,19 +279,13 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     }
 
     @Test
-    public void testMergeEnvelopesUnknownConflictsWithEnvelopeFile2() throws Exception {
-        expectedException.expect(AnnotationMergingException.class);
-        expectedException.expectMessage("New SignatureContent has clashing Annotation data! Path: META-INF/annotation-2.dat");
-        mergeEnvelopes(ENVELOPES_FOR_MIX_CONFLICT_2);
-    }
-
-    @Test
     public void testMergeEnvelopesWithExactSameDocument() throws Exception {
         try (Envelope envelope = mergeEnvelopesUnclosed(ENVELOPES_FOR_SAME_DOCUMENT)) {
             assertEquals(2, envelope.getSignatureContents().size());
         }
     }
 
+    @Ignore // TODO: KSIE-116
     @Test
     public void testMergeEnvelopeWithExactSameEnvelope() throws Exception {
         try (Envelope envelope = mergeEnvelopesUnclosed(ENVELOPES_IDENTICAL)) {
@@ -362,10 +344,8 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
         try (Envelope first = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES);
              Envelope second = getEnvelope(ENVELOPE_WITH_ONE_DOCUMENT)) {
 
-            first.add(second);
-            //TODO: KSIE-116: Should not clear up the content but just copy/duplicated to another,
-            // actual expected value is 1
-            Assert.assertEquals(0, second.getSignatureContents().size());
+            first.addAll(second.getSignatureContents());
+            Assert.assertEquals(1, second.getSignatureContents().size());
         }
     }
 
@@ -374,26 +354,26 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
         try (Envelope first = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES);
              Envelope second = getEnvelope(ENVELOPE_WITH_ONE_DOCUMENT)) {
 
-            first.add(second);
-            packagingFactory.addSignature(second, singletonList(testDocumentHelloText), singletonList(stringEnvelopeAnnotation));
-            //TODO: KSIE-116: Should not clear up the content but just copy/duplicated to another,
-            // actual expected value would be 2
-            Assert.assertEquals(1, second.getSignatureContents().size());
+            first.addAll(second.getSignatureContents());
+            packagingFactory.addSignature(second, singletonList(testDocumentHelloPdf), singletonList(stringEnvelopeAnnotation));
+            Assert.assertEquals(2, second.getSignatureContents().size());
         }
     }
 
+    @Ignore // KSIE-116
     @Test
     public void testMergeWithUnknownFiles() throws Exception {
         try (Envelope first = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES);
              Envelope second  = getEnvelope(ENVELOPE_WITH_MULTIPLE_SIGNATURES)) {
 
-            first.add(second);
-            //TODO: KSIE-116, KSIE-114: Should not clear up the content but just copy/duplicated to another,
-            // actual expected values would be 3/2/0/1
+            first.addAll(second.getSignatureContents());
             assertEquals(3, first.getSignatureContents().size());
-            assertEquals(0, second.getSignatureContents().size());
-            assertEquals(1, first.getUnknownFiles().size());
+            assertEquals(2, second.getSignatureContents().size());
+            assertEquals(0, first.getUnknownFiles().size());
             assertEquals(1, second.getUnknownFiles().size());
+            //TODO: KSIE-116: Should copy SignatureContent, not reuse same object,
+            // Signature time sets the same signature to be first in sorted lists of first and second envelope
+            assertTrue(first.getSignatureContents().get(0) != second.getSignatureContents().get(0));
         }
     }
 
@@ -403,7 +383,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
                      getEnvelopeWith2SignaturesWithSameAnnotation(stringEnvelopeAnnotation);
              Envelope first = new Envelope(original.getSignatureContents().get(0));
              Envelope second = new Envelope(original.getSignatureContents().get(1))) {
-            first.add(second);
+            first.addAll(second.getSignatureContents());
             ByteArrayOutputStream baos  = new ByteArrayOutputStream();
             EnvelopeWriter writer = new ZipEnvelopeWriter();
             writer.write(first, baos);
@@ -429,7 +409,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
 
     private void addEnvelope(Envelope target, int expectedSize) throws Exception {
         try (Envelope source = getEnvelopeIgnoreExceptions(ENVELOPE_WITH_NO_DOCUMENTS)) {
-            target.add(source);
+            target.addAll(source.getSignatureContents());
             assertEquals(expectedSize, target.getSignatureContents().size());
         }
     }
@@ -441,7 +421,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     private Envelope mergeEnvelopesUnclosed(String[] envelopes) throws Exception {
         Envelope envelope1 = getEnvelope(envelopes[0]);
         try (Envelope envelope2 = getEnvelope(envelopes[1])) {
-            envelope1.add(envelope2);
+            envelope1.addAll(envelope2.getSignatureContents());
         }
         return envelope1;
     }

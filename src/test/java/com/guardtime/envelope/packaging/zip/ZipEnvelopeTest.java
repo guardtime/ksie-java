@@ -77,28 +77,6 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testAddEnvelope_OK() throws Exception {
-        EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
-                .withSignatureFactory(mockedSignatureFactory)
-                .withVerificationPolicy(null)
-                .withIndexProviderFactory(new UuidIndexProviderFactory())
-                .build();
-        try (
-                Envelope envelope =
-                        packagingFactory.create(singletonList(testDocumentHelloPdf), singletonList(stringEnvelopeAnnotation))
-        ) {
-            assertEquals(1, envelope.getSignatureContents().size());
-            try (
-                    Envelope newEnvelope =
-                            packagingFactory.create(singletonList(testDocumentHelloText), new ArrayList<Annotation>())
-            ) {
-                envelope.add(newEnvelope);
-                assertEquals(2, envelope.getSignatureContents().size());
-            }
-        }
-    }
-
-    @Test
     public void testAddListOfSignatureContent_OK() throws Exception {
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(mockedSignatureFactory)
@@ -118,7 +96,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
             ) {
                 packagingFactory.addSignature(newEnvelope, singletonList(document), new ArrayList<Annotation>());
                 int expected = newEnvelope.getSignatureContents().size() + 1;
-                envelope.add(newEnvelope);
+                envelope.addAll(newEnvelope.getSignatureContents());
                 assertEquals(expected, envelope.getSignatureContents().size());
             }
         }

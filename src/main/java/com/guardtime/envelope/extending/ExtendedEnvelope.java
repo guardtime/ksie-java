@@ -64,12 +64,6 @@ public class ExtendedEnvelope extends Envelope {
     }
 
     @Override
-    public void add(Envelope envelope) throws EnvelopeMergingException {
-        super.add(envelope);
-        wrapSignatureContents();
-    }
-
-    @Override
     public void addAll(Collection<SignatureContent> contents) throws EnvelopeMergingException {
         super.addAll(contents);
         wrapSignatureContents();
