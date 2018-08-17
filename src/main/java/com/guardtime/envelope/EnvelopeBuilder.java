@@ -20,9 +20,10 @@
 package com.guardtime.envelope;
 
 import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.annotation.AnnotationBuilder;
+import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.FileDocument;
-import com.guardtime.envelope.document.StreamDocument;
+import com.guardtime.envelope.document.DocumentBuilder;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.SignatureContent;
@@ -73,11 +74,21 @@ public class EnvelopeBuilder {
     }
 
     public EnvelopeBuilder withDocument(InputStream input, String name, String mimeType) {
-        return withDocument(new StreamDocument(input, mimeType, name));
+        return withDocument(
+                new DocumentBuilder()
+                        .withDocumentName(name)
+                        .withDocumentMimeType(mimeType)
+                        .withContent(input)
+                        .build()
+        );
     }
 
     public EnvelopeBuilder withDocument(File file, String mimeType) {
-        return withDocument(new FileDocument(file, mimeType));
+        return withDocument(
+                new DocumentBuilder()
+                        .withContent(file)
+                        .withDocumentMimeType(mimeType)
+                        .build());
     }
 
     public EnvelopeBuilder withDocument(Document document) {
@@ -88,6 +99,36 @@ public class EnvelopeBuilder {
             LOGGER.debug("Document '{}' will be added to the envelope", document);
         }
         return this;
+    }
+
+    public EnvelopeBuilder withAnnotation(String content, String domain, EnvelopeAnnotationType type) {
+        return withAnnotation(
+                new AnnotationBuilder()
+                        .withDomain(domain)
+                        .withAnnotationType(type)
+                        .withContent(content)
+                        .build()
+        );
+    }
+
+    public EnvelopeBuilder withAnnotation(File content, String domain, EnvelopeAnnotationType type) {
+        return withAnnotation(
+                new AnnotationBuilder()
+                        .withDomain(domain)
+                        .withAnnotationType(type)
+                        .withContent(content)
+                        .build()
+        );
+    }
+
+    public EnvelopeBuilder withAnnotation(InputStream content, String domain, EnvelopeAnnotationType type) {
+        return withAnnotation(
+                new AnnotationBuilder()
+                        .withDomain(domain)
+                        .withAnnotationType(type)
+                        .withContent(content)
+                        .build()
+        );
     }
 
     public EnvelopeBuilder withAnnotation(Annotation annotation) {

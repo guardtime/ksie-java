@@ -64,5 +64,4 @@ public interface Annotation extends AutoCloseable, EnvelopeElement, Cloneable {
      */
     void setPath(String path);
 
-    Annotation clone();
 }

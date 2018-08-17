@@ -21,7 +21,7 @@ package com.guardtime.envelope.packaging.zip;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.StreamDocument;
+import com.guardtime.envelope.document.DocumentBuilder;
 import com.guardtime.envelope.indexing.UuidIndexProviderFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
@@ -51,7 +51,11 @@ public class ZipEnvelopeWriterTest extends AbstractEnvelopeTest {
                 .withIndexProviderFactory(new UuidIndexProviderFactory())
                 .build();
         when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mock(EnvelopeSignature.class));
-        Document testDocument = new StreamDocument(new ByteArrayInputStream(new byte[0]), "some type", "folder/");
+        Document testDocument = new DocumentBuilder()
+                .withDocumentMimeType("some type")
+                .withDocumentName("folder/")
+                .withContent(new ByteArrayInputStream(new byte[0]))
+                .build();
         try (Envelope envelope = packagingFactory.create(
                 singletonList(testDocument),
                 singletonList(stringEnvelopeAnnotation)

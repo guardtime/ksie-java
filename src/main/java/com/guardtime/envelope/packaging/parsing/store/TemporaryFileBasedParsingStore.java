@@ -31,9 +31,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -48,10 +46,10 @@ public final class TemporaryFileBasedParsingStore extends ParsingStore {
     private static TemporaryFileBasedParsingStore instance;
 
     private final Map<UUID, File> store = new HashMap<>();
-    private final Path tempDir;
+    private Path tempDir;
 
     private TemporaryFileBasedParsingStore() throws IOException {
-        this.tempDir = Util.getTempDirectory();
+        createTempDir();
     }
 
     public static ParsingStore getInstance() {
@@ -59,7 +57,7 @@ public final class TemporaryFileBasedParsingStore extends ParsingStore {
             try {
                 instance = new TemporaryFileBasedParsingStore();
             } catch (IOException e) {
-                throw new RuntimeException("Failed to create TemporaryFileBasedParsintStore instance!");
+                throw new RuntimeException("Failed to create TemporaryFileBasedParsingStore instance!");
             }
         }
         return instance;
@@ -68,6 +66,7 @@ public final class TemporaryFileBasedParsingStore extends ParsingStore {
     @Override
     public ParsingStoreReference store(String name, InputStream stream) throws ParsingStoreException {
         try {
+            createTempDir();
             File tmpFile = Util.createTempFile(tempDir);
             Util.copyToTempFile(stream, tmpFile);
             UUID uuid = UUID.randomUUID();
@@ -75,6 +74,12 @@ public final class TemporaryFileBasedParsingStore extends ParsingStore {
             return addNewReference(uuid, name);
         } catch (IOException e) {
             throw new ParsingStoreException("Failed to store stream!", e);
+        }
+    }
+
+    private void createTempDir() throws IOException {
+        if (tempDir == null || !tempDir.toFile().exists()) {
+            this.tempDir = Util.getTempDirectory();
         }
     }
 

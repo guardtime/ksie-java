@@ -30,19 +30,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.guardtime.envelope.packaging.Envelope.HASH_ALGORITHM;
 import static com.guardtime.envelope.util.Util.notNull;
 
 
 /**
  * Generic implementation for {@link Document} that is lacking {@link Document#getInputStream()} implementation.
  */
-public abstract class AbstractDocument implements Document {
-
-    public static final HashAlgorithm HASH_ALGORITHM = HashAlgorithm.SHA2_256;
+abstract class AbstractDocument implements Document {
 
     protected final String mimeType;
     protected final String fileName;
-    private boolean closed = false;
+    protected boolean closed = false;
 
     /**
      *

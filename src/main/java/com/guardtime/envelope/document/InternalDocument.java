@@ -14,11 +14,11 @@ import java.io.InputStream;
  * {@link com.guardtime.envelope.signature.EnvelopeSignature} to {@link com.guardtime.envelope.packaging.Envelope}.
  */
 
-public class InternalDocument extends AbstractDocument {
+class InternalDocument extends AbstractDocument {
     private static final String MIME_TYPE = "application/ksie-structure-file"; // non-documented value
-    private final EnvelopeElement element;
+    protected final EnvelopeElement element;
 
-    public InternalDocument(EnvelopeElement element) {
+    InternalDocument(EnvelopeElement element) {
         super(MIME_TYPE, extractPath(element));
         this.element = element;
     }
@@ -44,11 +44,6 @@ public class InternalDocument extends AbstractDocument {
     private static String extractPath(EnvelopeElement element) {
         Util.notNull(element, "EnvelopeElement");
         return element.getPath();
-    }
-
-    @Override
-    public Document clone() {
-        return new InternalDocument(element);
     }
 
 }

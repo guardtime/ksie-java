@@ -29,7 +29,7 @@ import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
-import com.guardtime.envelope.packaging.parsing.store.TemporaryFileBasedParsingStoreFactory;
+import com.guardtime.envelope.packaging.parsing.store.TemporaryFileBasedParsingStore;
 import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.envelope.signature.SignatureFactory;
 import com.guardtime.envelope.signature.ksi.KsiSignatureFactory;
@@ -76,7 +76,7 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
         when(mockKsiSignature.getAggregationTime()).thenReturn(mock(Date.class));
         when(mockKsi.read(any(InputStream.class))).thenReturn(mockKsiSignature);
         SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi, mockKsi);
-        this.reader = new ZipEnvelopeReader(manifestFactory, signatureFactory, new TemporaryFileBasedParsingStoreFactory());
+        this.reader = new ZipEnvelopeReader(manifestFactory, signatureFactory, TemporaryFileBasedParsingStore.getInstance());
     }
 
     @After

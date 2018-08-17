@@ -31,7 +31,7 @@ import static com.guardtime.envelope.util.Util.notNull;
  * Represents an {@link Annotation} that has been parsed in. Uses a {@link ParsingStore} from where to access the data of
  * the {@link Annotation}.
  */
-public class ParsedAnnotation extends AbstractAnnotation {
+class ParsedAnnotation extends AbstractAnnotation {
 
     private final ParsingStoreReference parsingStoreReference;
 
@@ -44,7 +44,7 @@ public class ParsedAnnotation extends AbstractAnnotation {
      * @param type              The annotation type, indicating the persistence of the annotation, see
      *                          {@link EnvelopeAnnotationType} for details.
      */
-    public ParsedAnnotation(ParsingStoreReference reference, String domain, EnvelopeAnnotationType type) {
+    ParsedAnnotation(ParsingStoreReference reference, String domain, EnvelopeAnnotationType type) {
         super(domain, type);
         notNull(reference, "Parsing store reference");
         this.parsingStoreReference = reference;
@@ -59,11 +59,6 @@ public class ParsedAnnotation extends AbstractAnnotation {
             );
         }
         return inputStream;
-    }
-
-    @Override
-    public Annotation clone() {
-        return null;
     }
 
     @Override

@@ -20,9 +20,7 @@
 package com.guardtime.envelope.document;
 
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreReference;
-import com.guardtime.envelope.packaging.parsing.store.TemporaryFileBasedParsingStore;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +31,7 @@ import static com.guardtime.envelope.util.Util.notNull;
  * Represents a {@link Document} that has been parsed in. Uses a {@link ParsingStore} from where to access the data of
  * the {@link Document}
  */
-public class ParsedDocument extends AbstractDocument implements UnknownDocument {
+class ParsedDocument extends AbstractDocument implements UnknownDocument {
 
     private final ParsingStoreReference parsingStoreReference;
 
@@ -44,22 +42,10 @@ public class ParsedDocument extends AbstractDocument implements UnknownDocument 
      * @param mimeType          The MIME-type of the {@link Document}.
      * @param fileName          The file name to be used for the {@link Document}.
      */
-    public ParsedDocument(ParsingStoreReference reference, String mimeType, String fileName) {
+    protected ParsedDocument(ParsingStoreReference reference, String mimeType, String fileName) {
         super(mimeType, fileName);
         notNull(reference, "Parsing store reference");
         this.parsingStoreReference = reference;
-    }
-
-    public ParsedDocument(InputStream data, String mimeType, String fileName) {
-        this(addToStore(data, fileName), mimeType, fileName);
-    }
-
-    private static ParsingStoreReference addToStore(InputStream data, String name) {
-        try {
-            return TemporaryFileBasedParsingStore.getInstance().store(name, data);
-        } catch (ParsingStoreException e) {
-            throw new IllegalArgumentException("Can not copy input stream", e);
-        }
     }
 
     @Override
@@ -74,13 +60,10 @@ public class ParsedDocument extends AbstractDocument implements UnknownDocument 
     }
 
     @Override
-    public Document clone() {
-        return new ParsedDocument(parsingStoreReference.clone(), mimeType, fileName);
-    }
-
-    @Override
     public void close() {
-        parsingStoreReference.unstore();
-        super.close();
+        if (!closed) {
+            parsingStoreReference.unstore();
+            super.close();
+        }
     }
 }

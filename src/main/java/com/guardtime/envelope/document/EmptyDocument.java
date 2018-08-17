@@ -25,7 +25,6 @@ import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,7 @@ import java.util.Map;
  * Represents a document in a envelope which doesn't store the document data in the same envelope (detached document).
  */
 public class EmptyDocument extends AbstractDocument {
-    private final Map<HashAlgorithm, DataHash> dataHashMap;
+    protected final Map<HashAlgorithm, DataHash> dataHashMap;
 
     /**
      * Creates a new {@link EmptyDocument} with the given properties.
@@ -43,7 +42,7 @@ public class EmptyDocument extends AbstractDocument {
      * @param mimeType MIME type of the file, can be freely chosen.
      * @param hashes list of {@link DataHash} that are generated from the data associated with the document.
      */
-    public EmptyDocument(String fileName, String mimeType, List<DataHash> hashes) {
+    EmptyDocument(String fileName, String mimeType, List<DataHash> hashes) {
         super(mimeType, fileName);
         Util.notEmpty(hashes, "Data hash list");
         this.dataHashMap = mapHashes(hashes);
@@ -73,11 +72,6 @@ public class EmptyDocument extends AbstractDocument {
     @Override
     public boolean isWritable() {
         return false;
-    }
-
-    @Override
-    public Document clone() {
-        return new EmptyDocument(fileName, mimeType, new ArrayList<>(dataHashMap.values()));
     }
 
 }

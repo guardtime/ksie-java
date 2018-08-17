@@ -39,7 +39,6 @@ import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.packaging.parsing.EnvelopeReader;
 import com.guardtime.envelope.packaging.parsing.store.MemoryBasedParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.envelope.signature.SignatureFactory;
@@ -90,7 +89,6 @@ public final class EnvelopePackagingFactory {
         Util.notNull(builder.signatureFactory, "Signature factory");
         Util.notNull(builder.manifestFactory, "Manifest factory");
         Util.notNull(builder.indexProviderFactory, "Index provider factory");
-        Util.notNull(builder.parsingStore, "Parsing store");
         Util.notNull(builder.envelopeReader, "Envelope reader");
         this.signatureFactory = builder.signatureFactory;
         this.manifestFactory = builder.manifestFactory;
@@ -370,7 +368,7 @@ public final class EnvelopePackagingFactory {
         protected SignatureFactory signatureFactory;
         protected EnvelopeManifestFactory manifestFactory = new TlvEnvelopeManifestFactory();
         protected IndexProviderFactory indexProviderFactory = new IncrementingIndexProviderFactory();
-        protected ParsingStore parsingStore = new MemoryBasedParsingStore();
+        protected ParsingStore parsingStore = MemoryBasedParsingStore.getInstance();
         protected EnvelopeReader envelopeReader;
         protected VerificationPolicy verificationPolicy = new InternalVerificationPolicy();
 
@@ -389,7 +387,7 @@ public final class EnvelopePackagingFactory {
             return this;
         }
 
-        public Builder withParsingStoreFactory(ParsingStore store) {
+        public Builder withParsingStore(ParsingStore store) {
             this.parsingStore = store;
             return this;
         }

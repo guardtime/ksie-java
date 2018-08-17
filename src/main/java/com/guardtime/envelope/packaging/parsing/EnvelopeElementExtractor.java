@@ -67,7 +67,6 @@ class EnvelopeElementExtractor {
         this.singleAnnotationManifestHandler = new SingleAnnotationManifestHandler(manifestFactory);
         this.signatureHandler = new SignatureHandler(signatureFactory);
         this.parsingStoreHandler = storeHandler;
-
     }
 
     public Set<String> getManifestUris() {

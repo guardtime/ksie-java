@@ -21,8 +21,8 @@ package com.guardtime.envelope.integration;
 
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
-import com.guardtime.envelope.packaging.parsing.store.MemoryBasedParsingStoreFactory;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
+import com.guardtime.envelope.packaging.parsing.store.MemoryBasedParsingStore;
+import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.util.Util;
 
 import org.junit.Before;
@@ -47,8 +47,8 @@ public class MemoryBasedParsingIntegrationTest extends AbstractEnvelopeParsingIn
     }
 
     @Override
-    public ParsingStoreFactory getParsingStore() {
-        return new MemoryBasedParsingStoreFactory();
+    public ParsingStore getParsingStore() {
+        return MemoryBasedParsingStore.getInstance();
     }
 
     @Test

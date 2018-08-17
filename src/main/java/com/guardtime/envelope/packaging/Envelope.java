@@ -26,6 +26,7 @@ import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.util.SortedList;
 import com.guardtime.envelope.util.Util;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,6 +42,8 @@ import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifyUni
  * and signatures that validate the content of the envelope.
  */
 public class Envelope implements AutoCloseable {
+
+    public static final HashAlgorithm HASH_ALGORITHM = HashAlgorithm.SHA2_256;
 
     private List<SignatureContent> signatureContents = new SortedList<>();
     private boolean closed = false;

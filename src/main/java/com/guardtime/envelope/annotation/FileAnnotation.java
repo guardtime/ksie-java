@@ -29,7 +29,7 @@ import java.io.InputStream;
 /**
  * Annotation that is based on {@link File} as the data source.
  */
-public class FileAnnotation extends AbstractAnnotation {
+class FileAnnotation extends AbstractAnnotation {
 
     private final File file;
 
@@ -41,7 +41,7 @@ public class FileAnnotation extends AbstractAnnotation {
      * @param type annotation type, indicating the persistence of the annotation, see {@link EnvelopeAnnotationType} for details.
      */
 
-    public FileAnnotation(File file, String domain, EnvelopeAnnotationType type) {
+    FileAnnotation(File file, String domain, EnvelopeAnnotationType type) {
         super(domain, type);
         Util.notNull(file, "File");
         this.file = file;
@@ -52,8 +52,4 @@ public class FileAnnotation extends AbstractAnnotation {
         return new FileInputStream(file);
     }
 
-    @Override
-    public Annotation clone() {
-        return new FileAnnotation(file, domain, type);
-    }
 }

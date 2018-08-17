@@ -34,11 +34,15 @@ import java.util.UUID;
  * NB! There is no defence against too large data. Use with care!
  * </p>
  */
-public class  MemoryBasedParsingStore extends ParsingStore {
+public final class MemoryBasedParsingStore extends ParsingStore {
 
     private static MemoryBasedParsingStore instance;
 
     private Map<UUID, byte[]> store = new HashMap<>();
+
+    private MemoryBasedParsingStore() {
+        // private!
+    }
 
     public static ParsingStore getInstance() {
         if (instance == null) {
@@ -60,7 +64,11 @@ public class  MemoryBasedParsingStore extends ParsingStore {
 
     @Override
     public InputStream get(UUID uuid) {
-        return new ByteArrayInputStream(store.get(uuid));
+        byte[] bytes = store.get(uuid);
+        if (bytes == null) {
+            throw new IllegalStateException("Parsing store has lost content for ID '" + uuid.toString() + "'");
+        }
+        return new ByteArrayInputStream(bytes);
     }
 
     @Override

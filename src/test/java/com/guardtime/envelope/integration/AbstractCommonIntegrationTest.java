@@ -27,6 +27,7 @@ import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
+import com.guardtime.envelope.packaging.parsing.store.TemporaryFileBasedParsingStore;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
 import com.guardtime.envelope.signature.SignatureException;
@@ -59,6 +60,7 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
     private static final File TRUST_STORE_FILE;
     private static final String TRUST_STORE_PASSWORD;
     protected EnvelopePackagingFactory packagingFactory;
+    protected EnvelopePackagingFactory packagingFactoryTFPS; // TemporaryFileParsingStore
     protected SignatureFactory signatureFactory;
     protected EnvelopeWriter envelopeWriter;
     protected KSI ksi;
@@ -114,6 +116,10 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
         packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
                 .build();
+        packagingFactoryTFPS = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withParsingStore(TemporaryFileBasedParsingStore.getInstance())
+                .build();
         envelopeWriter = new ZipEnvelopeWriter();
     }
 
@@ -134,6 +140,14 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
             return getEnvelope(path);
         } catch (EnvelopeReadingException e) {
             return e.getEnvelope();
+        }
+    }
+
+    Envelope getEnvelopeWithTemporaryFileParsingStore(String path) throws Exception {
+        URL url = Thread.currentThread().getContextClassLoader().getResource(path);
+        File file = new File(url.toURI());
+        try (FileInputStream input = new FileInputStream(file)) {
+            return packagingFactoryTFPS.read(input);
         }
     }
 

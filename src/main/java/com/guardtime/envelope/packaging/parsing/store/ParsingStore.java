@@ -51,7 +51,7 @@ public abstract class ParsingStore {
         return ref;
     }
 
-    private void updateReferences(UUID uuid, ParsingStoreReference parsingStoreReference) {
+    protected void updateReferences(UUID uuid, ParsingStoreReference parsingStoreReference) {
         List<ParsingStoreReference> currentReferences;
         if (references.containsKey(uuid)) {
             currentReferences = references.get(uuid);
@@ -63,10 +63,14 @@ public abstract class ParsingStore {
     }
 
     void unregister(UUID uuid, ParsingStoreReference parsingStoreReference) {
+        if (!references.containsKey(uuid)) {
+            return;
+        }
         List<ParsingStoreReference> currentReferences = references.get(uuid);
         currentReferences.remove(parsingStoreReference);
         if (currentReferences.isEmpty()) {
             clearStore(uuid);
+            references.remove(uuid);
         }
     }
 

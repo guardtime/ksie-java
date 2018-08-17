@@ -20,7 +20,7 @@
 package com.guardtime.envelope;
 
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.StreamDocument;
+import com.guardtime.envelope.document.DocumentBuilder;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
@@ -90,11 +90,12 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
     @Test
     public void testAddDocumentToEnvelope() throws Exception {
         EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
-        try (StreamDocument document = new StreamDocument(
-                new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
-                MIME_TYPE_APPLICATION_TXT,
-                TEST_FILE_NAME_TEST_TXT
-        )) {
+        try (Document document = new DocumentBuilder()
+                .withContent(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT))
+                .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
+                .withDocumentName(TEST_FILE_NAME_TEST_TXT)
+                .build()
+        ) {
             builder.withDocument(document);
             assertEquals(1, builder.getDocuments().size());
 
@@ -156,16 +157,16 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
         expectedException.expectMessage("Document with name '" + TEST_FILE_NAME_TEST_TXT + "' already exists!");
         expectedException.expect(IllegalArgumentException.class);
         try (
-                Document document = new StreamDocument(
-                        new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)),
-                        MIME_TYPE_APPLICATION_TXT,
-                        TEST_FILE_NAME_TEST_TXT
-                );
-                Document streamDocument = new StreamDocument(
-                        new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)),
-                        MIME_TYPE_APPLICATION_TXT,
-                        TEST_FILE_NAME_TEST_TXT
-                )
+                Document document = new DocumentBuilder()
+                        .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
+                        .withDocumentName(TEST_FILE_NAME_TEST_TXT)
+                        .withContent(new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)))
+                        .build();
+                Document streamDocument = new DocumentBuilder()
+                        .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
+                        .withDocumentName(TEST_FILE_NAME_TEST_TXT)
+                        .withContent(new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)))
+                        .build()
         ) {
             EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
             builder.withDocument(document);
@@ -180,16 +181,16 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Found multiple documents with same name and non-matching data hash!");
         try (
-                Document document = new StreamDocument(
-                        new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)),
-                        MIME_TYPE_APPLICATION_TXT,
-                        TEST_FILE_NAME_TEST_TXT
-                );
-                Document streamDocument = new StreamDocument(
-                        new ByteArrayInputStream("ImportantDocument-HAHA".getBytes(StandardCharsets.UTF_8)),
-                        MIME_TYPE_APPLICATION_TXT,
-                        TEST_FILE_NAME_TEST_TXT
-                )
+                Document document = new DocumentBuilder()
+                        .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
+                        .withDocumentName(TEST_FILE_NAME_TEST_TXT)
+                        .withContent(new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)))
+                        .build();
+                Document streamDocument = new DocumentBuilder()
+                        .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
+                        .withDocumentName(TEST_FILE_NAME_TEST_TXT)
+                        .withContent(new ByteArrayInputStream("ImportantDocument-HAHA".getBytes(StandardCharsets.UTF_8)))
+                        .build()
         ) {
             // build initial envelope
             EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);

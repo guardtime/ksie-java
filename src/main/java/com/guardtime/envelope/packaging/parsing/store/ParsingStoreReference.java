@@ -17,16 +17,17 @@ public class ParsingStoreReference {
         this.owner = store;
     }
 
+    public ParsingStoreReference(ParsingStoreReference original) {
+        this(original.uuid, original.name, original.owner);
+        owner.updateReferences(uuid, this);
+    }
+
     public String getName() {
         return name;
     }
 
     public InputStream get() {
         return owner.get(uuid);
-    }
-
-    public ParsingStoreReference clone() {
-        return owner.addNewReference(uuid, name);
     }
 
     public void unstore() {

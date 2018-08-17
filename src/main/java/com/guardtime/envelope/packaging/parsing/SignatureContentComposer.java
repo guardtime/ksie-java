@@ -20,11 +20,10 @@
 package com.guardtime.envelope.packaging.parsing;
 
 import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.annotation.AnnotationBuilder;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
-import com.guardtime.envelope.annotation.ParsedAnnotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.EmptyDocument;
-import com.guardtime.envelope.document.ParsedDocument;
+import com.guardtime.envelope.document.DocumentBuilder;
 import com.guardtime.envelope.manifest.AnnotationDataReference;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.DocumentsManifest;
@@ -129,10 +128,18 @@ class SignatureContentComposer {
             if (invalidReference(reference)) return null;
             String documentUri = reference.getUri();
             try {
-                return new ParsedDocument(handler.getParsingStoreReference(documentUri), reference.getMimeType(), documentUri);
+                return new DocumentBuilder()
+                        .withDocumentMimeType(reference.getMimeType())
+                        .withDocumentName(documentUri)
+                        .withParsingStoreReference(handler.getParsingStoreReference(documentUri))
+                        .build();
             } catch (ContentParsingException e) {
                 // either removed or was never present in the first place, verifier will decide
-                return new EmptyDocument(documentUri, reference.getMimeType(), reference.getHashList());
+                return new DocumentBuilder()
+                        .withDocumentName(documentUri)
+                        .withDocumentMimeType(reference.getMimeType())
+                        .withDataHashList(reference.getHashList())
+                        .build();
             }
         }
 
@@ -178,13 +185,18 @@ class SignatureContentComposer {
             }
             AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
             String uri = annotationDataReference.getUri();
-            Annotation annotation = new ParsedAnnotation(
-                    parsingStoreHandler.get(uri),
-                    annotationDataReference.getDomain(),
-                    type
-            );
-            annotation.setPath(uri);
-            return annotation;
+            try {
+                Annotation annotation = new AnnotationBuilder()
+                        .withParsingStoreReference(parsingStoreHandler.get(uri))
+                        .withDomain(annotationDataReference.getDomain())
+                        .withAnnotationType(type)
+                        .build();
+                annotation.setPath(uri);
+                return annotation;
+            } catch (NullPointerException | IllegalStateException e) {
+                logger.debug("Failed to extract Annotation for '{}'.", uri, e);
+                return null;
+            }
         }
 
         private void fetchSignature() {

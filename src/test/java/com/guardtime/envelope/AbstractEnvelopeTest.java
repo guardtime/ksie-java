@@ -20,10 +20,10 @@
 package com.guardtime.envelope;
 
 import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.annotation.AnnotationBuilder;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
-import com.guardtime.envelope.annotation.StringAnnotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.StreamDocument;
+import com.guardtime.envelope.document.DocumentBuilder;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.DocumentsManifest;
@@ -162,21 +162,21 @@ public class AbstractEnvelopeTest {
 
     @Before
     public void setUpDocumentsAndAnnotations() {
-        stringEnvelopeAnnotation = new StringAnnotation(
-                ANNOTATION_CONTENT,
-                ANNOTATION_DOMAIN_COM_GUARDTIME,
-                EnvelopeAnnotationType.NON_REMOVABLE
-        );
-        testDocumentHelloText = new StreamDocument(
-                new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
-                MIME_TYPE_APPLICATION_TXT,
-                TEST_FILE_NAME_TEST_TXT
-        );
-        testDocumentHelloPdf = new StreamDocument(
-                new ByteArrayInputStream(TEST_DATA_PDF_CONTENT),
-                MIME_TYPE_APPLICATION_PDF,
-                TEST_FILE_NAME_TEST_PDF
-        );
+        stringEnvelopeAnnotation = new AnnotationBuilder()
+                .withContent(ANNOTATION_CONTENT)
+                .withDomain(ANNOTATION_DOMAIN_COM_GUARDTIME)
+                .withAnnotationType(EnvelopeAnnotationType.NON_REMOVABLE)
+                .build();
+        testDocumentHelloText = new DocumentBuilder()
+                .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
+                .withDocumentName(TEST_FILE_NAME_TEST_TXT)
+                .withContent(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT))
+                .build();
+        testDocumentHelloPdf = new DocumentBuilder()
+                .withDocumentMimeType(MIME_TYPE_APPLICATION_PDF)
+                .withDocumentName(TEST_FILE_NAME_TEST_PDF)
+                .withContent(new ByteArrayInputStream(TEST_DATA_PDF_CONTENT))
+                .build();
         envelopeElements.addAll(Arrays.asList(
                 testDocumentHelloPdf,
                 testDocumentHelloText,

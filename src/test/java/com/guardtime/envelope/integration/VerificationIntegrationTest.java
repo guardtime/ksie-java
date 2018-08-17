@@ -20,10 +20,10 @@
 package com.guardtime.envelope.integration;
 
 import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.annotation.AnnotationBuilder;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
-import com.guardtime.envelope.annotation.StringAnnotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.EmptyDocument;
+import com.guardtime.envelope.document.DocumentBuilder;
 import com.guardtime.envelope.extending.ExtendedEnvelope;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
@@ -605,16 +605,19 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
                 .build();
         String documentName = "Document1.txt";
         try (
-                Document document = new EmptyDocument(
-                        documentName,
-                        "txt",
-                        singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(expectedDocumentContent).getHash()));
-                Annotation annotation = new StringAnnotation(
-                        "Document is not with envelope. Envelope was created with empty envelope document. " +
-                                "Document itself can be added later on if needed.",
-                        "com.guardtime.com",
-                        EnvelopeAnnotationType.NON_REMOVABLE
-                );
+                Document document = new DocumentBuilder()
+                        .withDocumentName(documentName)
+                        .withDocumentMimeType("txt")
+                        .withDataHashList(
+                                singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(expectedDocumentContent).getHash())
+                        )
+                        .build();
+                Annotation annotation = new AnnotationBuilder()
+                        .withContent("Document is not with envelope. Envelope was created with empty envelope document. " +
+                                "Document itself can be added later on if needed.")
+                        .withDomain("com.guardtime.com")
+                        .withAnnotationType(EnvelopeAnnotationType.NON_REMOVABLE)
+                        .build();
                 Envelope envelope = packagingFactory.create(singletonList(document), singletonList(annotation));
                 InputStream stream = new ByteArrayInputStream(addedDocumentContent)
         ) {

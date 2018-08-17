@@ -28,7 +28,7 @@ import static com.guardtime.envelope.util.Util.notNull;
 /**
  * Represents an {@link Annotation} that is based on a String as the data source.
  */
-public class StringAnnotation extends AbstractAnnotation {
+class StringAnnotation extends AbstractAnnotation {
 
     private final String content;
 
@@ -39,7 +39,7 @@ public class StringAnnotation extends AbstractAnnotation {
      *               entity controlling the Internet domain name z.y.x.
      * @param type annotation type, indicating the persistence of the annotation, see {@link EnvelopeAnnotationType} for details.
      */
-    public StringAnnotation(String content, String domain, EnvelopeAnnotationType type) {
+    StringAnnotation(String content, String domain, EnvelopeAnnotationType type) {
         super(domain, type);
         notNull(content, "Content");
         this.content = content;
@@ -50,8 +50,4 @@ public class StringAnnotation extends AbstractAnnotation {
         return new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
     }
 
-    @Override
-    public Annotation clone() {
-        return new StringAnnotation(content, domain, type);
-    }
 }

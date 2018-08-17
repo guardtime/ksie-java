@@ -56,7 +56,5 @@ public interface Document extends EnvelopeElement, AutoCloseable, Cloneable {
      */
     boolean isWritable();
 
-    Document clone();
-
 }
 

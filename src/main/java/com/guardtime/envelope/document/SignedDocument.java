@@ -106,9 +106,4 @@ public class SignedDocument implements Document {
         return new ArrayList<>(content.getAnnotations().values());
     }
 
-    @Override
-    public Document clone() {
-        // Not copyable, don't want to propagate CloneNotSupportedException so returning null;
-        return null;
-    }
 }

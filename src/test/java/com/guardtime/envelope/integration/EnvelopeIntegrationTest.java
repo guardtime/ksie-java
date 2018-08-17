@@ -4,8 +4,7 @@ import com.guardtime.envelope.EnvelopeBuilder;
 import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.InternalDocument;
-import com.guardtime.envelope.document.ParsedDocument;
+import com.guardtime.envelope.document.DocumentBuilder;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
@@ -15,6 +14,7 @@ import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
+import com.guardtime.envelope.packaging.parsing.store.MemoryBasedParsingStore;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
 import com.guardtime.envelope.signature.SignatureException;
@@ -71,6 +71,7 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
 
         EnvelopePackagingFactory factory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(new KsiSignatureFactory(signer, new SignatureReader()))
+                .withParsingStore(MemoryBasedParsingStore.getInstance())
                 .build();
 
         expectedException.expect(SignatureException.class);
@@ -94,7 +95,7 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
                 FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_RANDOM_UUID_INDEXES));
                 Envelope existingEnvelope = packagingFactory.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-                Document document = new ParsedDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
+                Document document = constructDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
         ) {
             Assert.assertTrue(compareSignatureContentListOrder(existingEnvelope));
 
@@ -114,7 +115,7 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
                 FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_MIXED_INDEX_TYPES_IN_CONTENTS));
                 Envelope existingEnvelope = packagingFactory.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-                Document document = new ParsedDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
+                Document document = constructDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
         ) {
             Assert.assertTrue(compareSignatureContentListOrder(existingEnvelope));
 
@@ -133,7 +134,7 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
         try (FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_MULTIPLE_SIGNATURES_WITH_SAME_SIGNING_TIME));
              Envelope envelope = packagingFactory.read(stream);
              ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-             Document document = new ParsedDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
+             Document document = constructDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
         ) {
             packagingFactory.addSignature(
                     envelope,
@@ -187,7 +188,7 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
         try (FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_UNUSED_INTERNAL_FILE_AS_DOC_REFERENCE));
              Envelope envelope = limitedPackagingFactory.read(stream);
              ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-             Document document = new ParsedDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
+             Document document = constructDocument(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc")
         ) {
             limitedPackagingFactory.addSignature(
                     envelope,
@@ -246,7 +247,7 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testAnnotationAsReferredDocument_OK() throws Exception {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream("randomData".getBytes());
-             Document doc = new ParsedDocument(inputStream, "application/random", "someFile.file");
+             Document doc = constructDocument(inputStream, "application/random", "someFile.file");
              Envelope envelope = packagingFactory.create(singletonList(doc), singletonList(stringEnvelopeAnnotation))) {
             Annotation annotation = envelope.getSignatureContents().get(0).getAnnotations().values().iterator().next();
             addContentAndVerify(envelope, annotation);
@@ -256,7 +257,7 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testAnnotationManifestAsReferredDocument_OK() throws Exception {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream("randomData".getBytes());
-             Document doc = new ParsedDocument(inputStream, "application/random", "someFile.file");
+             Document doc = constructDocument(inputStream, "application/random", "someFile.file");
              Envelope envelope = packagingFactory.create(singletonList(doc), singletonList(stringEnvelopeAnnotation))) {
             SingleAnnotationManifest annotationManifest =
                     envelope.getSignatureContents().get(0).getSingleAnnotationManifests().values().iterator().next();
@@ -341,7 +342,7 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
 
     private void addContentAndVerify(EnvelopePackagingFactory packagingFactory, Envelope envelope, EnvelopeElement element)
             throws Exception {
-        Document doc2 = new InternalDocument(element);
+        Document doc2 = new DocumentBuilder().withContent(element).build();
         packagingFactory.addSignature(envelope, singletonList(doc2), Collections.singletonList(stringEnvelopeAnnotation));
         Assert.assertEquals(2, envelope.getSignatureContents().size());
         EnvelopeWriter writer = new ZipEnvelopeWriter();
@@ -381,6 +382,14 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
         Assert.assertEquals(1, content.getAnnotations().size());
         Assert.assertEquals(1, content.getSingleAnnotationManifests().size());
         Assert.assertEquals(stringEnvelopeAnnotation, content.getAnnotations().values().iterator().next());
+    }
+
+    private Document constructDocument(ByteArrayInputStream input, String mimeTypeApplicationTxt, String s) {
+        return new DocumentBuilder()
+                .withDocumentMimeType(mimeTypeApplicationTxt)
+                .withDocumentName(s)
+                .withContent(input)
+                .build();
     }
 
 }

@@ -22,7 +22,7 @@ package com.guardtime.envelope.packaging.zip;
 import com.guardtime.envelope.AbstractEnvelopeTest;
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.StreamDocument;
+import com.guardtime.envelope.document.DocumentBuilder;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.UuidIndexProviderFactory;
 import com.guardtime.envelope.packaging.Envelope;
@@ -92,7 +92,11 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                     Envelope newEnvelope =
                             packagingFactory.create(singletonList(testDocumentHelloText), new ArrayList<Annotation>());
                     ByteArrayInputStream input = new ByteArrayInputStream("auh".getBytes(StandardCharsets.UTF_8));
-                    Document document = new StreamDocument(input, "text/plain", "someTestFile.txt")
+                    Document document = new DocumentBuilder()
+                            .withDocumentMimeType("text/plain")
+                            .withDocumentName("someTestFile.txt")
+                            .withContent(input)
+                            .build()
             ) {
                 packagingFactory.addSignature(newEnvelope, singletonList(document), new ArrayList<Annotation>());
                 int expected = newEnvelope.getSignatureContents().size() + 1;
@@ -139,11 +143,11 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                 singletonList(stringEnvelopeAnnotation)
         )) {
             assertEquals(1, envelope.getSignatureContents().size());
-            try (Document clashingDocument = new StreamDocument(
-                    new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
-                    testDocumentHelloPdf.getMimeType(),
-                    testDocumentHelloPdf.getFileName()
-            );
+            try (Document clashingDocument = new DocumentBuilder()
+                    .withContent(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT))
+                    .withDocumentMimeType(testDocumentHelloPdf.getMimeType())
+                    .withDocumentName(testDocumentHelloPdf.getFileName())
+                    .build();
                  Envelope newEnvelope = packagingFactory.create(singletonList(clashingDocument), new ArrayList<Annotation>())
             ) {
                 envelope.add(newEnvelope.getSignatureContents().get(0));
@@ -174,11 +178,11 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                 .withVerificationPolicy(null)
                 .withIndexProviderFactory(new UuidIndexProviderFactory())
                 .build();
-        Document testDocument = new StreamDocument(
-                new ByteArrayInputStream(new byte[0]),
-                "some type",
-                filename
-        );
+        Document testDocument = new DocumentBuilder()
+                .withDocumentMimeType("some type")
+                .withDocumentName(filename)
+                .withContent(new ByteArrayInputStream(new byte[0]))
+                .build();
         try (Envelope ignored = packagingFactory.create(singletonList(testDocument), singletonList(stringEnvelopeAnnotation))) {
             //empty
         }

@@ -31,14 +31,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 
-import static com.guardtime.envelope.document.AbstractDocument.HASH_ALGORITHM;
+import static com.guardtime.envelope.packaging.Envelope.HASH_ALGORITHM;
 import static com.guardtime.envelope.util.Util.notNull;
 import static com.guardtime.ksi.util.Util.toByteArray;
 
 /**
  * Generic implementation for {@link Annotation} that is lacking {@link Annotation#getInputStream()} implementation.
  */
-public abstract class AbstractAnnotation implements Annotation {
+abstract class AbstractAnnotation implements Annotation {
     protected static final Logger logger = LoggerFactory.getLogger(Annotation.class);
 
     protected final String domain;
@@ -52,7 +52,7 @@ public abstract class AbstractAnnotation implements Annotation {
      *               entity controlling the Internet domain name z.y.x.
      * @param type annotation type, indicating the persistence of the annotation, see {@link EnvelopeAnnotationType} for details.
      */
-    public AbstractAnnotation(String domain, EnvelopeAnnotationType type) {
+    protected AbstractAnnotation(String domain, EnvelopeAnnotationType type) {
         notNull(domain, "Domain");
         notNull(type, "Annotation type");
         this.type = type;
@@ -140,4 +140,5 @@ public abstract class AbstractAnnotation implements Annotation {
         }
         return Objects.hash(getDomain(), getAnnotationType(), dataHash, getPath());
     }
+
 }
