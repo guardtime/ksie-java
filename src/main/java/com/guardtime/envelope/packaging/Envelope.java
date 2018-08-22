@@ -24,6 +24,7 @@ import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.document.SignedDocument;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
+import com.guardtime.envelope.packaging.parsing.ParsedEnvelopeBuilder;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.util.SortedList;
 import com.guardtime.envelope.util.Util;
@@ -53,7 +54,7 @@ public class Envelope implements AutoCloseable {
     }
 
     public Envelope(Collection<SignatureContent> contents, List<UnknownDocument> unknownFiles, ParsingStore store) {
-        Util.notNull(contents, "Signature contents");
+        Util.notEmpty(contents, "Signature contents");
         Util.notNull(unknownFiles, "Unknown files");
         this.signatureContents.addAll(contents);
         this.unknownFiles.addAll(unknownFiles);

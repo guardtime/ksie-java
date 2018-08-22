@@ -31,7 +31,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.util.Arrays;
+import java.util.Collections;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,10 +49,10 @@ public class EnvelopeVerifierTest extends AbstractEnvelopeTest {
 
     @Test
     public void testTerminatedTopLevelRuleStopsVerification() throws Exception {
-        Rule mockEnvelopeRuleFirst = Mockito.mock(Rule.class);
-        Rule mockEnvelopeRuleSecond = Mockito.mock(Rule.class);
-        Rule mockEnvelopeRuleThird = Mockito.mock(Rule.class);
-        VerificationPolicy mockPolicy = Mockito.mock(VerificationPolicy.class);
+        Rule mockEnvelopeRuleFirst = mock(Rule.class);
+        Rule mockEnvelopeRuleSecond = mock(Rule.class);
+        Rule mockEnvelopeRuleThird = mock(Rule.class);
+        VerificationPolicy mockPolicy = mock(VerificationPolicy.class);
         when(mockEnvelopeRuleSecond.verify(Mockito.any(ResultHolder.class), Mockito.any(Envelope.class)))
                 .thenThrow(RuleTerminatingException.class);
         when(mockPolicy.getSignatureContentRules()).thenReturn(Arrays.<Rule<SignatureContent>>asList(
@@ -60,7 +62,9 @@ public class EnvelopeVerifierTest extends AbstractEnvelopeTest {
         ));
 
         EnvelopeVerifier verifier = new EnvelopeVerifier(mockPolicy);
-        verifier.verify(Mockito.mock(Envelope.class));
+        Envelope mockEnvelope = mock(Envelope.class);
+        when(mockEnvelope.getSignatureContents()).thenReturn(Collections.singletonList(mock(SignatureContent.class)));
+        verifier.verify(mockEnvelope);
         verify(mockEnvelopeRuleThird, never()).verify(Mockito.any(ResultHolder.class), Mockito.any(Envelope.class));
     }
 
