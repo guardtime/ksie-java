@@ -21,7 +21,6 @@ package com.guardtime.envelope.packaging.zip;
 
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
-import com.guardtime.envelope.util.Util;
 
 import java.io.IOException;
 
@@ -36,7 +35,6 @@ public class ZipEnvelopePackagingFactoryBuilder extends EnvelopePackagingFactory
 
     @Override
     public EnvelopePackagingFactory build() throws IOException {
-        Util.notNull(parsingStore, "Parsing store");
         envelopeReader = new ZipEnvelopeReader(manifestFactory, signatureFactory, parsingStore);
         return super.build();
     }

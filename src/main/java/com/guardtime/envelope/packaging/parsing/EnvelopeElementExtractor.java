@@ -46,11 +46,11 @@ import static com.guardtime.envelope.packaging.EnvelopeWriter.MIME_TYPE_ENTRY_NA
 
 /**
  * Helper that manages different {@link ContentHandler} instances and parsed envelope contents.
- * Converts entries in ParsingStore to appropriate {@link com.guardtime.envelope.EnvelopeElement} by using different
- * {@link ContentHandler}s.
+ * Converts entries in {@link ParsingStoreSession} to appropriate {@link com.guardtime.envelope.EnvelopeElement} by using
+ * different {@link ContentHandler}s.
  */
 class EnvelopeElementExtractor {
-    private final ParsingStoreHandler parsingStoreHandler;
+    private final ParsingStoreSession parsingStoreSession;
     private final MimeTypeHandler mimeTypeHandler;
     private final ManifestHandler manifestHandler;
     private final DocumentsManifestHandler documentsManifestHandler;
@@ -59,19 +59,19 @@ class EnvelopeElementExtractor {
     private final SignatureHandler signatureHandler;
 
     EnvelopeElementExtractor(EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory,
-                             ParsingStoreHandler storeHandler) {
+                             ParsingStoreSession storeSession) {
         this.mimeTypeHandler = new MimeTypeHandler();
         this.manifestHandler = new ManifestHandler(manifestFactory);
         this.documentsManifestHandler = new DocumentsManifestHandler(manifestFactory);
         this.annotationsManifestHandler = new AnnotationsManifestHandler(manifestFactory);
         this.singleAnnotationManifestHandler = new SingleAnnotationManifestHandler(manifestFactory);
         this.signatureHandler = new SignatureHandler(signatureFactory);
-        this.parsingStoreHandler = storeHandler;
+        this.parsingStoreSession = storeSession;
     }
 
     public Set<String> getManifestUris() {
         Set<String> returnable = new HashSet<>();
-        for (String key : parsingStoreHandler.getStoredKeys()) {
+        for (String key : parsingStoreSession.getStoredKeys()) {
             if (manifestHandler.isSupported(key)) {
                 returnable.add(key);
             }
@@ -115,10 +115,10 @@ class EnvelopeElementExtractor {
     }
 
     public ParsingStoreReference getParsingStoreReference(String path) throws ContentParsingException {
-        if (!parsingStoreHandler.contains(path)) {
+        if (!parsingStoreSession.contains(path)) {
             throw new ContentParsingException("No content stored for entry '" + path + "'!");
         }
-        return parsingStoreHandler.get(path);
+        return parsingStoreSession.get(path);
     }
 
 }

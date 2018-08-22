@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 
-import static com.guardtime.envelope.packaging.Envelope.HASH_ALGORITHM;
+import static com.guardtime.envelope.manifest.Manifest.DEFAULT_HASH_ALGORITHM;
 import static com.guardtime.envelope.util.Util.notNull;
 import static com.guardtime.ksi.util.Util.toByteArray;
 
@@ -124,7 +124,7 @@ abstract class AbstractAnnotation implements Annotation {
             return getDomain().equals(that.getDomain()) &&
                     getAnnotationType().equals(that.getAnnotationType()) &&
                     getPath().equals(that.getPath()) &&
-                    getDataHash(HASH_ALGORITHM).equals(that.getDataHash(HASH_ALGORITHM));
+                    getDataHash(DEFAULT_HASH_ALGORITHM).equals(that.getDataHash(DEFAULT_HASH_ALGORITHM));
         } catch (DataHashException e) {
             throw new RuntimeException("Data hash calculation for equality check failed!", e);
         }
@@ -134,7 +134,7 @@ abstract class AbstractAnnotation implements Annotation {
     public int hashCode() {
         DataHash dataHash = null;
         try {
-            dataHash = getDataHash(HASH_ALGORITHM);
+            dataHash = getDataHash(DEFAULT_HASH_ALGORITHM);
         } catch (DataHashException e) {
             throw new RuntimeException("Object hash calculation failed!", e);
         }

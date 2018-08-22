@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * Represents document data that is to be used in an envelope.
  */
-public interface Document extends EnvelopeElement, AutoCloseable, Cloneable {
+public interface Document extends EnvelopeElement, AutoCloseable {
 
     String getFileName();
 

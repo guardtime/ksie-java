@@ -29,11 +29,12 @@ import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.InvalidManifestException;
 import com.guardtime.envelope.signature.SignatureFactoryType;
 import com.guardtime.envelope.util.Util;
-import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+
+import static com.guardtime.envelope.manifest.Manifest.DEFAULT_HASH_ALGORITHM;
 
 /**
  * Creates and parses manifests with TLV (Type Length Value) structure.
@@ -41,7 +42,6 @@ import java.util.Map;
 public class TlvEnvelopeManifestFactory implements
         EnvelopeManifestFactory<TlvManifest, TlvDocumentsManifest, TlvAnnotationsManifest, TlvSingleAnnotationManifest> {
 
-    private static final HashAlgorithm DEFAULT_HASH_ALGORITHM = HashAlgorithm.SHA2_256;
     protected static final TlvManifestFactoryType TLV_MANIFEST_FACTORY_TYPE = new TlvManifestFactoryType(
             "TLV manifest factory",
             "tlv"

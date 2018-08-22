@@ -21,12 +21,12 @@ package com.guardtime.envelope.packaging;
 
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.DocumentBuilder;
 import com.guardtime.envelope.document.SignedDocument;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.util.SortedList;
 import com.guardtime.envelope.util.Util;
-import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,8 +43,6 @@ import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifyUni
  */
 public class Envelope implements AutoCloseable {
 
-    public static final HashAlgorithm HASH_ALGORITHM = HashAlgorithm.SHA2_256;
-
     private List<SignatureContent> signatureContents = new SortedList<>();
     private boolean closed = false;
     private List<UnknownDocument> unknownFiles = new LinkedList<>();
@@ -60,11 +58,27 @@ public class Envelope implements AutoCloseable {
         this.unknownFiles.addAll(unknownFiles);
     }
 
-    protected Envelope(Envelope original) {
+    public Envelope(Envelope original) {
         this(
-                original.getSignatureContents(),
-                original.getUnknownFiles()
+                copySignatureContents(original.getSignatureContents()),
+                copyUnknownFiles(original.getUnknownFiles())
         );
+    }
+
+    private static List<UnknownDocument> copyUnknownFiles(List<UnknownDocument> originals) {
+        List<UnknownDocument> copies = new ArrayList<>();
+        for (UnknownDocument doc : originals) {
+            copies.add((UnknownDocument) new DocumentBuilder().withDocument(doc).build());
+        }
+        return copies;
+    }
+
+    private static List<SignatureContent> copySignatureContents(List<SignatureContent> originals) {
+        List<SignatureContent> copies = new ArrayList<>();
+        for (SignatureContent signatureContent : originals) {
+            copies.add(new SignatureContent(signatureContent));
+        }
+        return copies;
     }
 
     /**

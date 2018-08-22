@@ -165,9 +165,9 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     @Test
     public void testAddNewContentToMergedEnvelope1() throws Exception {
         try (Document document = new DocumentBuilder()
-                .withContent(new ByteArrayInputStream("".getBytes()))
                 .withDocumentMimeType("textDoc")
                 .withDocumentName("1-" + Long.toString(new Date().getTime()))
+                .withContent(new ByteArrayInputStream("".getBytes()))
                 .build();
              Envelope uuidEnvelope = packagingFactory.create(singletonList(document), singletonList(stringEnvelopeAnnotation));
              Envelope incEnvelope = getEnvelope(ENVELOPE_WITH_RANDOM_INCREMENTING_INDEXES);

@@ -21,6 +21,7 @@ package com.guardtime.envelope.manifest;
 
 import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.envelope.signature.EnvelopeSignature;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +32,8 @@ import java.io.InputStream;
  * envelope structure.
  */
 public interface Manifest extends EnvelopeElement {
+
+    HashAlgorithm DEFAULT_HASH_ALGORITHM = HashAlgorithm.SHA2_256;
 
     /**
      * @return InputStream containing this manifest.

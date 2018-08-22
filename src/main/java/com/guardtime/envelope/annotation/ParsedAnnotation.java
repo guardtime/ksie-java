@@ -33,7 +33,7 @@ import static com.guardtime.envelope.util.Util.notNull;
  */
 class ParsedAnnotation extends AbstractAnnotation {
 
-    private final ParsingStoreReference parsingStoreReference;
+    protected final ParsingStoreReference parsingStoreReference;
 
     /**
      * Creates {@link Annotation} with provided type and domain. The annotation value is provided via
@@ -55,7 +55,7 @@ class ParsedAnnotation extends AbstractAnnotation {
         InputStream inputStream = parsingStoreReference.get();
         if (inputStream == null) {
             throw new IOException(
-                    "Failed to acquire input stream from parsing store for key '" + parsingStoreReference.getName() + "'"
+                    "Failed to acquire input stream from parsing store for key '" + parsingStoreReference.getUuid() + "'"
             );
         }
         return inputStream;

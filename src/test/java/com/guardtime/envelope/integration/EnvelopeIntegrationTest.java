@@ -14,7 +14,10 @@ import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
+import com.guardtime.envelope.packaging.parsing.store.ActiveParsingStoreProvider;
 import com.guardtime.envelope.packaging.parsing.store.MemoryBasedParsingStore;
+import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
+import com.guardtime.envelope.packaging.parsing.store.TemporaryFileBasedParsingStore;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
 import com.guardtime.envelope.signature.SignatureException;
@@ -38,6 +41,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static java.util.Collections.singletonList;
@@ -334,6 +338,63 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
                 Assert.assertEquals(2, parsedEnvelope.getSignatureContents().size());
             }
         }
+    }
+
+    @Test
+    public void testDeepCopyEnvelopeClosingOriginalDoesNotCloseCopy() throws Exception {
+        Envelope copy = null;
+        try (Envelope original = getEnvelope()) {
+            // create copy
+            copy = new Envelope(original);
+        }
+        EnvelopeWriter writer = new ZipEnvelopeWriter();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        writer.write(copy, bos);
+        copy.close();
+
+        try (Envelope parsedEnvelope = packagingFactory.read(new ByteArrayInputStream(bos.toByteArray()))) {
+            Assert.assertEquals(1, parsedEnvelope.getSignatureContents().size());
+        }
+    }
+
+    @Test
+    public void testDeepCopyEnvelopeClosingOriginalAndCopyClearsParseStore() throws Exception {
+        ParsingStore activeStore = ActiveParsingStoreProvider.getActiveParsingStore();
+        ActiveParsingStoreProvider.setActiveParsingStore(TemporaryFileBasedParsingStore.getInstance());
+        int tempFileCount = getKsieTempFiles().size();
+        Envelope copy = null;
+        try (Envelope original = getEnvelope()) {
+            copy = new Envelope(original);
+        }
+
+        Assert.assertTrue(tempFileCount < getKsieTempFiles().size());
+
+        copy.close();
+
+        Assert.assertEquals(tempFileCount, getKsieTempFiles().size());
+        ActiveParsingStoreProvider.setActiveParsingStore(activeStore);
+    }
+
+    @Test
+    public void testDeepCopyEnvelopesAreEqual() throws Exception {
+        // Testing equality with what they would be written to disk as to negate any locally implemented equals() bugs
+        Envelope copy = null;
+        EnvelopeWriter writer = new ZipEnvelopeWriter();
+        byte[] originalContent = null;
+        try (Envelope original = getEnvelope();
+             ByteArrayOutputStream bos = new ByteArrayOutputStream()
+         ) {
+            writer.write(original, bos);
+            originalContent = bos.toByteArray();
+            copy = new Envelope(original);
+
+        }
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        writer.write(copy, bos);
+        copy.close();
+        byte[] copyContent = bos.toByteArray();
+
+        Assert.assertTrue(Arrays.equals(originalContent, copyContent));
     }
 
     private void addContentAndVerify(Envelope envelope, EnvelopeElement element) throws Exception {

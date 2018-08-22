@@ -37,7 +37,7 @@ import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.packaging.parsing.EnvelopeReader;
-import com.guardtime.envelope.packaging.parsing.store.MemoryBasedParsingStore;
+import com.guardtime.envelope.packaging.parsing.store.ActiveParsingStoreProvider;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.signature.SignatureException;
@@ -368,7 +368,7 @@ public final class EnvelopePackagingFactory {
         protected SignatureFactory signatureFactory;
         protected EnvelopeManifestFactory manifestFactory = new TlvEnvelopeManifestFactory();
         protected IndexProviderFactory indexProviderFactory = new IncrementingIndexProviderFactory();
-        protected ParsingStore parsingStore = MemoryBasedParsingStore.getInstance();
+        protected ParsingStore parsingStore = ActiveParsingStoreProvider.getActiveParsingStore();
         protected EnvelopeReader envelopeReader;
         protected VerificationPolicy verificationPolicy = new InternalVerificationPolicy();
 

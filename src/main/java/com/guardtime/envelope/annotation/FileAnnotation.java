@@ -31,7 +31,7 @@ import java.io.InputStream;
  */
 class FileAnnotation extends AbstractAnnotation {
 
-    private final File file;
+    protected final File file;
 
     /**
      * Creates annotation of given type, specific file as a data source.

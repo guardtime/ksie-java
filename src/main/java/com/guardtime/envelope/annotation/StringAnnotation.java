@@ -30,7 +30,7 @@ import static com.guardtime.envelope.util.Util.notNull;
  */
 class StringAnnotation extends AbstractAnnotation {
 
-    private final String content;
+    protected final String content;
 
     /**
      * Creates {@link Annotation} with provided type, domain and given {@link String} as value.

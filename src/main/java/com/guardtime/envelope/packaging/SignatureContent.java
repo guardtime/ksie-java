@@ -45,7 +45,7 @@ import java.util.Map;
  * Structure that groups together all envelope internal structure elements (manifests), documents, annotations and
  * signatures that are directly connected to the signature.
  */
-public class SignatureContent implements AutoCloseable, Comparable<SignatureContent>, Cloneable {
+public class SignatureContent implements AutoCloseable, Comparable<SignatureContent> {
 
     private final Map<String, Document> documents;
     private final DocumentsManifest documentsManifest;
@@ -63,6 +63,10 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
         this.annotationsManifest = builder.annotationsManifest;
         this.manifest = builder.manifest;
         this.signature = builder.signature;
+    }
+
+    public SignatureContent(SignatureContent signatureContent) {
+        this(new Builder().withSignatureContent(signatureContent));
     }
 
     private List<Annotation> copyAnnotations(Collection<Annotation> annotations) {
@@ -178,14 +182,14 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
         );
         try (InputStream inputStream = removed.getInputStream()) {
             Document detached = new DocumentBuilder()
-                    .withContent(inputStream)
                     .withDocumentMimeType(removed.getMimeType())
                     .withDocumentName(removed.getFileName())
+                    .withContent(inputStream)
                     .build();
             removed.close();
             return detached;
         } catch (Exception e) {
-            throw new ParsingStoreException("Failed to detach document data from envelope data store.", e);
+            throw new ParsingStoreException("Failed to detach document data from data store.", e);
         }
     }
 
@@ -304,16 +308,16 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
             return this;
         }
 
-        public Builder withSignatureContent(SignatureContent original) {
+        protected Builder withSignatureContent(SignatureContent original) {
           return withDocuments(original.copyDocuments(original.getDocuments().values()))
                   .withAnnotations(original.copyAnnotations(original.getAnnotations().values()))
-                  // No copy needed for manifests and signature,
+                  .withSignature(original.getEnvelopeSignature().getCopy())
+                  // No copy needed for manifests,
                   // can use the same object as they never change during program lifetime.
                   .withSingleAnnotationManifests(new ArrayList<>(original.getSingleAnnotationManifests().values()))
                   .withDocumentsManifest(original.getDocumentsManifest())
                   .withAnnotationsManifest(original.getAnnotationsManifest())
-                  .withManifest(original.getManifest())
-                  .withSignature(original.getEnvelopeSignature());
+                  .withManifest(original.getManifest());
         }
 
         public SignatureContent build() {

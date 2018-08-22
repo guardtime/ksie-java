@@ -48,30 +48,30 @@ public final class TemporaryFileBasedParsingStore extends ParsingStore {
     private final Map<UUID, File> store = new HashMap<>();
     private Path tempDir;
 
-    private TemporaryFileBasedParsingStore() throws IOException {
-        createTempDir();
+    private TemporaryFileBasedParsingStore() {
+        // private!
     }
 
     public static ParsingStore getInstance() {
         if (instance == null) {
-            try {
-                instance = new TemporaryFileBasedParsingStore();
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to create TemporaryFileBasedParsingStore instance!");
-            }
+            instance = new TemporaryFileBasedParsingStore();
         }
         return instance;
     }
 
+    public static boolean isInstanciated() {
+        return instance != null;
+    }
+
     @Override
-    public ParsingStoreReference store(String name, InputStream stream) throws ParsingStoreException {
+    public ParsingStoreReference store(InputStream stream) throws ParsingStoreException {
         try {
             createTempDir();
             File tmpFile = Util.createTempFile(tempDir);
             Util.copyToTempFile(stream, tmpFile);
             UUID uuid = UUID.randomUUID();
             store.put(uuid, tmpFile);
-            return addNewReference(uuid, name);
+            return addNewReference(uuid);
         } catch (IOException e) {
             throw new ParsingStoreException("Failed to store stream!", e);
         }

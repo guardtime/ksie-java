@@ -144,9 +144,9 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
         )) {
             assertEquals(1, envelope.getSignatureContents().size());
             try (Document clashingDocument = new DocumentBuilder()
-                    .withContent(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT))
                     .withDocumentMimeType(testDocumentHelloPdf.getMimeType())
                     .withDocumentName(testDocumentHelloPdf.getFileName())
+                    .withContent(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT))
                     .build();
                  Envelope newEnvelope = packagingFactory.create(singletonList(clashingDocument), new ArrayList<Annotation>())
             ) {

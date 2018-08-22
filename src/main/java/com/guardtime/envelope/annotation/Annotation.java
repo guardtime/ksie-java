@@ -38,7 +38,7 @@ import java.io.InputStream;
  * removable, partly removable, non-removable.
  * </p>
  */
-public interface Annotation extends AutoCloseable, EnvelopeElement, Cloneable {
+public interface Annotation extends AutoCloseable, EnvelopeElement {
 
     /**
      * @return Type of annotation as represented by {@link EnvelopeAnnotationType} ENUM.

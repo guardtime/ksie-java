@@ -53,7 +53,7 @@ class ParsedDocument extends AbstractDocument implements UnknownDocument {
         InputStream inputStream = parsingStoreReference.get();
         if (inputStream == null) {
             throw new IOException(
-                    "Failed to acquire input stream from parsing store for key '" + parsingStoreReference.getName() + "'"
+                    "Failed to acquire input stream from parsing store for key '" + parsingStoreReference.getUuid() + "'"
             );
         }
         return inputStream;

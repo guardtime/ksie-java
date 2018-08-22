@@ -77,15 +77,15 @@ public abstract class EnvelopeReader {
      */
     public Envelope read(InputStream input) throws IOException, InvalidEnvelopeException {
         EnvelopeReadingException readingException = new EnvelopeReadingException("Reading envelope encountered errors!");
-        ParsingStoreHandler parsingStoreHandler = new ParsingStoreHandler(parsingStore);
-        parseInputStream(input, parsingStoreHandler, readingException);
+        ParsingStoreSession parsingStoreSession = new ParsingStoreSession(parsingStore);
+        parseInputStream(input, parsingStoreSession, readingException);
         EnvelopeElementExtractor envelopeElementExtractor =
-                new EnvelopeElementExtractor(manifestFactory, signatureFactory, parsingStoreHandler);
+                new EnvelopeElementExtractor(manifestFactory, signatureFactory, parsingStoreSession);
 
-        List<SignatureContent> contents = buildSignatures(envelopeElementExtractor, readingException, parsingStoreHandler);
+        List<SignatureContent> contents = buildSignatures(envelopeElementExtractor, readingException, parsingStoreSession);
         validateMimeType(envelopeElementExtractor);
-        List<UnknownDocument> unknownFiles = parsingStoreHandler.getUnrequestedFiles();
-        parsingStoreHandler.clear();
+        List<UnknownDocument> unknownFiles = parsingStoreSession.getUnrequestedFiles();
+        parsingStoreSession.clear();
         Envelope envelope = new Envelope(contents, unknownFiles);
         readingException.setEnvelope(envelope);
 
@@ -102,11 +102,11 @@ public abstract class EnvelopeReader {
     /**
      * Processes input stream containing envelope and stores each entry in envelope to parsing store.
      * @param input            {@link InputStream} containing {@link Envelope}.
-     * @param storeHandler     stores all parsed entries. Implementation must add each entry to store (key, stream) method.
+     * @param storeSession     stores all parsed entries. Implementation must add each entry to store (key, stream) method.
      * @param readingException holds all expectable exceptions if any occurs.
      * @throws IOException     when error occurs during accessing of InputStream.
      */
-    protected abstract void parseInputStream(InputStream input, ParsingStoreHandler storeHandler,
+    protected abstract void parseInputStream(InputStream input, ParsingStoreSession storeSession,
                                              EnvelopeReadingException readingException)
             throws IOException;
 
@@ -153,14 +153,14 @@ public abstract class EnvelopeReader {
 
     private List<SignatureContent> buildSignatures(EnvelopeElementExtractor envelopeElementExtractor,
                                                    EnvelopeReadingException readingException,
-                                                   ParsingStoreHandler parsingStoreHandler) {
+                                                   ParsingStoreSession parsingStoreSession) {
         Set<String> parsedManifestUriSet = envelopeElementExtractor.getManifestUris();
         SignatureContentComposer signatureContentComposer = new SignatureContentComposer(envelopeElementExtractor);
         List<SignatureContent> signatures = new LinkedList<>();
         for (String manifestUri : parsedManifestUriSet) {
             try {
                 Pair<SignatureContent, List<Throwable>> signatureContentVectorPair =
-                        signatureContentComposer.compose(manifestUri, parsingStoreHandler);
+                        signatureContentComposer.compose(manifestUri, parsingStoreSession);
                 signatures.add(signatureContentVectorPair.getLeft());
                 readingException.addExceptions(signatureContentVectorPair.getRight());
             } catch (ContentParsingException e) {

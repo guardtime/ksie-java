@@ -77,6 +77,15 @@ class PostponedSignature<T> implements EnvelopeSignature<T> {
     }
 
     @Override
+    public EnvelopeSignature<T> getCopy() {
+        PostponedSignature<T> postponedSignature = new PostponedSignature<>(dataHash);
+        if (postponedSignature.internalSignature != null) {
+            postponedSignature.internalSignature = internalSignature.getCopy();
+        }
+        return postponedSignature;
+    }
+
+    @Override
     public int compareTo(EnvelopeSignature<T> o) {
         if (internalSignature != null) {
             return internalSignature.compareTo(o);

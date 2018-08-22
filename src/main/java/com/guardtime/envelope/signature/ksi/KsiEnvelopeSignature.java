@@ -56,6 +56,11 @@ class KsiEnvelopeSignature implements EnvelopeSignature<KSISignature> {
     }
 
     @Override
+    public EnvelopeSignature<KSISignature> getCopy() {
+        return new KsiEnvelopeSignature(signature);
+    }
+
+    @Override
     public void writeTo(OutputStream output) throws IOException {
         try {
             signature.writeTo(output);

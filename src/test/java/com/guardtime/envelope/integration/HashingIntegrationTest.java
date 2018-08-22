@@ -66,9 +66,9 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
             .withAnnotationType(EnvelopeAnnotationType.FULLY_REMOVABLE)
             .build();
     private final Document envelopeDocument = new DocumentBuilder()
-            .withContent(new ByteArrayInputStream(INPUT_STREAM_STRING.getBytes(StandardCharsets.UTF_8)))
             .withDocumentMimeType(ENVELOPE_DOCUMENT_MIME_TYPE)
             .withDocumentName(ENVELOPE_DOCUMENT_FILE_NAME)
+            .withContent(new ByteArrayInputStream(INPUT_STREAM_STRING.getBytes(StandardCharsets.UTF_8)))
             .build();
     private Envelope envelope;
 

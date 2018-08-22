@@ -36,17 +36,16 @@ public abstract class ParsingStore {
     private Map<UUID, List<ParsingStoreReference>> references = new HashMap<>();
 
     /**
-     * @param key the key to use to store the data read from the stream.
      * @param stream the {@link InputStream} from which the data will be stored.
      *
      * @throws ParsingStoreException when reading the stream fails.
      */
-    public abstract ParsingStoreReference store(String key, InputStream stream) throws ParsingStoreException;
+    public abstract ParsingStoreReference store(InputStream stream) throws ParsingStoreException;
 
     public abstract InputStream get(UUID uuid);
 
-    ParsingStoreReference addNewReference(UUID uuid, String name) {
-        ParsingStoreReference ref = new ParsingStoreReference(uuid, name, this);
+    ParsingStoreReference addNewReference(UUID uuid) {
+        ParsingStoreReference ref = new ParsingStoreReference(uuid, this);
         updateReferences(uuid, ref);
         return ref;
     }
@@ -75,4 +74,5 @@ public abstract class ParsingStore {
     }
 
     protected abstract void clearStore(UUID uuid);
+
 }

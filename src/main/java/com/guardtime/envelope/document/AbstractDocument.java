@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.guardtime.envelope.packaging.Envelope.HASH_ALGORITHM;
+import static com.guardtime.envelope.manifest.Manifest.DEFAULT_HASH_ALGORITHM;
 import static com.guardtime.envelope.util.Util.notNull;
 
 
@@ -135,7 +135,7 @@ abstract class AbstractDocument implements Document {
     public int hashCode() {
         int result;
         try {
-            result = getDataHash(HASH_ALGORITHM).hashCode();
+            result = getDataHash(DEFAULT_HASH_ALGORITHM).hashCode();
         } catch (DataHashException e) {
             result = 0;
         }

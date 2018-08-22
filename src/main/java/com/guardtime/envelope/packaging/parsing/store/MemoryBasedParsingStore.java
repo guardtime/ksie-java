@@ -31,7 +31,7 @@ import java.util.UUID;
 /**
  * Keeps parsed data in memory.
  * <p>
- * NB! There is no defence against too large data. Use with care!
+ * NB! There is no protection against large data. Use with care!
  * </p>
  */
 public final class MemoryBasedParsingStore extends ParsingStore {
@@ -51,12 +51,16 @@ public final class MemoryBasedParsingStore extends ParsingStore {
         return instance;
     }
 
+    public static boolean isInstanciated() {
+        return instance != null;
+    }
+
     @Override
-    public ParsingStoreReference store(String name, InputStream stream) throws ParsingStoreException {
+    public ParsingStoreReference store(InputStream stream) throws ParsingStoreException {
         try {
             UUID uuid = UUID.randomUUID();
             store.put(uuid, Util.toByteArray(stream));
-            return addNewReference(uuid, name);
+            return addNewReference(uuid);
         } catch (IOException e) {
             throw new ParsingStoreException("Failed to access data in stream!", e);
         }

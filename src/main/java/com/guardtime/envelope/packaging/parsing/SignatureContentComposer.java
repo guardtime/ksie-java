@@ -52,9 +52,9 @@ class SignatureContentComposer {
         this.handler = envelopeElementExtractor;
     }
 
-    public Pair<SignatureContent, List<Throwable>> compose(String manifestPath, ParsingStoreHandler parsingStoreHandler)
+    public Pair<SignatureContent, List<Throwable>> compose(String manifestPath, ParsingStoreSession parsingStoreSession)
             throws ContentParsingException {
-        SignatureContentGroup group = new SignatureContentGroup(manifestPath, parsingStoreHandler);
+        SignatureContentGroup group = new SignatureContentGroup(manifestPath, parsingStoreSession);
         SignatureContent signatureContent = new SignatureContent.Builder()
                 .withManifest(group.manifest)
                 .withDocumentsManifest(group.documentsManifest)
@@ -78,11 +78,11 @@ class SignatureContentComposer {
         private List<Annotation> annotations = new LinkedList<>();
         private List<Document> documents = new LinkedList<>();
         private EnvelopeSignature signature;
-        private ParsingStoreHandler parsingStoreHandler;
+        private ParsingStoreSession parsingStoreSession;
 
 
-        SignatureContentGroup(String manifestPath, ParsingStoreHandler storeHandler) throws ContentParsingException {
-            this.parsingStoreHandler = storeHandler;
+        SignatureContentGroup(String manifestPath, ParsingStoreSession storeSession) throws ContentParsingException {
+            this.parsingStoreSession = storeSession;
             this.manifest = getManifest(manifestPath);
             this.documentsManifest = getDocumentsManifest();
             this.annotationsManifest = getAnnotationsManifest();
@@ -187,11 +187,11 @@ class SignatureContentComposer {
             String uri = annotationDataReference.getUri();
             try {
                 Annotation annotation = new AnnotationBuilder()
-                        .withParsingStoreReference(parsingStoreHandler.get(uri))
+                        .withParsingStoreReference(parsingStoreSession.get(uri))
                         .withDomain(annotationDataReference.getDomain())
                         .withAnnotationType(type)
+                        .withPath(uri)
                         .build();
-                annotation.setPath(uri);
                 return annotation;
             } catch (NullPointerException | IllegalStateException e) {
                 logger.debug("Failed to extract Annotation for '{}'.", uri, e);

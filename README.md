@@ -20,12 +20,12 @@ In order to get the latest version of KSIE Java SDK, download the source and bui
 
 The API full reference is available at: [http://guardtime.github.io/ksie-java/](http://guardtime.github.io/ksie-java/).
 
-For many activities you need to have previously composed the `EnvelopePackagingFactory` which requires the `SignatureFactory`.
+For many activities you need to have previously composed the `EnvelopePackagingFactory` which requires a `SignatureFactory` and an `EnvelopeReader`.
 
 Optionally other specifiers can be set:
 * `EnvelopeManifestFactory` can be provided if the standard TLV based manifest factory is not desired.
 * `IndexProviderFactory` can be provided to indicate what signature index string should be used.
-* `ParsingStoreFactory` can be provided to indicate where parsed envelope data will be stored during runtime.
+* `ParsingStore` can be provided to indicate where parsed envelope data will be stored during runtime.
 
 Following is the example of creating a packaging factory for ZIP based envelopes with TLV manifest structures and KSI based signatures, which will be the basis for the rest of the code examples:
 
@@ -53,15 +53,15 @@ Envelope signedEnvelope = builder.build();
 Or you can use the `EnvelopePackagingFactory` directly as shown below:
 
 ```java
-List<EnvelopeDocument> documents;
-List<EnvelopeAnnotation> annotations;  // Can be empty list
+List<Document> documents;
+List<Annotation> annotations;  // Can be empty list
 /* initialize and fill documents and annotations lists
 ...
 */
 Envelope signedEnvelope = packagingFactory.create(documents, annotations);
 ```
 
-It is important to note that each time a KSI envelope is created, its content is also signed. Thus you always get a signed envelope from both, the `EnvelopeBuilder` and the `EnvelopePackagingFactory`.
+It is important to note that by default each time a KSI envelope is created, its content is also signed. Thus you always get a signed envelope from both, the `EnvelopeBuilder` and the `EnvelopePackagingFactory`. This behaviour can be altered by using a different `SignatureFactory`. For example by using the `PostponedSignatureFactory`.
 
 When trying to parse an existing envelope only the `packagingFactory` can be used as shown below:
 
@@ -74,17 +74,19 @@ It is suggested to always verify the parsed envelope before adding new documents
 
 ### Writing an Envelope
 
-In order to write an envelope to some storage medium an EnvelopeWriter is needed.
-From existing implementations ZipEnvelopeWriter can be used from com.guardtime.envelope.packaging.zip package.
+In order to write an envelope to some storage medium an `EnvelopeWriter` is needed.
+From existing implementations `ZipEnvelopeWriter` can be used from `com.guardtime.envelope.packaging.zip` package.
 
+```java
 OutputStream outputStream = new FileOutputStream("path/to/store/envelope.extension");
 EnvelopeWriter writer = new ZipEnvelopeWriter();
 writer.write(envelope, outputStream);
+```
 
 
 ### Adding New Documents or Annotations to the Existing Envelope
 
-Both, the `EnvelopeBuilder` and `EnvelopePackagingFactory` allow for adding new documents and annotations to an existing envelope. The existing envelope's content will be copied to a new envelope and that will be expanded with the new documents/annotation and a signature covering them.
+Both, the `EnvelopeBuilder` and `EnvelopePackagingFactory` allow for adding new documents and annotations to an existing envelope. The existing envelope's content will be expanded with the new documents/annotation and a signature covering them.
 
 With `EnvelopeBuilder`:
 
@@ -99,8 +101,8 @@ Envelope signedEnvelope = builder.build();
 With `EnvelopePackagingFactory`:
 
 ```java
-List<EnvelopeDocument> documents;
-List<EnvelopeAnnotation> annotations;  // Can be empty list
+List<Document> documents;
+List<Annotation> annotations;  // Can be empty list
 /* initialize and fill documents and annotations lists
 ...
 */
@@ -118,10 +120,12 @@ The following example shows extending of all signatures in an envelope.
 Extender extender;
 /* Initialize KSI Extender
 ...
+com.guardtime.ksi.Extender extender
+...
 */
 ExtendingPolicy extendingPolicy = new KsiEnvelopeSignatureExtendingPolicy(extender)
 EnvelopeSignatureExtender signatureExtender = new EnvelopeSignatureExtender(signatureFactory, extendingPolicy)
-ExtendedEnvelope extendedEnvelope = signatureExtender.extend(Envelope);
+ExtendedEnvelope extendedEnvelope = signatureExtender.extend(envelope);
 extendedEnvelope.isExtended();
 extendedEnvelope.getExtendedSignatureContents().get(0).isExtended();
 
@@ -161,9 +165,9 @@ for(RuleVerificationResult ruleResult : result.getResults()) {
 
 ### Closing the Envelope
 
-`Envelope`, `EnvelopeDocument` and `EnvelopeAnnotation` are derived from `AutoCloseable` since they may hold resources which need to be closed once they are no longer needed. Therefore calling `close()` is highly recommended to avoid any data leaks.
+`Envelope`, `SignatureContent`, `Document` and `Annotation` are derived from `AutoCloseable` since they may hold resources which need to be closed once they are no longer needed. Therefore calling `close()` is highly recommended to avoid any data leaks.
 
-Calling `close()` on a Envelope will also close all `EnvelopeDocument` and `EnvelopeAnnotation` that it has references to.
+Calling `close()` on an `Envelope` will also close all `SignatureContent`, `Document` and `Annotation` that it has references to.
 
 
 ## Compiling the Code
@@ -175,7 +179,7 @@ The project can be built via the command line by executing the following maven c
 mvn clean install
 ```
 
-This command Maven to build and install the project in the local repository. Also all integration and unit tests will run.
+This command instructs Maven to build and install the project in the local repository. Also all integration and unit tests will be run.
 
 In order to run the integration tests successfully you need to have access to KSI
 service, the simplest is to request a trial account here [https://guardtime.com/blockchain-developers](https://guardtime.com/blockchain-developers).

@@ -91,9 +91,9 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
     public void testAddDocumentToEnvelope() throws Exception {
         EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
         try (Document document = new DocumentBuilder()
-                .withContent(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT))
                 .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
                 .withDocumentName(TEST_FILE_NAME_TEST_TXT)
+                .withContent(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT))
                 .build()
         ) {
             builder.withDocument(document);
