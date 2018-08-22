@@ -141,9 +141,10 @@ public final class EnvelopePackagingFactory {
 
     /**
      * Creates a {@link SignatureContent} that contains the new set of
-     * documents, annotations and a signature for the added elements and adds it to the existing Envelope.
+     * documents, annotations and a signature for the added elements and adds it to the {@link SignatureContent} copied from
+     * existing {@link Envelope} before composing the new {@link Envelope}.
      *
-     * @param existingEnvelope    an instance of {@link Envelope} which already has {@link EnvelopeSignature}(s).
+     * @param existingEnvelope     an instance of {@link Envelope} which already has {@link EnvelopeSignature}(s).
      * @param files                list of {@link Document} to be added and signed; can NOT be null.
      * @param annotations          list of {@link Annotation} to be added and signed; can be null.
      *
@@ -151,13 +152,27 @@ public final class EnvelopePackagingFactory {
      * @throws EnvelopeMergingException when there are issues adding the newly created {@link SignatureContent} to
      * existingEnvelope.
      * @throws SignatureException when acquiring root signature from signing service fails.
+     *
+     * @return A new instance of {@link Envelope} that contains copied content of existingEnvelope and the newly signed
+     * {@link SignatureContent}.
      */
-    public void addSignature(Envelope existingEnvelope, List<Document> files, List<Annotation> annotations)
+    public Envelope addSignature(Envelope existingEnvelope, List<Document> files, List<Annotation> annotations)
             throws InvalidEnvelopeException, EnvelopeMergingException, SignatureException {
         Util.notNull(existingEnvelope, "Envelope");
-        SignatureContent signatureContent = verifyAndSign(files, annotations, existingEnvelope);
-        existingEnvelope.add(signatureContent);
-        verifyEnvelope(existingEnvelope);
+        Envelope copy = new Envelope(existingEnvelope);
+        try {
+            SignatureContent signatureContent = verifyAndSign(files, annotations, copy);
+            copy.add(signatureContent);
+            verifyEnvelope(copy);
+            return copy;
+        } catch (Exception e) {
+            try {
+                copy.close();
+            } catch (Exception e1) {
+                throw new RuntimeException("Copied envelope failed to close gracefully!", e1);
+            }
+            throw e;
+        }
     }
 
     private SignatureContent verifyAndSign(List<Document> documentList, List<Annotation> annotations,

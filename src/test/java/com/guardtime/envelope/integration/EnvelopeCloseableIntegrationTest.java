@@ -97,7 +97,7 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
 
     @Test
     public void testDeleteAllTempFilesFromExistingEnvelope() throws Exception {
-        Envelope existingEnvelope = getEnvelope(ENVELOPE_WITH_MULTIPLE_SIGNATURES);
+        Envelope existingEnvelope = getEnvelopeWithTemporaryFileParsingStore(ENVELOPE_WITH_MULTIPLE_SIGNATURES);
         List<File> ksieTempFiles = getKsieTempFiles();
         try (
                 Document document = new DocumentBuilder()
@@ -109,9 +109,13 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
                         .withContent("content")
                         .withDomain("domain.com")
                         .withAnnotationType(EnvelopeAnnotationType.FULLY_REMOVABLE)
-                    .build()
+                    .build();
+                Envelope second = packagingFactory.addSignature(
+                        existingEnvelope,
+                        singletonList(document),
+                        singletonList(annotation)
+                )
         ) {
-            packagingFactory.addSignature(existingEnvelope, singletonList(document), singletonList(annotation));
             for (File doc : ksieTempFiles) {
                 Util.deleteFileOrDirectory(doc.toPath());
             }
@@ -136,9 +140,13 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
                         .withContent("content")
                         .withDomain("domain.com")
                         .withAnnotationType(EnvelopeAnnotationType.FULLY_REMOVABLE)
-                        .build()
+                        .build();
+                Envelope second = packagingFactory.addSignature(
+                        existingEnvelope,
+                        singletonList(document),
+                        singletonList(annotation)
+                )
         ) {
-            packagingFactory.addSignature(existingEnvelope, singletonList(document), singletonList(annotation));
             for (File doc : getKsieTempFiles()) {
                 if (isTempFile(doc) && !ksieTempFiles.contains(doc)) {
                     Util.deleteFileOrDirectory(doc.toPath());
@@ -207,7 +215,9 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
                     out.write("This is new content for temp file.");
                 }
             }
-            packagingFactory.addSignature(envelope, singletonList(document), singletonList(annotation));
+            try (Envelope second = packagingFactory.addSignature(envelope, singletonList(document), singletonList(annotation))) {
+
+            }
         }
     }
 

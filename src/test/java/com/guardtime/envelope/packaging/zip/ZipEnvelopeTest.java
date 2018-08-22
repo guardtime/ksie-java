@@ -96,11 +96,15 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                             .withDocumentMimeType("text/plain")
                             .withDocumentName("someTestFile.txt")
                             .withContent(input)
-                            .build()
+                            .build();
+                    Envelope second = packagingFactory.addSignature(
+                            newEnvelope,
+                            singletonList(document),
+                            new ArrayList<Annotation>()
+                    )
             ) {
-                packagingFactory.addSignature(newEnvelope, singletonList(document), new ArrayList<Annotation>());
-                int expected = newEnvelope.getSignatureContents().size() + 1;
-                envelope.addAll(newEnvelope.getSignatureContents());
+                int expected = second.getSignatureContents().size() + 1;
+                envelope.addAll(second.getSignatureContents());
                 assertEquals(expected, envelope.getSignatureContents().size());
             }
         }

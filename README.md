@@ -86,7 +86,7 @@ writer.write(envelope, outputStream);
 
 ### Adding New Documents or Annotations to the Existing Envelope
 
-Both, the `EnvelopeBuilder` and `EnvelopePackagingFactory` allow for adding new documents and annotations to an existing envelope. The existing envelope's content will be expanded with the new documents/annotation and a signature covering them.
+Both, the `EnvelopeBuilder` and `EnvelopePackagingFactory` allow for adding new documents and annotations to an existing envelope. The existing envelope's content will be copied to a new envelope and that will be expanded with the new documents/annotation and a signature covering them.
 
 With `EnvelopeBuilder`:
 
@@ -106,7 +106,7 @@ List<Annotation> annotations;  // Can be empty list
 /* initialize and fill documents and annotations lists
 ...
 */
-packagingFactory.addSignature(parsedEnvelope, documents, annotations);
+Envelope expandedEnvelope = packagingFactory.addSignature(parsedEnvelope, documents, annotations);
 ```
 
 

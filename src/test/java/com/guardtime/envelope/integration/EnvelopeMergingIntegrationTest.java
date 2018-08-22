@@ -178,8 +178,13 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
                      .build()
              ) {
             uuidEnvelope.addAll(incEnvelope.getSignatureContents());
-            packagingFactory.addSignature(uuidEnvelope, singletonList(document2), singletonList(stringEnvelopeAnnotation));
-            assertEquals(uuidEnvelope.getSignatureContents().size(), 4);
+            try (Envelope second = packagingFactory.addSignature(
+                    uuidEnvelope,
+                    singletonList(document2),
+                    singletonList(stringEnvelopeAnnotation)
+            )) {
+                assertEquals(second.getSignatureContents().size(), 4);
+            }
         }
     }
 
@@ -215,8 +220,13 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
              .build()
              ) {
             incEnvelope.addAll(uuidEnvelope.getSignatureContents());
-            incPackagingFactory.addSignature(incEnvelope, singletonList(document), singletonList(stringEnvelopeAnnotation));
-            assertEquals(incEnvelope.getSignatureContents().size(), 3);
+            try (Envelope second = incPackagingFactory.addSignature(
+                    incEnvelope,
+                    singletonList(document),
+                    singletonList(stringEnvelopeAnnotation)
+            )) {
+                assertEquals(second.getSignatureContents().size(), 3);
+            }
         }
     }
 
@@ -357,8 +367,13 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
              Envelope second = getEnvelope(ENVELOPE_WITH_ONE_DOCUMENT)) {
 
             first.addAll(second.getSignatureContents());
-            packagingFactory.addSignature(second, singletonList(testDocumentHelloPdf), singletonList(stringEnvelopeAnnotation));
-            Assert.assertEquals(2, second.getSignatureContents().size());
+            try (Envelope third = packagingFactory.addSignature(
+                    second,
+                    singletonList(testDocumentHelloPdf),
+                    singletonList(stringEnvelopeAnnotation)
+            )) {
+                Assert.assertEquals(2, third.getSignatureContents().size());
+            }
         }
     }
 

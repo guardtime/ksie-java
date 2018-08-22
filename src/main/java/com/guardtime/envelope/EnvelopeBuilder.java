@@ -145,8 +145,7 @@ public class EnvelopeBuilder {
         if (existingEnvelope == null) {
             envelope = packagingFactory.create(documents, annotations);
         } else {
-            packagingFactory.addSignature(existingEnvelope, documents, annotations);
-            envelope = existingEnvelope;
+            envelope = packagingFactory.addSignature(existingEnvelope, documents, annotations);
         }
         documents.clear();
         annotations.clear();

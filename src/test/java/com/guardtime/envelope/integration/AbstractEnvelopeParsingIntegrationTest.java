@@ -166,14 +166,14 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                                 "application/txt"
                         )
                         .build()
-            ) {
-                envelopeWriter.write(envelope, bos);
+        ) {
+            envelopeWriter.write(envelope, bos);
 
-                try (
-                        InputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
-                        Envelope parsedInEnvelope = defaultPackagingFactory.read(inputStream)
-                ) {
-                    assertSingleContentsWithSingleDocument(parsedInEnvelope);
+            try (
+                    InputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
+                    Envelope parsedInEnvelope = defaultPackagingFactory.read(inputStream)
+            ) {
+                assertSingleContentsWithSingleDocument(parsedInEnvelope);
             }
         }
     }
@@ -203,13 +203,14 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
         try (Envelope existingEnvelope = packagingFactoryWithIncIndex.create(
                 singletonList(testDocumentHelloText),
                 singletonList(stringEnvelopeAnnotation)
-        )) {
-            packagingFactoryWithUuid.addSignature(
-                    existingEnvelope,
-                    singletonList(testDocumentHelloPdf),
-                    singletonList(stringEnvelopeAnnotation)
-            );
-            writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithUuid);
+        );
+             Envelope second = packagingFactoryWithUuid.addSignature(
+                     existingEnvelope,
+                     singletonList(testDocumentHelloPdf),
+                     singletonList(stringEnvelopeAnnotation)
+             )
+        ) {
+            writeEnvelopeToAndReadFromStream(second, packagingFactoryWithUuid);
         }
     }
 
@@ -218,13 +219,14 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
         try (Envelope existingEnvelope = packagingFactoryWithUuid.create(
                 singletonList(testDocumentHelloText),
                 singletonList(stringEnvelopeAnnotation)
-        )) {
-                packagingFactoryWithIncIndex.addSignature(
-                        existingEnvelope,
-                        singletonList(testDocumentHelloPdf),
-                        singletonList(stringEnvelopeAnnotation)
-                );
-                writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithIncIndex);
+            );
+            Envelope second = packagingFactoryWithIncIndex.addSignature(
+                     existingEnvelope,
+                     singletonList(testDocumentHelloPdf),
+                    singletonList(stringEnvelopeAnnotation)
+            )
+        ) {
+            writeEnvelopeToAndReadFromStream(second, packagingFactoryWithIncIndex);
         }
     }
 
@@ -238,14 +240,14 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                         .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
                         .withDocumentName("Doc.doc")
                         .withContent(input)
-                        .build()
+                        .build();
+                Envelope second = defaultPackagingFactory.addSignature(
+                        existingEnvelope,
+                        singletonList(document),
+                        singletonList(stringEnvelopeAnnotation)
+                )
         ) {
-            defaultPackagingFactory.addSignature(
-                    existingEnvelope,
-                    singletonList(document),
-                    singletonList(stringEnvelopeAnnotation)
-            );
-            writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithIncIndex);
+            writeEnvelopeToAndReadFromStream(second, packagingFactoryWithIncIndex);
         }
     }
 
@@ -259,14 +261,14 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                         .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
                         .withDocumentName("Doc.doc")
                         .withContent(input)
-                        .build()
+                        .build();
+                Envelope second = packagingFactoryWithUuid.addSignature(
+                        existingEnvelope,
+                        singletonList(document),
+                        singletonList(stringEnvelopeAnnotation)
+                )
         ) {
-            packagingFactoryWithUuid.addSignature(
-                    existingEnvelope,
-                    singletonList(document),
-                    singletonList(stringEnvelopeAnnotation)
-            );
-            writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithUuid);
+            writeEnvelopeToAndReadFromStream(second, packagingFactoryWithUuid);
         }
     }
 
@@ -280,14 +282,14 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                         .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
                         .withDocumentName("Doc.doc")
                         .withContent(input)
-                        .build()
+                        .build();
+                Envelope second = packagingFactoryWithUuid.addSignature(
+                        existingEnvelope,
+                        singletonList(document),
+                        singletonList(stringEnvelopeAnnotation)
+                )
         ) {
-            packagingFactoryWithUuid.addSignature(
-                    existingEnvelope,
-                    singletonList(document),
-                    singletonList(stringEnvelopeAnnotation)
-            );
-            writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithUuid);
+            writeEnvelopeToAndReadFromStream(second, packagingFactoryWithUuid);
         }
     }
 
@@ -302,13 +304,13 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                         .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
                         .withDocumentName("Doc.doc")
                         .withContent(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT))
-                        .build()
+                        .build();
+                Envelope second = packagingFactoryWithUuid.addSignature(
+                        existingEnvelope,
+                        singletonList(document),
+                        singletonList(stringEnvelopeAnnotation))
         ) {
-            packagingFactoryWithUuid.addSignature(
-                    existingEnvelope,
-                    singletonList(document),
-                    singletonList(stringEnvelopeAnnotation));
-            writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithIncIndex);
+            writeEnvelopeToAndReadFromStream(second, packagingFactoryWithIncIndex);
         }
     }
 
@@ -330,14 +332,14 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                                 .withContent("annotation 101")
                                 .withDomain("com.guardtime")
                                 .withAnnotationType(EnvelopeAnnotationType.FULLY_REMOVABLE)
-                                .build()
+                                .build();
+                Envelope second = packagingFactoryWithIncIndex.addSignature(
+                        existingEnvelope,
+                        singletonList(document),
+                        singletonList(envelopeAnnotation)
+                )
         ) {
-            packagingFactoryWithIncIndex.addSignature(
-                    existingEnvelope,
-                    singletonList(document),
-                    singletonList(envelopeAnnotation)
-            );
-            writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithIncIndex);
+            writeEnvelopeToAndReadFromStream(second, packagingFactoryWithIncIndex);
         }
     }
 
@@ -355,14 +357,14 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                         .withContent("annotation 101")
                         .withDomain("com.guardtime")
                         .withAnnotationType(EnvelopeAnnotationType.FULLY_REMOVABLE)
-                        .build()
+                        .build();
+                Envelope second = packagingFactoryWithIncIndex.addSignature(
+                        existingEnvelope,
+                        singletonList(document),
+                        singletonList(envelopeAnnotation)
+                )
         ) {
-            packagingFactoryWithIncIndex.addSignature(
-                    existingEnvelope,
-                    singletonList(document),
-                    singletonList(envelopeAnnotation)
-            );
-            writeEnvelopeToAndReadFromStream(existingEnvelope, packagingFactoryWithIncIndex);
+            writeEnvelopeToAndReadFromStream(second, packagingFactoryWithIncIndex);
         }
     }
 

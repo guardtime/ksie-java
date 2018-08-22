@@ -125,10 +125,10 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
         when(mockKSISignature.getAggregationTime()).thenReturn(new Date());
         when(mockSignature.getSignature()).thenReturn(mockKSISignature);
         when(mockSignature.getSignedDataHash()).thenReturn(NULL_DATA_HASH);
+        when(mockSignature.getCopy()).thenReturn(mockSignature);
         when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mockSignature);
         if (existingEnvelope != null) {
-            packagingFactory.addSignature(existingEnvelope, documents, annotations);
-            return existingEnvelope;
+            return packagingFactory.addSignature(existingEnvelope, documents, annotations);
         }
         return packagingFactory.create(documents, annotations);
     }
@@ -355,7 +355,9 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
             Envelope existingEnvelope = createInternallyValidEnvelope(documents, null);
 
             List<Document> newDocuments = singletonList(streamDocument);
-            createInternallyValidEnvelope(newDocuments, null, existingEnvelope);
+            try (Envelope newEnvelope = createInternallyValidEnvelope(newDocuments, null, existingEnvelope)) {
+
+            }
         }
     }
 
