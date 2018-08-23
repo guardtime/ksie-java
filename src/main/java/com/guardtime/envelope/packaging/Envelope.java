@@ -24,7 +24,6 @@ import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.document.SignedDocument;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
-import com.guardtime.envelope.packaging.parsing.ParsedEnvelopeBuilder;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.util.SortedList;
 import com.guardtime.envelope.util.Util;
