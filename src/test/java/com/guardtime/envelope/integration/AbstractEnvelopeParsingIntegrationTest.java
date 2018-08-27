@@ -87,7 +87,7 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
     @Test
     public void testReadEnvelopeWithMissingManifest() throws Exception {
         expectedException.expect(InvalidEnvelopeException.class);
-        expectedException.expectMessage("Reading envelope encountered errors!");
+        expectedException.expectMessage("No valid signature content parsed!");
         try (Envelope ignored = getEnvelope(ENVELOPE_WITH_MISSING_MANIFEST)) {
             //empty
         }

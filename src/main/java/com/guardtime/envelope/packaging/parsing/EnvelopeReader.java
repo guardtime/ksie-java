@@ -88,7 +88,7 @@ public abstract class EnvelopeReader {
         validateMimeType(envelopeElementExtractor);
         List<SignatureContent> contents = buildSignatures(envelopeElementExtractor, readingException);
         if (contents.isEmpty()) {
-            throw readingException;
+            throw new InvalidEnvelopeException("No valid signature content parsed!");
         }
         List<UnknownDocument> unknownFiles = getAndLogUnknownFiles(envelopeElementExtractor);
         envelopeElementExtractor.clear();
