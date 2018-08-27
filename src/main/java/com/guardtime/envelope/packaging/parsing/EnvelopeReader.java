@@ -90,7 +90,7 @@ public abstract class EnvelopeReader {
         if (contents.isEmpty()) {
             throw readingException;
         }
-        List<UnknownDocument> unknownFiles = envelopeElementExtractor.getUnrequestedFiles();
+        List<UnknownDocument> unknownFiles = getAndLogUnknownFiles(envelopeElementExtractor);
         envelopeElementExtractor.clear();
         Envelope envelope = new Envelope(contents, unknownFiles, parsingStore);
         readingException.setEnvelope(envelope);
@@ -103,6 +103,14 @@ public abstract class EnvelopeReader {
             throw readingException;
         }
         return envelope;
+    }
+
+    private List<UnknownDocument> getAndLogUnknownFiles(EnvelopeElementExtractor envelopeElementExtractor) {
+        List<UnknownDocument> result = envelopeElementExtractor.getUnrequestedFiles();
+        for (UnknownDocument doc : result) {
+            LOGGER.warn("Encountered an unknown file in envelope at path '{}'", doc.getPath());
+        }
+        return result;
     }
 
     /**
