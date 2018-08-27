@@ -53,7 +53,7 @@ public class Envelope implements AutoCloseable {
     }
 
     public Envelope(Collection<SignatureContent> contents, List<UnknownDocument> unknownFiles, ParsingStore store) {
-        Util.notNull(contents, "Signature contents");
+        Util.notEmpty(contents, "Signature contents");
         Util.notNull(unknownFiles, "Unknown files");
         this.signatureContents.addAll(contents);
         this.unknownFiles.addAll(unknownFiles);
