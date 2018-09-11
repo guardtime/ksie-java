@@ -105,7 +105,7 @@ class EnvelopeElementExtractor {
 
     private  <T> T parseAndUnstore(ContentHandler<T> handler, String path) throws ContentParsingException {
         ParsingStoreReference parsingStoreReference = getParsingStoreReference(path);
-        try (InputStream stream = parsingStoreReference.get()) {
+        try (InputStream stream = parsingStoreReference.getStoredContent()) {
             return handler.parse(stream, path);
         } catch (IOException e) {
             throw new ContentParsingException("Failed to access data for '" + path + "'!");

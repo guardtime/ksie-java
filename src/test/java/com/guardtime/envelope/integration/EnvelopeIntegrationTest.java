@@ -4,7 +4,7 @@ import com.guardtime.envelope.EnvelopeBuilder;
 import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.DocumentBuilder;
+import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
@@ -402,7 +402,7 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
 
     private void addContentAndVerify(EnvelopePackagingFactory packagingFactory, Envelope envelope, EnvelopeElement element)
             throws Exception {
-        Document doc2 = new DocumentBuilder().withContent(element).build();
+        Document doc2 = DocumentFactory.create(element);
         try (Envelope second = packagingFactory.addSignature(
                 envelope,
                 singletonList(doc2),
@@ -450,11 +450,7 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
     }
 
     private Document constructDocument(ByteArrayInputStream input, String mimeTypeApplicationTxt, String s) {
-        return new DocumentBuilder()
-                .withDocumentMimeType(mimeTypeApplicationTxt)
-                .withDocumentName(s)
-                .withContent(input)
-                .build();
+        return DocumentFactory.create(input, mimeTypeApplicationTxt, s);
     }
 
 }

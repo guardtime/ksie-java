@@ -42,11 +42,7 @@ public class InternalDocumentTest extends AbstractEnvelopeTest {
 
     @Test
     public void testCompareStreams() throws IOException {
-        Document document = new DocumentBuilder()
-                .withDocumentMimeType("doc")
-                .withDocumentName("doc")
-                .withContent(new ByteArrayInputStream(new byte[32]))
-                .build();
+        Document document = DocumentFactory.create(new ByteArrayInputStream(new byte[32]), "doc", "doc");
         InternalDocument internalDocument = new InternalDocument(document);
 
         assertTrue(

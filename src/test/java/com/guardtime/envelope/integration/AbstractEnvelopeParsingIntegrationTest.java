@@ -21,10 +21,10 @@ package com.guardtime.envelope.integration;
 
 import com.guardtime.envelope.EnvelopeBuilder;
 import com.guardtime.envelope.annotation.Annotation;
-import com.guardtime.envelope.annotation.AnnotationBuilder;
+import com.guardtime.envelope.annotation.AnnotationFactory;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.DocumentBuilder;
+import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.UuidIndexProviderFactory;
 import com.guardtime.envelope.packaging.Envelope;
@@ -236,11 +236,7 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                 FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_RANDOM_INCREMENTING_INDEXES));
                 Envelope existingEnvelope = defaultPackagingFactory.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-                Document document = new DocumentBuilder()
-                        .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
-                        .withDocumentName("Doc.doc")
-                        .withContent(input)
-                        .build();
+                Document document = DocumentFactory.create(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc");
                 Envelope second = defaultPackagingFactory.addSignature(
                         existingEnvelope,
                         singletonList(document),
@@ -257,11 +253,7 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                 FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_RANDOM_UUID_INDEXES));
                 Envelope existingEnvelope = packagingFactoryWithUuid.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-                Document document = new DocumentBuilder()
-                        .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
-                        .withDocumentName("Doc.doc")
-                        .withContent(input)
-                        .build();
+                Document document = DocumentFactory.create(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc");
                 Envelope second = packagingFactoryWithUuid.addSignature(
                         existingEnvelope,
                         singletonList(document),
@@ -278,11 +270,7 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                 FileInputStream stream = new FileInputStream(loadFile(ENVELOPE_WITH_MIXED_INDEX_TYPES));
                 Envelope existingEnvelope = packagingFactoryWithUuid.read(stream);
                 ByteArrayInputStream input = new ByteArrayInputStream(TEST_DATA_TXT_CONTENT);
-                Document document = new DocumentBuilder()
-                        .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
-                        .withDocumentName("Doc.doc")
-                        .withContent(input)
-                        .build();
+                Document document = DocumentFactory.create(input, MIME_TYPE_APPLICATION_TXT, "Doc.doc");
                 Envelope second = packagingFactoryWithUuid.addSignature(
                         existingEnvelope,
                         singletonList(document),
@@ -300,11 +288,11 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                         packagingFactoryWithIncIndex.read(
                                 new FileInputStream(loadFile(ENVELOPE_WITH_MIXED_INDEX_TYPES_IN_CONTENTS))
                         );
-                Document document = new DocumentBuilder()
-                        .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
-                        .withDocumentName("Doc.doc")
-                        .withContent(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT))
-                        .build();
+                Document document = DocumentFactory.create(
+                        new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
+                        MIME_TYPE_APPLICATION_TXT,
+                        "Doc.doc"
+                );
                 Envelope second = packagingFactoryWithUuid.addSignature(
                         existingEnvelope,
                         singletonList(document),
@@ -322,17 +310,13 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
                 Envelope existingEnvelope = packagingFactoryWithIncIndex.read(
                         new FileInputStream(loadFile(ENVELOPE_WITH_TWO_CONTENTS_AND_ONE_MANIFEST_REMOVED))
                 );
-                Document document = new DocumentBuilder()
-                        .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
-                        .withDocumentName("Doc.doc")
-                        .withContent(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT))
-                        .build();
+                Document document = DocumentFactory.create(
+                        new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
+                        MIME_TYPE_APPLICATION_TXT,
+                        "Doc.doc"
+                );
                 Annotation envelopeAnnotation =
-                        new AnnotationBuilder()
-                                .withContent("annotation 101")
-                                .withDomain("com.guardtime")
-                                .withAnnotationType(EnvelopeAnnotationType.FULLY_REMOVABLE)
-                                .build();
+                        AnnotationFactory.create("annotation 101", "com.guardtime", EnvelopeAnnotationType.FULLY_REMOVABLE);
                 Envelope second = packagingFactoryWithIncIndex.addSignature(
                         existingEnvelope,
                         singletonList(document),
@@ -348,16 +332,13 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
         try (
                 Envelope existingEnvelope =
                         packagingFactoryWithIncIndex.read(new FileInputStream(loadFile(ENVELOPE_WITH_UNKNOWN_FILES)));
-                Document document = new DocumentBuilder()
-                        .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
-                        .withDocumentName("Doc.doc")
-                        .withContent(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT))
-                        .build();
-                Annotation envelopeAnnotation = new AnnotationBuilder()
-                        .withContent("annotation 101")
-                        .withDomain("com.guardtime")
-                        .withAnnotationType(EnvelopeAnnotationType.FULLY_REMOVABLE)
-                        .build();
+                Document document = DocumentFactory.create(
+                        new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
+                        MIME_TYPE_APPLICATION_TXT,
+                        "Doc.doc"
+                );
+                Annotation envelopeAnnotation =
+                        AnnotationFactory.create("annotation 101", "com.guardtime", EnvelopeAnnotationType.FULLY_REMOVABLE);
                 Envelope second = packagingFactoryWithIncIndex.addSignature(
                         existingEnvelope,
                         singletonList(document),
@@ -449,11 +430,8 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
     }
 
     private List<Document> getEnvelopeDocument(String fileName) {
-        return singletonList(new DocumentBuilder()
-                .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
-                .withDocumentName(fileName)
-                .withContent(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT))
-                .build()
+        return singletonList(
+                DocumentFactory.create(new ByteArrayInputStream(TEST_DATA_TXT_CONTENT), MIME_TYPE_APPLICATION_TXT, fileName)
         );
     }
 

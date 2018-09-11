@@ -67,7 +67,7 @@ public final class MemoryBasedParsingStore extends ParsingStore {
     }
 
     @Override
-    public InputStream get(UUID uuid) {
+    public InputStream getContent(UUID uuid) {
         byte[] bytes = store.get(uuid);
         if (bytes == null) {
             throw new IllegalStateException("Parsing store has lost content for ID '" + uuid.toString() + "'");

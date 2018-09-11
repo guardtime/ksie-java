@@ -42,7 +42,7 @@ public abstract class ParsingStore {
      */
     public abstract ParsingStoreReference store(InputStream stream) throws ParsingStoreException;
 
-    public abstract InputStream get(UUID uuid);
+    public abstract InputStream getContent(UUID uuid);
 
     ParsingStoreReference addNewReference(UUID uuid) {
         ParsingStoreReference ref = new ParsingStoreReference(uuid, this);

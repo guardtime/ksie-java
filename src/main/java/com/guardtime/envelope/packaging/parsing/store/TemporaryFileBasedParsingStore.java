@@ -59,7 +59,7 @@ public final class TemporaryFileBasedParsingStore extends ParsingStore {
         return instance;
     }
 
-    public static boolean isInstanciated() {
+    public static boolean isInstantiated() {
         return instance != null;
     }
 
@@ -84,7 +84,7 @@ public final class TemporaryFileBasedParsingStore extends ParsingStore {
     }
 
     @Override
-    public InputStream get(UUID uuid) {
+    public InputStream getContent(UUID uuid) {
         try {
             File file = store.get(uuid);
             return Files.newInputStream(file.toPath());

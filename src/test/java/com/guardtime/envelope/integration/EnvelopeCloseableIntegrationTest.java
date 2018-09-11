@@ -20,10 +20,10 @@
 package com.guardtime.envelope.integration;
 
 import com.guardtime.envelope.annotation.Annotation;
-import com.guardtime.envelope.annotation.AnnotationBuilder;
+import com.guardtime.envelope.annotation.AnnotationFactory;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.DocumentBuilder;
+import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.extending.ExtendedEnvelope;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
@@ -100,16 +100,12 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         Envelope existingEnvelope = getEnvelopeWithTemporaryFileParsingStore(ENVELOPE_WITH_MULTIPLE_SIGNATURES);
         List<File> ksieTempFiles = getKsieTempFiles();
         try (
-                Document document = new DocumentBuilder()
-                        .withDocumentMimeType("byte inputstream")
-                        .withDocumentName("byte-input-stream.bis")
-                        .withContent(new ByteArrayInputStream(new byte[313]))
-                        .build();
-                Annotation annotation = new AnnotationBuilder()
-                        .withContent("content")
-                        .withDomain("domain.com")
-                        .withAnnotationType(EnvelopeAnnotationType.FULLY_REMOVABLE)
-                    .build();
+                Document document = DocumentFactory.create(
+                        new ByteArrayInputStream(new byte[313]),
+                        "byte inputstream",
+                        "byte-input-stream.bis"
+                );
+                Annotation annotation = AnnotationFactory.create("content", "domain.com", EnvelopeAnnotationType.FULLY_REMOVABLE);
                 Envelope second = packagingFactory.addSignature(
                         existingEnvelope,
                         singletonList(document),
@@ -131,16 +127,12 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         Envelope existingEnvelope = getEnvelope(ENVELOPE_WITH_MULTIPLE_SIGNATURES);
         List<File> ksieTempFiles = getKsieTempFiles();
         try (
-                Document document = new DocumentBuilder()
-                        .withDocumentMimeType("byte inputstream")
-                        .withDocumentName("byte-input-stream.bis")
-                        .withContent(new ByteArrayInputStream(new byte[313]))
-                        .build();
-                Annotation annotation = new AnnotationBuilder()
-                        .withContent("content")
-                        .withDomain("domain.com")
-                        .withAnnotationType(EnvelopeAnnotationType.FULLY_REMOVABLE)
-                        .build();
+                Document document = DocumentFactory.create(
+                        new ByteArrayInputStream(new byte[313]),
+                        "byte inputstream",
+                        "byte-input-stream.bis"
+                );
+                Annotation annotation = AnnotationFactory.create("content", "domain.com", EnvelopeAnnotationType.FULLY_REMOVABLE);
                 Envelope second = packagingFactory.addSignature(
                         existingEnvelope,
                         singletonList(document),
@@ -192,16 +184,15 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         expectedException.expect(InvalidEnvelopeException.class);
         expectedException.expectMessage("Created envelope did not pass internal verification");
         try (
-                Document document = new DocumentBuilder()
-                        .withDocumentMimeType("qwerty")
-                        .withDocumentName("qwert.file")
-                        .withContent(new ByteArrayInputStream("randum".getBytes()))
-                        .build();
-                Annotation annotation = new AnnotationBuilder()
-                        .withContent("qwerty file")
-                        .withDomain("qwerty.domain.com")
-                        .withAnnotationType(EnvelopeAnnotationType.FULLY_REMOVABLE)
-                .build();
+                Document document = DocumentFactory.create(
+                        new ByteArrayInputStream("randum".getBytes()),
+                        "qwerty",
+                        "qwert.file"
+                );
+                Annotation annotation = AnnotationFactory.create("qwerty file",
+                        "qwerty.domain.com",
+                        EnvelopeAnnotationType.FULLY_REMOVABLE
+                );
                 Envelope envelope = getEnvelopeWithTemporaryFileParsingStore(ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION)
         ) {
             List<File> tempFiles = getKsieTempFiles();

@@ -42,7 +42,7 @@ public final class ActiveParsingStoreProvider {
         if (getInstance().storeInstance == null) {
             if (MemoryBasedParsingStore.isInstanciated()) {
                 setActiveParsingStore(MemoryBasedParsingStore.getInstance());
-            } else if (TemporaryFileBasedParsingStore.isInstanciated()) {
+            } else if (TemporaryFileBasedParsingStore.isInstantiated()) {
                 setActiveParsingStore(TemporaryFileBasedParsingStore.getInstance());
             } else {
                 setActiveParsingStore(MemoryBasedParsingStore.getInstance());

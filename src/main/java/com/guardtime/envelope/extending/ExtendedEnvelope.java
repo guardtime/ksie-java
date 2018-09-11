@@ -60,9 +60,9 @@ public class ExtendedEnvelope extends Envelope {
     public List<ExtendedSignatureContent> getExtendedSignatureContents() {
         List<ExtendedSignatureContent> result = new ArrayList<>();
         for (SignatureContent content: getSignatureContents()) {
-            try {
+            if (content instanceof ExtendedSignatureContent) {
                 result.add((ExtendedSignatureContent) content);
-            } catch (ClassCastException e) {
+            } else {
                 // wrap?
                 result.add(new ExtendedSignatureContent(content));
             }

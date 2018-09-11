@@ -21,10 +21,10 @@ package com.guardtime.envelope.packaging.zip;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
 import com.guardtime.envelope.annotation.Annotation;
-import com.guardtime.envelope.annotation.AnnotationBuilder;
+import com.guardtime.envelope.annotation.AnnotationFactory;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.DocumentBuilder;
+import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.DocumentsManifest;
 import com.guardtime.envelope.manifest.Manifest;
@@ -79,11 +79,12 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        annotationList.add(new AnnotationBuilder()
-                .withContent(ANNOTATION_CONTENT)
-                .withDomain(ANNOTATION_DOMAIN_COM_GUARDTIME)
-                .withAnnotationType(EnvelopeAnnotationType.NON_REMOVABLE)
-                .build()
+        annotationList.add(
+                AnnotationFactory.create(
+                        ANNOTATION_CONTENT,
+                        ANNOTATION_DOMAIN_COM_GUARDTIME,
+                        EnvelopeAnnotationType.NON_REMOVABLE
+                )
         );
         documentList.add(testDocumentHelloText);
     }
@@ -234,11 +235,8 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
         List<Document> documentsList = new ArrayList<>(documentList);
         documentsList.add(testDocumentHelloPdf);
         List<Annotation> annotationsList = new ArrayList<>(annotationList);
-        annotationsList.add(new AnnotationBuilder()
-                .withContent("moreContent")
-                .withDomain("com.guardtime.test.inner")
-                .withAnnotationType(EnvelopeAnnotationType.VALUE_REMOVABLE)
-                .build()
+        annotationsList.add(
+                AnnotationFactory.create("moreContent", "com.guardtime.test.inner", EnvelopeAnnotationType.VALUE_REMOVABLE)
         );
 
         try (Envelope envelope = createInternallyValidEnvelope(documentsList, annotationsList)) {
@@ -253,21 +251,19 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     public void testCreateEnvelopeWithExistingEnvelopeAndMultipleDocumentsAndAnnotations() throws Exception {
         try (
                 Envelope envelope = createInternallyValidEnvelope(documentList, annotationList);
-                Document streamDocument = new DocumentBuilder()
-                        .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
-                        .withDocumentName(TEST_FILE_NAME_TEST_DOC)
-                        .withContent(new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)))
-                        .build()
+                Document streamDocument =
+                        DocumentFactory.create(
+                                new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)),
+                                MIME_TYPE_APPLICATION_TXT,
+                                TEST_FILE_NAME_TEST_DOC
+                        )
         ) {
             List<Document> documentsList = new ArrayList<>();
             documentsList.add(testDocumentHelloPdf);
             documentsList.add(streamDocument);
             List<Annotation> annotationsList = new ArrayList<>(annotationList);
-            annotationsList.add(new AnnotationBuilder()
-                    .withContent("moreContent")
-                    .withDomain("com.guardtime.test.inner")
-                    .withAnnotationType(EnvelopeAnnotationType.VALUE_REMOVABLE)
-                    .build()
+            annotationsList.add(
+                    AnnotationFactory.create("moreContent", "com.guardtime.test.inner", EnvelopeAnnotationType.VALUE_REMOVABLE)
             );
 
             try (Envelope newEnvelope = createInternallyValidEnvelope(documentsList, annotationsList, envelope)) {
@@ -289,16 +285,16 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
         expectedException.expectMessage("Found multiple documents with same name and non-matching data hash!");
 
         List<Document> documents = Arrays.asList(
-                new DocumentBuilder()
-                        .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
-                        .withDocumentName(TEST_FILE_NAME_TEST_TXT)
-                        .withContent(new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)))
-                        .build(),
-                new DocumentBuilder()
-                        .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
-                        .withDocumentName(TEST_FILE_NAME_TEST_TXT)
-                        .withContent(new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)))
-                        .build()
+                DocumentFactory.create(
+                        new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)),
+                        MIME_TYPE_APPLICATION_TXT,
+                        TEST_FILE_NAME_TEST_TXT
+                ),
+                DocumentFactory.create(
+                        new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)),
+                        MIME_TYPE_APPLICATION_TXT,
+                        TEST_FILE_NAME_TEST_TXT
+                )
         );
         createInternallyValidEnvelope(documents, null);
     }
@@ -322,11 +318,12 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     @Test
     public void testCreateWithExistingEnvelopeVerifiesEnvelope_OK() throws Exception {
         try (
-                Document streamDocument = new DocumentBuilder()
-                        .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
-                        .withDocumentName(TEST_FILE_NAME_TEST_PDF)
-                        .withContent(new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)))
-                        .build();
+                Document streamDocument =
+                        DocumentFactory.create(
+                                new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)),
+                                MIME_TYPE_APPLICATION_TXT,
+                                TEST_FILE_NAME_TEST_PDF
+                        );
                 Envelope envelope = createInternallyValidEnvelope(documentList, annotationList);
                 Envelope newEnvelope = createInternallyValidEnvelope(singletonList(streamDocument), annotationList, envelope)
         ) {
@@ -340,16 +337,17 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Found multiple documents with same name and non-matching data hash!");
         try (
-                Document document = new DocumentBuilder()
-                        .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
-                        .withDocumentName(TEST_FILE_NAME_TEST_TXT)
-                        .withContent(new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)))
-                        .build();
-                Document streamDocument = new DocumentBuilder()
-                        .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
-                        .withDocumentName(TEST_FILE_NAME_TEST_TXT)
-                        .withContent(new ByteArrayInputStream("MoreImportantDocument-0411".getBytes(StandardCharsets.UTF_8)))
-                        .build()
+                Document document =
+                        DocumentFactory.create(
+                                new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)),
+                                MIME_TYPE_APPLICATION_TXT,
+                                TEST_FILE_NAME_TEST_TXT
+                        );
+                Document streamDocument = DocumentFactory.create(
+                        new ByteArrayInputStream("MoreImportantDocument-0411".getBytes(StandardCharsets.UTF_8)),
+                        MIME_TYPE_APPLICATION_TXT,
+                        TEST_FILE_NAME_TEST_TXT
+                )
         ) {
             List<Document> documents = singletonList(document);
             Envelope existingEnvelope = createInternallyValidEnvelope(documents, null);
@@ -364,11 +362,12 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     @Test
     public void testCreateEnvelopeWithExistingEnvelopeWithSameDocument() throws Exception {
         try (
-                Document streamDocument = new DocumentBuilder()
-                        .withDocumentMimeType(MIME_TYPE_APPLICATION_TXT)
-                        .withDocumentName(TEST_FILE_NAME_TEST_TXT)
-                        .withContent(new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)))
-                        .build();
+                Document streamDocument =
+                        DocumentFactory.create(
+                                new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)),
+                                MIME_TYPE_APPLICATION_TXT,
+                                TEST_FILE_NAME_TEST_TXT
+                        );
                 Envelope envelope = createInternallyValidEnvelope(singletonList(streamDocument), null);
                 Envelope newEnvelope = createInternallyValidEnvelope(singletonList(streamDocument), null, envelope)
         ) {

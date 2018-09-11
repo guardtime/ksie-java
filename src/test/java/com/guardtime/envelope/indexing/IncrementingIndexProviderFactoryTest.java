@@ -20,7 +20,7 @@
 package com.guardtime.envelope.indexing;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
-import com.guardtime.envelope.document.DocumentBuilder;
+import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
@@ -96,11 +96,7 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
         Envelope mockEnvelope = mock(Envelope.class);
         List<UnknownDocument> unknownFileList = new ArrayList<>();
         unknownFileList.add(
-                (UnknownDocument) new DocumentBuilder()
-                        .withParsingStoreReference(mock(ParsingStoreReference.class))
-                        .withDocumentMimeType("m")
-                        .withDocumentName(META_INF + "/manifest-384.tlv")
-                        .build()
+                (UnknownDocument) DocumentFactory.create(mock(ParsingStoreReference.class), "m", META_INF + "/manifest-384.tlv")
         );
         when(mockEnvelope.getUnknownFiles()).thenReturn(unknownFileList);
         IndexProvider indexProvider = indexProviderFactory.create(mockEnvelope);
@@ -112,11 +108,11 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
         Envelope mockEnvelope = mock(Envelope.class);
         List<UnknownDocument> unknownFileList = new ArrayList<>();
         unknownFileList.add(
-                (UnknownDocument) new DocumentBuilder()
-                        .withParsingStoreReference(mock(ParsingStoreReference.class))
-                        .withDocumentMimeType("m")
-                        .withDocumentName(META_INF + "/annotation-854.tlv")
-                        .build()
+                (UnknownDocument) DocumentFactory.create(
+                        mock(ParsingStoreReference.class),
+                        "m",
+                        META_INF + "/annotation-854.tlv"
+                )
         );
         when(mockEnvelope.getUnknownFiles()).thenReturn(unknownFileList);
         IndexProvider indexProvider = indexProviderFactory.create(mockEnvelope);

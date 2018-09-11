@@ -20,9 +20,9 @@
 package com.guardtime.envelope.packaging;
 
 import com.guardtime.envelope.annotation.Annotation;
-import com.guardtime.envelope.annotation.AnnotationBuilder;
+import com.guardtime.envelope.annotation.AnnotationFactory;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.DocumentBuilder;
+import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.document.EmptyDocument;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.DocumentsManifest;
@@ -72,7 +72,7 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
     private List<Annotation> copyAnnotations(Collection<Annotation> annotations) {
         List<Annotation> copied = new ArrayList<>();
         for (Annotation annot : annotations) {
-            copied.add(new AnnotationBuilder().withAnnotation(annot).build());
+            copied.add(AnnotationFactory.create(annot));
         }
         return copied;
     }
@@ -80,7 +80,7 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
     private List<Document> copyDocuments(Collection<Document> documents) {
         List<Document> copied = new ArrayList<>();
         for (Document doc : documents) {
-            copied.add(new DocumentBuilder().withDocument(doc).build());
+            copied.add(DocumentFactory.create(doc));
         }
         return copied;
     }
@@ -143,11 +143,7 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
         if (document instanceof EmptyDocument) {
             documents.put(
                     path,
-                    new DocumentBuilder()
-                            .withDocumentMimeType(document.getMimeType())
-                            .withDocumentName(document.getFileName())
-                            .withContent(data)
-                            .build()
+                    DocumentFactory.create(data, document.getMimeType(), document.getFileName())
             );
             return true;
         }
@@ -174,18 +170,10 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
         }
         documents.put(
                 path,
-                new DocumentBuilder()
-                        .withDocumentName(removed.getFileName())
-                        .withDocumentMimeType(removed.getMimeType())
-                        .withDataHashList(removedDocumentHashes)
-                        .build()
+                DocumentFactory.create(removedDocumentHashes, removed.getMimeType(), removed.getFileName())
         );
         try (InputStream inputStream = removed.getInputStream()) {
-            Document detached = new DocumentBuilder()
-                    .withDocumentMimeType(removed.getMimeType())
-                    .withDocumentName(removed.getFileName())
-                    .withContent(inputStream)
-                    .build();
+            Document detached = DocumentFactory.create(inputStream, removed.getMimeType(), removed.getFileName());
             removed.close();
             return detached;
         } catch (Exception e) {

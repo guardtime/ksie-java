@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.packaging.parsing;
 
-import com.guardtime.envelope.document.DocumentBuilder;
+import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
@@ -50,12 +50,7 @@ public class ParsingStoreSession {
         List<String> keys = new ArrayList<>(references.keySet());
         keys.removeAll(requestedKeys);
         for (String key : keys) {
-            returnable.add(
-                    (UnknownDocument) new DocumentBuilder()
-                            .withDocumentMimeType("unknown")
-                            .withDocumentName(key)
-                            .withParsingStoreReference(get(key))
-                            .build());
+            returnable.add((UnknownDocument) DocumentFactory.create(get(key), "unknown", key));
         }
         return returnable;
     }

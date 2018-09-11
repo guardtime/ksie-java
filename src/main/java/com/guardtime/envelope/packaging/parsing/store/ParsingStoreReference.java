@@ -39,8 +39,8 @@ public class ParsingStoreReference {
         owner.updateReferences(uuid, this);
     }
 
-    public InputStream get() {
-        return owner.get(uuid);
+    public InputStream getStoredContent() {
+        return owner.getContent(uuid);
     }
 
     public void unstore() {

@@ -21,7 +21,7 @@ package com.guardtime.envelope.packaging;
 
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.DocumentBuilder;
+import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.document.SignedDocument;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
@@ -68,7 +68,7 @@ public class Envelope implements AutoCloseable {
     private static List<UnknownDocument> copyUnknownFiles(List<UnknownDocument> originals) {
         List<UnknownDocument> copies = new ArrayList<>();
         for (UnknownDocument doc : originals) {
-            copies.add((UnknownDocument) new DocumentBuilder().withDocument(doc).build());
+            copies.add((UnknownDocument) DocumentFactory.create(doc));
         }
         return copies;
     }

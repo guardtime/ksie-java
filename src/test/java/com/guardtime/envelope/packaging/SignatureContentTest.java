@@ -22,7 +22,7 @@ package com.guardtime.envelope.packaging;
 import com.guardtime.envelope.AbstractEnvelopeTest;
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.DocumentBuilder;
+import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.document.EmptyDocument;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
@@ -95,11 +95,11 @@ public class SignatureContentTest extends AbstractEnvelopeTest {
         List<Document> documents = Arrays.asList(
                 testDocumentHelloText,
                 testDocumentHelloPdf,
-                new DocumentBuilder()
-                        .withDocumentName(TEST_FILE_NAME_TEST_DOC)
-                        .withDocumentMimeType("application/doc")
-                        .withDataHashList(singletonList(new DataHash(HashAlgorithm.SHA2_256, new byte[32])))
-                        .build()
+                DocumentFactory.create(
+                        singletonList(new DataHash(HashAlgorithm.SHA2_256, new byte[32])),
+                        "application/doc",
+                        TEST_FILE_NAME_TEST_DOC
+                )
         );
         when(mockedDocumentsManifest.getDocumentReferences()).thenAnswer(makeFileReferenceList(documents));
         when(mockedDocumentsManifest.getPath()).thenReturn("datamanifest.tlv");
