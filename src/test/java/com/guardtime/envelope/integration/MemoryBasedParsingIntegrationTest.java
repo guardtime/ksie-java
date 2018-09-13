@@ -48,7 +48,7 @@ public class MemoryBasedParsingIntegrationTest extends AbstractEnvelopeParsingIn
 
     @Override
     public ParsingStore getParsingStore() {
-        return MemoryBasedParsingStore.getInstance();
+        return new MemoryBasedParsingStore();
     }
 
     @Test

@@ -124,7 +124,7 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
                 .build();
         packagingFactoryTFPS = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
-                .withParsingStore(TemporaryFileBasedParsingStore.getInstance())
+                .withParsingStore(new TemporaryFileBasedParsingStore())
                 .build();
         envelopeWriter = new ZipEnvelopeWriter();
     }

@@ -31,6 +31,8 @@ import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.ManifestFactoryType;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
+import com.guardtime.envelope.packaging.parsing.store.ActiveParsingStoreProvider;
+import com.guardtime.envelope.packaging.parsing.store.MemoryBasedParsingStore;
 import com.guardtime.envelope.signature.SignatureFactory;
 import com.guardtime.envelope.signature.SignatureFactoryType;
 import com.guardtime.envelope.verification.rule.state.DefaultRuleStateProvider;
@@ -39,6 +41,7 @@ import org.hamcrest.CustomTypeSafeMatcher;
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
@@ -59,6 +62,11 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 public class AbstractEnvelopeTest {
+
+    @BeforeClass
+    public static void setUpeParsingStore() {
+        ActiveParsingStoreProvider.setActiveParsingStore(new MemoryBasedParsingStore());
+    }
 
     /**
      * Envelopes - Internally correct and does verify against anchors.

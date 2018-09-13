@@ -23,38 +23,22 @@ package com.guardtime.envelope.packaging.parsing.store;
  * Provides access to instance of {@link ParsingStore} which has been set as active.
  */
 public final class ActiveParsingStoreProvider {
-    private static ActiveParsingStoreProvider instance;
+    private static ActiveParsingStoreProvider instance = new ActiveParsingStoreProvider();
     private ParsingStore storeInstance;
 
     private ActiveParsingStoreProvider() {
         // private!
     }
 
-    public static void setActiveParsingStore(ParsingStore store) {
-        getInstance().storeInstance = store;
+    public static synchronized void setActiveParsingStore(ParsingStore store) {
+        instance.storeInstance = store;
     }
 
-    /**
-     * Return instance of {@link ParsingStore} that was set as active or defaults to instance of {@link MemoryBasedParsingStore}
-     * or {@link TemporaryFileBasedParsingStore} which has existing instance. Fallback result is {@link MemoryBasedParsingStore}.
-     */
     public static ParsingStore getActiveParsingStore() {
-        if (getInstance().storeInstance == null) {
-            if (MemoryBasedParsingStore.isInstanciated()) {
-                setActiveParsingStore(MemoryBasedParsingStore.getInstance());
-            } else if (TemporaryFileBasedParsingStore.isInstantiated()) {
-                setActiveParsingStore(TemporaryFileBasedParsingStore.getInstance());
-            } else {
-                setActiveParsingStore(MemoryBasedParsingStore.getInstance());
-            }
+        if (instance.storeInstance == null) {
+            throw new IllegalStateException("No ParsingStore has been set!");
         }
-        return getInstance().storeInstance;
+        return instance.storeInstance;
     }
 
-    private static ActiveParsingStoreProvider getInstance() {
-        if (instance == null) {
-            instance = new ActiveParsingStoreProvider();
-        }
-        return instance;
-    }
 }

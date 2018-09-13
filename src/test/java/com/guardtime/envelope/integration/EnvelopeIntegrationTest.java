@@ -15,7 +15,6 @@ import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.packaging.parsing.store.ActiveParsingStoreProvider;
-import com.guardtime.envelope.packaging.parsing.store.MemoryBasedParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.TemporaryFileBasedParsingStore;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
@@ -75,7 +74,6 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
 
         EnvelopePackagingFactory factory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(new KsiSignatureFactory(signer, new SignatureReader()))
-                .withParsingStore(MemoryBasedParsingStore.getInstance())
                 .build();
 
         expectedException.expect(SignatureException.class);
@@ -359,7 +357,7 @@ public class EnvelopeIntegrationTest extends AbstractCommonIntegrationTest {
     @Test
     public void testDeepCopyEnvelopeClosingOriginalAndCopyClearsParseStore() throws Exception {
         ParsingStore activeStore = ActiveParsingStoreProvider.getActiveParsingStore();
-        ActiveParsingStoreProvider.setActiveParsingStore(TemporaryFileBasedParsingStore.getInstance());
+        ActiveParsingStoreProvider.setActiveParsingStore(new TemporaryFileBasedParsingStore());
         int tempFileCount = getKsieTempFiles().size();
         Envelope copy = null;
         try (Envelope original = getEnvelope()) {

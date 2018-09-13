@@ -34,26 +34,9 @@ import java.util.UUID;
  * NB! There is no protection against large data. Use with care!
  * </p>
  */
-public final class MemoryBasedParsingStore extends ParsingStore {
-
-    private static MemoryBasedParsingStore instance;
+public class MemoryBasedParsingStore extends ParsingStore {
 
     private Map<UUID, byte[]> store = new HashMap<>();
-
-    private MemoryBasedParsingStore() {
-        // private!
-    }
-
-    public static ParsingStore getInstance() {
-        if (instance == null) {
-            instance = new MemoryBasedParsingStore();
-        }
-        return instance;
-    }
-
-    public static boolean isInstanciated() {
-        return instance != null;
-    }
 
     @Override
     public ParsingStoreReference store(InputStream stream) throws ParsingStoreException {

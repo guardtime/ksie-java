@@ -33,6 +33,7 @@ import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
+import com.guardtime.envelope.packaging.parsing.store.ActiveParsingStoreProvider;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
@@ -69,6 +70,7 @@ public abstract class AbstractEnvelopeParsingIntegrationTest extends AbstractCom
     @Before
     public void setUpPackagingFactories() throws Exception {
         parsingStore = getParsingStore();
+        ActiveParsingStoreProvider.setActiveParsingStore(parsingStore);
         this.packagingFactoryWithIncIndex = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
                 .withIndexProviderFactory(new IncrementingIndexProviderFactory())

@@ -40,28 +40,12 @@ import java.util.UUID;
  * NB! Does not provide protection against malicious file modification in temp folder. Use with care!
  * </p>
  */
-public final class TemporaryFileBasedParsingStore extends ParsingStore {
+public class TemporaryFileBasedParsingStore extends ParsingStore {
 
     private static final Logger logger = LoggerFactory.getLogger(TemporaryFileBasedParsingStore.class);
-    private static TemporaryFileBasedParsingStore instance;
 
     private final Map<UUID, File> store = new HashMap<>();
     private Path tempDir;
-
-    private TemporaryFileBasedParsingStore() {
-        // private!
-    }
-
-    public static ParsingStore getInstance() {
-        if (instance == null) {
-            instance = new TemporaryFileBasedParsingStore();
-        }
-        return instance;
-    }
-
-    public static boolean isInstantiated() {
-        return instance != null;
-    }
 
     @Override
     public ParsingStoreReference store(InputStream stream) throws ParsingStoreException {

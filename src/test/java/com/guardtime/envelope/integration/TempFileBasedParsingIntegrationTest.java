@@ -26,6 +26,6 @@ public class TempFileBasedParsingIntegrationTest extends AbstractEnvelopeParsing
 
     @Override
     protected ParsingStore getParsingStore() {
-        return TemporaryFileBasedParsingStore.getInstance();
+        return new TemporaryFileBasedParsingStore();
     }
 }

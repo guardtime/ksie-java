@@ -76,7 +76,7 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
         when(mockKsiSignature.getAggregationTime()).thenReturn(mock(Date.class));
         when(mockKsi.read(any(InputStream.class))).thenReturn(mockKsiSignature);
         SignatureFactory signatureFactory = new KsiSignatureFactory(mockKsi, mockKsi);
-        this.reader = new ZipEnvelopeReader(manifestFactory, signatureFactory, TemporaryFileBasedParsingStore.getInstance());
+        this.reader = new ZipEnvelopeReader(manifestFactory, signatureFactory, new TemporaryFileBasedParsingStore());
     }
 
     @After
