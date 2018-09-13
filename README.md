@@ -71,6 +71,12 @@ Envelope parsedEnvelope = packagingFactory.read(inputStream);
 
 It is suggested to always verify the parsed envelope before adding new documents or annotations to it.
 
+###### NB!
+
+Parsing an envelope requires that a `ParsingStore` is set. One should be set using:
+```java
+ActiveParsingStoreProvider.setActiveParsingStore
+```
 
 ### Writing an Envelope
 
