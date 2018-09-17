@@ -20,7 +20,7 @@
 package com.guardtime.envelope.document;
 
 import com.guardtime.envelope.EnvelopeElement;
-import com.guardtime.envelope.packaging.parsing.store.ActiveParsingStoreProvider;
+import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreReference;
 import com.guardtime.ksi.hashing.DataHash;
@@ -36,40 +36,41 @@ import static com.guardtime.envelope.util.Util.notNull;
 /**
  * Universal builder for {@link Document}
  */
-public final class DocumentFactory {
+public class DocumentFactory {
+    private final ParsingStore parsingStore;
 
-    private DocumentFactory() {
-        //private
+    public DocumentFactory(ParsingStore store) {
+        this.parsingStore = store;
     }
 
-    public static Document create(File file, String mimetype) {
+    public Document create(File file, String mimetype) {
         return new FileDocument(file, mimetype);
     }
 
-    public static Document create(File file, String mimetype, String filename) {
+    public Document create(File file, String mimetype, String filename) {
         return new FileDocument(file, mimetype, filename);
     }
 
-    public static Document create(Collection<DataHash> hashList, String mimetype, String filename) {
+    public Document create(Collection<DataHash> hashList, String mimetype, String filename) {
         return new EmptyDocument(filename, mimetype, new ArrayList<>(hashList));
     }
 
-    public static Document create(EnvelopeElement element) {
+    public Document create(EnvelopeElement element) {
         return new InternalDocument(element);
     }
 
-    public static Document create(ParsingStoreReference reference, String mimetype, String filename) {
+    public Document create(ParsingStoreReference reference, String mimetype, String filename) {
         return new ParsedDocument(reference, mimetype, filename);
     }
 
     /**
      * NB! Does not close the stream! Just reads from it.
      */
-    public static Document create(InputStream stream, String mimetype, String filename) {
+    public Document create(InputStream stream, String mimetype, String filename) {
         return new ParsedDocument(addToStore(stream), mimetype, filename);
     }
 
-    public static Document create(Document original) {
+    public Document create(Document original) {
         // TODO: Any better option?
         if (original instanceof FileDocument) {
             return create(((FileDocument) original).file, original.getMimeType(), original.getFileName());
@@ -86,10 +87,10 @@ public final class DocumentFactory {
         }
     }
 
-    private static ParsingStoreReference addToStore(InputStream data) {
+    private ParsingStoreReference addToStore(InputStream data) {
         notNull(data, "Input stream");
         try {
-            return ActiveParsingStoreProvider.getActiveParsingStore().store(data);
+            return parsingStore.store(data);
         } catch (ParsingStoreException e) {
             throw new IllegalArgumentException("Can not copy input stream to memory!", e);
         }

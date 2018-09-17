@@ -40,9 +40,11 @@ public class ParsingStoreSession {
     private final ParsingStore store;
     private final Map<String, ParsingStoreReference> references = new HashMap<>();
     private final Set<String> requestedKeys = new HashSet<>();
+    private DocumentFactory documentFactory;
 
     public ParsingStoreSession(ParsingStore store) {
         this.store = store;
+        this.documentFactory = new DocumentFactory(store);
     }
 
     public List<UnknownDocument> getUnrequestedFiles() {
@@ -50,7 +52,7 @@ public class ParsingStoreSession {
         List<String> keys = new ArrayList<>(references.keySet());
         keys.removeAll(requestedKeys);
         for (String key : keys) {
-            returnable.add((UnknownDocument) DocumentFactory.create(get(key), "unknown", key));
+            returnable.add((UnknownDocument) documentFactory.create(get(key), "unknown", key));
         }
         return returnable;
     }
@@ -83,4 +85,7 @@ public class ParsingStoreSession {
         }
     }
 
+    public ParsingStore getParsingStore() {
+        return store;
+    }
 }

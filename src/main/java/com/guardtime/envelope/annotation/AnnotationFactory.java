@@ -19,7 +19,7 @@
 
 package com.guardtime.envelope.annotation;
 
-import com.guardtime.envelope.packaging.parsing.store.ActiveParsingStoreProvider;
+import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreReference;
 
@@ -32,32 +32,34 @@ import static com.guardtime.envelope.util.Util.notNull;
 /**
  * Universal builder for {@link Annotation}
  */
-public final class AnnotationFactory {
+public class AnnotationFactory {
 
-    private AnnotationFactory() {
-        //
+    private final ParsingStore parsingStore;
+
+    public AnnotationFactory(ParsingStore parsingStore) {
+        this.parsingStore = parsingStore;
     }
 
-    public static Annotation create(File file, String domain, EnvelopeAnnotationType type) {
+    public Annotation create(File file, String domain, EnvelopeAnnotationType type) {
         return new FileAnnotation(file, domain, type);
     }
 
-    public static Annotation create(String content, String domain, EnvelopeAnnotationType type) {
+    public Annotation create(String content, String domain, EnvelopeAnnotationType type) {
         return new StringAnnotation(content, domain, type);
     }
 
-    public static Annotation create(ParsingStoreReference reference, String domain, EnvelopeAnnotationType type) {
+    public Annotation create(ParsingStoreReference reference, String domain, EnvelopeAnnotationType type) {
         return new ParsedAnnotation(reference, domain, type);
     }
 
     /**
      * NB! Does not close the stream! Just reads from it.
      */
-    public static Annotation create(InputStream stream, String domain, EnvelopeAnnotationType type) {
+    public Annotation create(InputStream stream, String domain, EnvelopeAnnotationType type) {
         return create(addToStore(stream), domain, type);
     }
 
-    public static Annotation create(Annotation original) {
+    public Annotation create(Annotation original) {
         // TODO: Any better option?
         Annotation newAnnotation = null;
         if (original instanceof FileAnnotation) {
@@ -81,10 +83,10 @@ public final class AnnotationFactory {
         return newAnnotation;
     }
 
-    private static ParsingStoreReference addToStore(InputStream data) {
+    private ParsingStoreReference addToStore(InputStream data) {
         notNull(data, "Input stream");
         try {
-            return ActiveParsingStoreProvider.getActiveParsingStore().store(data);
+            return parsingStore.store(data);
         } catch (ParsingStoreException e) {
             throw new IllegalArgumentException("Can not copy input stream to memory!", e);
         }

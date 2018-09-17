@@ -32,6 +32,7 @@ import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.parsing.handler.ContentParsingException;
+import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.util.Pair;
 
@@ -47,6 +48,8 @@ class SignatureContentComposer {
     private static final Logger logger = LoggerFactory.getLogger(SignatureContentComposer.class);
 
     private final EnvelopeElementExtractor handler;
+    private DocumentFactory documentFactory;
+    private AnnotationFactory annotationFactory;
 
     SignatureContentComposer(EnvelopeElementExtractor envelopeElementExtractor) {
         this.handler = envelopeElementExtractor;
@@ -54,6 +57,9 @@ class SignatureContentComposer {
 
     public Pair<SignatureContent, List<Throwable>> compose(String manifestPath, ParsingStoreSession parsingStoreSession)
             throws ContentParsingException {
+        ParsingStore parsingStore = parsingStoreSession.getParsingStore();
+        this.documentFactory = new DocumentFactory(parsingStore);
+        this.annotationFactory = new AnnotationFactory(parsingStore);
         SignatureContentGroup group = new SignatureContentGroup(manifestPath, parsingStoreSession);
         SignatureContent signatureContent = new SignatureContent.Builder()
                 .withManifest(group.manifest)
@@ -128,14 +134,14 @@ class SignatureContentComposer {
             if (invalidReference(reference)) return null;
             String documentUri = reference.getUri();
             try {
-                return DocumentFactory.create(
+                return documentFactory.create(
                         handler.getParsingStoreReference(documentUri),
                         reference.getMimeType(),
                         documentUri
                 );
             } catch (ContentParsingException e) {
                 // either removed or was never present in the first place, verifier will decide
-                return DocumentFactory.create(reference.getHashList(), reference.getMimeType(), documentUri);
+                return documentFactory.create(reference.getHashList(), reference.getMimeType(), documentUri);
             }
         }
 
@@ -182,7 +188,7 @@ class SignatureContentComposer {
             AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
             String uri = annotationDataReference.getUri();
             try {
-                Annotation annotation = AnnotationFactory.create(
+                Annotation annotation = annotationFactory.create(
                         parsingStoreSession.get(uri),
                         annotationDataReference.getDomain(),
                         type

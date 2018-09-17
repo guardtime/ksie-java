@@ -20,7 +20,6 @@
 package com.guardtime.envelope;
 
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
@@ -61,6 +60,7 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
                 .withSignatureFactory(mockedSignatureFactory)
                 .withVerificationPolicy(null)
                 .withIndexProviderFactory(new IncrementingIndexProviderFactory())
+                .withParsingStore(parsingStore)
                 .build();
 
         EnvelopeSignature mockedSignature = mock(EnvelopeSignature.class);
@@ -90,7 +90,7 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
     @Test
     public void testAddDocumentToEnvelope() throws Exception {
         EnvelopeBuilder builder = new EnvelopeBuilder(mockedPackagingFactory);
-        try (Document document = DocumentFactory.create(
+        try (Document document = documentFactory.create(
                 new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                 MIME_TYPE_APPLICATION_TXT,
                 TEST_FILE_NAME_TEST_TXT
@@ -100,15 +100,17 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
             assertEquals(1, builder.getDocuments().size());
 
             builder.withDocument(
-                    new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
-                    TEST_FILE_NAME_TEST_DOC,
-                    MIME_TYPE_APPLICATION_TXT
+                    documentFactory.create(
+                            new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
+                            MIME_TYPE_APPLICATION_TXT,
+                            TEST_FILE_NAME_TEST_DOC
+                    )
             );
             assertEquals(2, builder.getDocuments().size());
 
             File mockFile = Mockito.mock(File.class);
             when(mockFile.getName()).thenReturn("SomeName.ext");
-            builder.withDocument(mockFile, "application/binary");
+            builder.withDocument(documentFactory.create(mockFile, "application/binary"));
             assertEquals(3, builder.getDocuments().size());
 
             closeAll(builder.getDocuments());
@@ -157,12 +159,12 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
         expectedException.expectMessage("Document with name '" + TEST_FILE_NAME_TEST_TXT + "' already exists!");
         expectedException.expect(IllegalArgumentException.class);
         try (
-                Document document = DocumentFactory.create(
+                Document document = documentFactory.create(
                         new ByteArrayInputStream("ImportantDocument-1".getBytes(StandardCharsets.UTF_8)),
                         MIME_TYPE_APPLICATION_TXT,
                         TEST_FILE_NAME_TEST_TXT
                 );
-                Document streamDocument = DocumentFactory.create(
+                Document streamDocument = documentFactory.create(
                         new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)),
                         MIME_TYPE_APPLICATION_TXT,
                         TEST_FILE_NAME_TEST_TXT
@@ -181,12 +183,12 @@ public class EnvelopeBuilderTest extends AbstractEnvelopeTest {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Found multiple documents with same name and non-matching data hash!");
         try (
-                Document document = DocumentFactory.create(
+                Document document = documentFactory.create(
                         new ByteArrayInputStream("ImportantDocument-2".getBytes(StandardCharsets.UTF_8)),
                         MIME_TYPE_APPLICATION_TXT,
                         TEST_FILE_NAME_TEST_TXT
                 );
-                Document streamDocument = DocumentFactory.create(
+                Document streamDocument = documentFactory.create(
                         new ByteArrayInputStream("ImportantDocument-HAHA".getBytes(StandardCharsets.UTF_8)),
                         MIME_TYPE_APPLICATION_TXT,
                         TEST_FILE_NAME_TEST_TXT

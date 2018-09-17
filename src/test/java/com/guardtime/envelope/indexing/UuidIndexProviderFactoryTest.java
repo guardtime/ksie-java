@@ -38,6 +38,7 @@ public class UuidIndexProviderFactoryTest extends AbstractEnvelopeTest {
     public void testCreateWithMixedEnvelope() throws Exception {
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(mockedSignatureFactory)
+                .withParsingStore(parsingStore)
                 .withVerificationPolicy(null)
                 .build();
         try (Envelope envelope = packagingFactory.create(

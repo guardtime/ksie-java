@@ -37,7 +37,6 @@ import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.packaging.parsing.EnvelopeReader;
-import com.guardtime.envelope.packaging.parsing.store.ActiveParsingStoreProvider;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.signature.SignatureException;
@@ -84,17 +83,20 @@ public final class EnvelopePackagingFactory {
     private final IndexProviderFactory indexProviderFactory;
     private final EnvelopeReader envelopeReader;
     private final VerificationPolicy verificationPolicy;
+    private final ParsingStore parsingStore;
 
     private EnvelopePackagingFactory(Builder builder) {
         Util.notNull(builder.signatureFactory, "Signature factory");
         Util.notNull(builder.manifestFactory, "Manifest factory");
         Util.notNull(builder.indexProviderFactory, "Index provider factory");
         Util.notNull(builder.envelopeReader, "Envelope reader");
+        Util.notNull(builder.parsingStore, "Parsing store");
         this.signatureFactory = builder.signatureFactory;
         this.manifestFactory = builder.manifestFactory;
         this.indexProviderFactory = builder.indexProviderFactory;
         this.verificationPolicy = builder.verificationPolicy;
         this.envelopeReader = builder.envelopeReader;
+        this.parsingStore = builder.parsingStore;
         logger.info("Envelope factory initialized");
     }
 
@@ -159,7 +161,7 @@ public final class EnvelopePackagingFactory {
     public Envelope addSignature(Envelope existingEnvelope, List<Document> files, List<Annotation> annotations)
             throws InvalidEnvelopeException, EnvelopeMergingException, SignatureException {
         Util.notNull(existingEnvelope, "Envelope");
-        Envelope copy = new Envelope(existingEnvelope);
+        Envelope copy = new Envelope(existingEnvelope, parsingStore);
         try {
             SignatureContent signatureContent = verifyAndSign(files, annotations, copy);
             copy.add(signatureContent);
@@ -187,7 +189,8 @@ public final class EnvelopePackagingFactory {
                     annotations,
                     indexProvider,
                     manifestFactory,
-                    signatureFactory
+                    signatureFactory,
+                    parsingStore
             ).sign();
         } catch (DataHashException | InvalidManifestException e) {
             throw new InvalidEnvelopeException("Failed to create internal structure!", e);
@@ -303,12 +306,14 @@ public final class EnvelopePackagingFactory {
         private EntryNameProvider nameProvider;
         private EnvelopeManifestFactory manifestFactory;
         private SignatureFactory signatureFactory;
+        private ParsingStore parsingStore;
 
         private Map<Annotation, SingleAnnotationManifest> annotationsManifestContent = new HashMap<>();
         private List<SingleAnnotationManifest> singleAnnotationManifests = new ArrayList<>();
 
         ContentSigner(List<Document> documents, List<Annotation> annotations, IndexProvider indexProvider,
-                             EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory) {
+                             EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory, ParsingStore store) {
+            this.parsingStore = store;
             this.documents = documents;
             this.annotations = annotations;
 
@@ -383,7 +388,7 @@ public final class EnvelopePackagingFactory {
         protected SignatureFactory signatureFactory;
         protected EnvelopeManifestFactory manifestFactory = new TlvEnvelopeManifestFactory();
         protected IndexProviderFactory indexProviderFactory = new IncrementingIndexProviderFactory();
-        protected ParsingStore parsingStore = ActiveParsingStoreProvider.getActiveParsingStore();
+        protected ParsingStore parsingStore;
         protected EnvelopeReader envelopeReader;
         protected VerificationPolicy verificationPolicy = new InternalVerificationPolicy();
 

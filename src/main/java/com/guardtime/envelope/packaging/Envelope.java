@@ -25,6 +25,7 @@ import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.document.SignedDocument;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
+import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.util.SortedList;
 import com.guardtime.envelope.util.Util;
 
@@ -58,25 +59,26 @@ public class Envelope implements AutoCloseable {
         this.unknownFiles.addAll(unknownFiles);
     }
 
-    public Envelope(Envelope original) {
+    public Envelope(Envelope original, ParsingStore store) {
         this(
-                copySignatureContents(original.getSignatureContents()),
-                copyUnknownFiles(original.getUnknownFiles())
+                copySignatureContents(original.getSignatureContents(), store),
+                copyUnknownFiles(original.getUnknownFiles(), store)
         );
     }
 
-    private static List<UnknownDocument> copyUnknownFiles(List<UnknownDocument> originals) {
+    private static List<UnknownDocument> copyUnknownFiles(List<UnknownDocument> originals, ParsingStore store) {
+        DocumentFactory documentFactory = new DocumentFactory(store);
         List<UnknownDocument> copies = new ArrayList<>();
         for (UnknownDocument doc : originals) {
-            copies.add((UnknownDocument) DocumentFactory.create(doc));
+            copies.add((UnknownDocument) documentFactory.create(doc));
         }
         return copies;
     }
 
-    private static List<SignatureContent> copySignatureContents(List<SignatureContent> originals) {
+    private static List<SignatureContent> copySignatureContents(List<SignatureContent> originals, ParsingStore store) {
         List<SignatureContent> copies = new ArrayList<>();
         for (SignatureContent signatureContent : originals) {
-            copies.add(new SignatureContent(signatureContent));
+            copies.add(new SignatureContent(signatureContent, store));
         }
         return copies;
     }

@@ -68,6 +68,7 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
     protected SignatureFactory signatureFactory;
     protected EnvelopeWriter envelopeWriter;
     protected KSI ksi;
+    protected TemporaryFileBasedParsingStore temporaryFileBasedParsingStore = new TemporaryFileBasedParsingStore();
 
     protected Path tmpDir = Paths.get(System.getProperty("java.io.tmpdir"));
 
@@ -76,6 +77,7 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
     private static final String TEST_EXTENDING_SERVICE;
 
     private static final String GUARDTIME_PUBLICATIONS_FILE;
+
 
     static {
         try {
@@ -121,10 +123,11 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
         signatureFactory = new KsiSignatureFactory(ksi, ksi);
         packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
+                .withParsingStore(parsingStore)
                 .build();
         packagingFactoryTFPS = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
-                .withParsingStore(new TemporaryFileBasedParsingStore())
+                .withParsingStore(temporaryFileBasedParsingStore)
                 .build();
         envelopeWriter = new ZipEnvelopeWriter();
     }

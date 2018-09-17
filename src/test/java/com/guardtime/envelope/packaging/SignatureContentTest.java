@@ -22,7 +22,6 @@ package com.guardtime.envelope.packaging;
 import com.guardtime.envelope.AbstractEnvelopeTest;
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.document.EmptyDocument;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
@@ -56,7 +55,7 @@ public class SignatureContentTest extends AbstractEnvelopeTest {
     public void testAttachDocumentData_OK() throws Exception {
         SignatureContent testable = getTestableContent();
         byte[] bytes = "testData".getBytes();
-        assertTrue(testable.attachDetachedDocument(TEST_FILE_NAME_TEST_DOC, new ByteArrayInputStream(bytes)));
+        assertTrue(testable.attachDetachedDocument(TEST_FILE_NAME_TEST_DOC, new ByteArrayInputStream(bytes), documentFactory));
         Document reAttachedDocument = testable.getDocuments().get(TEST_FILE_NAME_TEST_DOC);
         assertFalse(reAttachedDocument instanceof EmptyDocument);
         try (InputStream inputStream = reAttachedDocument.getInputStream()) {
@@ -69,14 +68,20 @@ public class SignatureContentTest extends AbstractEnvelopeTest {
     @Test
     public void testAttachDocumentDataToUnknownDocument_ReturnsFalse() {
         SignatureContent testable = getTestableContent();
-        assertFalse(testable.attachDetachedDocument("SomePathThatShouldNotExist", new ByteArrayInputStream(new byte[0])));
+        assertFalse(
+                testable.attachDetachedDocument(
+                        "SomePathThatShouldNotExist",
+                        new ByteArrayInputStream(new byte[0]),
+                        documentFactory
+                )
+        );
     }
 
     @Test
     public void testDetachDocumentData_OK() throws ParsingStoreException {
         SignatureContent testable = getTestableContent();
         int documentsCount = testable.getDocuments().size();
-        Document detached = testable.detachDocument(TEST_FILE_NAME_TEST_PDF);
+        Document detached = testable.detachDocument(TEST_FILE_NAME_TEST_PDF, documentFactory);
         assertEquals(documentsCount, testable.getDocuments().size());
         assertNotNull(detached);
         assertFalse(detached instanceof EmptyDocument);
@@ -87,7 +92,7 @@ public class SignatureContentTest extends AbstractEnvelopeTest {
     @Test
     public void testDetachDocumentDataForNonExistentDocument_ReturnsNull() throws ParsingStoreException {
         SignatureContent testable = getTestableContent();
-        Document detached = testable.detachDocument("ThisFileIsNotInTheSignatureContent");
+        Document detached = testable.detachDocument("ThisFileIsNotInTheSignatureContent", documentFactory);
         assertNull(detached);
     }
 
@@ -95,7 +100,7 @@ public class SignatureContentTest extends AbstractEnvelopeTest {
         List<Document> documents = Arrays.asList(
                 testDocumentHelloText,
                 testDocumentHelloPdf,
-                DocumentFactory.create(
+                documentFactory.create(
                         singletonList(new DataHash(HashAlgorithm.SHA2_256, new byte[32])),
                         "application/doc",
                         TEST_FILE_NAME_TEST_DOC

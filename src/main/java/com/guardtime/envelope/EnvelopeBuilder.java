@@ -20,10 +20,7 @@
 package com.guardtime.envelope;
 
 import com.guardtime.envelope.annotation.Annotation;
-import com.guardtime.envelope.annotation.AnnotationFactory;
-import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.SignatureContent;
@@ -31,8 +28,6 @@ import com.guardtime.envelope.packaging.SignatureContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -73,14 +68,6 @@ public class EnvelopeBuilder {
         return this;
     }
 
-    public EnvelopeBuilder withDocument(InputStream input, String name, String mimeType) {
-        return withDocument(DocumentFactory.create(input, mimeType, name));
-    }
-
-    public EnvelopeBuilder withDocument(File file, String mimeType) {
-        return withDocument(DocumentFactory.create(file, mimeType));
-    }
-
     public EnvelopeBuilder withDocument(Document document) {
         notNull(document, "Data file ");
         checkDocumentNameExistence(document);
@@ -89,18 +76,6 @@ public class EnvelopeBuilder {
             LOGGER.debug("Document '{}' will be added to the envelope", document);
         }
         return this;
-    }
-
-    public EnvelopeBuilder withAnnotation(String content, String domain, EnvelopeAnnotationType type) {
-        return withAnnotation(AnnotationFactory.create(content, domain, type));
-    }
-
-    public EnvelopeBuilder withAnnotation(File content, String domain, EnvelopeAnnotationType type) {
-        return withAnnotation(AnnotationFactory.create(content, domain, type));
-    }
-
-    public EnvelopeBuilder withAnnotation(InputStream content, String domain, EnvelopeAnnotationType type) {
-        return withAnnotation(AnnotationFactory.create(content, domain, type));
     }
 
     public EnvelopeBuilder withAnnotation(Annotation annotation) {

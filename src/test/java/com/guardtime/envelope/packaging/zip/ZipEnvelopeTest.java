@@ -22,7 +22,6 @@ package com.guardtime.envelope.packaging.zip;
 import com.guardtime.envelope.AbstractEnvelopeTest;
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.UuidIndexProviderFactory;
 import com.guardtime.envelope.packaging.Envelope;
@@ -58,6 +57,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
     public void testAddSingleSignatureContent_OK() throws Exception {
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(mockedSignatureFactory)
+                .withParsingStore(parsingStore)
                 .withVerificationPolicy(null)
                 .withIndexProviderFactory(new UuidIndexProviderFactory())
                 .build();
@@ -80,6 +80,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
     public void testAddListOfSignatureContent_OK() throws Exception {
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(mockedSignatureFactory)
+                .withParsingStore(parsingStore)
                 .withVerificationPolicy(null)
                 .withIndexProviderFactory(new UuidIndexProviderFactory())
                 .build();
@@ -92,7 +93,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                     Envelope newEnvelope =
                             packagingFactory.create(singletonList(testDocumentHelloText), new ArrayList<Annotation>());
                     ByteArrayInputStream input = new ByteArrayInputStream("auh".getBytes(StandardCharsets.UTF_8));
-                    Document document = DocumentFactory.create(input, "text/plain", "someTestFile.txt");
+                    Document document = documentFactory.create(input, "text/plain", "someTestFile.txt");
                     Envelope second = packagingFactory.addSignature(
                             newEnvelope,
                             singletonList(document),
@@ -112,6 +113,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
         expectedException.expectMessage("New SignatureContent has clashing Manifest!");
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(mockedSignatureFactory)
+                .withParsingStore(parsingStore)
                 .withVerificationPolicy(null)
                 .withIndexProviderFactory(new IncrementingIndexProviderFactory())
                 .build();
@@ -135,6 +137,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
         expectedException.expectMessage("New SignatureContent has clashing name for Document! Path: ");
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(mockedSignatureFactory)
+                .withParsingStore(parsingStore)
                 .withVerificationPolicy(null)
                 .withIndexProviderFactory(new UuidIndexProviderFactory())
                 .build();
@@ -143,7 +146,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                 singletonList(stringEnvelopeAnnotation)
         )) {
             assertEquals(1, envelope.getSignatureContents().size());
-            try (Document clashingDocument = DocumentFactory.create(
+            try (Document clashingDocument = documentFactory.create(
                     new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                     testDocumentHelloPdf.getMimeType(),
                     testDocumentHelloPdf.getFileName()
@@ -175,10 +178,11 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
         expectedException.expectMessage("File name is not valid!");
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(mockedSignatureFactory)
+                .withParsingStore(parsingStore)
                 .withVerificationPolicy(null)
                 .withIndexProviderFactory(new UuidIndexProviderFactory())
                 .build();
-        Document testDocument = DocumentFactory.create(new ByteArrayInputStream(new byte[0]), "some type", filename);
+        Document testDocument = documentFactory.create(new ByteArrayInputStream(new byte[0]), "some type", filename);
         try (Envelope ignored = packagingFactory.create(singletonList(testDocument), singletonList(stringEnvelopeAnnotation))) {
             //empty
         }

@@ -31,8 +31,8 @@ import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.ManifestFactoryType;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
-import com.guardtime.envelope.packaging.parsing.store.ActiveParsingStoreProvider;
 import com.guardtime.envelope.packaging.parsing.store.MemoryBasedParsingStore;
+import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.signature.SignatureFactory;
 import com.guardtime.envelope.signature.SignatureFactoryType;
 import com.guardtime.envelope.verification.rule.state.DefaultRuleStateProvider;
@@ -41,7 +41,6 @@ import org.hamcrest.CustomTypeSafeMatcher;
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
@@ -62,11 +61,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 public class AbstractEnvelopeTest {
-
-    @BeforeClass
-    public static void setUpeParsingStore() {
-        ActiveParsingStoreProvider.setActiveParsingStore(new MemoryBasedParsingStore());
-    }
 
     /**
      * Envelopes - Internally correct and does verify against anchors.
@@ -167,20 +161,23 @@ public class AbstractEnvelopeTest {
     protected Document testDocumentHelloText;
     protected Document testDocumentHelloPdf;
     protected final List<AutoCloseable> envelopeElements = new LinkedList<>();
+    protected ParsingStore parsingStore = getParsingStore();
+    protected DocumentFactory documentFactory = new DocumentFactory(parsingStore);
+    protected AnnotationFactory annotationFactory = new AnnotationFactory(parsingStore);
 
     @Before
     public void setUpDocumentsAndAnnotations() {
-        stringEnvelopeAnnotation = AnnotationFactory.create(
+        stringEnvelopeAnnotation = annotationFactory.create(
                 ANNOTATION_CONTENT,
                 ANNOTATION_DOMAIN_COM_GUARDTIME,
                 EnvelopeAnnotationType.NON_REMOVABLE
         );
-        testDocumentHelloText = DocumentFactory.create(
+        testDocumentHelloText = documentFactory.create(
                 new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                 MIME_TYPE_APPLICATION_TXT,
                 TEST_FILE_NAME_TEST_TXT
         );
-        testDocumentHelloPdf = DocumentFactory.create(
+        testDocumentHelloPdf = documentFactory.create(
                 new ByteArrayInputStream(TEST_DATA_PDF_CONTENT),
                 MIME_TYPE_APPLICATION_PDF,
                 TEST_FILE_NAME_TEST_PDF
@@ -243,6 +240,10 @@ public class AbstractEnvelopeTest {
         )).thenReturn(mockedManifest);
         when(mockedSignatureFactory.getSignatureFactoryType()).thenReturn(mockedSignatureFactoryType);
         when(mockedSignatureFactoryType.getSignatureMimeType()).thenReturn(SIGNATURE_MIME_TYPE);
+    }
+
+    protected ParsingStore getParsingStore() {
+        return new MemoryBasedParsingStore();
     }
 
     @After

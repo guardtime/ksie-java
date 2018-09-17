@@ -21,7 +21,6 @@ package com.guardtime.envelope.integration;
 
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.extending.ExtendedEnvelope;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.UuidIndexProviderFactory;
@@ -99,10 +98,12 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
         packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
                 .withIndexProviderFactory(new UuidIndexProviderFactory())
+                .withParsingStore(parsingStore)
                 .build();
         incPackagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
                 .withIndexProviderFactory(new IncrementingIndexProviderFactory())
+                .withParsingStore(parsingStore)
                 .build();
     }
 
@@ -164,14 +165,14 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
 
     @Test
     public void testAddNewContentToMergedEnvelope1() throws Exception {
-        try (Document document = DocumentFactory.create(
+        try (Document document = documentFactory.create(
                 new ByteArrayInputStream("".getBytes()),
                 "textDoc",
                 "1-" + Long.toString(new Date().getTime())
             );
             Envelope uuidEnvelope = packagingFactory.create(singletonList(document), singletonList(stringEnvelopeAnnotation));
             Envelope incEnvelope = getEnvelope(ENVELOPE_WITH_RANDOM_INCREMENTING_INDEXES);
-            Document document2 = DocumentFactory.create(
+            Document document2 = documentFactory.create(
                     new ByteArrayInputStream("".getBytes()),
                     "textDoc",
                     "2-" + Long.toString(new Date().getTime())
@@ -213,7 +214,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
                      singletonList(testDocumentHelloText),
                      singletonList(stringEnvelopeAnnotation)
              );
-             Document document = DocumentFactory.create(
+             Document document = documentFactory.create(
                      new ByteArrayInputStream("".getBytes()),
                      "textDoc",
                      Long.toString(new Date().getTime())
@@ -447,7 +448,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
         Document document = existingDocument;
         if (document == null) {
             document =
-                    DocumentFactory.create(
+                    documentFactory.create(
                             new ByteArrayInputStream(UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8)),
                             "text/plain",
                             UUID.randomUUID().toString()

@@ -29,6 +29,7 @@ import com.guardtime.envelope.manifest.DocumentsManifest;
 import com.guardtime.envelope.manifest.FileReference;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
+import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.ksi.hashing.DataHash;
@@ -65,22 +66,22 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
         this.signature = builder.signature;
     }
 
-    public SignatureContent(SignatureContent signatureContent) {
-        this(new Builder().withSignatureContent(signatureContent));
+    public SignatureContent(SignatureContent signatureContent, ParsingStore parsingStore) {
+        this(new Builder().withSignatureContent(signatureContent, parsingStore));
     }
 
-    private List<Annotation> copyAnnotations(Collection<Annotation> annotations) {
+    private List<Annotation> copyAnnotations(Collection<Annotation> annotations, AnnotationFactory annotationFactory) {
         List<Annotation> copied = new ArrayList<>();
         for (Annotation annot : annotations) {
-            copied.add(AnnotationFactory.create(annot));
+            copied.add(annotationFactory.create(annot));
         }
         return copied;
     }
 
-    private List<Document> copyDocuments(Collection<Document> documents) {
+    private List<Document> copyDocuments(Collection<Document> documents, DocumentFactory documentFactory) {
         List<Document> copied = new ArrayList<>();
         for (Document doc : documents) {
-            copied.add(DocumentFactory.create(doc));
+            copied.add(documentFactory.create(doc));
         }
         return copied;
     }
@@ -138,12 +139,12 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
      * @param data data stream to be attached to the {@link Document}. NB! Does NOT close the stream!
      * @return True, after successful attachment.
      */
-    public boolean attachDetachedDocument(String path, InputStream data) {
+    public boolean attachDetachedDocument(String path, InputStream data, DocumentFactory documentFactory) {
         Document document = documents.get(path);
         if (document instanceof EmptyDocument) {
             documents.put(
                     path,
-                    DocumentFactory.create(data, document.getMimeType(), document.getFileName())
+                    documentFactory.create(data, document.getMimeType(), document.getFileName())
             );
             return true;
         }
@@ -156,7 +157,7 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
      * {@link SignatureContent}. If no document found or if the document is already detached, null will be returned.
      * @throws ParsingStoreException when detaching an instance of {@link Document} fails.
      */
-    public Document detachDocument(String path) throws ParsingStoreException {
+    public Document detachDocument(String path, DocumentFactory documentFactory) throws ParsingStoreException {
         if (!documents.containsKey(path) || documents.get(path) instanceof EmptyDocument) {
             return null;
         }
@@ -170,10 +171,10 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
         }
         documents.put(
                 path,
-                DocumentFactory.create(removedDocumentHashes, removed.getMimeType(), removed.getFileName())
+                documentFactory.create(removedDocumentHashes, removed.getMimeType(), removed.getFileName())
         );
         try (InputStream inputStream = removed.getInputStream()) {
-            Document detached = DocumentFactory.create(inputStream, removed.getMimeType(), removed.getFileName());
+            Document detached = documentFactory.create(inputStream, removed.getMimeType(), removed.getFileName());
             removed.close();
             return detached;
         } catch (Exception e) {
@@ -261,6 +262,9 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
         private List<SingleAnnotationManifest> singleAnnotationManifests;
         private EnvelopeSignature signature;
 
+        public Builder() {
+        }
+
         public Builder withDocuments(Collection<Document> documents) {
             this.documents = new ArrayList<>(documents);
             return this;
@@ -296,9 +300,11 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
             return this;
         }
 
-        protected Builder withSignatureContent(SignatureContent original) {
-          return withDocuments(original.copyDocuments(original.getDocuments().values()))
-                  .withAnnotations(original.copyAnnotations(original.getAnnotations().values()))
+        protected Builder withSignatureContent(SignatureContent original, ParsingStore parsingStore) {
+          return withDocuments(original.copyDocuments(original.getDocuments().values(), new DocumentFactory(parsingStore)))
+                  .withAnnotations(
+                          original.copyAnnotations(original.getAnnotations().values(), new AnnotationFactory(parsingStore))
+                  )
                   .withSignature(original.getEnvelopeSignature().getCopy())
                   // No copy needed for manifests,
                   // can use the same object as they never change during program lifetime.

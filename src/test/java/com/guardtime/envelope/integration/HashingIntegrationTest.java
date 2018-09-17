@@ -21,10 +21,8 @@ package com.guardtime.envelope.integration;
 
 import com.guardtime.envelope.EnvelopeBuilder;
 import com.guardtime.envelope.annotation.Annotation;
-import com.guardtime.envelope.annotation.AnnotationFactory;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.Manifest;
@@ -60,11 +58,11 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
     private static final String ENVELOPE_DOCUMENT_FILE_NAME = "StreamFile.txt";
     private static final String ENVELOPE_DOCUMENT_MIME_TYPE = "Stream";
     private static final String INPUT_STREAM_STRING = "Input from stream.";
-    private final Annotation envelopeAnnotation = AnnotationFactory.create(ENVELOPE_ANNOTATION_CONTENT,
+    private final Annotation envelopeAnnotation = annotationFactory.create(ENVELOPE_ANNOTATION_CONTENT,
             ENVELOPE_ANNOTATION_TYPE_DOMAIN,
             EnvelopeAnnotationType.FULLY_REMOVABLE
     );
-    private final Document envelopeDocument = DocumentFactory.create(
+    private final Document envelopeDocument = documentFactory.create(
             new ByteArrayInputStream(INPUT_STREAM_STRING.getBytes(StandardCharsets.UTF_8)),
             ENVELOPE_DOCUMENT_MIME_TYPE,
             ENVELOPE_DOCUMENT_FILE_NAME
@@ -348,6 +346,7 @@ public class HashingIntegrationTest extends AbstractCommonIntegrationTest {
         return new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
                 .withManifestFactory(envelopeManifestFactory)
+                .withParsingStore(parsingStore)
                 .build();
     }
 
