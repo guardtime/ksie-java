@@ -123,8 +123,7 @@ public class Envelope implements AutoCloseable {
      * as such any external calls to <code>close()</code> on those resources may lead to unexpected behaviour.
      *
      * @param content the content to be added.
-     * @throws EnvelopeMergingException when the {@link SignatureContent} can not be added into the {@link Envelope} due to
-     * clashing file paths or any other reason.
+     * @throws EnvelopeMergingException when the {@link SignatureContent} can not be added into the {@link Envelope}.
      */
     public void add(SignatureContent content) throws EnvelopeMergingException {
         verifyNewSignatureContentIsAcceptable(content, signatureContents);
@@ -137,8 +136,7 @@ public class Envelope implements AutoCloseable {
      * {@link SignatureContent}s and as such any external calls to close() on those resources may lead to unexpected behaviour.
      *
      * @param contents the content to be added.
-     * @throws EnvelopeMergingException when any {@link SignatureContent} can not be added into the {@link Envelope} due to
-     * clashing file paths or any other reason.
+     * @throws EnvelopeMergingException when any {@link SignatureContent} can not be added into the {@link Envelope}.
      */
     public void addAll(Collection<SignatureContent> contents) throws EnvelopeMergingException {
         List<SignatureContent> original = new LinkedList<>(signatureContents);

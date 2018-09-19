@@ -82,9 +82,12 @@ public abstract class EnvelopeReader {
         EnvelopeElementExtractor envelopeElementExtractor =
                 new EnvelopeElementExtractor(manifestFactory, signatureFactory, parsingStoreSession);
 
-        List<SignatureContent> contents = buildSignatures(envelopeElementExtractor, readingException, parsingStoreSession);
         validateMimeType(envelopeElementExtractor);
-        List<UnknownDocument> unknownFiles = parsingStoreSession.getUnrequestedFiles();
+        List<SignatureContent> contents = buildSignatures(envelopeElementExtractor, readingException, parsingStoreSession);
+        if (contents.isEmpty()) {
+            throw new InvalidEnvelopeException("No valid signature content parsed!");
+        }
+        List<UnknownDocument> unknownFiles = getAndLogUnknownFiles(parsingStoreSession);
         parsingStoreSession.clear();
         Envelope envelope = new Envelope(contents, unknownFiles);
         readingException.setEnvelope(envelope);
@@ -97,6 +100,14 @@ public abstract class EnvelopeReader {
             throw readingException;
         }
         return envelope;
+    }
+
+    private List<UnknownDocument> getAndLogUnknownFiles(ParsingStoreSession session) {
+        List<UnknownDocument> result = session.getUnrequestedFiles();
+        for (UnknownDocument doc : result) {
+            LOGGER.warn("Encountered an unknown file in envelope at path '{}'", doc.getPath());
+        }
+        return result;
     }
 
     /**
