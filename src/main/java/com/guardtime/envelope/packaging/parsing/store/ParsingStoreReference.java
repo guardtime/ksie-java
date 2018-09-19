@@ -19,6 +19,7 @@
 
 package com.guardtime.envelope.packaging.parsing.store;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
@@ -28,19 +29,27 @@ import java.util.UUID;
 public class ParsingStoreReference {
     private final UUID uuid;
     private final ParsingStore owner;
+    private final String pathName;
 
-    public ParsingStoreReference(UUID uuid, ParsingStore store) {
+    public ParsingStoreReference(UUID uuid, ParsingStore store, String pathName) {
         this.uuid = uuid;
         this.owner = store;
+        this.pathName = pathName;
     }
 
     public ParsingStoreReference(ParsingStoreReference original) {
-        this(original.uuid, original.owner);
+        this(original.uuid, original.owner, original.pathName);
         owner.updateReferences(uuid, this);
     }
 
-    public InputStream getStoredContent() {
-        return owner.getContent(uuid);
+    public InputStream getStoredContent() throws IOException {
+        InputStream inputStream = owner.getContent(uuid);
+        if (inputStream == null) {
+            throw new IOException(
+                    "Failed to acquire input stream from parsing store for key '" + getKey() + "'"
+            );
+        }
+        return inputStream;
     }
 
     public void unstore() {
@@ -49,5 +58,13 @@ public class ParsingStoreReference {
 
     public UUID getUuid() {
         return uuid;
+    }
+
+    public String getKey() {
+        String result = getUuid().toString();
+        if (pathName != null) {
+            return result + " - " + pathName;
+        }
+        return result;
     }
 }

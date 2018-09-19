@@ -189,7 +189,7 @@ class SignatureContentComposer {
             String uri = annotationDataReference.getUri();
             try {
                 Annotation annotation = annotationFactory.create(
-                        parsingStoreSession.get(uri),
+                        parsingStoreSession.getReference(uri),
                         annotationDataReference.getDomain(),
                         type
                 );

@@ -52,7 +52,7 @@ public class ParsingStoreSession {
         List<String> keys = new ArrayList<>(references.keySet());
         keys.removeAll(requestedKeys);
         for (String key : keys) {
-            returnable.add((UnknownDocument) documentFactory.create(get(key), "unknown", key));
+            returnable.add((UnknownDocument) documentFactory.create(getReference(key), "unknown", key));
         }
         return returnable;
     }
@@ -65,13 +65,13 @@ public class ParsingStoreSession {
         return references.containsKey(path);
     }
 
-    public ParsingStoreReference get(String path) {
+    public ParsingStoreReference getReference(String path) {
         requestedKeys.add(path);
         return new ParsingStoreReference(references.get(path));
     }
 
     public void store(String name, InputStream input) throws ParsingStoreException {
-        ParsingStoreReference ref = store.store(input);
+        ParsingStoreReference ref = store.store(input, name);
         references.put(name, ref);
     }
 

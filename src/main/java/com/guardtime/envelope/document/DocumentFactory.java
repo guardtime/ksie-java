@@ -67,11 +67,10 @@ public class DocumentFactory {
      * NB! Does not close the stream! Just reads from it.
      */
     public Document create(InputStream stream, String mimetype, String filename) {
-        return new ParsedDocument(addToStore(stream), mimetype, filename);
+        return new ParsedDocument(addToStore(stream, filename), mimetype, filename);
     }
 
     public Document create(Document original) {
-        // TODO: Any better option?
         if (original instanceof FileDocument) {
             return create(((FileDocument) original).file, original.getMimeType(), original.getFileName());
         } else if (original instanceof EmptyDocument) {
@@ -87,12 +86,12 @@ public class DocumentFactory {
         }
     }
 
-    private ParsingStoreReference addToStore(InputStream data) {
+    private ParsingStoreReference addToStore(InputStream data, String path) {
         notNull(data, "Input stream");
         try {
-            return parsingStore.store(data);
+            return parsingStore.store(data, path);
         } catch (ParsingStoreException e) {
-            throw new IllegalArgumentException("Can not copy input stream to memory!", e);
+            throw new IllegalArgumentException("Can not copy input stream to parsing store!", e);
         }
     }
 

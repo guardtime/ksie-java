@@ -118,7 +118,7 @@ class EnvelopeElementExtractor {
         if (!parsingStoreSession.contains(path)) {
             throw new ContentParsingException("No content stored for entry '" + path + "'!");
         }
-        return parsingStoreSession.get(path);
+        return parsingStoreSession.getReference(path);
     }
 
 }

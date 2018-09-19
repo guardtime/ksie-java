@@ -42,7 +42,6 @@ import com.guardtime.envelope.verification.result.ResultHolder;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -295,10 +294,10 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     public void testMergeEnvelopesWithExactSameDocument() throws Exception {
         try (Envelope envelope = mergeEnvelopesUnclosed(ENVELOPES_FOR_SAME_DOCUMENT)) {
             assertEquals(2, envelope.getSignatureContents().size());
+            assertSignatureContentsCount(envelope, 2);
         }
     }
 
-    @Ignore // TODO: KSIE-116
     @Test
     public void testMergeEnvelopeWithExactSameEnvelope() throws Exception {
         try (Envelope envelope = mergeEnvelopesUnclosed(ENVELOPES_IDENTICAL)) {
@@ -378,20 +377,17 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
         }
     }
 
-    @Ignore // KSIE-116
     @Test
     public void testMergeWithUnknownFiles() throws Exception {
         try (Envelope first = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES);
              Envelope second  = getEnvelope(ENVELOPE_WITH_MULTIPLE_SIGNATURES)) {
-
-            first.addAll(second.getSignatureContents());
+            for (SignatureContent content : second.getSignatureContents()) {
+                first.add(new SignatureContent(content, parsingStore));
+            }
             assertEquals(3, first.getSignatureContents().size());
             assertEquals(2, second.getSignatureContents().size());
             assertEquals(0, first.getUnknownFiles().size());
             assertEquals(1, second.getUnknownFiles().size());
-            //TODO: KSIE-116: Should copy SignatureContent, not reuse same object,
-            // Signature time sets the same signature to be first in sorted lists of first and second envelope
-            assertTrue(first.getSignatureContents().get(0) != second.getSignatureContents().get(0));
         }
     }
 
@@ -439,7 +435,9 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     private Envelope mergeEnvelopesUnclosed(String[] envelopes) throws Exception {
         Envelope envelope1 = getEnvelope(envelopes[0]);
         try (Envelope envelope2 = getEnvelope(envelopes[1])) {
-            envelope1.addAll(envelope2.getSignatureContents());
+            for (SignatureContent content : envelope2.getSignatureContents()) {
+                envelope1.add(new SignatureContent(content, parsingStore));
+            }
         }
         return envelope1;
     }

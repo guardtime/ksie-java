@@ -48,14 +48,14 @@ public class TemporaryFileBasedParsingStore extends ParsingStore {
     private Path tempDir;
 
     @Override
-    public ParsingStoreReference store(InputStream stream) throws ParsingStoreException {
+    public ParsingStoreReference store(InputStream stream, String pathName) throws ParsingStoreException {
         try {
             createTempDir();
             File tmpFile = Util.createTempFile(tempDir);
             Util.copyToTempFile(stream, tmpFile);
             UUID uuid = UUID.randomUUID();
             store.put(uuid, tmpFile);
-            return addNewReference(uuid);
+            return addNewReference(uuid, pathName);
         } catch (IOException e) {
             throw new ParsingStoreException("Failed to store stream!", e);
         }

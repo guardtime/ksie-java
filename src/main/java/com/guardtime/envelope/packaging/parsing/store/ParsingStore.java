@@ -38,14 +38,19 @@ public abstract class ParsingStore {
     /**
      * @param stream the {@link InputStream} from which the data will be stored.
      *
+     * @param pathName optional name of stored file.
      * @throws ParsingStoreException when reading the stream fails.
      */
-    public abstract ParsingStoreReference store(InputStream stream) throws ParsingStoreException;
+    public abstract ParsingStoreReference store(InputStream stream, String pathName) throws ParsingStoreException;
+
+    public ParsingStoreReference store(InputStream stream) throws ParsingStoreException {
+        return store(stream, null);
+    }
 
     public abstract InputStream getContent(UUID uuid);
 
-    ParsingStoreReference addNewReference(UUID uuid) {
-        ParsingStoreReference ref = new ParsingStoreReference(uuid, this);
+    ParsingStoreReference addNewReference(UUID uuid, String path) {
+        ParsingStoreReference ref = new ParsingStoreReference(uuid, this, path);
         updateReferences(uuid, ref);
         return ref;
     }

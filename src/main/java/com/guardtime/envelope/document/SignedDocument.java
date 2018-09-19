@@ -105,5 +105,4 @@ public class SignedDocument implements Document {
     public List<Annotation> getAnnotations() {
         return new ArrayList<>(content.getAnnotations().values());
     }
-
 }

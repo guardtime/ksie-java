@@ -38,7 +38,7 @@ class ParsedAnnotation extends AbstractAnnotation {
     /**
      * Creates {@link Annotation} with provided type and domain. The annotation value is provided via
      * {@link ParsingStoreReference}.
-     * @param reference         The {@link ParsingStore} that contains the annotation data.
+     * @param reference         The {@link ParsingStoreReference} that provides access to the stored annotation data.
      * @param domain            The key of the annotation key-value pair. To prevent key conflicts, the prefix x.y.z. is
      *                          reserved to the entity controlling the Internet domain name z.y.x.
      * @param type              The annotation type, indicating the persistence of the annotation, see
@@ -52,13 +52,7 @@ class ParsedAnnotation extends AbstractAnnotation {
 
     @Override
     public InputStream getInputStream() throws IOException {
-        InputStream inputStream = parsingStoreReference.getStoredContent();
-        if (inputStream == null) {
-            throw new IOException(
-                    "Failed to acquire input stream from parsing store for key '" + parsingStoreReference.getUuid() + "'"
-            );
-        }
-        return inputStream;
+        return parsingStoreReference.getStoredContent();
     }
 
     @Override

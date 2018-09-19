@@ -109,6 +109,19 @@ List<Annotation> annotations;  // Can be empty list
 Envelope expandedEnvelope = packagingFactory.addSignature(parsedEnvelope, documents, annotations);
 ```
 
+### Merging Envelopes
+
+There is support of merging `SignatureContent` from one `Envelope` to another. However it is important to note that the instance of `SignatureContent` should be a copy and not the original if it originates from a parsed in `Envelope`. This is due to the fact that upon closing the parsed in `Envelope` all of its `SignatureContents` will be closed as well. `Envelope` does not handle this copying  itself. Therefore the appropriate pattern would look something like:
+
+``` java
+Envelope base = packagingFactory.read(inputStream);
+Envelope env1 = packagingFactory.read(anotherInputStream);
+// Add all or some depending on the need.
+for (SignatureContent content : env1.getSignatureContent()) {
+  base.add(new SignatureContent(content, parsingStore));
+}
+env1.close()
+```
 
 ### Extending Signatures in the Envelope ###
 

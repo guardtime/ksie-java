@@ -37,7 +37,7 @@ class ParsedDocument extends AbstractDocument implements UnknownDocument {
 
     /**
      * Creates {@link Document} with provided MIME-type and file name. The data for the {@link Document} is accessible by the
-     * provided {@link ParsingStoreReference} with the provided key.
+     * provided {@link ParsingStoreReference}.
      * @param reference         The {@link ParsingStoreReference} that provides the document data.
      * @param mimeType          The MIME-type of the {@link Document}.
      * @param fileName          The file name to be used for the {@link Document}.
@@ -50,13 +50,7 @@ class ParsedDocument extends AbstractDocument implements UnknownDocument {
 
     @Override
     public InputStream getInputStream() throws IOException {
-        InputStream inputStream = parsingStoreReference.getStoredContent();
-        if (inputStream == null) {
-            throw new IOException(
-                    "Failed to acquire input stream from parsing store for key '" + parsingStoreReference.getUuid() + "'"
-            );
-        }
-        return inputStream;
+        return parsingStoreReference.getStoredContent();
     }
 
     @Override

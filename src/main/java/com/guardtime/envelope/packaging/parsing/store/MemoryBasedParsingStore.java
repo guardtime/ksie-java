@@ -39,11 +39,11 @@ public class MemoryBasedParsingStore extends ParsingStore {
     private Map<UUID, byte[]> store = new HashMap<>();
 
     @Override
-    public ParsingStoreReference store(InputStream stream) throws ParsingStoreException {
+    public ParsingStoreReference store(InputStream stream, String pathName) throws ParsingStoreException {
         try {
             UUID uuid = UUID.randomUUID();
             store.put(uuid, Util.toByteArray(stream));
-            return addNewReference(uuid);
+            return addNewReference(uuid, pathName);
         } catch (IOException e) {
             throw new ParsingStoreException("Failed to access data in stream!", e);
         }

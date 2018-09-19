@@ -56,39 +56,37 @@ public class AnnotationFactory {
      * NB! Does not close the stream! Just reads from it.
      */
     public Annotation create(InputStream stream, String domain, EnvelopeAnnotationType type) {
-        return create(addToStore(stream), domain, type);
+        return create(stream, domain, type, null);
+    }
+
+    public Annotation create(InputStream stream, String domain, EnvelopeAnnotationType type, String path) {
+        return create(addToStore(stream, path), domain, type);
     }
 
     public Annotation create(Annotation original) {
-        // TODO: Any better option?
-        Annotation newAnnotation = null;
+        String originalPath = original.getPath();
+        Annotation newAnnotation;
         if (original instanceof FileAnnotation) {
             newAnnotation = create(((FileAnnotation) original).file, original.getDomain(), original.getAnnotationType());
         } else if (original instanceof StringAnnotation) {
             newAnnotation = create(((StringAnnotation) original).content, original.getDomain(), original.getAnnotationType());
-        } else if (original instanceof ParsedAnnotation) {
-            newAnnotation = create(
-                    ((ParsedAnnotation) original).parsingStoreReference,
-                    original.getDomain(),
-                    original.getAnnotationType()
-            );
         } else {
             try (InputStream inputStream = original.getInputStream()) {
-                newAnnotation = create(inputStream, original.getDomain(), original.getAnnotationType());
+                newAnnotation = create(inputStream, original.getDomain(), original.getAnnotationType(), originalPath);
             } catch (IOException e) {
                 throw new IllegalArgumentException("Failed to access content of provided Annotation.", e);
             }
         }
-        newAnnotation.setPath(original.getPath());
+        newAnnotation.setPath(originalPath);
         return newAnnotation;
     }
 
-    private ParsingStoreReference addToStore(InputStream data) {
+    private ParsingStoreReference addToStore(InputStream data, String path) {
         notNull(data, "Input stream");
         try {
-            return parsingStore.store(data);
+            return parsingStore.store(data, path);
         } catch (ParsingStoreException e) {
-            throw new IllegalArgumentException("Can not copy input stream to memory!", e);
+            throw new IllegalArgumentException("Can not copy input stream to parsing store!", e);
         }
     }
 }
