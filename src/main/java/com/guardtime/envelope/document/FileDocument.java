@@ -29,16 +29,16 @@ import static com.guardtime.envelope.util.Util.notNull;
 /**
  * Document that is based on a {@link File}.
  */
-public class FileDocument extends AbstractDocument {
+class FileDocument extends AbstractDocument {
 
-    private final File file;
+    protected final File file;
 
     /**
      * Creates {@link Document} with provided MIME-type and file.
      * @param mimeType The MIME-type of the {@link Document}.
      * @param file     The {@link File} to be used for the {@link Document} data and name.
      */
-    public FileDocument(File file, String mimeType) {
+    FileDocument(File file, String mimeType) {
         this(file, mimeType, null);
     }
 
@@ -48,7 +48,7 @@ public class FileDocument extends AbstractDocument {
      * @param mimeType The MIME-type of the {@link Document}.
      * @param fileName The file name to be used for the {@link Document}.
      */
-    public FileDocument(File file, String mimeType, String fileName) {
+    FileDocument(File file, String mimeType, String fileName) {
         super(mimeType, getFileName(file, fileName));
         this.file = file;
     }
@@ -62,4 +62,5 @@ public class FileDocument extends AbstractDocument {
     public InputStream getInputStream() throws IOException {
         return new FileInputStream(file);
     }
+
 }

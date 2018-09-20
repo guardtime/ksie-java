@@ -21,9 +21,7 @@ package com.guardtime.envelope.integration;
 
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
-import com.guardtime.envelope.annotation.StringAnnotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.extending.ExtendedEnvelope;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
@@ -40,18 +38,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationTest {
-    private Path tmpDir = Paths.get(System.getProperty("java.io.tmpdir"));
 
     @Before
     public void setUp() throws Exception {
@@ -79,14 +73,14 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
 
     @Test
     public void testCloseDeletesTemporaryFiles() throws Exception {
-        Envelope envelope = getEnvelope();
+        Envelope envelope = getEnvelopeWithTemporaryFileParsingStore(ENVELOPE_WITH_ONE_DOCUMENT);
         assertTrue("Temporary files not found!", anyKsieTempFiles());
         envelope.close();
     }
 
     @Test
     public void testEnvelopeWithTryWithResources() throws Exception {
-        try (Envelope envelope = getEnvelope()) {
+        try (Envelope envelope = getEnvelopeWithTemporaryFileParsingStore(ENVELOPE_WITH_ONE_DOCUMENT)) {
             assertFalse(envelope.getSignatureContents().isEmpty());
             assertTrue("Temporary files not found!", anyKsieTempFiles());
         }
@@ -102,28 +96,27 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
 
     @Test
     public void testDeleteAllTempFilesFromExistingEnvelope() throws Exception {
-        Envelope existingEnvelope = getEnvelope(ENVELOPE_WITH_MULTIPLE_SIGNATURES);
+        int tempFileCount = getKsieTempFiles().size();
+        Envelope existingEnvelope = getEnvelopeWithTemporaryFileParsingStore(ENVELOPE_WITH_MULTIPLE_SIGNATURES);
         List<File> ksieTempFiles = getKsieTempFiles();
         try (
-                Document document = new StreamDocument(
+                Document document = documentFactory.create(
                         new ByteArrayInputStream(new byte[313]),
                         "byte inputstream",
                         "byte-input-stream.bis"
                 );
-                Annotation annotation = new StringAnnotation(
-                        "content",
-                        "domain.com",
-                        EnvelopeAnnotationType.FULLY_REMOVABLE
+                Annotation annotation = annotationFactory.create("content", "domain.com", EnvelopeAnnotationType.FULLY_REMOVABLE);
+                Envelope second = packagingFactory.addSignature(
+                        existingEnvelope,
+                        singletonList(document),
+                        singletonList(annotation)
                 )
         ) {
-            packagingFactory.addSignature(existingEnvelope, singletonList(document), singletonList(annotation));
             for (File doc : ksieTempFiles) {
-                if (isTempFile(doc)) {
-                    Util.deleteFileOrDirectory(doc.toPath());
-                }
+                Util.deleteFileOrDirectory(doc.toPath());
             }
             existingEnvelope.close();
-            assertFalse(anyKsieTempFiles());
+            assertEquals(tempFileCount, getKsieTempFiles().size());
         } finally {
             existingEnvelope.close();
         }
@@ -134,18 +127,18 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         Envelope existingEnvelope = getEnvelope(ENVELOPE_WITH_MULTIPLE_SIGNATURES);
         List<File> ksieTempFiles = getKsieTempFiles();
         try (
-                Document document = new StreamDocument(
+                Document document = documentFactory.create(
                         new ByteArrayInputStream(new byte[313]),
                         "byte inputstream",
                         "byte-input-stream.bis"
                 );
-                Annotation annotation = new StringAnnotation(
-                        "content",
-                        "domain.com",
-                        EnvelopeAnnotationType.FULLY_REMOVABLE
+                Annotation annotation = annotationFactory.create("content", "domain.com", EnvelopeAnnotationType.FULLY_REMOVABLE);
+                Envelope second = packagingFactory.addSignature(
+                        existingEnvelope,
+                        singletonList(document),
+                        singletonList(annotation)
                 )
         ) {
-            packagingFactory.addSignature(existingEnvelope, singletonList(document), singletonList(annotation));
             for (File doc : getKsieTempFiles()) {
                 if (isTempFile(doc) && !ksieTempFiles.contains(doc)) {
                     Util.deleteFileOrDirectory(doc.toPath());
@@ -175,11 +168,12 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Store has been corrupted! Expected to find file");
         try (
-                Envelope envelope = getEnvelope(ENVELOPE_WITH_MULTIPLE_SIGNATURES);
+                Envelope envelope = getEnvelopeWithTemporaryFileParsingStore(ENVELOPE_WITH_MULTIPLE_SIGNATURES);
                 ByteArrayOutputStream bos = new ByteArrayOutputStream()
         ) {
             List<File> tempFiles = getKsieTempFiles();
-            assertTrue(tempFiles.size() == envelope.getSignatureContents().size() + 1);
+            // Magic number = 1 doc + 1 annot per signatureContent + 1 unknownFile for ENVELOPE_WITH_MULTIPLE_SIGNATURES
+            assertTrue(tempFiles.size() == 5);
             Util.deleteFileOrDirectory(tempFiles.get(0).toPath());
             envelopeWriter.write(envelope, bos);
         }
@@ -190,31 +184,31 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         expectedException.expect(InvalidEnvelopeException.class);
         expectedException.expectMessage("Created envelope did not pass internal verification");
         try (
-                Document document = new StreamDocument(new ByteArrayInputStream(new byte[3]), "qwerty", "qwert.file");
-                Annotation annotation = new StringAnnotation(
-                        "qwerty file",
+                Document document = documentFactory.create(
+                        new ByteArrayInputStream("randum".getBytes()),
+                        "qwerty",
+                        "qwert.file"
+                );
+                Annotation annotation = annotationFactory.create("qwerty file",
                         "qwerty.domain.com",
                         EnvelopeAnnotationType.FULLY_REMOVABLE
                 );
-                Envelope envelope = getEnvelope(ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION)
+                Envelope envelope = getEnvelopeWithTemporaryFileParsingStore(ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION)
         ) {
             List<File> tempFiles = getKsieTempFiles();
-            //One KSIE directory for envelope, one per signatureContent and one KSIE...tmp file for annotation.
+            //Magic number = 1 document + 1 annotation per signature content for ENVELOPE_WITH_NON_REMOVABLE_ANNOTATION
             assertTrue(
                     "Temp dir contains more than necessary KSIE temporary files, test system is not clean.",
-                    tempFiles.size() == envelope.getSignatureContents().size() + 2
+                    tempFiles.size() == 2
             );
-            for (File tmp : tempFiles) {
-                if (tmp.isDirectory()) {
-                    File[] files = tmp.listFiles();
-                    for (File file : files) {
-                        try (PrintWriter out = new PrintWriter(file)) {
-                            out.write("This is new content for temp file.");
-                        }
-                    }
+            for (File file: tempFiles) {
+                try (PrintWriter out = new PrintWriter(file)) {
+                    out.write("This is new content for temp file.");
                 }
             }
-            packagingFactory.addSignature(envelope, singletonList(document), singletonList(annotation));
+            try (Envelope second = packagingFactory.addSignature(envelope, singletonList(document), singletonList(annotation))) {
+
+            }
         }
     }
 
@@ -243,38 +237,4 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         assertFalse(anyKsieTempFiles());
     }
 
-    private boolean anyKsieTempFiles() {
-        return !getKsieTempFiles().isEmpty();
-    }
-
-    private List<File> getKsieTempFiles() {
-        List<File> ksieTempFiles = new LinkedList<>();
-        for (File f : tempFiles()) {
-            if (isTempFile(f)) {
-                ksieTempFiles.add(f);
-            }
-        }
-        return ksieTempFiles;
-    }
-
-    private void cleanTempDir() throws IOException {
-        for (File f : tempFiles()) {
-            if (isTempFile(f)) {
-                Util.deleteFileOrDirectory(f.toPath());
-            }
-        }
-    }
-
-    private List<File> tempFiles() {
-        File[] list = tmpDir.toFile().listFiles();
-        if (list == null) {
-            return new LinkedList<>();
-        } else {
-            return Arrays.asList(list);
-        }
-    }
-
-    private boolean isTempFile(File s) {
-        return s.getName().startsWith(Util.TEMP_DIR_PREFIX) || s.getName().startsWith(Util.TEMP_FILE_PREFIX);
-    }
 }

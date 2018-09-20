@@ -19,13 +19,13 @@
 
 package com.guardtime.envelope.integration;
 
-import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
-import com.guardtime.envelope.packaging.parsing.store.TemporaryFileBasedParsingStoreFactory;
+import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
+import com.guardtime.envelope.packaging.parsing.store.TemporaryFileBasedParsingStore;
 
 public class TempFileBasedParsingIntegrationTest extends AbstractEnvelopeParsingIntegrationTest {
 
     @Override
-    protected ParsingStoreFactory getParsingStoreFactory() {
-        return new TemporaryFileBasedParsingStoreFactory();
+    protected ParsingStore getParsingStore() {
+        return new TemporaryFileBasedParsingStore();
     }
 }

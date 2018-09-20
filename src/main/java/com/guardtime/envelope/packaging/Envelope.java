@@ -21,6 +21,7 @@ package com.guardtime.envelope.packaging;
 
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.document.SignedDocument;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
@@ -43,29 +44,43 @@ import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifyUni
  */
 public class Envelope implements AutoCloseable {
 
-    private ParsingStore parsingStore;
     private List<SignatureContent> signatureContents = new SortedList<>();
     private boolean closed = false;
     private List<UnknownDocument> unknownFiles = new LinkedList<>();
 
     public Envelope(SignatureContent signatureContent) {
-        this(Collections.singletonList(signatureContent), Collections.<UnknownDocument>emptyList(), null);
+        this(Collections.singletonList(signatureContent), Collections.<UnknownDocument>emptyList());
     }
 
-    public Envelope(Collection<SignatureContent> contents, List<UnknownDocument> unknownFiles, ParsingStore store) {
-        Util.notEmpty(contents, "Signature contents");
+    public Envelope(Collection<SignatureContent> contents, List<UnknownDocument> unknownFiles) {
+        Util.notNull(contents, "Signature contents");
         Util.notNull(unknownFiles, "Unknown files");
         this.signatureContents.addAll(contents);
         this.unknownFiles.addAll(unknownFiles);
-        this.parsingStore = store;
     }
 
-    protected Envelope(Envelope original) {
+    public Envelope(Envelope original, ParsingStore store) {
         this(
-                original.getSignatureContents(),
-                original.getUnknownFiles(),
-                original.getParsingStore()
+                copySignatureContents(original.getSignatureContents(), store),
+                copyUnknownFiles(original.getUnknownFiles(), store)
         );
+    }
+
+    private static List<UnknownDocument> copyUnknownFiles(List<UnknownDocument> originals, ParsingStore store) {
+        DocumentFactory documentFactory = new DocumentFactory(store);
+        List<UnknownDocument> copies = new ArrayList<>();
+        for (UnknownDocument doc : originals) {
+            copies.add((UnknownDocument) documentFactory.create(doc));
+        }
+        return copies;
+    }
+
+    private static List<SignatureContent> copySignatureContents(List<SignatureContent> originals, ParsingStore store) {
+        List<SignatureContent> copies = new ArrayList<>();
+        for (SignatureContent signatureContent : originals) {
+            copies.add(new SignatureContent(signatureContent, store));
+        }
+        return copies;
     }
 
     /**
@@ -94,12 +109,11 @@ public class Envelope implements AutoCloseable {
         for (SignatureContent content : getSignatureContents()) {
             content.close();
         }
+
         for (UnknownDocument f : getUnknownFiles()) {
             f.close();
         }
-        if (parsingStore != null) {
-            this.parsingStore.close();
-        }
+
         this.closed = true;
     }
 
@@ -109,8 +123,7 @@ public class Envelope implements AutoCloseable {
      * as such any external calls to <code>close()</code> on those resources may lead to unexpected behaviour.
      *
      * @param content the content to be added.
-     * @throws EnvelopeMergingException when the {@link SignatureContent} can not be added into the {@link Envelope} due to
-     * clashing file paths or any other reason.
+     * @throws EnvelopeMergingException when the {@link SignatureContent} can not be added into the {@link Envelope}.
      */
     public void add(SignatureContent content) throws EnvelopeMergingException {
         verifyNewSignatureContentIsAcceptable(content, signatureContents);
@@ -123,8 +136,7 @@ public class Envelope implements AutoCloseable {
      * {@link SignatureContent}s and as such any external calls to close() on those resources may lead to unexpected behaviour.
      *
      * @param contents the content to be added.
-     * @throws EnvelopeMergingException when any {@link SignatureContent} can not be added into the {@link Envelope} due to
-     * clashing file paths or any other reason.
+     * @throws EnvelopeMergingException when any {@link SignatureContent} can not be added into the {@link Envelope}.
      */
     public void addAll(Collection<SignatureContent> contents) throws EnvelopeMergingException {
         List<SignatureContent> original = new LinkedList<>(signatureContents);
@@ -149,10 +161,6 @@ public class Envelope implements AutoCloseable {
             }
         }
         return signedDocuments;
-    }
-
-    protected ParsingStore getParsingStore() {
-        return parsingStore;
     }
 
     public boolean isClosed() {

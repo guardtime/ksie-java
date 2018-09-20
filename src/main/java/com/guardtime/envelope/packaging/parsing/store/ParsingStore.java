@@ -22,38 +22,62 @@ package com.guardtime.envelope.packaging.parsing.store;
 import com.guardtime.envelope.packaging.Envelope;
 
 import java.io.InputStream;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Data store that is meant to keep data from parsed in {@link Envelope}.
  */
-public interface ParsingStore extends AutoCloseable {
+public abstract class ParsingStore {
+
+    private Map<UUID, List<ParsingStoreReference>> references = new HashMap<>();
 
     /**
-     * @param key the key to use to store the data read from the stream.
      * @param stream the {@link InputStream} from which the data will be stored.
      *
+     * @param pathName optional name of stored file.
      * @throws ParsingStoreException when reading the stream fails.
      */
-    void store(String key, InputStream stream) throws ParsingStoreException;
+    public abstract ParsingStoreReference store(InputStream stream, String pathName) throws ParsingStoreException;
 
-    Set<String> getStoredKeys();
+    public ParsingStoreReference store(InputStream stream) throws ParsingStoreException {
+        return store(stream, null);
+    }
 
-    /**
-     * @param key the key used to store the data of interest.
-     * @return An {@link InputStream} of the data stored with the key.
-     */
-    InputStream get(String key);
+    public abstract InputStream getContent(UUID uuid);
 
-    boolean contains(String key);
+    ParsingStoreReference addNewReference(UUID uuid, String path) {
+        ParsingStoreReference ref = new ParsingStoreReference(uuid, this, path);
+        updateReferences(uuid, ref);
+        return ref;
+    }
 
-    void remove(String key);
+    protected void updateReferences(UUID uuid, ParsingStoreReference parsingStoreReference) {
+        List<ParsingStoreReference> currentReferences;
+        if (references.containsKey(uuid)) {
+            currentReferences = references.get(uuid);
+        } else {
+            currentReferences = new LinkedList<>();
+            references.put(uuid, currentReferences);
+        }
+        currentReferences.add(parsingStoreReference);
+    }
 
-    /**
-     * Takes all the contents of <code>that</code> and adds it to this.
-     * @param that ParsingStore containing the contents to be added.
-     * @throws ParsingStoreException when adding the content fails.
-     */
-    void transferFrom(ParsingStore that) throws ParsingStoreException;
+    void unregister(UUID uuid, ParsingStoreReference parsingStoreReference) {
+        if (!references.containsKey(uuid)) {
+            return;
+        }
+        List<ParsingStoreReference> currentReferences = references.get(uuid);
+        currentReferences.remove(parsingStoreReference);
+        if (currentReferences.isEmpty()) {
+            clearStore(uuid);
+            references.remove(uuid);
+        }
+    }
+
+    protected abstract void clearStore(UUID uuid);
 
 }

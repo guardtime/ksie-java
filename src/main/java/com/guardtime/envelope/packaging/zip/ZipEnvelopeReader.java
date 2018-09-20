@@ -22,9 +22,9 @@ package com.guardtime.envelope.packaging.zip;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.parsing.EnvelopeReader;
+import com.guardtime.envelope.packaging.parsing.ParsingStoreSession;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
 import com.guardtime.envelope.signature.SignatureFactory;
 
 import java.io.IOException;
@@ -38,12 +38,12 @@ import java.util.zip.ZipInputStream;
 class ZipEnvelopeReader extends EnvelopeReader {
 
     ZipEnvelopeReader(EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory,
-                      ParsingStoreFactory storeFactory) {
-        super(manifestFactory, signatureFactory, storeFactory);
+                      ParsingStore store) {
+        super(manifestFactory, signatureFactory, store);
     }
 
-    protected void parseInputStream(InputStream input, ParsingStore store, EnvelopeReadingException readingException)
-            throws IOException {
+    protected void parseInputStream(InputStream input, ParsingStoreSession storeSession,
+                                    EnvelopeReadingException readingException) throws IOException {
         try (ZipInputStream zipInput = new ZipInputStream(input)) {
             ZipEntry entry;
             while ((entry = zipInput.getNextEntry()) != null) {
@@ -54,7 +54,7 @@ class ZipEnvelopeReader extends EnvelopeReader {
                 }
                 try {
                     LOGGER.debug("Reading ZIP entry '{}'.", name);
-                    store.store(name, zipInput);
+                    storeSession.store(name, zipInput);
                 } catch (ParsingStoreException e) {
                     readingException.addException(e);
                 }

@@ -21,9 +21,7 @@ package com.guardtime.envelope.integration;
 
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
-import com.guardtime.envelope.annotation.StringAnnotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.EmptyDocument;
 import com.guardtime.envelope.extending.ExtendedEnvelope;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
@@ -517,16 +515,16 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             verifiedEnvelope = verifier.verify(envelope);
             assertEquals(VerificationResult.OK, verifiedEnvelope.getVerificationResult());
 
-            detached = content.detachDocument(documentName);
+            detached = content.detachDocument(documentName, documentFactory);
             verifiedEnvelope = verifier.verify(envelope);
             assertEquals(VerificationResult.NOK, verifiedEnvelope.getVerificationResult());
 
             inputStream = detached.getInputStream();
-            boolean added = content.attachDetachedDocument(detached.getFileName(), inputStream);
+            boolean added = content.attachDetachedDocument(detached.getFileName(), inputStream, documentFactory);
             assertTrue(added);
             verifiedEnvelope = verifier.verify(envelope);
             assertEquals(VerificationResult.OK, verifiedEnvelope.getVerificationResult());
-            added = content.attachDetachedDocument(detached.getFileName(), inputStream);
+            added = content.attachDetachedDocument(detached.getFileName(), inputStream, documentFactory);
             assertFalse(added);
         } finally {
             if (inputStream != null) {
@@ -602,14 +600,16 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
                 .withVerificationPolicy(new LimitedInternalVerificationPolicy())
+                .withParsingStore(parsingStore)
                 .build();
         String documentName = "Document1.txt";
         try (
-                Document document = new EmptyDocument(
-                        documentName,
+                Document document = documentFactory.create(
+                        singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(expectedDocumentContent).getHash()),
                         "txt",
-                        singletonList(new DataHasher(HashAlgorithm.SHA2_256).addData(expectedDocumentContent).getHash()));
-                Annotation annotation = new StringAnnotation(
+                        documentName
+                );
+                Annotation annotation = annotationFactory.create(
                         "Document is not with envelope. Envelope was created with empty envelope document. " +
                                 "Document itself can be added later on if needed.",
                         "com.guardtime.com",
@@ -621,7 +621,7 @@ public class VerificationIntegrationTest extends AbstractCommonIntegrationTest {
             VerifiedEnvelope verifiedEnvelope = envelopeVerifier.verify(envelope);
             assertTrue(verifiedEnvelope.getVerificationResult().equals(VerificationResult.NOK));
 
-            envelope.getSignatureContents().get(0).attachDetachedDocument(documentName, stream);
+            envelope.getSignatureContents().get(0).attachDetachedDocument(documentName, stream, documentFactory);
             verifiedEnvelope = envelopeVerifier.verify(envelope);
             assertTrue(verifiedEnvelope.getVerificationResult().equals(verificationResult));
         }

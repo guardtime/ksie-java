@@ -25,7 +25,6 @@ import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,18 +33,23 @@ import java.util.List;
  */
 public class ExtendedEnvelope extends Envelope {
 
-    private List<ExtendedSignatureContent> extendedSignatureContents;
-
     public ExtendedEnvelope(Envelope original) {
-        super(original);
-        wrapSignatureContents();
+        super(getWrappedSignatureContents(original.getSignatureContents()), original.getUnknownFiles());
+    }
+
+    private static Collection<SignatureContent> getWrappedSignatureContents(Collection<SignatureContent> originalContents) {
+        List<SignatureContent> extendedContents = new ArrayList<>(originalContents.size());
+        for (SignatureContent content : originalContents) {
+            extendedContents.add(new ExtendedSignatureContent(content));
+        }
+        return extendedContents;
     }
 
     /**
      * @return True, if all {@link SignatureContent}s of this {@link Envelope} are extended.
      */
     public boolean isFullyExtended() {
-        for (ExtendedSignatureContent content : extendedSignatureContents) {
+        for (ExtendedSignatureContent content : getExtendedSignatureContents()) {
             if (!content.isExtended()) {
                 return false;
             }
@@ -54,27 +58,25 @@ public class ExtendedEnvelope extends Envelope {
     }
 
     public List<ExtendedSignatureContent> getExtendedSignatureContents() {
-        return Collections.unmodifiableList(extendedSignatureContents);
+        List<ExtendedSignatureContent> result = new ArrayList<>();
+        for (SignatureContent content: getSignatureContents()) {
+            if (content instanceof ExtendedSignatureContent) {
+                result.add((ExtendedSignatureContent) content);
+            } else {
+                // wrap?
+                result.add(new ExtendedSignatureContent(content));
+            }
+        }
+        return result;
     }
 
     @Override
     public void add(SignatureContent content) throws EnvelopeMergingException {
-        super.add(content);
-        wrapSignatureContents();
+        super.add(new ExtendedSignatureContent(content));
     }
 
     @Override
     public void addAll(Collection<SignatureContent> contents) throws EnvelopeMergingException {
-        super.addAll(contents);
-        wrapSignatureContents();
-    }
-
-    private void wrapSignatureContents() {
-        List<SignatureContent> originalSignatureContents = getSignatureContents();
-        List<ExtendedSignatureContent> extendedContents = new ArrayList<>(originalSignatureContents.size());
-        for (SignatureContent content : originalSignatureContents) {
-            extendedContents.add(new ExtendedSignatureContent(content));
-        }
-        this.extendedSignatureContents = extendedContents;
+        super.addAll(getWrappedSignatureContents(contents));
     }
 }

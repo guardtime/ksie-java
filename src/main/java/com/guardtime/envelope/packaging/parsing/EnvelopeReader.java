@@ -28,8 +28,6 @@ import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.packaging.parsing.handler.ContentParsingException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
 import com.guardtime.envelope.signature.SignatureFactory;
 import com.guardtime.envelope.util.Pair;
 import com.guardtime.envelope.util.Util;
@@ -53,16 +51,16 @@ public abstract class EnvelopeReader {
 
     private final EnvelopeManifestFactory manifestFactory;
     private final SignatureFactory signatureFactory;
-    private final ParsingStoreFactory parsingStoreFactory;
+    private final ParsingStore parsingStore;
 
     public EnvelopeReader(EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory,
-                          ParsingStoreFactory storeFactory) {
+                          ParsingStore store) {
         Util.notNull(manifestFactory, "Manifest factory");
         Util.notNull(signatureFactory, "Signature factory");
-        Util.notNull(storeFactory, "Parsing store factory");
+        Util.notNull(store, "Parsing store");
         this.manifestFactory = manifestFactory;
         this.signatureFactory = signatureFactory;
-        this.parsingStoreFactory = storeFactory;
+        this.parsingStore = store;
     }
 
     /**
@@ -76,23 +74,22 @@ public abstract class EnvelopeReader {
      * @throws EnvelopeReadingException when there were issues parsing some elements of the {@link Envelope}. The parsed
      *         envelope and all encountered exceptions can be retrieved from this exception.
      * @throws IOException              when errors occur accessing data in provided {@link InputStream}.
-     * @throws ParsingStoreException    when errors are encountered while interacting with the {@link ParsingStore}.
      */
-    public Envelope read(InputStream input) throws IOException, InvalidEnvelopeException, ParsingStoreException {
+    public Envelope read(InputStream input) throws IOException, InvalidEnvelopeException {
         EnvelopeReadingException readingException = new EnvelopeReadingException("Reading envelope encountered errors!");
-        ParsingStore parsingStore = parsingStoreFactory.create();
-        parseInputStream(input, parsingStore, readingException);
+        ParsingStoreSession parsingStoreSession = new ParsingStoreSession(parsingStore);
+        parseInputStream(input, parsingStoreSession, readingException);
         EnvelopeElementExtractor envelopeElementExtractor =
-                new EnvelopeElementExtractor(manifestFactory, signatureFactory, parsingStore);
+                new EnvelopeElementExtractor(manifestFactory, signatureFactory, parsingStoreSession);
 
         validateMimeType(envelopeElementExtractor);
-        List<SignatureContent> contents = buildSignatures(envelopeElementExtractor, readingException);
+        List<SignatureContent> contents = buildSignatures(envelopeElementExtractor, readingException, parsingStoreSession);
         if (contents.isEmpty()) {
             throw new InvalidEnvelopeException("No valid signature content parsed!");
         }
-        List<UnknownDocument> unknownFiles = getAndLogUnknownFiles(envelopeElementExtractor);
-        envelopeElementExtractor.clear();
-        Envelope envelope = new Envelope(contents, unknownFiles, parsingStore);
+        List<UnknownDocument> unknownFiles = getAndLogUnknownFiles(parsingStoreSession);
+        parsingStoreSession.clear();
+        Envelope envelope = new Envelope(contents, unknownFiles);
         readingException.setEnvelope(envelope);
 
         if (!containsValidContents(contents)) {
@@ -105,8 +102,8 @@ public abstract class EnvelopeReader {
         return envelope;
     }
 
-    private List<UnknownDocument> getAndLogUnknownFiles(EnvelopeElementExtractor envelopeElementExtractor) {
-        List<UnknownDocument> result = envelopeElementExtractor.getUnrequestedFiles();
+    private List<UnknownDocument> getAndLogUnknownFiles(ParsingStoreSession session) {
+        List<UnknownDocument> result = session.getUnrequestedFiles();
         for (UnknownDocument doc : result) {
             LOGGER.warn("Encountered an unknown file in envelope at path '{}'", doc.getPath());
         }
@@ -116,11 +113,12 @@ public abstract class EnvelopeReader {
     /**
      * Processes input stream containing envelope and stores each entry in envelope to parsing store.
      * @param input            {@link InputStream} containing {@link Envelope}.
-     * @param store            stores all parsed entries. Implementation must add each entry to store (key, stream) method.
+     * @param storeSession     stores all parsed entries. Implementation must add each entry to store (key, stream) method.
      * @param readingException holds all expectable exceptions if any occurs.
      * @throws IOException     when error occurs during accessing of InputStream.
      */
-    protected abstract void parseInputStream(InputStream input, ParsingStore store, EnvelopeReadingException readingException)
+    protected abstract void parseInputStream(InputStream input, ParsingStoreSession storeSession,
+                                             EnvelopeReadingException readingException)
             throws IOException;
 
     private boolean containsValidContents(List<SignatureContent> signatureContents) {
@@ -165,17 +163,18 @@ public abstract class EnvelopeReader {
     protected abstract String getMimeType();
 
     private List<SignatureContent> buildSignatures(EnvelopeElementExtractor envelopeElementExtractor,
-                                                   EnvelopeReadingException readingException) {
+                                                   EnvelopeReadingException readingException,
+                                                   ParsingStoreSession parsingStoreSession) {
         Set<String> parsedManifestUriSet = envelopeElementExtractor.getManifestUris();
         SignatureContentComposer signatureContentComposer = new SignatureContentComposer(envelopeElementExtractor);
         List<SignatureContent> signatures = new LinkedList<>();
         for (String manifestUri : parsedManifestUriSet) {
             try {
                 Pair<SignatureContent, List<Throwable>> signatureContentVectorPair =
-                        signatureContentComposer.compose(manifestUri, parsingStoreFactory);
+                        signatureContentComposer.compose(manifestUri, parsingStoreSession);
                 signatures.add(signatureContentVectorPair.getLeft());
                 readingException.addExceptions(signatureContentVectorPair.getRight());
-            } catch (ContentParsingException | ParsingStoreException e) {
+            } catch (ContentParsingException e) {
                 LOGGER.debug("Parsing SignatureContent failed for '{}'. Reason: '{}'", manifestUri, e.getMessage());
                 readingException.addException(e);
             }

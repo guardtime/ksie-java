@@ -20,10 +20,10 @@
 package com.guardtime.envelope;
 
 import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.annotation.AnnotationFactory;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
-import com.guardtime.envelope.annotation.StringAnnotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.StreamDocument;
+import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.DocumentsManifest;
@@ -31,6 +31,8 @@ import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
 import com.guardtime.envelope.manifest.Manifest;
 import com.guardtime.envelope.manifest.ManifestFactoryType;
 import com.guardtime.envelope.manifest.SingleAnnotationManifest;
+import com.guardtime.envelope.packaging.parsing.store.MemoryBasedParsingStore;
+import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.signature.SignatureFactory;
 import com.guardtime.envelope.signature.SignatureFactoryType;
 import com.guardtime.envelope.verification.rule.state.DefaultRuleStateProvider;
@@ -159,20 +161,23 @@ public class AbstractEnvelopeTest {
     protected Document testDocumentHelloText;
     protected Document testDocumentHelloPdf;
     protected final List<AutoCloseable> envelopeElements = new LinkedList<>();
+    protected ParsingStore parsingStore = getParsingStore();
+    protected DocumentFactory documentFactory = new DocumentFactory(parsingStore);
+    protected AnnotationFactory annotationFactory = new AnnotationFactory(parsingStore);
 
     @Before
     public void setUpDocumentsAndAnnotations() {
-        stringEnvelopeAnnotation = new StringAnnotation(
+        stringEnvelopeAnnotation = annotationFactory.create(
                 ANNOTATION_CONTENT,
                 ANNOTATION_DOMAIN_COM_GUARDTIME,
                 EnvelopeAnnotationType.NON_REMOVABLE
         );
-        testDocumentHelloText = new StreamDocument(
+        testDocumentHelloText = documentFactory.create(
                 new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                 MIME_TYPE_APPLICATION_TXT,
                 TEST_FILE_NAME_TEST_TXT
         );
-        testDocumentHelloPdf = new StreamDocument(
+        testDocumentHelloPdf = documentFactory.create(
                 new ByteArrayInputStream(TEST_DATA_PDF_CONTENT),
                 MIME_TYPE_APPLICATION_PDF,
                 TEST_FILE_NAME_TEST_PDF
@@ -235,6 +240,10 @@ public class AbstractEnvelopeTest {
         )).thenReturn(mockedManifest);
         when(mockedSignatureFactory.getSignatureFactoryType()).thenReturn(mockedSignatureFactoryType);
         when(mockedSignatureFactoryType.getSignatureMimeType()).thenReturn(SIGNATURE_MIME_TYPE);
+    }
+
+    protected ParsingStore getParsingStore() {
+        return new MemoryBasedParsingStore();
     }
 
     @After

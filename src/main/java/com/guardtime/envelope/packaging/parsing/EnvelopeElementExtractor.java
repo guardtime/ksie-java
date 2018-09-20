@@ -19,8 +19,6 @@
 
 package com.guardtime.envelope.packaging.parsing;
 
-import com.guardtime.envelope.document.ParsedDocument;
-import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.DocumentsManifest;
 import com.guardtime.envelope.manifest.EnvelopeManifestFactory;
@@ -34,15 +32,13 @@ import com.guardtime.envelope.packaging.parsing.handler.ManifestHandler;
 import com.guardtime.envelope.packaging.parsing.handler.MimeTypeHandler;
 import com.guardtime.envelope.packaging.parsing.handler.SignatureHandler;
 import com.guardtime.envelope.packaging.parsing.handler.SingleAnnotationManifestHandler;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
+import com.guardtime.envelope.packaging.parsing.store.ParsingStoreReference;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.signature.SignatureFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static com.guardtime.envelope.packaging.EnvelopeWriter.MIME_TYPE_ENTRY_NAME;
@@ -50,43 +46,32 @@ import static com.guardtime.envelope.packaging.EnvelopeWriter.MIME_TYPE_ENTRY_NA
 
 /**
  * Helper that manages different {@link ContentHandler} instances and parsed envelope contents.
- * Converts entries in ParsingStore to appropriate {@link com.guardtime.envelope.EnvelopeElement} by using different
- * {@link ContentHandler}s.
+ * Converts entries in {@link ParsingStoreSession} to appropriate {@link com.guardtime.envelope.EnvelopeElement} by using
+ * different {@link ContentHandler}s.
  */
 class EnvelopeElementExtractor {
-    private final ParsingStore parsingStore;
+    private final ParsingStoreSession parsingStoreSession;
     private final MimeTypeHandler mimeTypeHandler;
     private final ManifestHandler manifestHandler;
     private final DocumentsManifestHandler documentsManifestHandler;
     private final AnnotationsManifestHandler annotationsManifestHandler;
     private final SingleAnnotationManifestHandler singleAnnotationManifestHandler;
     private final SignatureHandler signatureHandler;
-    private final Set<String> requestedKeys = new HashSet<>();
 
-    EnvelopeElementExtractor(EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory, ParsingStore store) {
+    EnvelopeElementExtractor(EnvelopeManifestFactory manifestFactory, SignatureFactory signatureFactory,
+                             ParsingStoreSession storeSession) {
         this.mimeTypeHandler = new MimeTypeHandler();
         this.manifestHandler = new ManifestHandler(manifestFactory);
         this.documentsManifestHandler = new DocumentsManifestHandler(manifestFactory);
         this.annotationsManifestHandler = new AnnotationsManifestHandler(manifestFactory);
         this.singleAnnotationManifestHandler = new SingleAnnotationManifestHandler(manifestFactory);
         this.signatureHandler = new SignatureHandler(signatureFactory);
-        this.parsingStore = store;
-
-    }
-
-    public List<UnknownDocument> getUnrequestedFiles() {
-        List<UnknownDocument> returnable = new ArrayList<>();
-        Set<String> keys = new HashSet<>(parsingStore.getStoredKeys());
-        keys.removeAll(requestedKeys);
-        for (String key : keys) {
-            returnable.add(new ParsedDocument(parsingStore, key, "unknown", key));
-        }
-        return returnable;
+        this.parsingStoreSession = storeSession;
     }
 
     public Set<String> getManifestUris() {
         Set<String> returnable = new HashSet<>();
-        for (String key : parsingStore.getStoredKeys()) {
+        for (String key : parsingStoreSession.getStoredKeys()) {
             if (manifestHandler.isSupported(key)) {
                 returnable.add(key);
             }
@@ -95,59 +80,45 @@ class EnvelopeElementExtractor {
     }
 
     public SingleAnnotationManifest getSingleAnnotationManifest(String uri) throws ContentParsingException {
-        return parse(singleAnnotationManifestHandler, uri);
+        return parseAndUnstore(singleAnnotationManifestHandler, uri);
     }
 
     public byte[] getMimeTypeContent() throws ContentParsingException {
-        return parse(mimeTypeHandler, MIME_TYPE_ENTRY_NAME);
+        return parseAndUnstore(mimeTypeHandler, MIME_TYPE_ENTRY_NAME);
     }
 
     public Manifest getManifest(String manifestPath) throws ContentParsingException {
-        return parse(manifestHandler, manifestPath);
+        return parseAndUnstore(manifestHandler, manifestPath);
     }
 
     public DocumentsManifest getDocumentsManifest(String manifestPath) throws ContentParsingException {
-        return parse(documentsManifestHandler, manifestPath);
+        return parseAndUnstore(documentsManifestHandler, manifestPath);
     }
 
     public AnnotationsManifest getAnnotationsManifest(String manifestPath) throws ContentParsingException {
-        return parse(annotationsManifestHandler, manifestPath);
+        return parseAndUnstore(annotationsManifestHandler, manifestPath);
     }
 
     public EnvelopeSignature getEnvelopeSignature(String path) throws ContentParsingException {
-        return parse(signatureHandler, path);
+        return parseAndUnstore(signatureHandler, path);
     }
 
-    public InputStream getDocumentStream(String path) throws ContentParsingException {
-        return getInputStream(path);
-    }
-
-    public InputStream getAnnotationDataStream(String path) throws ContentParsingException {
-        return getInputStream(path);
-    }
-
-    private  <T> T parse(ContentHandler<T> handler, String path) throws ContentParsingException {
-        try (InputStream stream = getInputStream(path)) {
+    private  <T> T parseAndUnstore(ContentHandler<T> handler, String path) throws ContentParsingException {
+        ParsingStoreReference parsingStoreReference = getParsingStoreReference(path);
+        try (InputStream stream = parsingStoreReference.getStoredContent()) {
             return handler.parse(stream, path);
         } catch (IOException e) {
             throw new ContentParsingException("Failed to access data for '" + path + "'!");
+        } finally {
+            parsingStoreReference.unstore();
         }
     }
 
-    private InputStream getInputStream(String path) throws ContentParsingException {
-        requestedKeys.add(path);
-        if (!parsingStore.contains(path)) {
+    public ParsingStoreReference getParsingStoreReference(String path) throws ContentParsingException {
+        if (!parsingStoreSession.contains(path)) {
             throw new ContentParsingException("No content stored for entry '" + path + "'!");
         }
-        return parsingStore.get(path);
+        return parsingStoreSession.getReference(path);
     }
 
-    /**
-     * Clears parsingStore of content that has already been parsed.
-     */
-    public void clear() {
-        for (String key : requestedKeys) {
-            parsingStore.remove(key);
-        }
-    }
 }

@@ -47,18 +47,6 @@ public class EnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testCreatePackagingFactoryWithoutParsingStoreFactory_ThrowsNullPointerException() throws Exception {
-        expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("Parsing store factory must be present");
-        new EnvelopePackagingFactory
-                .Builder()
-                .withSignatureFactory(mockedSignatureFactory)
-                .withManifestFactory(mockedManifestFactory)
-                .withParsingStoreFactory(null)
-                .build();
-    }
-
-    @Test
     public void testCreatePackagingFactoryWithoutEnvelopeReader_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Envelope reader must be present");

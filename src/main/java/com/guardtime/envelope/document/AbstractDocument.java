@@ -30,18 +30,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.guardtime.envelope.manifest.Manifest.DEFAULT_HASH_ALGORITHM;
 import static com.guardtime.envelope.util.Util.notNull;
 
 
 /**
  * Generic implementation for {@link Document} that is lacking {@link Document#getInputStream()} implementation.
  */
-public abstract class AbstractDocument implements Document {
-
-    public static final HashAlgorithm HASH_ALGORITHM = HashAlgorithm.SHA2_256;
+abstract class AbstractDocument implements Document {
 
     protected final String mimeType;
     protected final String fileName;
+    protected boolean closed = false;
 
     /**
      *
@@ -97,7 +97,7 @@ public abstract class AbstractDocument implements Document {
 
     @Override
     public boolean isWritable() {
-        return true;
+        return !closed;
     }
 
     @Override
@@ -135,7 +135,7 @@ public abstract class AbstractDocument implements Document {
     public int hashCode() {
         int result;
         try {
-            result = getDataHash(HASH_ALGORITHM).hashCode();
+            result = getDataHash(DEFAULT_HASH_ALGORITHM).hashCode();
         } catch (DataHashException e) {
             result = 0;
         }
@@ -145,12 +145,14 @@ public abstract class AbstractDocument implements Document {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         //Nothing to do here
+        this.closed = true;
     }
 
     @Override
     public String getPath() {
         return fileName;
     }
+
 }

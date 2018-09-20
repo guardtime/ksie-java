@@ -71,6 +71,7 @@ public class PostponedSignatureFactoryIntegrationTest extends AbstractCommonInte
         postponedPackagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(postponedSignatureFactory)
                 .withVerificationPolicy(new LimitedInternalVerificationPolicy())
+                .withParsingStore(parsingStore)
                 .build();
         testEnvelope = postponedPackagingFactory.create(
                 singletonList(testDocumentHelloText),

@@ -24,14 +24,13 @@ import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.EnvelopeWriter;
-import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.exception.EnvelopeReadingException;
-import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
+import com.guardtime.envelope.packaging.parsing.store.TemporaryFileBasedParsingStore;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
-import com.guardtime.envelope.signature.SignatureException;
 import com.guardtime.envelope.signature.SignatureFactory;
 import com.guardtime.envelope.signature.ksi.KsiSignatureFactory;
+import com.guardtime.envelope.util.Util;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.KSIBuilder;
 import com.guardtime.ksi.pdu.PduVersion;
@@ -50,8 +49,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest {
@@ -59,15 +64,20 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
     private static final File TRUST_STORE_FILE;
     private static final String TRUST_STORE_PASSWORD;
     protected EnvelopePackagingFactory packagingFactory;
+    protected EnvelopePackagingFactory packagingFactoryTFPS; // TemporaryFileParsingStore
     protected SignatureFactory signatureFactory;
     protected EnvelopeWriter envelopeWriter;
     protected KSI ksi;
+    protected TemporaryFileBasedParsingStore temporaryFileBasedParsingStore = new TemporaryFileBasedParsingStore();
+
+    protected Path tmpDir = Paths.get(System.getProperty("java.io.tmpdir"));
 
     private static final KSIServiceCredentials KSI_SERVICE_CREDENTIALS;
     private static final String TEST_SIGNING_SERVICE;
     private static final String TEST_EXTENDING_SERVICE;
 
     private static final String GUARDTIME_PUBLICATIONS_FILE;
+
 
     static {
         try {
@@ -113,6 +123,11 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
         signatureFactory = new KsiSignatureFactory(ksi, ksi);
         packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
+                .withParsingStore(parsingStore)
+                .build();
+        packagingFactoryTFPS = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(signatureFactory)
+                .withParsingStore(temporaryFileBasedParsingStore)
                 .build();
         envelopeWriter = new ZipEnvelopeWriter();
     }
@@ -137,6 +152,14 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
         }
     }
 
+    Envelope getEnvelopeWithTemporaryFileParsingStore(String path) throws Exception {
+        URL url = Thread.currentThread().getContextClassLoader().getResource(path);
+        File file = new File(url.toURI());
+        try (FileInputStream input = new FileInputStream(file)) {
+            return packagingFactoryTFPS.read(input);
+        }
+    }
+
     /*
     Created envelope will be closed.
      */
@@ -155,18 +178,75 @@ public abstract class AbstractCommonIntegrationTest extends AbstractEnvelopeTest
         }
     }
 
-    Envelope getEnvelopeWith2SignaturesWithSameAnnotation(Annotation annotation) throws InvalidEnvelopeException,
-            SignatureException,
-            EnvelopeMergingException {
+    Envelope getEnvelopeWith2SignaturesWithSameAnnotation(Annotation annotation) throws Exception {
         Envelope envelope = packagingFactory.create(
                 singletonList(testDocumentHelloText),
                 singletonList(annotation)
         );
-        packagingFactory.addSignature(
+        Envelope second = packagingFactory.addSignature(
                 envelope,
                 singletonList(testDocumentHelloPdf),
                 singletonList(annotation)
         );
-        return envelope;
+        envelope.close();
+        return second;
+    }
+
+
+    protected boolean anyKsieTempFiles() {
+        return getKsieTempFiles().size() > 0;
+    }
+
+    protected List<File> getKsieTempFiles() {
+        List<File> ksieTempFiles = new ArrayList<>();
+        for (File f : tempFiles()) {
+            if (isTempFile(f)) {
+                ksieTempFiles.add(f);
+            } else if (isTempDir(f)) {
+                ksieTempFiles.addAll(getKsieTempFilesFromDirectory(f));
+            }
+        }
+        return ksieTempFiles;
+    }
+
+    protected List<File> getKsieTempFilesFromDirectory(File dir) {
+        List<File> ksieTempFiles = new ArrayList<>();
+        for (File f : tempFiles(dir)) {
+            if (isTempFile(f)) {
+                ksieTempFiles.add(f);
+            } else if (isTempDir(f)) {
+                ksieTempFiles.addAll(getKsieTempFilesFromDirectory(f));
+            }
+        }
+        return ksieTempFiles;
+    }
+
+    protected void cleanTempDir() throws IOException {
+        for (File f : tempFiles()) {
+            if (isTempFile(f) || isTempDir(f)) {
+                Util.deleteFileOrDirectory(f.toPath());
+            }
+        }
+    }
+
+    protected List<File> tempFiles() {
+        return tempFiles(tmpDir.toFile());
+    }
+
+    protected List<File> tempFiles(File dir) {
+        File[] list = dir.listFiles();
+        if (list == null) {
+            return emptyList();
+        } else {
+            return asList(list);
+        }
+    }
+
+    protected boolean isTempFile(File s) {
+        return s.isFile() && s.getName().startsWith(Util.TEMP_FILE_PREFIX);
+    }
+
+    protected boolean isTempDir(File s) {
+        return s.getName().startsWith(Util.TEMP_DIR_PREFIX) && s.isDirectory();
     }
 }

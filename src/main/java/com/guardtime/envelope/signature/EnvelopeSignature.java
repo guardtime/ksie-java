@@ -57,4 +57,9 @@ public interface EnvelopeSignature<O> extends Comparable<EnvelopeSignature<O>> {
      */
     boolean isExtended();
 
+    /**
+     * Return deep copy of {@link EnvelopeSignature}.
+     */
+    EnvelopeSignature<O> getCopy();
+
 }

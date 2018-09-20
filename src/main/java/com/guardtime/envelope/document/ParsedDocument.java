@@ -20,6 +20,7 @@
 package com.guardtime.envelope.document;
 
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
+import com.guardtime.envelope.packaging.parsing.store.ParsingStoreReference;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,39 +31,33 @@ import static com.guardtime.envelope.util.Util.notNull;
  * Represents a {@link Document} that has been parsed in. Uses a {@link ParsingStore} from where to access the data of
  * the {@link Document}
  */
-public class ParsedDocument extends AbstractDocument implements UnknownDocument {
+class ParsedDocument extends AbstractDocument implements UnknownDocument {
 
-    private final ParsingStore parsingStore;
-    private final String key;
+    private final ParsingStoreReference parsingStoreReference;
 
     /**
-     *
-     * Creates {@link Document} with provided MIME-type and file name. The data for the {@link Document} is contained in the
-     * provided {@link ParsingStore} and can be accessed with the provided key.
-     * @param store             The {@link ParsingStore} that contains the document data.
-     * @param parsingStoreKey   The key for the data in {@link ParsingStore} of the document.
+     * Creates {@link Document} with provided MIME-type and file name. The data for the {@link Document} is accessible by the
+     * provided {@link ParsingStoreReference}.
+     * @param reference         The {@link ParsingStoreReference} that provides the document data.
      * @param mimeType          The MIME-type of the {@link Document}.
      * @param fileName          The file name to be used for the {@link Document}.
      */
-    public ParsedDocument(ParsingStore store, String parsingStoreKey, String mimeType, String fileName) {
+    protected ParsedDocument(ParsingStoreReference reference, String mimeType, String fileName) {
         super(mimeType, fileName);
-        notNull(store, "Parsing store");
-        notNull(parsingStoreKey, "Parsing store key");
-        this.parsingStore = store;
-        this.key = parsingStoreKey;
+        notNull(reference, "Parsing store reference");
+        this.parsingStoreReference = reference;
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        InputStream inputStream = parsingStore.get(key);
-        if (inputStream == null) {
-            throw new IOException("Failed to acquire input stream from parsing store for key '" + key + "'");
-        }
-        return inputStream;
+        return parsingStoreReference.getStoredContent();
     }
 
     @Override
     public void close() {
-        parsingStore.remove(key);
+        if (!closed) {
+            parsingStoreReference.unstore();
+            super.close();
+        }
     }
 }

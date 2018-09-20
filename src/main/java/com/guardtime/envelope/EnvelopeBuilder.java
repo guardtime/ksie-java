@@ -21,8 +21,6 @@ package com.guardtime.envelope;
 
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.FileDocument;
-import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
 import com.guardtime.envelope.packaging.SignatureContent;
@@ -30,8 +28,6 @@ import com.guardtime.envelope.packaging.SignatureContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -72,14 +68,6 @@ public class EnvelopeBuilder {
         return this;
     }
 
-    public EnvelopeBuilder withDocument(InputStream input, String name, String mimeType) {
-        return withDocument(new StreamDocument(input, mimeType, name));
-    }
-
-    public EnvelopeBuilder withDocument(File file, String mimeType) {
-        return withDocument(new FileDocument(file, mimeType));
-    }
-
     public EnvelopeBuilder withDocument(Document document) {
         notNull(document, "Data file ");
         checkDocumentNameExistence(document);
@@ -104,8 +92,7 @@ public class EnvelopeBuilder {
         if (existingEnvelope == null) {
             envelope = packagingFactory.create(documents, annotations);
         } else {
-            packagingFactory.addSignature(existingEnvelope, documents, annotations);
-            envelope = existingEnvelope;
+            envelope = packagingFactory.addSignature(existingEnvelope, documents, annotations);
         }
         documents.clear();
         annotations.clear();

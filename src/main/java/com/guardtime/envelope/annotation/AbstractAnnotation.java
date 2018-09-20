@@ -31,14 +31,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 
-import static com.guardtime.envelope.document.AbstractDocument.HASH_ALGORITHM;
+import static com.guardtime.envelope.manifest.Manifest.DEFAULT_HASH_ALGORITHM;
 import static com.guardtime.envelope.util.Util.notNull;
 import static com.guardtime.ksi.util.Util.toByteArray;
 
 /**
  * Generic implementation for {@link Annotation} that is lacking {@link Annotation#getInputStream()} implementation.
  */
-public abstract class AbstractAnnotation implements Annotation {
+abstract class AbstractAnnotation implements Annotation {
     protected static final Logger logger = LoggerFactory.getLogger(Annotation.class);
 
     protected final String domain;
@@ -52,7 +52,7 @@ public abstract class AbstractAnnotation implements Annotation {
      *               entity controlling the Internet domain name z.y.x.
      * @param type annotation type, indicating the persistence of the annotation, see {@link EnvelopeAnnotationType} for details.
      */
-    public AbstractAnnotation(String domain, EnvelopeAnnotationType type) {
+    protected AbstractAnnotation(String domain, EnvelopeAnnotationType type) {
         notNull(domain, "Domain");
         notNull(type, "Annotation type");
         this.type = type;
@@ -124,7 +124,7 @@ public abstract class AbstractAnnotation implements Annotation {
             return getDomain().equals(that.getDomain()) &&
                     getAnnotationType().equals(that.getAnnotationType()) &&
                     getPath().equals(that.getPath()) &&
-                    getDataHash(HASH_ALGORITHM).equals(that.getDataHash(HASH_ALGORITHM));
+                    getDataHash(DEFAULT_HASH_ALGORITHM).equals(that.getDataHash(DEFAULT_HASH_ALGORITHM));
         } catch (DataHashException e) {
             throw new RuntimeException("Data hash calculation for equality check failed!", e);
         }
@@ -134,10 +134,11 @@ public abstract class AbstractAnnotation implements Annotation {
     public int hashCode() {
         DataHash dataHash = null;
         try {
-            dataHash = getDataHash(HASH_ALGORITHM);
+            dataHash = getDataHash(DEFAULT_HASH_ALGORITHM);
         } catch (DataHashException e) {
             throw new RuntimeException("Object hash calculation failed!", e);
         }
         return Objects.hash(getDomain(), getAnnotationType(), dataHash, getPath());
     }
+
 }

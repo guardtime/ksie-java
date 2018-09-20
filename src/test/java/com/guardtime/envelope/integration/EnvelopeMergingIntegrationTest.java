@@ -21,7 +21,6 @@ package com.guardtime.envelope.integration;
 
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.extending.ExtendedEnvelope;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.UuidIndexProviderFactory;
@@ -43,7 +42,6 @@ import com.guardtime.envelope.verification.result.ResultHolder;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -99,10 +97,12 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
         packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
                 .withIndexProviderFactory(new UuidIndexProviderFactory())
+                .withParsingStore(parsingStore)
                 .build();
         incPackagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(signatureFactory)
                 .withIndexProviderFactory(new IncrementingIndexProviderFactory())
+                .withParsingStore(parsingStore)
                 .build();
     }
 
@@ -164,21 +164,27 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
 
     @Test
     public void testAddNewContentToMergedEnvelope1() throws Exception {
-        try (Document document = new StreamDocument(
+        try (Document document = documentFactory.create(
                 new ByteArrayInputStream("".getBytes()),
                 "textDoc",
                 "1-" + Long.toString(new Date().getTime())
-        );
-             Envelope uuidEnvelope = packagingFactory.create(singletonList(document), singletonList(stringEnvelopeAnnotation));
-             Envelope incEnvelope = getEnvelope(ENVELOPE_WITH_RANDOM_INCREMENTING_INDEXES);
-             Document document2 = new StreamDocument(
-                     new ByteArrayInputStream("".getBytes()),
-                     "textDoc",
-                     "2-" + Long.toString(new Date().getTime())
-             )) {
+            );
+            Envelope uuidEnvelope = packagingFactory.create(singletonList(document), singletonList(stringEnvelopeAnnotation));
+            Envelope incEnvelope = getEnvelope(ENVELOPE_WITH_RANDOM_INCREMENTING_INDEXES);
+            Document document2 = documentFactory.create(
+                    new ByteArrayInputStream("".getBytes()),
+                    "textDoc",
+                    "2-" + Long.toString(new Date().getTime())
+            )
+        ) {
             uuidEnvelope.addAll(incEnvelope.getSignatureContents());
-            packagingFactory.addSignature(uuidEnvelope, singletonList(document2), singletonList(stringEnvelopeAnnotation));
-            assertEquals(uuidEnvelope.getSignatureContents().size(), 4);
+            try (Envelope second = packagingFactory.addSignature(
+                    uuidEnvelope,
+                    singletonList(document2),
+                    singletonList(stringEnvelopeAnnotation)
+            )) {
+                assertEquals(second.getSignatureContents().size(), 4);
+            }
         }
     }
 
@@ -207,14 +213,20 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
                      singletonList(testDocumentHelloText),
                      singletonList(stringEnvelopeAnnotation)
              );
-             Document document = new StreamDocument(
+             Document document = documentFactory.create(
                      new ByteArrayInputStream("".getBytes()),
                      "textDoc",
                      Long.toString(new Date().getTime())
-             )) {
+             )
+        ) {
             incEnvelope.addAll(uuidEnvelope.getSignatureContents());
-            incPackagingFactory.addSignature(incEnvelope, singletonList(document), singletonList(stringEnvelopeAnnotation));
-            assertEquals(incEnvelope.getSignatureContents().size(), 3);
+            try (Envelope second = incPackagingFactory.addSignature(
+                    incEnvelope,
+                    singletonList(document),
+                    singletonList(stringEnvelopeAnnotation)
+            )) {
+                assertEquals(second.getSignatureContents().size(), 3);
+            }
         }
     }
 
@@ -282,10 +294,10 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     public void testMergeEnvelopesWithExactSameDocument() throws Exception {
         try (Envelope envelope = mergeEnvelopesUnclosed(ENVELOPES_FOR_SAME_DOCUMENT)) {
             assertEquals(2, envelope.getSignatureContents().size());
+            assertSignatureContentsCount(envelope, 2);
         }
     }
 
-    @Ignore // TODO: KSIE-116
     @Test
     public void testMergeEnvelopeWithExactSameEnvelope() throws Exception {
         try (Envelope envelope = mergeEnvelopesUnclosed(ENVELOPES_IDENTICAL)) {
@@ -355,25 +367,27 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
              Envelope second = getEnvelope(ENVELOPE_WITH_ONE_DOCUMENT)) {
 
             first.addAll(second.getSignatureContents());
-            packagingFactory.addSignature(second, singletonList(testDocumentHelloPdf), singletonList(stringEnvelopeAnnotation));
-            Assert.assertEquals(2, second.getSignatureContents().size());
+            try (Envelope third = packagingFactory.addSignature(
+                    second,
+                    singletonList(testDocumentHelloPdf),
+                    singletonList(stringEnvelopeAnnotation)
+            )) {
+                Assert.assertEquals(2, third.getSignatureContents().size());
+            }
         }
     }
 
-    @Ignore // KSIE-116
     @Test
     public void testMergeWithUnknownFiles() throws Exception {
         try (Envelope first = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES);
              Envelope second  = getEnvelope(ENVELOPE_WITH_MULTIPLE_SIGNATURES)) {
-
-            first.addAll(second.getSignatureContents());
+            for (SignatureContent content : second.getSignatureContents()) {
+                first.add(new SignatureContent(content, parsingStore));
+            }
             assertEquals(3, first.getSignatureContents().size());
             assertEquals(2, second.getSignatureContents().size());
             assertEquals(0, first.getUnknownFiles().size());
             assertEquals(1, second.getUnknownFiles().size());
-            //TODO: KSIE-116: Should copy SignatureContent, not reuse same object,
-            // Signature time sets the same signature to be first in sorted lists of first and second envelope
-            assertTrue(first.getSignatureContents().get(0) != second.getSignatureContents().get(0));
         }
     }
 
@@ -421,7 +435,9 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     private Envelope mergeEnvelopesUnclosed(String[] envelopes) throws Exception {
         Envelope envelope1 = getEnvelope(envelopes[0]);
         try (Envelope envelope2 = getEnvelope(envelopes[1])) {
-            envelope1.addAll(envelope2.getSignatureContents());
+            for (SignatureContent content : envelope2.getSignatureContents()) {
+                envelope1.add(new SignatureContent(content, parsingStore));
+            }
         }
         return envelope1;
     }
@@ -429,11 +445,12 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     private SignatureContent createSignatureContent(Document existingDocument) throws Exception {
         Document document = existingDocument;
         if (document == null) {
-            document = new StreamDocument(
-                    new ByteArrayInputStream(UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8)),
-                    "text/plain",
-                    UUID.randomUUID().toString()
-            );
+            document =
+                    documentFactory.create(
+                            new ByteArrayInputStream(UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8)),
+                            "text/plain",
+                            UUID.randomUUID().toString()
+                    );
         }
         try (Envelope temp = packagingFactory.create(singletonList(document), new LinkedList<Annotation>())) {
             return temp.getSignatureContents().get(0);

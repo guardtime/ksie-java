@@ -20,11 +20,10 @@
 package com.guardtime.envelope.packaging.parsing;
 
 import com.guardtime.envelope.annotation.Annotation;
+import com.guardtime.envelope.annotation.AnnotationFactory;
 import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
-import com.guardtime.envelope.annotation.ParsedAnnotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.EmptyDocument;
-import com.guardtime.envelope.document.ParsedDocument;
+import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.manifest.AnnotationDataReference;
 import com.guardtime.envelope.manifest.AnnotationsManifest;
 import com.guardtime.envelope.manifest.DocumentsManifest;
@@ -34,16 +33,12 @@ import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.parsing.handler.ContentParsingException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStoreFactory;
 import com.guardtime.envelope.signature.EnvelopeSignature;
 import com.guardtime.envelope.util.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,14 +48,19 @@ class SignatureContentComposer {
     private static final Logger logger = LoggerFactory.getLogger(SignatureContentComposer.class);
 
     private final EnvelopeElementExtractor handler;
+    private DocumentFactory documentFactory;
+    private AnnotationFactory annotationFactory;
 
     SignatureContentComposer(EnvelopeElementExtractor envelopeElementExtractor) {
         this.handler = envelopeElementExtractor;
     }
 
-    public Pair<SignatureContent, List<Throwable>> compose(String manifestPath, ParsingStoreFactory parsingStoreFactory)
-            throws ContentParsingException, ParsingStoreException {
-        SignatureContentGroup group = new SignatureContentGroup(manifestPath, parsingStoreFactory.create());
+    public Pair<SignatureContent, List<Throwable>> compose(String manifestPath, ParsingStoreSession parsingStoreSession)
+            throws ContentParsingException {
+        ParsingStore parsingStore = parsingStoreSession.getParsingStore();
+        this.documentFactory = new DocumentFactory(parsingStore);
+        this.annotationFactory = new AnnotationFactory(parsingStore);
+        SignatureContentGroup group = new SignatureContentGroup(manifestPath, parsingStoreSession);
         SignatureContent signatureContent = new SignatureContent.Builder()
                 .withManifest(group.manifest)
                 .withDocumentsManifest(group.documentsManifest)
@@ -69,7 +69,6 @@ class SignatureContentComposer {
                 .withDocuments(group.documents)
                 .withAnnotations(group.annotations)
                 .withSignature(group.signature)
-                .withParsingStore(group.parsingStore)
                 .build();
 
         return Pair.of(signatureContent, group.exceptions);
@@ -85,11 +84,11 @@ class SignatureContentComposer {
         private List<Annotation> annotations = new LinkedList<>();
         private List<Document> documents = new LinkedList<>();
         private EnvelopeSignature signature;
-        private ParsingStore parsingStore;
+        private ParsingStoreSession parsingStoreSession;
 
 
-        SignatureContentGroup(String manifestPath, ParsingStore parsingStore) throws ContentParsingException {
-            this.parsingStore = parsingStore;
+        SignatureContentGroup(String manifestPath, ParsingStoreSession storeSession) throws ContentParsingException {
+            this.parsingStoreSession = storeSession;
             this.manifest = getManifest(manifestPath);
             this.documentsManifest = getDocumentsManifest();
             this.annotationsManifest = getAnnotationsManifest();
@@ -134,12 +133,15 @@ class SignatureContentComposer {
         private Document fetchDocumentFromHandler(FileReference reference) {
             if (invalidReference(reference)) return null;
             String documentUri = reference.getUri();
-            try (InputStream stream = handler.getDocumentStream(documentUri)) {
-                parsingStore.store(documentUri, stream);
-                return new ParsedDocument(parsingStore, documentUri, reference.getMimeType(), documentUri);
-            } catch (ContentParsingException | ParsingStoreException | IOException e) {
+            try {
+                return documentFactory.create(
+                        handler.getParsingStoreReference(documentUri),
+                        reference.getMimeType(),
+                        documentUri
+                );
+            } catch (ContentParsingException e) {
                 // either removed or was never present in the first place, verifier will decide
-                return new EmptyDocument(documentUri, reference.getMimeType(), reference.getHashList());
+                return documentFactory.create(reference.getHashList(), reference.getMimeType(), documentUri);
             }
         }
 
@@ -185,13 +187,16 @@ class SignatureContentComposer {
             }
             AnnotationDataReference annotationDataReference = singleAnnotationManifest.getAnnotationReference();
             String uri = annotationDataReference.getUri();
-            try (InputStream stream = handler.getAnnotationDataStream(uri)) {
-                parsingStore.store(uri, stream);
-                Annotation annotation = new ParsedAnnotation(parsingStore, uri, annotationDataReference.getDomain(), type);
+            try {
+                Annotation annotation = annotationFactory.create(
+                        parsingStoreSession.getReference(uri),
+                        annotationDataReference.getDomain(),
+                        type
+                );
                 annotation.setPath(uri);
                 return annotation;
-            } catch (ContentParsingException | ParsingStoreException | IOException e) {
-                logger.debug("Failed to parse annotation for '{}'. Reason: '{}", uri, e.getMessage());
+            } catch (NullPointerException | IllegalStateException e) {
+                logger.debug("Failed to extract Annotation for '{}'.", uri, e);
                 return null;
             }
         }

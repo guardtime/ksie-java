@@ -20,11 +20,10 @@
 package com.guardtime.envelope.indexing;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
-import com.guardtime.envelope.document.ParsedDocument;
 import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.EnvelopePackagingFactory;
-import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
+import com.guardtime.envelope.packaging.parsing.store.ParsingStoreReference;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 
 import org.junit.Assert;
@@ -48,6 +47,7 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
     public void testCreateWithValidEnvelope() throws Exception {
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(mockedSignatureFactory)
+                .withParsingStore(parsingStore)
                 .withVerificationPolicy(null)
                 .build();
         try (Envelope envelope = packagingFactory.create(
@@ -63,6 +63,7 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
     public void testCreateWithMixedEnvelope() throws Exception {
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(mockedSignatureFactory)
+                .withParsingStore(parsingStore)
                 .withVerificationPolicy(null)
                 .withIndexProviderFactory(new UuidIndexProviderFactory())
                 .build();
@@ -95,7 +96,9 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
     public void testWithClashingUnknownManifestFile() {
         Envelope mockEnvelope = mock(Envelope.class);
         List<UnknownDocument> unknownFileList = new ArrayList<>();
-        unknownFileList.add(new ParsedDocument(mock(ParsingStore.class), "k", "m", META_INF + "/manifest-384.tlv"));
+        unknownFileList.add(
+                (UnknownDocument) documentFactory.create(mock(ParsingStoreReference.class), "m", META_INF + "/manifest-384.tlv")
+        );
         when(mockEnvelope.getUnknownFiles()).thenReturn(unknownFileList);
         IndexProvider indexProvider = indexProviderFactory.create(mockEnvelope);
         Assert.assertEquals("385", indexProvider.getNextSignatureIndex());
@@ -105,7 +108,13 @@ public class IncrementingIndexProviderFactoryTest extends AbstractEnvelopeTest {
     public void testWithClashingUnknownAnnotationFile() {
         Envelope mockEnvelope = mock(Envelope.class);
         List<UnknownDocument> unknownFileList = new ArrayList<>();
-        unknownFileList.add(new ParsedDocument(mock(ParsingStore.class), "k", "m", META_INF + "/annotation-854.tlv"));
+        unknownFileList.add(
+                (UnknownDocument) documentFactory.create(
+                        mock(ParsingStoreReference.class),
+                        "m",
+                        META_INF + "/annotation-854.tlv"
+                )
+        );
         when(mockEnvelope.getUnknownFiles()).thenReturn(unknownFileList);
         IndexProvider indexProvider = indexProviderFactory.create(mockEnvelope);
         Assert.assertEquals("855", indexProvider.getNextAnnotationIndex());

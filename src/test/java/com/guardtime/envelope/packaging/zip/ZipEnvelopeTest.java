@@ -22,7 +22,6 @@ package com.guardtime.envelope.packaging.zip;
 import com.guardtime.envelope.AbstractEnvelopeTest;
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
-import com.guardtime.envelope.document.StreamDocument;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.UuidIndexProviderFactory;
 import com.guardtime.envelope.packaging.Envelope;
@@ -58,6 +57,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
     public void testAddSingleSignatureContent_OK() throws Exception {
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(mockedSignatureFactory)
+                .withParsingStore(parsingStore)
                 .withVerificationPolicy(null)
                 .withIndexProviderFactory(new UuidIndexProviderFactory())
                 .build();
@@ -80,6 +80,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
     public void testAddListOfSignatureContent_OK() throws Exception {
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(mockedSignatureFactory)
+                .withParsingStore(parsingStore)
                 .withVerificationPolicy(null)
                 .withIndexProviderFactory(new UuidIndexProviderFactory())
                 .build();
@@ -92,11 +93,15 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                     Envelope newEnvelope =
                             packagingFactory.create(singletonList(testDocumentHelloText), new ArrayList<Annotation>());
                     ByteArrayInputStream input = new ByteArrayInputStream("auh".getBytes(StandardCharsets.UTF_8));
-                    Document document = new StreamDocument(input, "text/plain", "someTestFile.txt")
+                    Document document = documentFactory.create(input, "text/plain", "someTestFile.txt");
+                    Envelope second = packagingFactory.addSignature(
+                            newEnvelope,
+                            singletonList(document),
+                            new ArrayList<Annotation>()
+                    )
             ) {
-                packagingFactory.addSignature(newEnvelope, singletonList(document), new ArrayList<Annotation>());
-                int expected = newEnvelope.getSignatureContents().size() + 1;
-                envelope.addAll(newEnvelope.getSignatureContents());
+                int expected = second.getSignatureContents().size() + 1;
+                envelope.addAll(second.getSignatureContents());
                 assertEquals(expected, envelope.getSignatureContents().size());
             }
         }
@@ -108,6 +113,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
         expectedException.expectMessage("New SignatureContent has clashing Manifest!");
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(mockedSignatureFactory)
+                .withParsingStore(parsingStore)
                 .withVerificationPolicy(null)
                 .withIndexProviderFactory(new IncrementingIndexProviderFactory())
                 .build();
@@ -131,6 +137,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
         expectedException.expectMessage("New SignatureContent has clashing name for Document! Path: ");
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(mockedSignatureFactory)
+                .withParsingStore(parsingStore)
                 .withVerificationPolicy(null)
                 .withIndexProviderFactory(new UuidIndexProviderFactory())
                 .build();
@@ -139,12 +146,12 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                 singletonList(stringEnvelopeAnnotation)
         )) {
             assertEquals(1, envelope.getSignatureContents().size());
-            try (Document clashingDocument = new StreamDocument(
+            try (Document clashingDocument = documentFactory.create(
                     new ByteArrayInputStream(TEST_DATA_TXT_CONTENT),
                     testDocumentHelloPdf.getMimeType(),
                     testDocumentHelloPdf.getFileName()
-            );
-                 Envelope newEnvelope = packagingFactory.create(singletonList(clashingDocument), new ArrayList<Annotation>())
+                );
+                Envelope newEnvelope = packagingFactory.create(singletonList(clashingDocument), new ArrayList<Annotation>())
             ) {
                 envelope.add(newEnvelope.getSignatureContents().get(0));
             }
@@ -171,14 +178,11 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
         expectedException.expectMessage("File name is not valid!");
         EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
                 .withSignatureFactory(mockedSignatureFactory)
+                .withParsingStore(parsingStore)
                 .withVerificationPolicy(null)
                 .withIndexProviderFactory(new UuidIndexProviderFactory())
                 .build();
-        Document testDocument = new StreamDocument(
-                new ByteArrayInputStream(new byte[0]),
-                "some type",
-                filename
-        );
+        Document testDocument = documentFactory.create(new ByteArrayInputStream(new byte[0]), "some type", filename);
         try (Envelope ignored = packagingFactory.create(singletonList(testDocument), singletonList(stringEnvelopeAnnotation))) {
             //empty
         }

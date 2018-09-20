@@ -63,7 +63,10 @@ public class DocumentsIntegrityRuleTest extends AbstractEnvelopeTest {
         when(mockedEnvelopeSignature.getSignature()).thenReturn(mockKsiSignature);
         when(mockedSignatureFactory.read(Mockito.any(InputStream.class))).thenReturn(mockedEnvelopeSignature);
 
-        this.packagingFactory = new ZipEnvelopePackagingFactoryBuilder().withSignatureFactory(mockedSignatureFactory).build();
+        this.packagingFactory = new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withParsingStore(parsingStore)
+                .build();
     }
 
     private RuleVerificationResult getRuleVerificationResult(String path) throws Exception {
