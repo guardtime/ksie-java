@@ -2,7 +2,7 @@
 
 Guardtime's KSI Blockchain is an industrial scale blockchain platform that cryptographically ensures data integrity and proves time of existence. The KSI signatures, based on hash chains, link data to this global calendar blockchain.
 
-The checkpoints of the blockchain, published in newspapers and electronic media, enable long term integrity of any digital asset without the need to trust any system. There are many applications for KSI, a classical example is signing of any type of logs - system logs, financial transactions, call records, etc. For more, see https://guardtime.com
+The checkpoints of the blockchain, published in newspapers and electronic media, enable long term integrity of any digital asset without the need to trust any system. There are many applications for KSI, a classical example is signing of any type of logs - system logs, financial transactions, call records, etc, but also any other type of documents and data. For more, see https://guardtime.com
 
 KSI Envelope (KSIE) is designed to contain data, meta-data and KSI signatures. The signed data may be detached from the envelope or attached to the envelope itself. The KSI Envelope supports two kinds of custom meta-data: meta-data that can be removed and meta-data that can not be removed from it without affecting the verification result.
 
@@ -20,14 +20,14 @@ In order to get the latest version of KSIE Java SDK, download the source and bui
 
 The API full reference is available at: [http://guardtime.github.io/ksie-java/](http://guardtime.github.io/ksie-java/).
 
-For many activities you need to have previously composed the `EnvelopePackagingFactory` which requires a `SignatureFactory` and an `EnvelopeReader`.
+For most activities you need to have previously composed `EnvelopePackagingFactory` which requires a `SignatureFactory` and an `EnvelopeReader`.
 
 Optionally other specifiers can be set:
 * `EnvelopeManifestFactory` can be provided if the standard TLV based manifest factory is not desired.
 * `IndexProviderFactory` can be provided to indicate what signature index string should be used.
 * `ParsingStore` can be provided to indicate where parsed envelope data will be stored during runtime.
 
-Following is the example of creating a packaging factory for ZIP based envelopes with TLV manifest structures and KSI based signatures, which will be the basis for the rest of the code examples:
+Following is the example of creating a packaging factory for ZIP based envelopes with TLV manifest structures and KSI signatures, which will be the basis for the rest of the code examples:
 
 ```java
 Signer signer;
@@ -37,6 +37,10 @@ Reader reader;
 */
 SignatureFactory signatureFactory = new KsiSignatureFactory(signer, reader);
 EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().withSignatureFactory(signatureFactory).build();
+/*
+Note that the EnvelopeReader is not specified in this example as the
+ZipEnvelopePackagingFactoryBuilder has it covered.
+*/
 ```
 
 ### Creating the Envelope
@@ -45,8 +49,8 @@ In order to create a new envelope you have a choice of using the `EnvelopeBuilde
 
 ```java
 EnvelopeBuilder builder = new EnvelopeBuilder(packagingFactory);
-builder.withDocument(...);      //can be used multiple times before calling build()
-builder.withAnnotation(...);    //can be used multiple times before calling build()  or can be omitted
+builder.withDocument(...);      // Can be used multiple times before calling build()
+builder.withAnnotation(...);    //Can be used multiple times before calling build() or can be omitted
 Envelope signedEnvelope = builder.build();
 ```
 
@@ -55,13 +59,13 @@ Or you can use the `EnvelopePackagingFactory` directly as shown below:
 ```java
 List<Document> documents;
 List<Annotation> annotations;  // Can be empty list
-/* initialize and fill documents and annotations lists
+/* Initialize and fill documents and annotations lists
 ...
 */
 Envelope signedEnvelope = packagingFactory.create(documents, annotations);
 ```
 
-It is important to note that by default each time a KSI envelope is created, its content is also signed. Thus you always get a signed envelope from both, the `EnvelopeBuilder` and the `EnvelopePackagingFactory`. This behaviour can be altered by using a different `SignatureFactory`. For example by using the `PostponedSignatureFactory`.
+It is important to remember that by default each time a KSI envelope is created, its content is also signed. Thus you always get a signed envelope from both, the `EnvelopeBuilder` and the `EnvelopePackagingFactory`. This behaviour can be altered by using a different `SignatureFactory`. For example by using the `PostponedSignatureFactory`.
 
 When trying to parse an existing envelope only the `packagingFactory` can be used as shown below:
 
@@ -69,10 +73,10 @@ When trying to parse an existing envelope only the `packagingFactory` can be use
 Envelope parsedEnvelope = packagingFactory.read(inputStream);
 ```
 
-It is suggested to always verify the parsed envelope before adding new documents or annotations to it.
+It is suggested to always verify the parsed envelope before adding new documents or annotations to it, see instructions in Verifying the Envelope section.
 
 
-### Writing an Envelope
+### Writing the Envelope
 
 In order to write an envelope to some storage medium an `EnvelopeWriter` is needed.
 From existing implementations `ZipEnvelopeWriter` can be used from `com.guardtime.envelope.packaging.zip` package.
@@ -86,15 +90,15 @@ writer.write(envelope, outputStream);
 
 ### Adding New Documents or Annotations to the Existing Envelope
 
-Both, the `EnvelopeBuilder` and `EnvelopePackagingFactory` allow for adding new documents and annotations to an existing envelope. The existing envelope's content will be copied to a new envelope and that will be expanded with the new documents/annotation and a signature covering them.
+Both, the `EnvelopeBuilder` and `EnvelopePackagingFactory` allow adding new documents and annotations to the existing envelope. The existing envelope's content will be copied to a new envelope and that will be expanded with the new documents/annotations and a signature covering them.
 
 With `EnvelopeBuilder`:
 
 ```java
 EnvelopeBuilder builder = new EnvelopeBuilder(packagingFactory);
 builder.withExistingEnvelope(parsedEnvelope);
-builder.withDocument(...);      //can be used multiple times before calling build()
-builder.withAnnotation(...);    //can be used multiple times before calling build()  or can be omitted
+builder.withDocument(...);      // Can be used multiple times before calling build()
+builder.withAnnotation(...);    // Can be used multiple times before calling build() or can be omitted
 Envelope signedEnvelope = builder.build();
 ```
 
@@ -103,20 +107,20 @@ With `EnvelopePackagingFactory`:
 ```java
 List<Document> documents;
 List<Annotation> annotations;  // Can be empty list
-/* initialize and fill documents and annotations lists
+/* Initialize and fill documents and annotations lists
 ...
 */
 Envelope expandedEnvelope = packagingFactory.addSignature(parsedEnvelope, documents, annotations);
 ```
 
-### Merging Envelopes
+### Merging the Envelopes
 
-There is support of merging `SignatureContent` from one `Envelope` to another. However it is important to note that the instance of `SignatureContent` should be a copy and not the original if it originates from a parsed in `Envelope`. This is due to the fact that upon closing the parsed in `Envelope` all of its `SignatureContents` will be closed as well. `Envelope` does not handle this copying  itself. Therefore the appropriate pattern would look something like:
+The `SignatureContent` can be merged from one `Envelope` to another. However it is important to note that the instance of `SignatureContent` should be a copy and not the original if it originates from a parsed in `Envelope`. This is due to the fact that upon closing the parsed in `Envelope` all of its `SignatureContents` will be closed as well; the `Envelope` does not handle this copying itself. Therefore the appropriate pattern would look something like:
 
 ``` java
 Envelope base = packagingFactory.read(inputStream);
 Envelope env1 = packagingFactory.read(anotherInputStream);
-// Add all or some depending on the need.
+// Add all or some depending on the need
 for (SignatureContent content : env1.getSignatureContent()) {
   base.add(new SignatureContent(content, parsingStore));
 }
@@ -127,7 +131,7 @@ env1.close()
 
 For extending it is necessary to specify the `SignatureFactory` implementation that applies to the given envelope, and the `ExtendingPolicy` to define extension point.
 
-The following example shows extending of all signatures in an envelope.
+To extend all the KSI signatures in an envelope:
 
 ```java
 Extender extender;
@@ -141,13 +145,12 @@ EnvelopeSignatureExtender signatureExtender = new EnvelopeSignatureExtender(sign
 ExtendedEnvelope extendedEnvelope = signatureExtender.extend(envelope);
 extendedEnvelope.isExtended();
 extendedEnvelope.getExtendedSignatureContents().get(0).isExtended();
-
 ```
 
 
 ### Verifying the Envelope
 
-The following example shows a simple verification for an envelope.
+The following example shows a simple verification of an envelope:
 
 ```java
 ContextAwarePolicy contextAwarePolicy;
