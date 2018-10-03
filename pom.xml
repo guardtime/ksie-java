@@ -33,7 +33,7 @@
         <junit.version>4.12</junit.version>
         <mockito.version>1.10.19</mockito.version>
         <slf4j.version>1.7.12</slf4j.version>
-        <ksi.sdk.version>4.11.153</ksi.sdk.version>
+        <ksi.sdk.version>4.12.181</ksi.sdk.version>
         <jacoco.version>0.8.0</jacoco.version>
     </properties>
 
