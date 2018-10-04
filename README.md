@@ -111,15 +111,14 @@ Envelope expandedEnvelope = packagingFactory.addSignature(parsedEnvelope, docume
 
 ### Merging Envelopes
 
-There is support of merging `SignatureContent` from one `Envelope` to another. However it is important to note that the instance of `SignatureContent` should be a copy and not the original if it originates from a parsed in `Envelope`. This is due to the fact that upon closing the parsed in `Envelope` all of its `SignatureContents` will be closed as well. `Envelope` does not handle this copying  itself. Therefore the appropriate pattern would look something like:
+There is support of merging `SignatureContent` from one `Envelope` to another.
 
 ``` java
 Envelope base = packagingFactory.read(inputStream);
 Envelope env1 = packagingFactory.read(anotherInputStream);
 // Add all or some depending on the need.
-for (SignatureContent content : env1.getSignatureContent()) {
-  base.add(new SignatureContent(content, parsingStore));
-}
+base.addAll(env1.getSignatureContents());
+//base.add(env1.getSignatureContents().get(0));
 env1.close()
 ```
 

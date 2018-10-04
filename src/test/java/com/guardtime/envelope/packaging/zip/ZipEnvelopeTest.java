@@ -50,6 +50,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
     @Before
     public void setUpSignatureFactory() throws Exception {
         EnvelopeSignature mockSignature = mock(EnvelopeSignature.class);
+        when(mockSignature.getCopy()).thenReturn(mock(EnvelopeSignature.class));
         when(mockedSignatureFactory.create(any(DataHash.class))).thenReturn(mockSignature);
     }
 
@@ -70,7 +71,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                     Envelope newEnvelope =
                             packagingFactory.create(singletonList(testDocumentHelloText), new ArrayList<Annotation>())
             ) {
-                envelope.add(newEnvelope.getSignatureContents().get(0));
+                envelope.add(newEnvelope.getSignatureContents().get(0), parsingStore);
                 assertEquals(2, envelope.getSignatureContents().size());
             }
         }
@@ -101,7 +102,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                     )
             ) {
                 int expected = second.getSignatureContents().size() + 1;
-                envelope.addAll(second.getSignatureContents());
+                envelope.addAll(second.getSignatureContents(), parsingStore);
                 assertEquals(expected, envelope.getSignatureContents().size());
             }
         }
@@ -126,7 +127,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                     Envelope newEnvelope =
                             packagingFactory.create(singletonList(testDocumentHelloText), new ArrayList<Annotation>())
             ) {
-                envelope.add(newEnvelope.getSignatureContents().get(0));
+                envelope.add(newEnvelope.getSignatureContents().get(0), parsingStore);
             }
         }
     }
@@ -153,7 +154,7 @@ public class ZipEnvelopeTest extends AbstractEnvelopeTest {
                 );
                 Envelope newEnvelope = packagingFactory.create(singletonList(clashingDocument), new ArrayList<Annotation>())
             ) {
-                envelope.add(newEnvelope.getSignatureContents().get(0));
+                envelope.add(newEnvelope.getSignatureContents().get(0), parsingStore);
             }
         }
     }

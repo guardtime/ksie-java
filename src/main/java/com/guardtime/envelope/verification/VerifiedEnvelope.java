@@ -21,13 +21,11 @@ package com.guardtime.envelope.verification;
 
 import com.guardtime.envelope.packaging.Envelope;
 import com.guardtime.envelope.packaging.SignatureContent;
-import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import com.guardtime.envelope.verification.result.RuleVerificationResult;
 import com.guardtime.envelope.verification.result.VerificationResult;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -39,18 +37,9 @@ public class VerifiedEnvelope extends Envelope {
     private final ResultHolder resultHolder;
 
     public VerifiedEnvelope(Envelope envelope, ResultHolder holder) {
-        super(getWrappedSignatureContents(envelope.getSignatureContents(), holder), envelope.getUnknownFiles());
+        super(envelope.getSignatureContents(), envelope.getUnknownFiles());
         this.resultHolder = holder;
         this.aggregateResult = resultHolder.getAggregatedResult();
-    }
-
-    private static Collection<SignatureContent> getWrappedSignatureContents(Collection<SignatureContent> originalContents,
-                                                                            ResultHolder resultHolder) {
-        List<SignatureContent> verifiedContents = new ArrayList<>(originalContents.size());
-        for (SignatureContent content : originalContents) {
-            verifiedContents.add(new VerifiedSignatureContent(content, resultHolder));
-        }
-        return verifiedContents;
     }
 
     /**
@@ -70,19 +59,13 @@ public class VerifiedEnvelope extends Envelope {
     }
 
     public List<VerifiedSignatureContent> getVerifiedSignatureContents() {
-        List<VerifiedSignatureContent> result = new ArrayList<>();
-        for (SignatureContent con : getSignatureContents()) {
-            result.add((VerifiedSignatureContent) con);
+        List<SignatureContent> originalContents = getSignatureContents();
+        List<VerifiedSignatureContent> result = new ArrayList<>(originalContents.size());
+        for (SignatureContent con : originalContents) {
+            result.add(new VerifiedSignatureContent(con, resultHolder));
         }
         return result;
     }
 
-    public void add(SignatureContent content) throws EnvelopeMergingException {
-        super.add(new VerifiedSignatureContent(content, resultHolder));
-    }
-
-    public void addAll(Collection<SignatureContent> contents) throws EnvelopeMergingException {
-        super.addAll(getWrappedSignatureContents(contents, resultHolder));
-    }
-
 }
+    

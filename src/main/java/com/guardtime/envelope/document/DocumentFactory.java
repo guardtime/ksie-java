@@ -23,6 +23,7 @@ import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreReference;
+import com.guardtime.envelope.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 
 import java.io.File;
@@ -40,6 +41,7 @@ public class DocumentFactory {
     private final ParsingStore parsingStore;
 
     public DocumentFactory(ParsingStore store) {
+        Util.notNull(store, "Parsing store");
         this.parsingStore = store;
     }
 

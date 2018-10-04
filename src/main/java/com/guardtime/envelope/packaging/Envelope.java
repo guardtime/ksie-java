@@ -29,6 +29,9 @@ import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.util.SortedList;
 import com.guardtime.envelope.util.Util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,6 +46,8 @@ import static com.guardtime.envelope.packaging.EnvelopeMergingVerifier.verifyUni
  * and signatures that validate the content of the envelope.
  */
 public class Envelope implements AutoCloseable {
+
+    private static final Logger logger = LoggerFactory.getLogger(Envelope.class);
 
     private List<SignatureContent> signatureContents = new SortedList<>();
     private boolean closed = false;
@@ -66,7 +71,7 @@ public class Envelope implements AutoCloseable {
         );
     }
 
-    private static List<UnknownDocument> copyUnknownFiles(List<UnknownDocument> originals, ParsingStore store) {
+    static List<UnknownDocument> copyUnknownFiles(List<UnknownDocument> originals, ParsingStore store) {
         DocumentFactory documentFactory = new DocumentFactory(store);
         List<UnknownDocument> copies = new ArrayList<>();
         for (UnknownDocument doc : originals) {
@@ -75,7 +80,7 @@ public class Envelope implements AutoCloseable {
         return copies;
     }
 
-    private static List<SignatureContent> copySignatureContents(List<SignatureContent> originals, ParsingStore store) {
+    static List<SignatureContent> copySignatureContents(List<SignatureContent> originals, ParsingStore store) {
         List<SignatureContent> copies = new ArrayList<>();
         for (SignatureContent signatureContent : originals) {
             copies.add(new SignatureContent(signatureContent, store));
@@ -106,45 +111,83 @@ public class Envelope implements AutoCloseable {
      */
     @Override
     public void close() throws Exception {
+        Exception exc = null;
         for (SignatureContent content : getSignatureContents()) {
-            content.close();
+            try {
+                content.close();
+            } catch (Exception e) {
+                // Need to try and close other contents, lets put this on hold for now and throw later. Log it as well.
+                exc = e;
+                logger.error("Failed to close SignatureContent!", e);
+            }
         }
 
         for (UnknownDocument f : getUnknownFiles()) {
-            f.close();
+            try {
+                f.close();
+            } catch (Exception e) {
+                exc = e;
+                logger.error("Failed to close UnknownDocument!", e);
+            }
+        }
+        if (exc != null) {
+            throw exc;
         }
 
         this.closed = true;
     }
 
     /**
-     * Adds the {@link SignatureContent} to this {@link Envelope}.
-     * Also takes ownership of the resources associated with the {@link SignatureContent} and
-     * as such any external calls to <code>close()</code> on those resources may lead to unexpected behaviour.
+     * Adds a copy of {@link SignatureContent} to this {@link Envelope}.
      *
      * @param content the content to be added.
+     * @param parsingStore instance of {@link ParsingStore} to be used for deep copying {@link SignatureContent}.
      * @throws EnvelopeMergingException when the {@link SignatureContent} can not be added into the {@link Envelope}.
      */
-    public void add(SignatureContent content) throws EnvelopeMergingException {
+    public void add(SignatureContent content, ParsingStore parsingStore) throws EnvelopeMergingException {
         verifyNewSignatureContentIsAcceptable(content, signatureContents);
         verifyUniqueness(content, signatureContents, unknownFiles);
-        signatureContents.add(content);
+        signatureContents.add(new SignatureContent(content, parsingStore));
     }
 
     /**
-     * Adds all {@link SignatureContent}s to this {@link Envelope}. Also takes ownership of the resources associated with the
-     * {@link SignatureContent}s and as such any external calls to close() on those resources may lead to unexpected behaviour.
+     * Adds copies of all {@link SignatureContent}s to this {@link Envelope}.
      *
      * @param contents the content to be added.
+     * @param parsingStore instance of {@link ParsingStore} to be used for deep copying {@link SignatureContent}.
      * @throws EnvelopeMergingException when any {@link SignatureContent} can not be added into the {@link Envelope}.
      */
-    public void addAll(Collection<SignatureContent> contents) throws EnvelopeMergingException {
+    public void addAll(Collection<SignatureContent> contents, ParsingStore parsingStore) throws EnvelopeMergingException {
         List<SignatureContent> original = new LinkedList<>(signatureContents);
+        List<SignatureContent> copies = new LinkedList<>();
+        SignatureContent copiedContent = null;
         try {
             for (SignatureContent content : contents) {
-                add(content);
+                copiedContent = new SignatureContent(content, parsingStore);
+                verifyNewSignatureContentIsAcceptable(copiedContent, signatureContents);
+                verifyUniqueness(copiedContent, signatureContents, unknownFiles);
+                copies.add(copiedContent);
             }
+            signatureContents.addAll(copies);
         } catch (Exception e) {
+            if (copiedContent != null) {
+                try {
+                    copiedContent.close();
+                } catch (Exception signatureContentCloseException) {
+                    // We are already throwing exception with more important information about why merging failed.
+                    // Log down the exception for closing and continue to close other SignatureContent
+                    logger.error("Failed to close copied SignatureContent!", e);
+                }
+            }
+            for (SignatureContent content : copies) {
+                try {
+                    content.close();
+                } catch (Exception signatureContentCloseException) {
+                    // We are already throwing exception with more important information about why merging failed.
+                    // Log down the exception for closing and continue to close other SignatureContent
+                    logger.error("Failed to close copied SignatureContent!", e);
+                }
+            }
             this.signatureContents = original;
             throw e;
         }

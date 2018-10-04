@@ -22,6 +22,7 @@ package com.guardtime.envelope.annotation;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreReference;
+import com.guardtime.envelope.util.Util;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +38,7 @@ public class AnnotationFactory {
     private final ParsingStore parsingStore;
 
     public AnnotationFactory(ParsingStore parsingStore) {
+        Util.notNull(parsingStore, "Parsing store");
         this.parsingStore = parsingStore;
     }
 

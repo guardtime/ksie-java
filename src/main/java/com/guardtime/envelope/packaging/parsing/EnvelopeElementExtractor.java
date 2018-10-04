@@ -69,7 +69,7 @@ class EnvelopeElementExtractor {
         this.parsingStoreSession = storeSession;
     }
 
-    public Set<String> getManifestUris() {
+    Set<String> getManifestUris() {
         Set<String> returnable = new HashSet<>();
         for (String key : parsingStoreSession.getStoredKeys()) {
             if (manifestHandler.isSupported(key)) {
@@ -79,11 +79,11 @@ class EnvelopeElementExtractor {
         return returnable;
     }
 
-    public SingleAnnotationManifest getSingleAnnotationManifest(String uri) throws ContentParsingException {
+    SingleAnnotationManifest getSingleAnnotationManifest(String uri) throws ContentParsingException {
         return parseAndUnstore(singleAnnotationManifestHandler, uri);
     }
 
-    public byte[] getMimeTypeContent() throws ContentParsingException {
+    byte[] getMimeTypeContent() throws ContentParsingException {
         return parseAndUnstore(mimeTypeHandler, MIME_TYPE_ENTRY_NAME);
     }
 
@@ -114,7 +114,7 @@ class EnvelopeElementExtractor {
         }
     }
 
-    public ParsingStoreReference getParsingStoreReference(String path) throws ContentParsingException {
+    ParsingStoreReference getParsingStoreReference(String path) throws ContentParsingException {
         if (!parsingStoreSession.contains(path)) {
             throw new ContentParsingException("No content stored for entry '" + path + "'!");
         }
