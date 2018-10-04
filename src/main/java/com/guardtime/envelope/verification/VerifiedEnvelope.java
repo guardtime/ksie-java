@@ -68,4 +68,3 @@ public class VerifiedEnvelope extends Envelope {
     }
 
 }
-    
