@@ -127,6 +127,13 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
     }
 
     @Test
+    public void testReadEnvelopeWithNoContents_ThrowsInvalidPackageException() throws Exception {
+        expectedException.expect(InvalidEnvelopeException.class);
+        expectedException.expectMessage("No valid signature content parsed!");
+        setUpEnvelope(EMPTY_ENVELOPE2, false);
+    }
+
+    @Test
     public void testReadEnvelopeWithMimetypeContainingInvalidValue_ThrowsInvalidPackageException() throws Exception {
         expectedException.expect(InvalidEnvelopeException.class);
         expectedException.expectMessage("Parsed Envelope has invalid MIME type. Can't process it!");
