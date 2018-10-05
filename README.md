@@ -115,7 +115,7 @@ Envelope expandedEnvelope = packagingFactory.addSignature(parsedEnvelope, docume
 
 ### Merging the Envelopes
 
-There is support of merging `SignatureContent` from one `Envelope` to another.
+`SignatureContent`s can be merged from one `Envelope` to another.
 
 ``` java
 Envelope base = packagingFactory.read(inputStream);

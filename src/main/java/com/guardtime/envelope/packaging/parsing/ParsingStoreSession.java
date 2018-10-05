@@ -73,9 +73,9 @@ public class ParsingStoreSession {
     }
 
     /**
-     * Stores provided data at key into {@link ParsingStore}
-     * @param name  Key with which to store the data. Usually the filename.
-     * @param input Data to be stored.
+     * Stores provided data at key into {@link ParsingStore}.
+     * @param name  the key at which to store the data; usually a filename.
+     * @param input data to be stored.
      * @throws ParsingStoreException When an error occurs storing the data. Can also mean that the key is already in use.
      * Good practice is to test with {@link #contains(String)}. Since generally each ParsingStoreSession should be used for one
      * envelope parsing there shouldn't occur any duplicate keys.
