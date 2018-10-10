@@ -36,7 +36,6 @@ public class ParsingStoreReference {
     public ParsingStoreReference(UUID uuid, ParsingStore store, String pathName) {
         Util.notNull(uuid, "UUID");
         Util.notNull(store, "Parsing store");
-        Util.notNull(pathName, "Path name");
         this.uuid = uuid;
         this.owner = store;
         this.pathName = pathName;

@@ -30,13 +30,6 @@ public class ParsingStoreReferenceTest extends AbstractEnvelopeTest {
     }
 
     @Test
-    public void testCreateWithoutName_ThrowsNullPointerException() throws Exception {
-        expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("Path name must be present");
-        new ParsingStoreReference(UUID.randomUUID(), parsingStore, null);
-    }
-
-    @Test
     public void testAccessingStoredContent_OK() throws Exception {
         ParsingStoreReference reference = null;
         String originalContent = "someContent";
