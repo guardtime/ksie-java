@@ -123,7 +123,7 @@ abstract class AbstractAnnotation implements Annotation {
         try {
             return getDomain().equals(that.getDomain()) &&
                     getAnnotationType().equals(that.getAnnotationType()) &&
-                    (getPath() == null && that.getPath() == null || getPath().equals(that.getPath())) &&
+                    (getPath() == null && that.getPath() == null || Objects.equals(getPath(), that.getPath())) &&
                     getDataHash(DEFAULT_HASH_ALGORITHM).equals(that.getDataHash(DEFAULT_HASH_ALGORITHM));
         } catch (DataHashException e) {
             throw new RuntimeException("Data hash calculation for equality check failed!", e);

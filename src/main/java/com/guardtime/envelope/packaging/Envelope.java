@@ -24,6 +24,7 @@ import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.document.DocumentFactory;
 import com.guardtime.envelope.document.SignedDocument;
 import com.guardtime.envelope.document.UnknownDocument;
+import com.guardtime.envelope.packaging.exception.EnvelopeClosingException;
 import com.guardtime.envelope.packaging.exception.EnvelopeMergingException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.util.SortedList;
@@ -108,17 +109,21 @@ public class Envelope implements AutoCloseable {
      * {@link Annotation}s in the envelope.
      * NB! This will close {@link Document}s and
      * {@link Annotation}s added during creation as well.
+     *
+     * @throws EnvelopeClosingException when some resources fail to close. All resources are attempted to be closed and all
+     * exceptions encountered will be added to thrown exception and can be accessed by
+     * {@link EnvelopeClosingException#getExceptions()}.
      */
     @Override
     public void close() throws Exception {
-        Exception exc = null;
+        EnvelopeClosingException exc =
+                new EnvelopeClosingException("Failed to close all Envelope resources! Look at nested exception(s)!");
         for (SignatureContent content : getSignatureContents()) {
             try {
                 content.close();
             } catch (Exception e) {
-                // Need to try and close other contents, lets put this on hold for now and throw later. Log it as well.
-                exc = e;
-                logger.error("Failed to close SignatureContent!", e);
+                exc.addException(e);
+                logger.debug("Failed to close SignatureContent!", e);
             }
         }
 
@@ -126,11 +131,11 @@ public class Envelope implements AutoCloseable {
             try {
                 f.close();
             } catch (Exception e) {
-                exc = e;
-                logger.error("Failed to close UnknownDocument!", e);
+                exc.addException(e);
+                logger.debug("Failed to close UnknownDocument!", e);
             }
         }
-        if (exc != null) {
+        if (!exc.getExceptions().isEmpty()) {
             throw exc;
         }
 
