@@ -3,6 +3,7 @@ package com.guardtime.envelope.packaging.exception;
 import com.guardtime.envelope.EnvelopeException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,22 +13,14 @@ import java.util.List;
  * Wrapped exceptions can be retrieved by calling {@link #getExceptions()}.
  */
 public class EnvelopeClosingException extends EnvelopeException {
-    private List<Throwable> exceptions = new ArrayList<>();
+    private List<Exception> exceptions;
 
-    public EnvelopeClosingException(String message, Throwable cause) {
-        this(message);
-        addException(cause);
+    public EnvelopeClosingException(String message, Collection<Exception> causes) {
+        super(message, causes.iterator().next());
+        this.exceptions = new ArrayList<>(causes);
     }
 
-    public EnvelopeClosingException(String message) {
-        super(message);
-    }
-
-    public void addException(Throwable e) {
-        exceptions.add(e);
-    }
-
-    public List<Throwable> getExceptions() {
+    public List<Exception> getExceptions() {
         return Collections.unmodifiableList(exceptions);
     }
 }

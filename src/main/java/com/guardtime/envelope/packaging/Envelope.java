@@ -116,13 +116,12 @@ public class Envelope implements AutoCloseable {
      */
     @Override
     public void close() throws Exception {
-        EnvelopeClosingException exc =
-                new EnvelopeClosingException("Failed to close all Envelope resources! Look at nested exception(s)!");
+        List<Exception> exceptions = new ArrayList<>();
         for (SignatureContent content : getSignatureContents()) {
             try {
                 content.close();
             } catch (Exception e) {
-                exc.addException(e);
+                exceptions.add(e);
                 logger.debug("Failed to close SignatureContent!", e);
             }
         }
@@ -131,12 +130,15 @@ public class Envelope implements AutoCloseable {
             try {
                 f.close();
             } catch (Exception e) {
-                exc.addException(e);
+                exceptions.add(e);
                 logger.debug("Failed to close UnknownDocument!", e);
             }
         }
-        if (!exc.getExceptions().isEmpty()) {
-            throw exc;
+        if (!exceptions.isEmpty()) {
+            throw new EnvelopeClosingException(
+                    String.format("Failed to close all Envelope resources! Encountered %d exceptions!", exceptions.size()),
+                    exceptions
+            );
         }
 
         this.closed = true;
