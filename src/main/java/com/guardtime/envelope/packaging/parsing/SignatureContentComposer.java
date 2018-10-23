@@ -55,7 +55,7 @@ class SignatureContentComposer {
         this.handler = envelopeElementExtractor;
     }
 
-    public Pair<SignatureContent, List<Throwable>> compose(String manifestPath, ParsingStoreSession parsingStoreSession)
+    Pair<SignatureContent, List<Throwable>> compose(String manifestPath, ParsingStoreSession parsingStoreSession)
             throws ContentParsingException {
         ParsingStore parsingStore = parsingStoreSession.getParsingStore();
         this.documentFactory = new DocumentFactory(parsingStore);

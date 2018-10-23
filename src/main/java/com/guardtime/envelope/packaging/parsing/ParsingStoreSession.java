@@ -24,6 +24,7 @@ import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreReference;
+import com.guardtime.envelope.util.Util;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -42,12 +43,13 @@ public class ParsingStoreSession {
     private final Set<String> requestedKeys = new HashSet<>();
     private DocumentFactory documentFactory;
 
-    public ParsingStoreSession(ParsingStore store) {
+    ParsingStoreSession(ParsingStore store) {
+        Util.notNull(store, "Parsing store");
         this.store = store;
         this.documentFactory = new DocumentFactory(store);
     }
 
-    public List<UnknownDocument> getUnrequestedFiles() {
+    List<UnknownDocument> getUnrequestedFiles() {
         List<UnknownDocument> returnable = new ArrayList<>();
         List<String> keys = new ArrayList<>(references.keySet());
         keys.removeAll(requestedKeys);
@@ -57,7 +59,7 @@ public class ParsingStoreSession {
         return returnable;
     }
 
-    public List<String> getStoredKeys() {
+    List<String> getStoredKeys() {
         return new ArrayList<>(references.keySet());
     }
 
@@ -65,12 +67,23 @@ public class ParsingStoreSession {
         return references.containsKey(path);
     }
 
-    public ParsingStoreReference getReference(String path) {
+    ParsingStoreReference getReference(String path) {
         requestedKeys.add(path);
         return new ParsingStoreReference(references.get(path));
     }
 
+    /**
+     * Stores provided data at key into {@link ParsingStore}.
+     * @param name  the key at which to store the data; usually a filename.
+     * @param input data to be stored.
+     * @throws ParsingStoreException When an error occurs storing the data. Can also mean that the key is already in use.
+     * Good practice is to test with {@link #contains(String)}. Since generally each ParsingStoreSession should be used for one
+     * envelope parsing there shouldn't occur any duplicate keys.
+     */
     public void store(String name, InputStream input) throws ParsingStoreException {
+        if (contains(name)) {
+            throw new ParsingStoreException("Key '" + name + "' already used for storage!");
+        }
         ParsingStoreReference ref = store.store(input, name);
         references.put(name, ref);
     }
@@ -79,13 +92,13 @@ public class ParsingStoreSession {
      * Clear all {@link ParsingStoreReference}s created during storing. Should be called once all necessary references have been
      * used.
      */
-    public void clear() {
+    void clear() {
         for (ParsingStoreReference reference: references.values()) {
             reference.unstore();
         }
     }
 
-    public ParsingStore getParsingStore() {
+    ParsingStore getParsingStore() {
         return store;
     }
 }

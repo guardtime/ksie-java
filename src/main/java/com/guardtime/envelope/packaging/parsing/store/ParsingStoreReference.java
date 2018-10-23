@@ -19,6 +19,8 @@
 
 package com.guardtime.envelope.packaging.parsing.store;
 
+import com.guardtime.envelope.util.Util;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
@@ -32,6 +34,8 @@ public class ParsingStoreReference {
     private final String pathName;
 
     public ParsingStoreReference(UUID uuid, ParsingStore store, String pathName) {
+        Util.notNull(uuid, "UUID");
+        Util.notNull(store, "Parsing store");
         this.uuid = uuid;
         this.owner = store;
         this.pathName = pathName;
