@@ -16,6 +16,35 @@ Access to full KSIE specification can be requested from https://guardtime.com/bl
 In order to get the latest version of KSIE Java SDK, download the source and build using Maven.
 
 
+## Compiling the Code
+
+To compile the code you need JDK 1.7 (or later) and [Maven 3](https://maven.apache.org/).
+The project can be built via the command line by executing the following maven command:
+
+```
+mvn clean install
+```
+
+This command instructs Maven to build and install the project in the local repository. Also all integration and unit tests will be run.
+
+In order to run the integration tests successfully you need to have access to KSI
+service, the simplest is to request a trial account here [https://guardtime.com/blockchain-developers](https://guardtime.com/blockchain-developers).
+
+Add the KSI configuration to the file `src/test/resources/config.properties` (see file `src/test/resources/config.properties.sample` for more information).
+
+You can skip the integration tests by executing the following command:
+
+```
+mvn clean install -DskipITs
+```
+
+You can skip unit and integration tests by executing the following command:
+
+```
+mvn clean install -DskipTests
+```
+
+
 ## Usage
 
 The API full reference is available at: [http://guardtime.github.io/ksie-java/](http://guardtime.github.io/ksie-java/).
@@ -183,35 +212,6 @@ for(RuleVerificationResult ruleResult : result.getResults()) {
 `Envelope`, `SignatureContent`, `Document` and `Annotation` are derived from `AutoCloseable` since they may hold resources which need to be closed once they are no longer needed. Therefore calling `close()` is highly recommended to avoid any data leaks.
 
 Calling `close()` on an `Envelope` will also close all `SignatureContent`, `Document` and `Annotation` that it has references to.
-
-
-## Compiling the Code
-
-To compile the code you need JDK 1.7 (or later) and [Maven 3](https://maven.apache.org/).
-The project can be built via the command line by executing the following maven command:
-
-```
-mvn clean install
-```
-
-This command instructs Maven to build and install the project in the local repository. Also all integration and unit tests will be run.
-
-In order to run the integration tests successfully you need to have access to KSI
-service, the simplest is to request a trial account here [https://guardtime.com/blockchain-developers](https://guardtime.com/blockchain-developers).
-
-Add the KSI configuration to the file `src/test/resources/config.properties` (see file `src/test/resources/config.properties.sample` for more information).
-
-You can skip the integration tests by executing the following command:
-
-```
-mvn clean install -DskipITs
-```
-
-You can skip unit and integration tests by executing the following command:
-
-```
-mvn clean install -DskipTests
-```
 
 
 ## Dependencies
