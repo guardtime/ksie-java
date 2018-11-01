@@ -29,20 +29,23 @@ public class AnnotationFactoryTest extends AbstractEnvelopeTest {
     @Test
     public void testCreateFromFile_OK() throws Exception {
         AnnotationFactory factory = new AnnotationFactory(parsingStore);
-        Annotation annotation = factory.create(loadFile(TEST_FILE_PATH_TEST_TXT), "SomeDomain", EnvelopeAnnotationType.NON_REMOVABLE);
+        Annotation annotation = factory.create(
+                loadFile(TEST_FILE_PATH_TEST_TXT), "SomeDomain", EnvelopeAnnotationType.NON_REMOVABLE);
         assertNotNull(annotation);
     }
 
     @Test
     public void testCreateFromInputStream_OK() {
         AnnotationFactory factory = new AnnotationFactory(parsingStore);
-        Annotation annotation = factory.create(new ByteArrayInputStream(new byte[32]), "SomeDomain", EnvelopeAnnotationType.NON_REMOVABLE);
+        Annotation annotation = factory.create(
+                new ByteArrayInputStream(new byte[32]), "SomeDomain", EnvelopeAnnotationType.NON_REMOVABLE);
         assertNotNull(annotation);
     }
 
     @Test
     public void testCreateWhereProvidedAnnotationIsInstanceOfFileAnnotation_Ok() throws Exception {
-        FileAnnotation annotation = new FileAnnotation(loadFile(TEST_FILE_PATH_TEST_TXT), "File.Domain", EnvelopeAnnotationType.NON_REMOVABLE);
+        FileAnnotation annotation = new FileAnnotation(
+                loadFile(TEST_FILE_PATH_TEST_TXT), "File.Domain", EnvelopeAnnotationType.NON_REMOVABLE);
         AnnotationFactory factory = new AnnotationFactory(parsingStore);
         Annotation newAnnotation = factory.create(annotation);
         assertNotSame(annotation, newAnnotation);
