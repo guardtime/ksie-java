@@ -24,6 +24,8 @@ import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
 import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.extending.ExtendedEnvelope;
 import com.guardtime.envelope.packaging.Envelope;
+import com.guardtime.envelope.packaging.SignatureContent;
+import com.guardtime.envelope.packaging.exception.EnvelopeClosingException;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
 import com.guardtime.envelope.util.Util;
 import com.guardtime.envelope.verification.VerifiedEnvelope;
@@ -32,6 +34,7 @@ import com.guardtime.envelope.verification.result.ResultHolder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -235,6 +238,16 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         ExtendedEnvelope extendedEnvelope = new ExtendedEnvelope(envelope);
         extendedEnvelope.close();
         assertFalse(anyKsieTempFiles());
+    }
+
+    @Test
+    public void testCloseEnvelopeWithFailingSignatureContent_ThrowsEnvelopeClosingException() throws Exception {
+        expectedException.expect(EnvelopeClosingException.class);
+        expectedException.expectMessage("Failed to close all Envelope resources! Encountered 1 exceptions!");
+        SignatureContent mockSignatureContent = Mockito.mock(SignatureContent.class);
+        Mockito.doThrow(new Exception("Testing exception!")).when(mockSignatureContent).close();
+        Envelope envelope = new Envelope(mockSignatureContent);
+        envelope.close();
     }
 
 }

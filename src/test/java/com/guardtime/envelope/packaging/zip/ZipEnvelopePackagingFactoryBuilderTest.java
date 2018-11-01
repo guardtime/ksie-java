@@ -261,15 +261,24 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
 
             try (Envelope newEnvelope = createInternallyValidEnvelope(documentsList, annotationsList, envelope)) {
                 assertNotNull(newEnvelope);
-                Collection<Document> containedDocuments = newEnvelope.getSignatureContents().get(1).getDocuments().values();
+                Collection<Document> containedDocuments = newEnvelope.getSignatureContents().get(0).getDocuments().values();
                 assertNotNull(containedDocuments);
-                assertTrue(containedDocuments.containsAll(documentsList));
+                assertTrue(customContains(containedDocuments, documentsList));
                 Collection<Annotation> containedAnnotations =
-                        newEnvelope.getSignatureContents().get(1).getAnnotations().values();
+                        newEnvelope.getSignatureContents().get(0).getAnnotations().values();
                 assertNotNull(containedAnnotations);
-                assertTrue(containedAnnotations.containsAll(annotationsList));
+                assertTrue(customContains(containedAnnotations, annotationsList));
             }
         }
+    }
+
+    private boolean customContains(Collection<?> container, Collection<?> contained) {
+        for (Object o : contained) {
+            if (!container.contains(o)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Test

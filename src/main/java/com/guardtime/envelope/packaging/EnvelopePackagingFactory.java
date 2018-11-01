@@ -21,6 +21,7 @@ package com.guardtime.envelope.packaging;
 
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.document.UnknownDocument;
 import com.guardtime.envelope.hash.HashAlgorithmProvider;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.IndexProvider;
@@ -69,6 +70,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.guardtime.envelope.packaging.EntryNameProvider.META_INF;
+import static com.guardtime.envelope.packaging.Envelope.copySignatureContents;
+import static com.guardtime.envelope.packaging.Envelope.copyUnknownFiles;
 import static com.guardtime.envelope.packaging.EnvelopeWriter.MIME_TYPE_ENTRY_NAME;
 
 /**
@@ -161,17 +164,24 @@ public final class EnvelopePackagingFactory {
     public Envelope addSignature(Envelope existingEnvelope, List<Document> files, List<Annotation> annotations)
             throws InvalidEnvelopeException, EnvelopeMergingException, SignatureException {
         Util.notNull(existingEnvelope, "Envelope");
-        Envelope copy = new Envelope(existingEnvelope, parsingStore);
+        List<SignatureContent> copiedContents = copySignatureContents(existingEnvelope.getSignatureContents(), parsingStore);
+        List<UnknownDocument> copiedUnknownFiles = copyUnknownFiles(existingEnvelope.getUnknownFiles(), parsingStore);
+        Envelope copy = null;
         try {
-            SignatureContent signatureContent = verifyAndSign(files, annotations, copy);
-            copy.add(signatureContent);
+            SignatureContent signatureContent = verifyAndSign(files, annotations, existingEnvelope);
+            copiedContents.add(signatureContent);
+            copy = new Envelope(copiedContents, copiedUnknownFiles);
             verifyEnvelope(copy);
             return copy;
         } catch (Exception e) {
-            try {
-                copy.close();
-            } catch (Exception e1) {
-                throw new RuntimeException("Copied envelope failed to close gracefully!", e1);
+            if (copy != null) {
+                try {
+                    copy.close();
+                } catch (Exception e1) {
+                    // The exception "e" is superior currently, we will log down closing error and throw out "e" since that
+                    // should indicate why adding signature failed and is more important to user!
+                    logger.error("Copied envelope failed to close gracefully!", e1);
+                }
             }
             throw e;
         }
@@ -326,7 +336,7 @@ public final class EnvelopePackagingFactory {
             );
         }
 
-        public SignatureContent sign() throws InvalidManifestException, SignatureException, DataHashException {
+        SignatureContent sign() throws InvalidManifestException, SignatureException, DataHashException {
             ManifestFactoryType manifestFactoryType = manifestFactory.getManifestFactoryType();
             SignatureFactoryType signatureFactoryType = signatureFactory.getSignatureFactoryType();
             logger.info("'{}' is used to create and read envelope manifests", manifestFactoryType.getName());
@@ -345,7 +355,7 @@ public final class EnvelopePackagingFactory {
 
             DataHash hash = getSignatureContentSigningHash(manifest);
             EnvelopeSignature signature = signatureFactory.create(hash);
-            SignatureContent signatureContent = new SignatureContent.Builder()
+            return new SignatureContent.Builder()
                     .withDocuments(documents)
                     .withDocumentsManifest(documentsManifest)
                     .withAnnotations(annotations)
@@ -354,7 +364,6 @@ public final class EnvelopePackagingFactory {
                     .withManifest(manifest)
                     .withSignature(signature)
                     .build();
-            return signatureContent;
         }
 
         private DataHash getSignatureContentSigningHash(Manifest manifest) throws DataHashException {

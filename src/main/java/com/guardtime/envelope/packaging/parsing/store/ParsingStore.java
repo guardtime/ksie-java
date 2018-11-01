@@ -21,6 +21,7 @@ package com.guardtime.envelope.packaging.parsing.store;
 
 import com.guardtime.envelope.packaging.Envelope;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -35,27 +36,35 @@ public abstract class ParsingStore {
 
     private Map<UUID, List<ParsingStoreReference>> references = new HashMap<>();
 
-    /**
-     * @param stream the {@link InputStream} from which the data will be stored.
-     *
-     * @param pathName optional name of stored file.
-     * @throws ParsingStoreException when reading the stream fails.
-     */
-    public abstract ParsingStoreReference store(InputStream stream, String pathName) throws ParsingStoreException;
-
     public ParsingStoreReference store(InputStream stream) throws ParsingStoreException {
         return store(stream, null);
     }
 
-    public abstract InputStream getContent(UUID uuid);
-
-    ParsingStoreReference addNewReference(UUID uuid, String path) {
-        ParsingStoreReference ref = new ParsingStoreReference(uuid, this, path);
-        updateReferences(uuid, ref);
-        return ref;
+    /**
+     * Stores provided data stream with provided key and provides access to the stored data through an instance of
+     * {@link ParsingStoreReference}
+     *
+     * @param stream the {@link InputStream} from which the data will be stored.
+     * @param pathName optional name of stored file.
+     * @throws ParsingStoreException when reading the stream fails.
+     */
+    public ParsingStoreReference store(InputStream stream, String pathName) throws ParsingStoreException {
+        try {
+            UUID uuid = UUID.randomUUID();
+            storeInternal(uuid, stream);
+            ParsingStoreReference reference = new ParsingStoreReference(uuid, this, pathName);
+            updateReferences(uuid, reference);
+            return reference;
+        } catch (IOException e) {
+            throw new ParsingStoreException("Failed to access data in stream!", e);
+        }
     }
 
-    protected void updateReferences(UUID uuid, ParsingStoreReference parsingStoreReference) {
+    public abstract InputStream getContent(UUID uuid);
+
+    abstract void storeInternal(UUID uuid, InputStream inputStream) throws IOException;
+
+    void updateReferences(UUID uuid, ParsingStoreReference parsingStoreReference) {
         List<ParsingStoreReference> currentReferences;
         if (references.containsKey(uuid)) {
             currentReferences = references.get(uuid);
