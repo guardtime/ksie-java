@@ -130,7 +130,7 @@ public class ZipEnvelopeReaderTest extends AbstractEnvelopeTest {
     public void testReadEnvelopeWithNoContents_ThrowsInvalidPackageException() throws Exception {
         expectedException.expect(InvalidEnvelopeException.class);
         expectedException.expectMessage("No valid signature content parsed!");
-        setUpEnvelope(EMPTY_ENVELOPE2, false);
+        setUpEnvelope(EMPTY_ENVELOPE_MIMETYPE_ONLY, false);
     }
 
     @Test

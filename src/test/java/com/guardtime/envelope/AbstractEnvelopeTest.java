@@ -90,7 +90,7 @@ public class AbstractEnvelopeTest {
      * Envelopes - Internally invalid or does not verify against anchors.
      */
     protected static final String EMPTY_ENVELOPE = "envelopes/invalid/empty.ksie";
-    protected static final String EMPTY_ENVELOPE2 = "envelopes/invalid/only-mimetype.ksie";
+    protected static final String EMPTY_ENVELOPE_MIMETYPE_ONLY = "envelopes/invalid/only-mimetype.ksie";
     protected static final String ENVELOPE_WITH_MISSING_MANIFEST = "envelopes/invalid/missing-manifest.ksie";
     protected static final String ENVELOPE_WITH_MISSING_MIMETYPE = "envelopes/invalid/missing-mimetype.ksie";
     protected static final String ENVELOPE_WITH_CHANGED_DOCUMENT = "envelopes/invalid/changed-document.ksie";

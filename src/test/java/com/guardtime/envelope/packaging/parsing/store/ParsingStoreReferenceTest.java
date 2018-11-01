@@ -2,7 +2,6 @@ package com.guardtime.envelope.packaging.parsing.store;
 
 import com.guardtime.envelope.AbstractEnvelopeTest;
 import com.guardtime.ksi.util.Util;
-
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -16,14 +15,14 @@ import static org.junit.Assert.assertTrue;
 public class ParsingStoreReferenceTest extends AbstractEnvelopeTest {
 
     @Test
-    public void testCreateWithoutId_ThrowsNullPointerException() throws Exception {
+    public void testCreateWithoutId_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("UUID must be present");
         new ParsingStoreReference(null, parsingStore, "name");
     }
 
     @Test
-    public void testCreateWithoutParsingStore_ThrowsNullPointerException() throws Exception {
+    public void testCreateWithoutParsingStore_ThrowsNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Parsing store must be present");
         new ParsingStoreReference(UUID.randomUUID(), null, "key");
@@ -67,5 +66,19 @@ public class ParsingStoreReferenceTest extends AbstractEnvelopeTest {
             // Expected behaviour since the content is not there anymore!
             assertTrue(e.getMessage().contains("Parsing store has lost content for ID '" + reference.getUuid().toString() + "'"));
         }
+    }
+
+    @Test
+    public void testGetKey_OK() {
+        String pathName = "PathNameInStore";
+        ParsingStore store = new MemoryBasedParsingStore();
+        ParsingStoreReference storeReference = new ParsingStoreReference(UUID.randomUUID(), store, pathName);
+        assertTrue(storeReference.getKey().contains(pathName));
+    }
+
+    @Test
+    public void testGetKeyWithNullPathName_OK() {
+        ParsingStoreReference reference = new ParsingStoreReference(UUID.randomUUID(), parsingStore, null);
+        UUID.fromString(reference.getKey());
     }
 }

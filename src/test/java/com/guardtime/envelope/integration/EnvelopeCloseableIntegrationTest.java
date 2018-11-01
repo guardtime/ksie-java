@@ -24,9 +24,11 @@ import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
 import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.extending.ExtendedEnvelope;
 import com.guardtime.envelope.packaging.Envelope;
+import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeClosingException;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
+import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
 import com.guardtime.envelope.util.Util;
 import com.guardtime.envelope.verification.VerifiedEnvelope;
 import com.guardtime.envelope.verification.result.ResultHolder;
@@ -250,4 +252,14 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         envelope.close();
     }
 
+    @Test
+    public void testCloseFirstEnvelopeThatIsMergedIntoSecondEnvelope() throws Exception {
+        Envelope envelope = getEnvelope();
+        Envelope envelope2 = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES);
+        envelope2.addAll(envelope.getSignatureContents(), parsingStore);
+        envelope.close();
+        EnvelopeWriter writer = new ZipEnvelopeWriter();
+        writer.write(envelope2, new ByteArrayOutputStream());
+        envelope2.close();
+    }
 }
