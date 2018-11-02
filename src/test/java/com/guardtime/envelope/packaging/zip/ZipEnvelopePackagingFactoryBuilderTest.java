@@ -141,6 +141,16 @@ public class ZipEnvelopePackagingFactoryBuilderTest extends AbstractEnvelopeTest
     }
 
     @Test
+    public void testCreateZipPackagingFactoryWithoutParsingStore_ThrowsNullPointerException() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Parsing store must be present");
+        new ZipEnvelopePackagingFactoryBuilder()
+                .withSignatureFactory(mockedSignatureFactory)
+                .withParsingStore(null)
+                .build();
+    }
+
+    @Test
     public void testCreateZipPackagingFactoryWithoutManifestFactory_ThrowsNullPointerException() throws Exception {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Manifest factory must be present");

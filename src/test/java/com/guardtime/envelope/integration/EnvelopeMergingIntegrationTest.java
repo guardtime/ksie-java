@@ -21,7 +21,9 @@ package com.guardtime.envelope.integration;
 
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.extending.EnvelopeSignatureExtender;
 import com.guardtime.envelope.extending.ExtendedEnvelope;
+import com.guardtime.envelope.extending.ksi.KsiEnvelopeSignatureExtendingPolicy;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.UuidIndexProviderFactory;
 import com.guardtime.envelope.packaging.Envelope;
@@ -39,9 +41,9 @@ import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
 import com.guardtime.envelope.verification.VerifiedEnvelope;
 import com.guardtime.envelope.verification.result.ResultHolder;
-
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -355,7 +357,6 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     public void testCheckMergingSourceEnvelopeContentCount() throws Exception {
         try (Envelope first = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES);
              Envelope second = getEnvelope(ENVELOPE_WITH_ONE_DOCUMENT)) {
-
             first.addAll(second.getSignatureContents(), parsingStore);
             Assert.assertEquals(1, second.getSignatureContents().size());
         }
@@ -372,7 +373,7 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
                     singletonList(testDocumentHelloPdf),
                     singletonList(stringEnvelopeAnnotation)
             )) {
-                Assert.assertEquals(2, third.getSignatureContents().size());
+                assertEquals(2, third.getSignatureContents().size());
             }
         }
     }
@@ -388,6 +389,29 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
             assertEquals(2, second.getSignatureContents().size());
             assertEquals(0, first.getUnknownFiles().size());
             assertEquals(1, second.getUnknownFiles().size());
+        }
+    }
+
+    @Ignore //TODO: KSIE-127
+    @Test
+    public void testMergeEnvelopeWithExactSameEnvelopes() throws Exception {
+        try (Envelope envelope = mergeEnvelopesUnclosed(ENVELOPES_IDENTICAL)) {
+            //Initially two contents remain until given envelope is parsed in again.
+            assertEquals(1, envelope.getSignatureContents().size());
+            assertSignatureContentsCount(envelope, 1);
+        }
+    }
+
+    @Test
+    public void testMergeEnvelopeWithSameEnvelopesButDifferentSignature() throws Exception {
+        expectedException.expect(SignatureMergingException.class);
+        expectedException.expectMessage("New SignatureContent has clashing signature!");
+        try (Envelope envelope1 = getEnvelope(ENVELOPE_WITH_MULTIPLE_ANNOTATIONS);
+             Envelope envelope2 = getEnvelope(ENVELOPE_WITH_MULTIPLE_ANNOTATIONS)) {
+            EnvelopeSignatureExtender ext = new EnvelopeSignatureExtender(signatureFactory,
+                    new KsiEnvelopeSignatureExtendingPolicy(ksi));
+            ExtendedEnvelope env = ext.extend(envelope2);
+            envelope1.addAll(env.getSignatureContents(), parsingStore);
         }
     }
 
@@ -470,13 +494,13 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     }
 
     private void compareEnvelopeBytes(Envelope first, Envelope second, int contentCount) throws IOException {
-        Assert.assertEquals(contentCount, first.getSignatureContents().size());
-        Assert.assertEquals(contentCount, second.getSignatureContents().size());
+        assertEquals(contentCount, first.getSignatureContents().size());
+        assertEquals(contentCount, second.getSignatureContents().size());
         EnvelopeWriter writer = new ZipEnvelopeWriter();
         ByteArrayOutputStream firstStream = new ByteArrayOutputStream();
         ByteArrayOutputStream secondStream = new ByteArrayOutputStream();
         writer.write(first, firstStream);
         writer.write(second, secondStream);
-        Assert.assertTrue(Arrays.equals(firstStream.toByteArray(), secondStream.toByteArray()));
+        assertTrue(Arrays.equals(firstStream.toByteArray(), secondStream.toByteArray()));
     }
 }

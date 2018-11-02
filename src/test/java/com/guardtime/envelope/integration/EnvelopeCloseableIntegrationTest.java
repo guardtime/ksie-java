@@ -24,9 +24,11 @@ import com.guardtime.envelope.annotation.EnvelopeAnnotationType;
 import com.guardtime.envelope.document.Document;
 import com.guardtime.envelope.extending.ExtendedEnvelope;
 import com.guardtime.envelope.packaging.Envelope;
+import com.guardtime.envelope.packaging.EnvelopeWriter;
 import com.guardtime.envelope.packaging.SignatureContent;
 import com.guardtime.envelope.packaging.exception.EnvelopeClosingException;
 import com.guardtime.envelope.packaging.exception.InvalidEnvelopeException;
+import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
 import com.guardtime.envelope.util.Util;
 import com.guardtime.envelope.verification.VerifiedEnvelope;
 import com.guardtime.envelope.verification.result.ResultHolder;
@@ -250,4 +252,21 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
         envelope.close();
     }
 
+    @Test
+    public void testCloseFirstEnvelopeThatIsMergedIntoSecondEnvelope() throws Exception {
+        try (Envelope envelope = getEnvelope();
+             Envelope envelope2 = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES)
+        ) {
+            int expected = envelope.getSignatureContents().size() + envelope2.getSignatureContents().size();
+            envelope2.addAll(envelope.getSignatureContents(), parsingStore);
+            envelope.close();
+            EnvelopeWriter writer = new ZipEnvelopeWriter();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            writer.write(envelope2, baos);
+            envelope2.close();
+            try (Envelope env = packagingFactory.read(new ByteArrayInputStream(baos.toByteArray()))) {
+                assertEquals(expected, env.getSignatureContents().size());
+            }
+        }
+    }
 }
