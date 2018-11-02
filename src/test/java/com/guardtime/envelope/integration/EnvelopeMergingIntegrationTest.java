@@ -21,7 +21,9 @@ package com.guardtime.envelope.integration;
 
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.document.Document;
+import com.guardtime.envelope.extending.EnvelopeSignatureExtender;
 import com.guardtime.envelope.extending.ExtendedEnvelope;
+import com.guardtime.envelope.extending.ksi.KsiEnvelopeSignatureExtendingPolicy;
 import com.guardtime.envelope.indexing.IncrementingIndexProviderFactory;
 import com.guardtime.envelope.indexing.UuidIndexProviderFactory;
 import com.guardtime.envelope.packaging.Envelope;
@@ -41,6 +43,7 @@ import com.guardtime.envelope.verification.VerifiedEnvelope;
 import com.guardtime.envelope.verification.result.ResultHolder;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -389,12 +392,26 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
         }
     }
 
+    @Ignore //TODO: KSIE-127
     @Test
     public void testMergeEnvelopeWithExactSameEnvelopes() throws Exception {
         try (Envelope envelope = mergeEnvelopesUnclosed(ENVELOPES_IDENTICAL)) {
             //Initially two contents remain until given envelope is parsed in again.
-            assertEquals(2, envelope.getSignatureContents().size());
+            assertEquals(1, envelope.getSignatureContents().size());
             assertSignatureContentsCount(envelope, 1);
+        }
+    }
+
+    @Test
+    public void testMergeEnvelopeWithSameEnvelopesButDifferentSignature() throws Exception {
+        expectedException.expect(SignatureMergingException.class);
+        expectedException.expectMessage("New SignatureContent has clashing signature!");
+        try (Envelope envelope1 = getEnvelope(ENVELOPE_WITH_MULTIPLE_ANNOTATIONS);
+             Envelope envelope2 = getEnvelope(ENVELOPE_WITH_MULTIPLE_ANNOTATIONS)) {
+            EnvelopeSignatureExtender ext = new EnvelopeSignatureExtender(signatureFactory,
+                    new KsiEnvelopeSignatureExtendingPolicy(ksi));
+            ExtendedEnvelope env = ext.extend(envelope2);
+            envelope1.addAll(env.getSignatureContents(), parsingStore);
         }
     }
 

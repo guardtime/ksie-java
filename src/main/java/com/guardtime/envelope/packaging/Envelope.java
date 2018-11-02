@@ -154,6 +154,7 @@ public class Envelope implements AutoCloseable {
     public void add(SignatureContent content, ParsingStore parsingStore) throws EnvelopeMergingException {
         verifyNewSignatureContentIsAcceptable(content, signatureContents);
         verifyUniqueness(content, signatureContents, unknownFiles);
+        // TODO: If exists, ignore
         signatureContents.add(new SignatureContent(content, parsingStore));
     }
 

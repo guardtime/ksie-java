@@ -254,12 +254,19 @@ public class EnvelopeCloseableIntegrationTest extends AbstractCommonIntegrationT
 
     @Test
     public void testCloseFirstEnvelopeThatIsMergedIntoSecondEnvelope() throws Exception {
-        Envelope envelope = getEnvelope();
-        Envelope envelope2 = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES);
-        envelope2.addAll(envelope.getSignatureContents(), parsingStore);
-        envelope.close();
-        EnvelopeWriter writer = new ZipEnvelopeWriter();
-        writer.write(envelope2, new ByteArrayOutputStream());
-        envelope2.close();
+        try (Envelope envelope = getEnvelope();
+             Envelope envelope2 = getEnvelope(ENVELOPE_WITH_RANDOM_UUID_INDEXES)
+        ) {
+            int expected = envelope.getSignatureContents().size() + envelope2.getSignatureContents().size();
+            envelope2.addAll(envelope.getSignatureContents(), parsingStore);
+            envelope.close();
+            EnvelopeWriter writer = new ZipEnvelopeWriter();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            writer.write(envelope2, baos);
+            envelope2.close();
+            try (Envelope env = packagingFactory.read(new ByteArrayInputStream(baos.toByteArray()))) {
+                assertEquals(expected, env.getSignatureContents().size());
+            }
+        }
     }
 }
