@@ -65,7 +65,7 @@ public class DocumentFactoryTest extends AbstractEnvelopeTest  {
                 .thenReturn(new DataHash(HashAlgorithm.SHA2_256, new byte[HashAlgorithm.SHA2_256.getLength()]));
         Document document = factory.create(element);
 
-        Document newDocument = factory.create(element);
+        Document newDocument = factory.create(document);
         assertNotSame(document, newDocument);
         assertEquals(document, newDocument);
 
