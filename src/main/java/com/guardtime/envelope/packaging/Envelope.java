@@ -155,7 +155,9 @@ public class Envelope implements AutoCloseable {
         verifyNewSignatureContentIsAcceptable(content, signatureContents);
         verifyUniqueness(content, signatureContents, unknownFiles);
         // TODO: If exists, ignore
-        signatureContents.add(new SignatureContent(content, parsingStore));
+        if (!signatureContents.contains(content)) {
+            signatureContents.add(new SignatureContent(content, parsingStore));
+        }
     }
 
     /**

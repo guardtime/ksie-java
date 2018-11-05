@@ -41,9 +41,9 @@ import com.guardtime.envelope.packaging.zip.ZipEnvelopePackagingFactoryBuilder;
 import com.guardtime.envelope.packaging.zip.ZipEnvelopeWriter;
 import com.guardtime.envelope.verification.VerifiedEnvelope;
 import com.guardtime.envelope.verification.result.ResultHolder;
+
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -301,14 +301,6 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
     }
 
     @Test
-    public void testMergeEnvelopeWithExactSameEnvelope() throws Exception {
-        try (Envelope envelope = mergeEnvelopesUnclosed(ENVELOPES_IDENTICAL)) {
-            assertEquals(2, envelope.getSignatureContents().size());
-            assertSignatureContentsCount(envelope, 1);
-        }
-    }
-
-    @Test
     public void testAddContentToVerifiedEnvelope() throws Exception {
         try (VerifiedEnvelope verifiedEnvelope =
                      new VerifiedEnvelope(getEnvelopeIgnoreExceptions(ENVELOPE_WITH_ONE_DOCUMENT), new ResultHolder())) {
@@ -392,11 +384,9 @@ public class EnvelopeMergingIntegrationTest extends AbstractCommonIntegrationTes
         }
     }
 
-    @Ignore //TODO: KSIE-127
     @Test
     public void testMergeEnvelopeWithExactSameEnvelopes() throws Exception {
         try (Envelope envelope = mergeEnvelopesUnclosed(ENVELOPES_IDENTICAL)) {
-            //Initially two contents remain until given envelope is parsed in again.
             assertEquals(1, envelope.getSignatureContents().size());
             assertSignatureContentsCount(envelope, 1);
         }
