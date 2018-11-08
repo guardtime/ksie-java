@@ -133,15 +133,14 @@ abstract class AbstractDocument implements Document {
 
     @Override
     public int hashCode() {
-        int result;
         try {
-            result = getDataHash(DEFAULT_HASH_ALGORITHM).hashCode();
+            int result = getDataHash(DEFAULT_HASH_ALGORITHM).hashCode();
+            result = 31 * result + (mimeType != null ? mimeType.hashCode() : 0);
+            result = 31 * result + (fileName != null ? fileName.hashCode() : 0);
+            return result;
         } catch (DataHashException e) {
-            result = 1;
+            throw new RuntimeException(e);
         }
-        result = 31 * result + (mimeType != null ? mimeType.hashCode() : 0);
-        result = 31 * result + (fileName != null ? fileName.hashCode() : 0);
-        return result;
     }
 
     @Override
