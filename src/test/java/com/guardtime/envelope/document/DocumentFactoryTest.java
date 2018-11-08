@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 public class DocumentFactoryTest extends AbstractEnvelopeTest  {
 
     @Test
-    public void testCreateWithoutParsingStore_ThrownNullPointerException() throws Exception {
+    public void testCreateWithoutParsingStore_ThrownNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Parsing store must be present");
         new DocumentFactory(null);
@@ -48,14 +48,14 @@ public class DocumentFactoryTest extends AbstractEnvelopeTest  {
     public void testCreateDocumentWhereOriginalIsInstanceOfFileDocument_OK() throws Exception {
         String fileName = "newFilename.doc";
         DocumentFactory factory = new DocumentFactory(parsingStore);
-        Document document = factory.create(loadFile(""), "Doc", fileName);
+        Document document = factory.create(loadFile(TEST_FILE_PATH_TEST_TXT), "Doc", fileName);
         Document newDocument = factory.create(document);
         assertNotSame(document, newDocument);
         assertEquals(document, newDocument);
     }
 
     @Test
-    public void testCreateDocumentWhereOriginalIsInstanceOfInternalDocument_OK() throws DataHashException, IOException {
+    public void testCreateDocumentWhereOriginalIsInstanceOfInternalDocument_OK() throws DataHashException {
         DocumentFactory factory = new DocumentFactory(parsingStore);
 
         EnvelopeElement element = Mockito.mock(EnvelopeElement.class);

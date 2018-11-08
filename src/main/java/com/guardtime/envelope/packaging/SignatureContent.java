@@ -42,11 +42,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Structure that groups together all envelope internal structure elements (manifests), documents, annotations and
@@ -237,29 +235,13 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
         if (this == o) return true;
         if (!(o instanceof SignatureContent)) return false;
         SignatureContent content = (SignatureContent) o;
-        return areEqualElementsMaps(getDocuments(), content.getDocuments()) &&
-                areEqualElementsMaps(getAnnotations(), content.getAnnotations()) &&
-                areEqualElementsMaps(singleAnnotationManifestMap, content.singleAnnotationManifestMap) &&
+        return getDocuments().equals(content.getDocuments()) &&
+                getAnnotations().equals(content.getAnnotations()) &&
+                getSingleAnnotationManifests().equals(content.getSingleAnnotationManifests()) &&
                 dataHashEquals(getManifest(), content.getManifest()) &&
-                dataHashEquals(documentsManifest, content.documentsManifest) &&
+                dataHashEquals(getDocumentsManifest(), content.getDocumentsManifest()) &&
                 dataHashEquals(getAnnotationsManifest(), content.getAnnotationsManifest()) &&
-                Objects.equals(signature.getSignature(), content.signature.getSignature());
-    }
-
-    private boolean areEqualElementsMaps(Map<String, ? extends EnvelopeElement> thisMap,
-                                         Map<String, ? extends EnvelopeElement> otherMap) {
-        Set<String> paths = new HashSet<>();
-        paths.addAll(thisMap.keySet());
-        paths.addAll(otherMap.keySet());
-        for (String path : paths) {
-            EnvelopeElement thisElement = thisMap.get(path);
-            EnvelopeElement otherElement = otherMap.get(path);
-            if (thisElement != null && thisElement.equals(otherElement)) {
-                continue;
-            }
-            return false;
-        }
-        return true;
+                Objects.equals(getEnvelopeSignature().getSignature(), content.getEnvelopeSignature().getSignature());
     }
 
     private boolean dataHashEquals(EnvelopeElement thisElement, EnvelopeElement otherElement) {
@@ -269,7 +251,7 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
                     otherElement != null ? otherElement.getDataHash(HashAlgorithm.SHA2_256) : null
             );
         } catch (DataHashException e) {
-            return false;
+            throw new RuntimeException(e);
         }
     }
 
@@ -286,7 +268,7 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
                     signature != null ? signature.getSignature() : null
             );
         } catch (DataHashException e) {
-            return 0;
+            throw new RuntimeException(e);
         }
     }
 

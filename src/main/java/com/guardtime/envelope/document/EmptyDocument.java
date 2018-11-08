@@ -25,6 +25,7 @@ import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.InputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +73,38 @@ public class EmptyDocument extends AbstractDocument {
     @Override
     public boolean isWritable() {
         return false;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Document that = (Document) o;
+
+        if (getFileName() != null ? !getFileName().equals(that.getFileName()) : that.getFileName() != null) return false;
+        if (getMimeType() != null ? !getMimeType().equals(that.getMimeType()) : that.getMimeType() != null) return false;
+        for (HashAlgorithm algorithm : dataHashMap.keySet()) {
+            if (algorithm.isDeprecated(new Date())) {
+                continue;
+            }
+            try {
+                if (!this.getDataHash(algorithm).equals(that.getDataHash(algorithm))) {
+                    return false;
+                }
+            } catch (DataHashException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 1;
+        result = 31 * result + (mimeType != null ? mimeType.hashCode() : 0);
+        result = 31 * result + (fileName != null ? fileName.hashCode() : 0);
+        return result;
     }
 
 }

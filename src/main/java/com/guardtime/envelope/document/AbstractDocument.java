@@ -125,7 +125,7 @@ abstract class AbstractDocument implements Document {
                     return false;
                 }
             } catch (DataHashException e) {
-                // ignore since it is an EmptyDocument that can't generate new hash
+                throw new RuntimeException(e);
             }
         }
         return true;
@@ -137,7 +137,7 @@ abstract class AbstractDocument implements Document {
         try {
             result = getDataHash(DEFAULT_HASH_ALGORITHM).hashCode();
         } catch (DataHashException e) {
-            result = 0;
+            result = 1;
         }
         result = 31 * result + (mimeType != null ? mimeType.hashCode() : 0);
         result = 31 * result + (fileName != null ? fileName.hashCode() : 0);
