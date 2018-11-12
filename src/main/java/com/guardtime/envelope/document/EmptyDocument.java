@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents a document in a envelope which doesn't store the document data in the same envelope (detached document).
@@ -83,7 +84,11 @@ public class EmptyDocument extends AbstractDocument {
 
         if (getFileName() != null ? !getFileName().equals(that.getFileName()) : that.getFileName() != null) return false;
         if (getMimeType() != null ? !getMimeType().equals(that.getMimeType()) : that.getMimeType() != null) return false;
-        return doDataHashesMatch(that, dataHashMap.keySet());
+        Set<HashAlgorithm> algorithmList = dataHashMap.keySet();
+        if (that instanceof EmptyDocument) {
+            algorithmList.retainAll(((EmptyDocument) that).dataHashMap.keySet());
+        }
+        return doDataHashesMatch(that, algorithmList);
     }
 
     @Override
