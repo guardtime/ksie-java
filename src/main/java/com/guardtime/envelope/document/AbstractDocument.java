@@ -27,6 +27,7 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -116,7 +117,12 @@ abstract class AbstractDocument implements Document {
 
         if (getFileName() != null ? !getFileName().equals(that.getFileName()) : that.getFileName() != null) return false;
         if (getMimeType() != null ? !getMimeType().equals(that.getMimeType()) : that.getMimeType() != null) return false;
-        for (HashAlgorithm algorithm : HashAlgorithm.getImplementedHashAlgorithms()) {
+        return doDataHashesMatch(that, HashAlgorithm.getImplementedHashAlgorithms());
+    }
+
+    protected boolean doDataHashesMatch(Document that, Collection<HashAlgorithm> algorithmList) {
+        boolean result = false;
+        for (HashAlgorithm algorithm : algorithmList) {
             if (algorithm.isDeprecated(new Date())) {
                 continue;
             }
@@ -127,8 +133,9 @@ abstract class AbstractDocument implements Document {
             } catch (DataHashException e) {
                 throw new RuntimeException(e);
             }
+            result = true;
         }
-        return true;
+        return result;
     }
 
     @Override
