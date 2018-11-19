@@ -154,9 +154,14 @@ public class Envelope implements AutoCloseable {
     public void add(SignatureContent content, ParsingStore parsingStore) throws EnvelopeMergingException {
         verifyNewSignatureContentIsAcceptable(content, signatureContents);
         verifyUniqueness(content, signatureContents, unknownFiles);
-        // TODO: If exists, ignore
+
         if (!signatureContents.contains(content)) {
             signatureContents.add(new SignatureContent(content, parsingStore));
+        } else {
+            logger.warn("Skipping SignatureContent with manifest path '{}' since it is a duplicate of an existing " +
+                            "SignatureContent in Envelope.",
+                    content.getManifest().getPath()
+            );
         }
     }
 
@@ -173,6 +178,13 @@ public class Envelope implements AutoCloseable {
         SignatureContent copiedContent = null;
         try {
             for (SignatureContent content : contents) {
+                if (signatureContents.contains(content)) {
+                    logger.warn("Skipping SignatureContent with manifest path '{}' since it is a duplicate of an existing " +
+                                    "SignatureContent in Envelope.",
+                            content.getManifest().getPath()
+                    );
+                    continue; // Skip since it is already present!
+                }
                 copiedContent = new SignatureContent(content, parsingStore);
                 verifyNewSignatureContentIsAcceptable(copiedContent, signatureContents);
                 verifyUniqueness(copiedContent, signatureContents, unknownFiles);

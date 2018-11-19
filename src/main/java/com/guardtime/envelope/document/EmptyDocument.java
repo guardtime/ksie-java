@@ -22,12 +22,15 @@ package com.guardtime.envelope.document;
 import com.guardtime.envelope.util.DataHashException;
 import com.guardtime.envelope.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.DataHasher;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -78,25 +81,34 @@ public class EmptyDocument extends AbstractDocument {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
+        if (o == null || !(o instanceof Document)) return false;
         Document that = (Document) o;
 
         if (getFileName() != null ? !getFileName().equals(that.getFileName()) : that.getFileName() != null) return false;
         if (getMimeType() != null ? !getMimeType().equals(that.getMimeType()) : that.getMimeType() != null) return false;
-        Set<HashAlgorithm> algorithmList = dataHashMap.keySet();
+
         if (that instanceof EmptyDocument) {
-            algorithmList.retainAll(((EmptyDocument) that).dataHashMap.keySet());
+            return Objects.equals(dataHashMap, ((EmptyDocument) that).dataHashMap);
+        } else {
+            Map<HashAlgorithm, DataHash> thatHashMap = generateDataHashMap(dataHashMap.keySet(), that);
+            return Objects.equals(dataHashMap, thatHashMap);
         }
-        return doDataHashesMatch(that, algorithmList);
+    }
+
+    private Map<HashAlgorithm, DataHash> generateDataHashMap(Set<HashAlgorithm> algorithms, Document that) {
+        Map<HashAlgorithm, DataHash> returnable = new HashMap<>();
+        for (HashAlgorithm algorithm : algorithms) {
+            try (InputStream inputStream = that.getInputStream()) {
+                returnable.put(algorithm, new DataHasher(algorithm, false).addData(inputStream).getHash());
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to access content of Document for equality comparison", e);
+            }
+        }
+        return returnable;
     }
 
     @Override
     public int hashCode() {
-        int result = 1;
-        result = 31 * result + (mimeType != null ? mimeType.hashCode() : 0);
-        result = 31 * result + (fileName != null ? fileName.hashCode() : 0);
-        return result;
+        return Objects.hash(fileName, mimeType, dataHashMap);
     }
-
 }

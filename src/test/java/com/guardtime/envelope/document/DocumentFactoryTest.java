@@ -9,6 +9,8 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
@@ -55,7 +57,7 @@ public class DocumentFactoryTest extends AbstractEnvelopeTest  {
     }
 
     @Test
-    public void testCreateDocumentWhereOriginalIsInstanceOfInternalDocument_OK() throws DataHashException {
+    public void testCreateDocumentWhereOriginalIsInstanceOfInternalDocument_OK() throws DataHashException, IOException {
         DocumentFactory factory = new DocumentFactory(parsingStore);
 
         EnvelopeElement element = Mockito.mock(EnvelopeElement.class);
@@ -63,6 +65,7 @@ public class DocumentFactoryTest extends AbstractEnvelopeTest  {
                 .thenReturn("Element.path");
         when(element.getDataHash(any(HashAlgorithm.class)))
                 .thenReturn(new DataHash(HashAlgorithm.SHA2_256, new byte[HashAlgorithm.SHA2_256.getLength()]));
+        when(element.getInputStream()).thenReturn(new ByteArrayInputStream("".getBytes()));
         Document document = factory.create(element);
 
         Document newDocument = factory.create(document);
