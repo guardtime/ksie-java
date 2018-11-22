@@ -19,6 +19,7 @@
 
 package com.guardtime.envelope.packaging;
 
+import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.envelope.annotation.Annotation;
 import com.guardtime.envelope.annotation.AnnotationFactory;
 import com.guardtime.envelope.document.Document;
@@ -32,7 +33,9 @@ import com.guardtime.envelope.manifest.SingleAnnotationManifest;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStore;
 import com.guardtime.envelope.packaging.parsing.store.ParsingStoreException;
 import com.guardtime.envelope.signature.EnvelopeSignature;
+import com.guardtime.envelope.util.DataHashException;
 import com.guardtime.ksi.hashing.DataHash;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -41,6 +44,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Structure that groups together all envelope internal structure elements (manifests), documents, annotations and
@@ -57,9 +61,9 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
     private EnvelopeSignature signature;
 
     protected SignatureContent(Builder builder) {
-        this.documents = formatDocumentsListToMap(builder.documents);
-        this.annotations = formatAnnotationsListToMap(builder.annotations);
-        this.singleAnnotationManifestMap = formatSingleAnnotationManifestsListToMap(builder.singleAnnotationManifests);
+        this.documents = builder.documents;
+        this.annotations = builder.annotations;
+        this.singleAnnotationManifestMap = builder.singleAnnotationManifests;
         this.documentsManifest = builder.documentsManifest;
         this.annotationsManifest = builder.annotationsManifest;
         this.manifest = builder.manifest;
@@ -192,32 +196,6 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
             document.close();
         }
     }
-
-    private Map<String, SingleAnnotationManifest> formatSingleAnnotationManifestsListToMap(
-            List<SingleAnnotationManifest> annotationManifests) {
-        Map<String, SingleAnnotationManifest> returnable = new HashMap<>();
-        for (SingleAnnotationManifest manifest : annotationManifests) {
-            returnable.put(manifest.getPath(), manifest);
-        }
-        return returnable;
-    }
-
-    private Map<String, Annotation> formatAnnotationsListToMap(List<Annotation> annotations) {
-        Map<String, Annotation> returnable = new HashMap<>();
-        for (Annotation annotation : annotations) {
-            returnable.put(annotation.getPath(), annotation);
-        }
-        return returnable;
-    }
-
-    private Map<String, Document> formatDocumentsListToMap(List<Document> documents) {
-        Map<String, Document> returnable = new HashMap<>();
-        for (Document document : documents) {
-            returnable.put(document.getPath(), document);
-        }
-        return returnable;
-    }
-
     @Override
     public int compareTo(SignatureContent other) {
         if (other == null || other.getEnvelopeSignature() == null) {
@@ -252,26 +230,84 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SignatureContent)) return false;
+        SignatureContent content = (SignatureContent) o;
+        return getDocuments().equals(content.getDocuments()) &&
+                getAnnotations().equals(content.getAnnotations()) &&
+                getSingleAnnotationManifests().equals(content.getSingleAnnotationManifests()) &&
+                dataHashEquals(getManifest(), content.getManifest()) &&
+                dataHashEquals(getDocumentsManifest(), content.getDocumentsManifest()) &&
+                dataHashEquals(getAnnotationsManifest(), content.getAnnotationsManifest()) &&
+                Objects.equals(getEnvelopeSignature().getSignature(), content.getEnvelopeSignature().getSignature());
+    }
+
+    private boolean dataHashEquals(EnvelopeElement thisElement, EnvelopeElement otherElement) {
+        try {
+            return Objects.equals(
+                    thisElement != null ? thisElement.getDataHash(HashAlgorithm.SHA2_256) : null,
+                    otherElement != null ? otherElement.getDataHash(HashAlgorithm.SHA2_256) : null
+            );
+        } catch (DataHashException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        try {
+            return Objects.hash(
+                    getStringDataHashMap(getDocuments()),
+                    getDocumentsManifest() != null ? getDocumentsManifest().getDataHash(HashAlgorithm.SHA2_256) : null,
+                    getManifest() != null ? getManifest().getDataHash(HashAlgorithm.SHA2_256) : null,
+                    getAnnotationsManifest() != null ? getAnnotationsManifest().getDataHash(HashAlgorithm.SHA2_256) : null,
+                    getStringDataHashMap(singleAnnotationManifestMap),
+                    getStringDataHashMap(getAnnotations()),
+                    signature != null ? signature.getSignature() : null
+            );
+        } catch (DataHashException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Map<String, DataHash> getStringDataHashMap(Map<String, ? extends EnvelopeElement> envelopeElementsMap) {
+        Map<String, DataHash> resultMap = new HashMap<>();
+        for (Map.Entry<String, ? extends EnvelopeElement> entry : envelopeElementsMap.entrySet()) {
+            try {
+                resultMap.put(entry.getKey(), entry.getValue().getDataHash(HashAlgorithm.SHA2_256));
+            } catch (DataHashException e) {
+                resultMap.put(entry.getKey(), null);
+            }
+        }
+        return resultMap;
+    }
+
     public static class Builder {
 
-        private List<Document> documents;
-        private List<Annotation> annotations;
+        private Map<String, Document> documents = new HashMap<>();
+        private Map<String, Annotation> annotations = new HashMap<>();
         private DocumentsManifest documentsManifest;
         private AnnotationsManifest annotationsManifest;
         private Manifest manifest;
-        private List<SingleAnnotationManifest> singleAnnotationManifests;
+        private Map<String, SingleAnnotationManifest> singleAnnotationManifests = new HashMap<>();
         private EnvelopeSignature signature;
 
         public Builder() {
         }
 
         public Builder withDocuments(Collection<Document> documents) {
-            this.documents = new ArrayList<>(documents);
+            for (Document document : documents) {
+                this.documents.put(document.getPath(), document);
+            }
             return this;
         }
 
         public Builder withAnnotations(List<Annotation> annotations) {
-            this.annotations = annotations;
+            for (Annotation annotation : annotations) {
+                this.annotations.put(annotation.getPath(), annotation);
+            }
             return this;
         }
 
@@ -291,7 +327,9 @@ public class SignatureContent implements AutoCloseable, Comparable<SignatureCont
         }
 
         public Builder withSingleAnnotationManifests(List<SingleAnnotationManifest> singleAnnotationManifests) {
-            this.singleAnnotationManifests = singleAnnotationManifests;
+            for (SingleAnnotationManifest manifest : singleAnnotationManifests) {
+                this.singleAnnotationManifests .put(manifest.getPath(), manifest);
+            }
             return this;
         }
 

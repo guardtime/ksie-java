@@ -59,16 +59,18 @@ Optionally other specifiers can be set:
 Following is the example of creating a packaging factory for ZIP based envelopes with TLV manifest structures and KSI signatures, which will be the basis for the rest of the code examples:
 
 ```java
+// Declare KSI Signer and Reader
 Signer signer;
 Reader reader;
 /* Initialize KSI Signer and Reader
 ...
 */
+
 SignatureFactory signatureFactory = new KsiSignatureFactory(signer, reader);
 EnvelopePackagingFactory packagingFactory = new ZipEnvelopePackagingFactoryBuilder().withSignatureFactory(signatureFactory).build();
 /*
 Note that the EnvelopeReader is not specified in this example as the
-ZipEnvelopePackagingFactoryBuilder has it covered.
+ZipEnvelopePackagingFactoryBuilder provides its own.
 */
 ```
 
@@ -171,6 +173,8 @@ com.guardtime.ksi.Extender extender
 ExtendingPolicy extendingPolicy = new KsiEnvelopeSignatureExtendingPolicy(extender)
 EnvelopeSignatureExtender signatureExtender = new EnvelopeSignatureExtender(signatureFactory, extendingPolicy)
 ExtendedEnvelope extendedEnvelope = signatureExtender.extend(envelope);
+
+// Check extended status either for Envelope or per SignatureContent:
 extendedEnvelope.isExtended();
 extendedEnvelope.getExtendedSignatureContents().get(0).isExtended();
 ```
@@ -193,6 +197,8 @@ Rule signatureRule = new KsiPolicyBasedSignatureIntegrityRule(contextAwarePolicy
 DefaultVerificationPolicy policy = new DefaultVerificationPolicy(signatureRule, new MimeTypeIntegrityRule(packagingFactory), implicitRules);
 EnvelopeVerifier verifier = new EnvelopeVerifier(policy);
 VerifiedEnvelope verifiedEnvelope = verifier.verify(envelope);
+
+// View verification result either for whole Envelope or per SignatureContent:
 VerificationResult verificationResult = verifiedEnvelope.getVerificationResult(); // OK/NOK/WARN
 VerificationResult verificationResult = verifiedEnvelope.getVerifiedSignatureContents().get(0).getVerificationResult(); // OK/NOK/WARN
 ```

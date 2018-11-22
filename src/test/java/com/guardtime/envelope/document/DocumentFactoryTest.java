@@ -5,9 +5,11 @@ import com.guardtime.envelope.EnvelopeElement;
 import com.guardtime.envelope.util.DataHashException;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
+
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Collections;
 
@@ -21,7 +23,7 @@ import static org.mockito.Mockito.when;
 public class DocumentFactoryTest extends AbstractEnvelopeTest  {
 
     @Test
-    public void testCreateWithoutParsingStore_ThrownNullPointerException() throws Exception {
+    public void testCreateWithoutParsingStore_ThrownNullPointerException() {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage("Parsing store must be present");
         new DocumentFactory(null);
@@ -48,7 +50,7 @@ public class DocumentFactoryTest extends AbstractEnvelopeTest  {
     public void testCreateDocumentWhereOriginalIsInstanceOfFileDocument_OK() throws Exception {
         String fileName = "newFilename.doc";
         DocumentFactory factory = new DocumentFactory(parsingStore);
-        Document document = factory.create(loadFile(""), "Doc", fileName);
+        Document document = factory.create(loadFile(TEST_FILE_PATH_TEST_TXT), "Doc", fileName);
         Document newDocument = factory.create(document);
         assertNotSame(document, newDocument);
         assertEquals(document, newDocument);
@@ -63,6 +65,7 @@ public class DocumentFactoryTest extends AbstractEnvelopeTest  {
                 .thenReturn("Element.path");
         when(element.getDataHash(any(HashAlgorithm.class)))
                 .thenReturn(new DataHash(HashAlgorithm.SHA2_256, new byte[HashAlgorithm.SHA2_256.getLength()]));
+        when(element.getInputStream()).thenReturn(new ByteArrayInputStream("".getBytes()));
         Document document = factory.create(element);
 
         Document newDocument = factory.create(document);

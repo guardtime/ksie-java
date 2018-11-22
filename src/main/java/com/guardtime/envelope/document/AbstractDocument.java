@@ -20,18 +20,19 @@
 package com.guardtime.envelope.document;
 
 import com.guardtime.envelope.util.DataHashException;
-import com.guardtime.envelope.util.Util;
 import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.guardtime.envelope.manifest.Manifest.DEFAULT_HASH_ALGORITHM;
+import static com.guardtime.envelope.util.Util.hash;
 import static com.guardtime.envelope.util.Util.notNull;
+import static com.guardtime.ksi.util.Util.toByteArray;
 
 
 /**
@@ -69,7 +70,7 @@ abstract class AbstractDocument implements Document {
     @Override
     public DataHash getDataHash(HashAlgorithm algorithm) throws DataHashException {
         try (InputStream inputStream = getInputStream()) {
-            return Util.hash(inputStream, algorithm);
+            return hash(inputStream, algorithm);
         } catch (IOException e) {
             throw new DataHashException("Failed to access data to generate hash.", e);
         }
@@ -77,7 +78,7 @@ abstract class AbstractDocument implements Document {
 
     @Override
     public List<DataHash> getDataHashList(List<HashAlgorithm> algorithmList) throws DataHashException {
-        Util.notNull(algorithmList, "Hash algorithm list");
+        notNull(algorithmList, "Hash algorithm list");
         List<DataHash> hashList = new ArrayList<>();
         for (HashAlgorithm algorithm : algorithmList) {
             try {
@@ -111,37 +112,38 @@ abstract class AbstractDocument implements Document {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (o instanceof EmptyDocument) return o.equals(this); // EmptyDocument should handle this!
 
         Document that = (Document) o;
 
         if (getFileName() != null ? !getFileName().equals(that.getFileName()) : that.getFileName() != null) return false;
         if (getMimeType() != null ? !getMimeType().equals(that.getMimeType()) : that.getMimeType() != null) return false;
-        for (HashAlgorithm algorithm : HashAlgorithm.getImplementedHashAlgorithms()) {
-            if (algorithm.isDeprecated(new Date())) {
-                continue;
-            }
-            try {
-                if (!this.getDataHash(algorithm).equals(that.getDataHash(algorithm))) {
-                    return false;
-                }
-            } catch (DataHashException e) {
-                // ignore since it is an EmptyDocument that can't generate new hash
-            }
+        return doContentsMatch(this, that);
+    }
+
+    private boolean doContentsMatch(AbstractDocument abstractDocument, Document that) {
+        try (InputStream thisStream = abstractDocument.getInputStream();
+             InputStream thatStream = that.getInputStream()
+        ) {
+            return Arrays.equals(
+                    toByteArray(thisStream),
+                    toByteArray(thatStream)
+            );
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to compare content of Documents.", e);
         }
-        return true;
     }
 
     @Override
     public int hashCode() {
-        int result;
         try {
-            result = getDataHash(DEFAULT_HASH_ALGORITHM).hashCode();
+            int result = getDataHash(DEFAULT_HASH_ALGORITHM).hashCode();
+            result = 31 * result + (mimeType != null ? mimeType.hashCode() : 0);
+            result = 31 * result + (fileName != null ? fileName.hashCode() : 0);
+            return result;
         } catch (DataHashException e) {
-            result = 0;
+            throw new RuntimeException(e);
         }
-        result = 31 * result + (mimeType != null ? mimeType.hashCode() : 0);
-        result = 31 * result + (fileName != null ? fileName.hashCode() : 0);
-        return result;
     }
 
     @Override
